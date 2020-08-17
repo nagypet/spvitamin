@@ -1,0 +1,24 @@
+task clean(type: Delete) {
+	delete "${dockerBuildDir}"
+}
+
+
+task dockerCreateImage(type: Exec) {
+    group 'docker'
+    description "Builds the ${dockerImageName} docker image."
+
+	dependsOn 'dockerGeatherInputs'
+	
+    doFirst {
+        logger.quiet "Building docker image: $dockerImageName"
+    }
+    workingDir dockerBuildDir
+    commandLine 'docker', 'build', '-t', dockerImageName, '.'
+	
+	outputs.upToDateWhen { !dockerImageInputsChanged }
+}
+
+
+dockerImage() {
+	dependsOn 'dockerCreateImage'
+}

@@ -1,0 +1,24 @@
+plugins {
+  id "org.sonarqube" version "3.0" apply false
+}
+apply from: 'gradle/common.gradle'
+apply from: 'gradle/docker.gradle'
+
+subprojects {
+    apply plugin: 'org.sonarqube'
+	sonarqube {
+        properties {
+            property "sonar.projectName", "NP/${project.name}"
+			property "sonar.host.url", "http://localhost:9000"
+			//property "sonar.branch.name", "master"
+			property "sonar.exclusions", "**/generated*/**"
+			
+			// For SVN projects, SonarQube would run "svn blame" to know
+			// who changed which parts of the code. Without authorization
+			// this fails, so we disable it
+			property "sonar.scm.disabled", "True"			
+        }
+    }		
+}
+
+defaultTasks 'dist'

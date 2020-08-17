@@ -1,0 +1,11 @@
+
+/*
+ * Copyright header
+ * The ultimate spring based webservice template project.
+ * Author Peter Nagy <nagy.peter.home@gmail.com> 
+ */
+
+include 'spvitamin-core'
+project(':spvitamin-core').projectDir = new File('../spvitamin-core')
+
+rootProject.name = 'pwdtool'

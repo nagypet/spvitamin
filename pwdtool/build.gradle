@@ -1,0 +1,42 @@
+
+/*
+ * Copyright header
+ * The ultimate spring based webservice template project.
+ * Author Peter Nagy <nagy.peter.home@gmail.com> 
+ */
+
+plugins {
+    id 'application'
+}
+apply from: '../gradle/common.gradle'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    flatDir {
+        dirs '../gradle/localrepo'
+    }
+}
+
+
+application {
+    mainClassName = 'hu.perit.crypto.Application'
+    // Some JVM options already set in common.gradle
+    applicationDefaultJvmArgs += ['-Xmx256m', '-Xms32m']
+}
+
+
+sourceCompatibility = 11
+  
+dependencies {	
+	compile project(':spvitamin-core')
+	
+    compileOnly 'org.projectlombok:lombok:1.18.8'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
+
+    //implementation('hu.perit:spvitamin-core:1.0.0-SNAPSHOT')
+
+    compile('log4j:log4j:1.2.17')
+}

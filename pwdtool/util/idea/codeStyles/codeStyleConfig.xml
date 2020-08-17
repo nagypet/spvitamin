@@ -1,0 +1,11 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<component name="ProjectCodeStyleConfiguration">
+  <state>
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Java like" />
+  </state>
+</component>

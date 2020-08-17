@@ -1,0 +1,13 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<component name="CopyrightManager">
+  <settings default="np">
+    <module2copyright>
+      <element module="All" copyright="np" />
+    </module2copyright>
+  </settings>
+</component>

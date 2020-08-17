@@ -1,0 +1,13 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<component name="CopyrightManager">
+  <copyright>
+    <option name="keyword" value="Copyright header" />
+    <option name="notice" value="Copyright header&#10;The ultimate spring based webservice template project.&#10;Author Peter Nagy &lt;nagy.peter.home@gmail.com&gt; " />
+    <option name="myName" value="np" />
+  </copyright>
+</component>

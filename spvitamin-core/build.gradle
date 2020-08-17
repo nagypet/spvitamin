@@ -1,0 +1,70 @@
+/*
+ * Copyright 2020-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    ext {
+        lombokVersion = '1.18.8'
+    }
+    repositories {
+        jcenter()
+        mavenCentral()
+		flatDir {
+			dirs '../gradle/localrepo'
+		}
+    }
+}
+
+// Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
+apply plugin: 'java-library'
+apply plugin: 'jacoco'
+apply from: '../gradle/common.gradle'
+
+
+repositories {
+    jcenter()
+    mavenCentral()
+    flatDir {
+        dirs '../gradle/localrepo'
+    }
+}
+
+
+sourceCompatibility = 11
+
+dependencies {
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // apache.commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+
+	// JUnit
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+
+    // Log4J
+    implementation('log4j:log4j:1.2.17')
+}
+
+
+test {
+    useJUnitPlatform()
+}
