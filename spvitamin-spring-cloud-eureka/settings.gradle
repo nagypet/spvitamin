@@ -43,6 +43,9 @@ project(':spvitamin-spring-cloud-feign').projectDir = new File('../spvitamin-spr
 include 'spvitamin-spring-admin'
 project(':spvitamin-spring-admin').projectDir = new File('../spvitamin-spring-admin')
 
+include 'spvitamin-spring-admin-api'
+project(':spvitamin-spring-admin-api').projectDir = new File('../spvitamin-spring-admin-api')
+
 include 'spvitamin-spring-logging'
 project(':spvitamin-spring-logging').projectDir = new File('../spvitamin-spring-logging')
 
