@@ -27,6 +27,7 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Log4j
@@ -34,6 +35,7 @@ import java.util.Map;
 @Component
 public class LdapAuthenticationProviderConfigurer
 {
+    public static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
     private final LdapProperties ldapProperties;
 
     public LdapAuthenticationProviderConfigurer(LdapProperties ldapProperties) {
@@ -46,6 +48,9 @@ public class LdapAuthenticationProviderConfigurer
 
             LdapProperties.SingleLdapProperties singleLdapProperties = entry.getValue();
 
+            Map<String, Object> ctxEnvironmentProps = new HashMap<>();
+            ctxEnvironmentProps.put(LDAP_CONNECT_TIMEOUT_KEY, String.valueOf(singleLdapProperties.getConnectTimeoutMs()));
+
             if (singleLdapProperties.isEnabled()) {
                 LdapAuthenticationProvider provider = this.createProvider(
                         entry.getKey(),
@@ -54,6 +59,8 @@ public class LdapAuthenticationProviderConfigurer
                         singleLdapProperties.getFilter(),
                         singleLdapProperties.isUserprincipalWithDomain(),
                         singleLdapProperties.getRootDN());
+
+                provider.setContextEnvironmentProperties(ctxEnvironmentProps);
 
                 auth.authenticationProvider(provider);
             }

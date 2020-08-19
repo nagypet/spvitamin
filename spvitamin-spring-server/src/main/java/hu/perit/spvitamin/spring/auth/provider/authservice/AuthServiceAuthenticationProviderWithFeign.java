@@ -20,7 +20,7 @@ import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.config.SysMicroservices;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.client.TemplateAuthClient;
+import hu.perit.spvitamin.spring.rest.client.AuthClient;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -30,9 +30,9 @@ import org.springframework.stereotype.Service;
 public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthenticationProvider {
 
     protected AuthorizationToken getAuthorizationToken(String userName, String password) {
-        TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+        AuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor(userName, password))
-                .build(TemplateAuthClient.class, getServiceUrl());
+                .build(AuthClient.class, getServiceUrl());
 
         return templateAuthClient.authenticate(null);
     }

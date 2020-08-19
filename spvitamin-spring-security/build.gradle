@@ -17,7 +17,6 @@
 buildscript {
     ext {
         springBootVersion = '2.3.2.RELEASE'
-		springCloudVersion = 'Hoxton.SR6'
     }
     repositories {
         jcenter()
@@ -55,26 +54,34 @@ bootJar {
 sourceCompatibility = 11
 
 dependencies {
+    compile project(':spvitamin-core')
+    compile project(':spvitamin-spring-general')
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Validation
+    implementation 'javax.validation:validation-api'
+
+    // FasterXML
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // Log4J
     implementation('log4j:log4j:1.2.17')
-}
-
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 

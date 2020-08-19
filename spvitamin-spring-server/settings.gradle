@@ -37,4 +37,16 @@ project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-
 include 'spvitamin-spring-security'
 project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
 
+include 'spvitamin-spring-cloud-feign'
+project(':spvitamin-spring-cloud-feign').projectDir = new File('../spvitamin-spring-cloud-feign')
+
+include 'spvitamin-spring-admin'
+project(':spvitamin-spring-admin').projectDir = new File('../spvitamin-spring-admin')
+
+include 'spvitamin-spring-admin-api'
+project(':spvitamin-spring-admin-api').projectDir = new File('../spvitamin-spring-admin-api')
+
+include 'spvitamin-spring-logging'
+project(':spvitamin-spring-logging').projectDir = new File('../spvitamin-spring-logging')
+
 rootProject.name = 'spvitamin-spring-server'

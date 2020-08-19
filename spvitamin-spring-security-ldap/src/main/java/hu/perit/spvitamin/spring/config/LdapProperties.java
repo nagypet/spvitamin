@@ -42,5 +42,6 @@ public class LdapProperties {
         private String filter = "(&(objectClass=user)(sAMAccountName={0}))";
         private boolean userprincipalWithDomain = false;
         private String domain;
+        private int connectTimeoutMs = 1000;
     }
 }

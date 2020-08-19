@@ -17,8 +17,7 @@
 package hu.perit.spvitamin.spring.auth.filter.jwt;
 
 import hu.perit.spvitamin.spring.auth.filter.AbstractTokenAuthenticationFilter;
-import hu.perit.spvitamin.spring.rest.model.AbstractAuthorizationToken;
-import hu.perit.spvitamin.spring.rest.model.JwtString;
+import hu.perit.spvitamin.spring.auth.filter.JwtString;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;

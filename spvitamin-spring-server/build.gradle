@@ -58,6 +58,8 @@ dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-security')
+    compile project(':spvitamin-spring-cloud-feign')
+    compile project(':spvitamin-spring-admin')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

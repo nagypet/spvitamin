@@ -17,7 +17,6 @@
 buildscript {
     ext {
         springBootVersion = '2.3.2.RELEASE'
-		springCloudVersion = 'Hoxton.SR6'
     }
     repositories {
         jcenter()
@@ -73,33 +72,18 @@ dependencies {
     implementation 'org.springframework.security:spring-security-core'
 
     // Validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'javax.validation:validation-api'
 
 	// FasterXML
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 	
-    // Swagger
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-
     // Log4J
     implementation('log4j:log4j:1.2.17')
 	
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    // OpenFeign
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
-    //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
-}
-
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
 

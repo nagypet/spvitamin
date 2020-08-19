@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
+import hu.perit.spvitamin.core.StackTracer;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
@@ -139,18 +140,23 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         String username = this.preFilter(auth.getName());
         String password = (String) auth.getCredentials();
 
-        DirContext ctx = bindAsUser(username, password);
-
+        DirContext ctx = null;
         try {
+            ctx = bindAsUser(username, password);
             return searchForUser(ctx, username);
         }
         catch (NamingException e) {
-            logger.error("Failed to locate directory entry for authenticated user: "
-                    + username, e);
+            logger.error("Failed to locate directory entry for authenticated user: " + username, e);
             throw badCredentials(e);
         }
+        catch (Exception ex) {
+            logger.error(StackTracer.toString(ex));
+            throw new LdapAuthenticationException("", "Ldap authentication failed!", ex);
+        }
         finally {
-            LdapUtils.closeContext(ctx);
+            if (ctx != null) {
+                LdapUtils.closeContext(ctx);
+            }
         }
     }
 
