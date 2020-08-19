@@ -1,0 +1,23 @@
+
+includeSubprojects(rootDir)
+
+
+def includeSubprojects(root) {
+	println "Included projects:"
+	discoverRecursive(root)
+}
+
+def discoverRecursive(root) {
+	root.eachDir(){ dir ->
+		if (dir.name != 'spvitamin') {
+			dir.eachFileMatch({it == 'build.gradle'}, { 
+				include "${dir.name}"
+				def projDir = new File("${root}", "${dir.name}")
+				project(":${dir.name}").projectDir = projDir
+				println "  :${dir.name} => ${projDir}"
+			})
+		}
+		discoverRecursive(dir)
+	}
+}
+

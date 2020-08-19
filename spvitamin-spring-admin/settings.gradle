@@ -28,19 +28,20 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-core'
-project(':spvitamin-core').projectDir = new File('../spvitamin-core')
 
-include 'spvitamin-spring-general'
-project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-general')
+def includeProject(projName) {
+	include "${projName}"
+	def projDir = new File('..', projName)
+	project(":${projName}").projectDir = projDir
+	println "  :${projName} => ${projDir}"
+}
 
-include 'spvitamin-spring-security'
-project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
+println "Included projects:"
+includeProject('spvitamin-core')
+includeProject('spvitamin-spring-general')
+includeProject('spvitamin-spring-security')
+includeProject('spvitamin-spring-logging')
+includeProject('spvitamin-spring-admin-api')
 
-include 'spvitamin-spring-logging'
-project(':spvitamin-spring-logging').projectDir = new File('../spvitamin-spring-logging')
-
-include 'spvitamin-spring-admin-api'
-project(':spvitamin-spring-admin-api').projectDir = new File('../spvitamin-spring-admin-api')
 
 rootProject.name = 'spvitamin-spring-admin'

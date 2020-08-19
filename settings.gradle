@@ -13,26 +13,7 @@ pluginManagement {
 }
 
 
-includeSubprojects()
+apply from: 'gradle/include-subprojects.gradle' 
 
-
-def includeSubprojects() {
-	println "Subprojects:"
-	discoverRecursive(rootDir)
-}
-
-def discoverRecursive(root) {
-	root.eachDir(){ dir ->
-		if (dir.name != 'spvitamin') {
-			dir.eachFileMatch({it == 'build.gradle'}, { 
-				include "${dir.name}"
-				def projDir = new File("${root}", "${dir.name}")
-				project(":${dir.name}").projectDir = projDir
-				println "  :${dir.name} => ${projDir}"
-			})
-		}
-		discoverRecursive(dir)
-	}
-}
 
 rootProject.name = 'spvitamin'
