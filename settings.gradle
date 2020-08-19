@@ -12,19 +12,27 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-core'
-include 'spvitamin-spring-admin'
-include 'spvitamin-spring-admin-api'
-include 'spvitamin-spring-cloud-eureka'
-include 'spvitamin-spring-cloud-feign'
-include 'spvitamin-spring-cloud-ribbon'
-include 'spvitamin-spring-cloud-zuul'
-include 'spvitamin-spring-data'
-include 'spvitamin-spring-general'
-include 'spvitamin-spring-logging'
-include 'spvitamin-spring-security'
-include 'spvitamin-spring-security-ldap'
-include 'spvitamin-spring-server'
-include 'pwdtool'
+
+includeSubprojects()
+
+
+def includeSubprojects() {
+	println "Subprojects:"
+	discoverRecursive(rootDir)
+}
+
+def discoverRecursive(root) {
+	root.eachDir(){ dir ->
+		if (dir.name != 'spvitamin') {
+			dir.eachFileMatch({it == 'build.gradle'}, { 
+				include "${dir.name}"
+				def projDir = new File("${root}", "${dir.name}")
+				project(":${dir.name}").projectDir = projDir
+				println "  :${dir.name} => ${projDir}"
+			})
+		}
+		discoverRecursive(dir)
+	}
+}
 
 rootProject.name = 'spvitamin'
