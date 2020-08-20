@@ -28,10 +28,8 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-core'
-project(':spvitamin-core').projectDir = new File('../spvitamin-core')
 
-include 'spvitamin-spring-general'
-project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-general')
+apply from: '../gradle/include-project-dependencies.gradle'
+
 
 rootProject.name = 'spvitamin-spring-cloud-feign'

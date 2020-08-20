@@ -28,7 +28,8 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-core'
-project(':spvitamin-core').projectDir = new File('../spvitamin-core')
+
+apply from: '../gradle/include-project-dependencies.gradle'
+
 
 rootProject.name = 'spvitamin-spring-logging'

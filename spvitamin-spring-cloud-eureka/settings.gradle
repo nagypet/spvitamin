@@ -29,21 +29,7 @@ pluginManagement {
 }
 
 
-def includeProject(projName) {
-	include "${projName}"
-	def projDir = new File('..', projName)
-	project(":${projName}").projectDir = projDir
-	println "  :${projName} => ${projDir}"
-}
-
-println "Included projects:"
-includeProject('spvitamin-core')
-includeProject('spvitamin-spring-general')
-includeProject('spvitamin-spring-security')
-includeProject('spvitamin-spring-cloud-feign')
-includeProject('spvitamin-spring-admin')
-includeProject('spvitamin-spring-admin-api')
-includeProject('spvitamin-spring-logging')
+apply from: '../gradle/include-project-dependencies.gradle'
 
 
 rootProject.name = 'spvitamin-spring-cloud-eureka'

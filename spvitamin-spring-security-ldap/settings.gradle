@@ -28,7 +28,8 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-spring-security'
-project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
+
+apply from: '../gradle/include-project-dependencies.gradle'
+
 
 rootProject.name = 'spvitamin-spring-security-ldap'

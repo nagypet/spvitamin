@@ -28,19 +28,8 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-core'
-project(':spvitamin-core').projectDir = new File('../spvitamin-core')
 
-include 'spvitamin-spring-general'
-project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-general')
+apply from: '../gradle/include-project-dependencies.gradle'
 
-include 'spvitamin-spring-security'
-project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
-
-include 'spvitamin-spring-logging'
-project(':spvitamin-spring-logging').projectDir = new File('../spvitamin-spring-logging')
-
-include 'spvitamin-spring-admin'
-project(':spvitamin-spring-admin').projectDir = new File('../spvitamin-spring-admin')
 
 rootProject.name = 'spvitamin-spring-cloud-zuul'

@@ -29,19 +29,6 @@ pluginManagement {
 }
 
 
-def includeProject(projName) {
-	include "${projName}"
-	def projDir = new File('..', projName)
-	project(":${projName}").projectDir = projDir
-	println "  :${projName} => ${projDir}"
-}
-
-println "Included projects:"
-includeProject('spvitamin-core')
-includeProject('spvitamin-spring-general')
-includeProject('spvitamin-spring-security')
-includeProject('spvitamin-spring-logging')
-includeProject('spvitamin-spring-admin-api')
-
+apply from: '../gradle/include-project-dependencies.gradle'
 
 rootProject.name = 'spvitamin-spring-admin'
