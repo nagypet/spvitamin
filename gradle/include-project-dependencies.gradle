@@ -17,61 +17,61 @@
 new ProjectConfigurer(settings).doIt()
 
 class ProjectConfigurer {
-	Map<String, File> projectMap = [:]
-	File rootDir
-	Settings settings
+    Map<String, File> projectMap = [:]
+    File rootDir
+    Settings settings
 
-	ProjectConfigurer(Settings settings) {
-		this.rootDir = settings.getRootDir()
-		this.settings = settings
-	}
-	
-	
-	void doIt() {
-		println "Included projects:"
-		this.discoverProjects()
-		Set<String> deps = this.getDependendentProjects(this.rootDir)
-		this.includeDependentProjects(deps)
-	}
-
-
-	/**
-	 * Recursively searches folders starting with '../' containing a build.gradle file.
-	 * @return
-	 */
-	private void discoverProjects() {
-		this.rootDir.getParentFile().eachDirRecurse(){ dir ->
-			dir.eachFileMatch({it == 'build.gradle'}, { 
-				this.projectMap.put(dir.name, dir)
-			})
-		}
-	}
+    ProjectConfigurer(Settings settings) {
+        this.rootDir = settings.getRootDir()
+        this.settings = settings
+    }
+    
+    
+    void doIt() {
+        println "Included projects:"
+        this.discoverProjects()
+        Set<String> deps = this.getDependendentProjects(this.rootDir)
+        this.includeDependentProjects(deps)
+    }
 
 
-	private Set<String> getDependendentProjects(File root) {
-		def deps = [] as Set
-		root.eachFileMatch({it == 'build.gradle'}, {
-			it.eachLine {line ->
-				if (line =~ /compile\s*project/) {
-					def matcher = line =~ /:[a-z-A-Z0-9]*/
-					if (matcher.size() == 1) {
-						def projName = matcher[0].substring(1)
-						deps += projName
-						deps += this.getDependendentProjects(this.projectMap[projName])
-					}
-				}
-			}
-		})
-		return deps
-	}
+    /**
+     * Recursively searches folders starting with '../' containing a build.gradle file.
+     * @return
+     */
+    private void discoverProjects() {
+        this.rootDir.getParentFile().eachDirRecurse(){ dir ->
+            dir.eachFileMatch({it == 'build.gradle'}, { 
+                this.projectMap.put(dir.name, dir)
+            })
+        }
+    }
 
 
-	private void includeDependentProjects(Set<String> deps) {
-		deps.each { projName ->
-			settings.include "${projName}"
-			def projDir = new File("${projectMap[projName]}")
-			settings.project(":${projName}").projectDir = projDir
-			println "  :${projName} => ${projDir}"
-		}
-	}
+    private Set<String> getDependendentProjects(File root) {
+        def deps = [] as Set
+        root.eachFileMatch({it == 'build.gradle'}, {
+            it.eachLine {line ->
+                if (line =~ /compile\s*project/) {
+                    def matcher = line =~ /:[a-z-A-Z0-9]*/
+                    if (matcher.size() == 1) {
+                        def projName = matcher[0].substring(1)
+                        deps += projName
+                        deps += this.getDependendentProjects(this.projectMap[projName])
+                    }
+                }
+            }
+        })
+        return deps
+    }
+
+
+    private void includeDependentProjects(Set<String> deps) {
+        deps.each { projName ->
+            settings.include "${projName}"
+            def projDir = new File("${projectMap[projName]}")
+            settings.project(":${projName}").projectDir = projDir
+            println "  :${projName} => ${projDir}"
+        }
+    }
 }

@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.ribbon.admin;
 
-import com.netflix.client.config.DefaultClientConfigImpl;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
@@ -31,10 +31,15 @@ public class RibbonServerParameters {
     {
         ServerParameterList params = new ServerParameterList();
 
-        DefaultClientConfigImpl clientConfigWithDefaultValues = DefaultClientConfigImpl.getClientConfigWithDefaultValues();
-        if (clientConfigWithDefaultValues != null) {
-            params.add(ServerParameterList.of(clientConfigWithDefaultValues, "Ribbon"));
+        //DefaultClientConfigImpl clientConfigWithDefaultValues = DefaultClientConfigImpl.getClientConfigWithDefaultValues();
+        /*
+        ClientConfigFactory clientConfigFactory = ClientConfigFactory.DEFAULT;
+        IClientConfig iClientConfig = clientConfigFactory.newConfig();
+        if (iClientConfig != null) {
+            params.add(ServerParameterList.of(iClientConfig, iClientConfig.getClientName()));
         }
+        */
+        params.add(new ServerParameter("Ribbon", "Config not available: TODO: find out how to get actual config", false));
 
         return params;
     }
