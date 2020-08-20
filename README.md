@@ -6,24 +6,24 @@ Gethering dependent projects in settings.gradle is usually not hard, but in case
 In order to use, place this script in a common folder in your project and reference it from your settings.gradle.
 
 **include-project-dependencies.gradle**
-```
+```groovy
 new ProjectConfigurer(settings).doIt()
 
 class ProjectConfigurer {
-	Map projectMap = [:]
+	Map<String, File> projectMap = [:]
 	File rootDir
 	Settings settings
 
-	ProjectConfigurer(settings) {
+	ProjectConfigurer(Settings settings) {
 		this.rootDir = settings.getRootDir()
 		this.settings = settings
 	}
 	
 	
-	def doIt() {
+	void doIt() {
 		println "Included projects:"
 		this.discoverProjects()
-		def deps = this.getDependendentProjects(this.rootDir)
+		Set<String> deps = this.getDependendentProjects(this.rootDir)
 		this.includeDependentProjects(deps)
 	}
 
@@ -32,16 +32,16 @@ class ProjectConfigurer {
 	 * Recursively searches folders starting with '../' containing a build.gradle file.
 	 * @return
 	 */
-	def private discoverProjects() {
+	private void discoverProjects() {
 		this.rootDir.getParentFile().eachDirRecurse(){ dir ->
 			dir.eachFileMatch({it == 'build.gradle'}, { 
-				this.projectMap[dir.name] = dir
+				this.projectMap.put(dir.name, dir)
 			})
 		}
 	}
 
 
-	def private getDependendentProjects(root) {
+	private Set<String> getDependendentProjects(File root) {
 		def deps = [] as Set
 		root.eachFileMatch({it == 'build.gradle'}, {
 			it.eachLine {line ->
@@ -59,7 +59,7 @@ class ProjectConfigurer {
 	}
 
 
-	def private includeDependentProjects(deps) {
+	private void includeDependentProjects(Set<String> deps) {
 		deps.each { projName ->
 			settings.include "${projName}"
 			def projDir = new File("${projectMap[projName]}")

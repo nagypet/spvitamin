@@ -31,4 +31,5 @@ pluginManagement {
 
 apply from: '../gradle/include-project-dependencies.gradle'
 
+
 rootProject.name = 'spvitamin-spring-server'
