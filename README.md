@@ -4,7 +4,8 @@
 Gethering dependent projects in settings.gradle is usually not hard, but in case of a project library we have to define not only direct dependencies, but also the dpendencies of all dependent projects. It is boylerplate code and totally unnecessary, because dependencies are already defined in our build.gradle files. I have implemented a groovy script to automate inclusion of dependent projects. It searches patterns in build.gradle files with 'compile project' and recursively includes the listed projects.
 
 In order to use, place this script in a common folder in your project and reference it from your settings.gradle.
-include-project-dependencies.gradle
+
+**include-project-dependencies.gradle**
 ```
 new ProjectConfigurer(settings).doIt()
 
@@ -68,7 +69,8 @@ class ProjectConfigurer {
 	}
 }
 ```
-settings.gradle
+
+**settings.gradle**
 ```
 pluginManagement {
   repositories {
