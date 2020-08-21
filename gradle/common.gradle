@@ -281,3 +281,11 @@ if (project.hasProperty('bootRun')) {
 	}
 }
 
+
+if (project.hasProperty('jacocoTestReport')) {
+	jacocoTestReport {
+		reports {
+			xml.enabled true
+		}
+	}
+}

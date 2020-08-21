@@ -51,7 +51,7 @@ public class SingleMetricAverageOfLastNValueGeneric<T extends Number>
         while (iter.hasNext())
         {
             T item = iter.next();
-            sum = sum.add(new BigDecimal(item.doubleValue()));
+            sum = sum.add(BigDecimal.valueOf(item.doubleValue()));
         }
 
         if (!queue.isEmpty())

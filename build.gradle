@@ -8,7 +8,7 @@ subprojects {
     apply plugin: 'org.sonarqube'
 	sonarqube {
         properties {
-            property "sonar.projectName", "NP/${project.name}"
+            property "sonar.projectName", "github/nagypet/spvitamin/${project.name}"
 			property "sonar.host.url", "http://localhost:9000"
 			//property "sonar.branch.name", "master"
 			property "sonar.exclusions", "**/generated*/**"
