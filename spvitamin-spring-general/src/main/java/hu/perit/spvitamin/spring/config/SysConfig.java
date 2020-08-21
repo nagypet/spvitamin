@@ -43,7 +43,7 @@ public class SysConfig {
         return SpringContext.getBean(CryptoProperties.class);
     }
 
-    public static SysMicroservices getSysMicroservices() {
-        return SpringContext.getBean(SysMicroservices.class);
+    public static MicroserviceCollectionProperties getSysMicroservices() {
+        return SpringContext.getBean(MicroserviceCollectionProperties.class);
     }
 }

@@ -24,6 +24,8 @@ import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * @author Peter Nagy
  */
@@ -34,12 +36,14 @@ import org.springframework.stereotype.Component;
 class StandardServerParameters
 {
 
-    private final SystemProperties systemProperties;
+    private final CryptoProperties cryptoProperties;
     private final JwtProperties jwtProperties;
     private final MetricsProperties metricsProperties;
-    private final ServerProperties serverProperties;
+    private final SystemProperties systemProperties;
     private final SecurityProperties securityProperties;
+    private final ServerProperties serverProperties;
     private final JacksonProperties jacksonProperties;
+    private final MicroserviceCollectionProperties microserviceCollectionProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -49,12 +53,19 @@ class StandardServerParameters
         params.add(new ServerParameter("(2) Swagger API Docs", this.getApiDocsUrl(), true));
         params.add(new ServerParameter("(3) Actuator", this.getActuatorUrl(), true));
 
-        params.add(ServerParameterList.of(this.systemProperties));
+        params.add(ServerParameterList.of(this.cryptoProperties));
         params.add(ServerParameterList.of(this.jwtProperties));
         params.add(ServerParameterList.of(this.metricsProperties));
-        params.add(ServerParameterList.of(this.serverProperties));
+        params.add(ServerParameterList.of(this.systemProperties));
         params.add(ServerParameterList.of(this.securityProperties));
+        params.add(ServerParameterList.of(this.serverProperties));
         params.add(ServerParameterList.of(this.jacksonProperties));
+
+        for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet()) {
+            params.add(ServerParameterList.of(entry.getValue(), "microservices." + entry.getKey()));
+        }
+
+        params.add(ServerParameterList.of(this.microserviceCollectionProperties));
 
         return params;
     }

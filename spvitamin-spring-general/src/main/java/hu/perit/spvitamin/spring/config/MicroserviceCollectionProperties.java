@@ -18,14 +18,19 @@ package hu.perit.spvitamin.spring.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Component
-@ConfigurationProperties("microservices")
-public class SysMicroservices {
+@ConfigurationProperties
+public class MicroserviceCollectionProperties {
 
-    @NestedConfigurationProperty
-    MicroserviceProperties authService;
+    private Map<String, MicroserviceProperties> microservices = new HashMap<>();
+
+    public MicroserviceProperties get(String name) {
+        return this.microservices.get(name);
+    }
 }

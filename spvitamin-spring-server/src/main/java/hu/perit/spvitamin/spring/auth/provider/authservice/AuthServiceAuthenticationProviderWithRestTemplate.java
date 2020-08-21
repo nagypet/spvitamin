@@ -18,7 +18,7 @@ package hu.perit.spvitamin.spring.auth.provider.authservice;
 
 import hu.perit.spvitamin.spring.auth.BasicAuthHeader;
 import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.config.SysMicroservices;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpEntity;
@@ -58,7 +58,7 @@ public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServi
 
 
     public static String getServiceUrl() {
-        SysMicroservices sysMicroservices = SysConfig.getSysMicroservices();
-        return sysMicroservices.getAuthService().getUrl();
+        MicroserviceCollectionProperties microserviceCollectionProperties = SysConfig.getSysMicroservices();
+        return microserviceCollectionProperties.get("auth-service").getUrl();
     }
 }

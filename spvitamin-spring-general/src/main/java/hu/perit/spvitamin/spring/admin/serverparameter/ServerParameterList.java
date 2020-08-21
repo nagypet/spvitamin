@@ -20,13 +20,13 @@ import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Nagy
@@ -38,27 +38,31 @@ public class ServerParameterList {
 
     private final List<ServerParameter> parameter = new ArrayList<>();
 
-    private static final Set<Class<?>> WRAPPER_TYPES = new HashSet<>();
+    private static final Set<String> WRAPPER_TYPES = new HashSet<>();
 
     static {
-        WRAPPER_TYPES.add(Boolean.class);
-        WRAPPER_TYPES.add(boolean.class);
-        WRAPPER_TYPES.add(Byte.class);
-        WRAPPER_TYPES.add(byte.class);
-        WRAPPER_TYPES.add(Character.class);
-        WRAPPER_TYPES.add(char.class);
-        WRAPPER_TYPES.add(Short.class);
-        WRAPPER_TYPES.add(short.class);
-        WRAPPER_TYPES.add(Integer.class);
-        WRAPPER_TYPES.add(int.class);
-        WRAPPER_TYPES.add(Long.class);
-        WRAPPER_TYPES.add(long.class);
-        WRAPPER_TYPES.add(Double.class);
-        WRAPPER_TYPES.add(double.class);
-        WRAPPER_TYPES.add(Float.class);
-        WRAPPER_TYPES.add(float.class);
-        WRAPPER_TYPES.add(String.class);
-        WRAPPER_TYPES.add(TimeZone.class);
+        WRAPPER_TYPES.add(Boolean.class.getName());
+        WRAPPER_TYPES.add(boolean.class.getName());
+        WRAPPER_TYPES.add(Byte.class.getName());
+        WRAPPER_TYPES.add(byte.class.getName());
+        WRAPPER_TYPES.add(Character.class.getName());
+        WRAPPER_TYPES.add(char.class.getName());
+        WRAPPER_TYPES.add(Short.class.getName());
+        WRAPPER_TYPES.add(short.class.getName());
+        WRAPPER_TYPES.add(Integer.class.getName());
+        WRAPPER_TYPES.add(int.class.getName());
+        WRAPPER_TYPES.add(Long.class.getName());
+        WRAPPER_TYPES.add(long.class.getName());
+        WRAPPER_TYPES.add(Double.class.getName());
+        WRAPPER_TYPES.add(double.class.getName());
+        WRAPPER_TYPES.add(Float.class.getName());
+        WRAPPER_TYPES.add(float.class.getName());
+        WRAPPER_TYPES.add(String.class.getName());
+        WRAPPER_TYPES.add(TimeZone.class.getName());
+        WRAPPER_TYPES.add(Map.class.getName());
+        WRAPPER_TYPES.add(Set.class.getName());
+        WRAPPER_TYPES.add(List.class.getName());
+        WRAPPER_TYPES.add(TimeUnit.class.getName());
     }
 
 
@@ -86,15 +90,14 @@ public class ServerParameterList {
         Field[] fields = objectClass.getDeclaredFields();
         for (Field field : fields) {
             String fieldName = String.format("%s.%s", StringUtils.isNotBlank(namePrefix) ? namePrefix : objectClass.getSimpleName(), field.getName());
-            if (isHidden(field)) {
+            if (isHidden(field) || isHidden(fieldName)) {
                 serverParameterList.add(new ServerParameter(fieldName, "*** [hidden]", false));
             }
             else {
                 try {
                     Object fieldValue = getFieldValue(field, o);
                     if (fieldValue != null) {
-                        NestedConfigurationProperty nestedConfigurationProperty = field.getAnnotation(NestedConfigurationProperty.class);
-                        if (nestedConfigurationProperty == null) {
+                        if (isPrimitiveType(fieldValue.getClass())) {
                             serverParameterList.add(new ServerParameter(fieldName, fieldValue.toString(), false));
                         }
                         else {
@@ -159,7 +162,12 @@ public class ServerParameterList {
                     try {
                         Object fieldValue = invokeGetter(method, o);
                         if (fieldValue != null) {
-                            serverParameterList.add(new ServerParameter(fieldName, fieldValue.toString(), false));
+                            if (isPrimitiveType(fieldValue.getClass())) {
+                                serverParameterList.add(new ServerParameter(fieldName, fieldValue.toString(), false));
+                            }
+                            else {
+                                serverParameterList.add(ServerParameterList.of(fieldValue, fieldName));
+                            }
                         }
                     }
                     catch (IllegalAccessException e) {
@@ -176,13 +184,18 @@ public class ServerParameterList {
 
     private static String getFieldNameFromGetter(Method method) {
         if (method.getName().startsWith("get")) {
-            return method.getName().substring(3);
+            return lowerCamelCase(method.getName().substring(3));
         }
         else if (method.getName().startsWith("is")) {
-            return method.getName().substring(2);
+            return lowerCamelCase(method.getName().substring(2));
         }
 
         throw new UnexpectedConditionException(String.format("'%s' is not a getter method!", method.getName()));
+    }
+
+
+    private static String lowerCamelCase(String name) {
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
 
@@ -200,7 +213,7 @@ public class ServerParameterList {
     }
 
     private static boolean isHidden(String fieldName) {
-        if (fieldName.toLowerCase().contains("password")) {
+        if (fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("secret")) {
             return true;
         }
 
@@ -208,13 +221,14 @@ public class ServerParameterList {
     }
 
     private static boolean isPrimitiveType(Class<?> clazz) {
-        return WRAPPER_TYPES.contains(clazz);
+        if (clazz.getName().startsWith("com.netflix")) return true;
+        return WRAPPER_TYPES.contains(clazz.getName());
     }
 
 
     private static Object tryInvokeGetter(Field field, Object o) throws InvocationTargetException, IllegalAccessException {
         for (Method method : o.getClass().getDeclaredMethods()) {
-            if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase())) {
+            if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase()) && isGetter(method)) {
                 if ((method.getName().startsWith("get") && (method.getName().length() == (field.getName().length() + 3)))
                         || (method.getName().startsWith("is") && (method.getName().length() == (field.getName().length() + 2)))
                 ) {

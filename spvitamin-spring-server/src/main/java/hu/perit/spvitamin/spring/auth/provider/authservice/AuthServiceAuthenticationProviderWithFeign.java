@@ -18,7 +18,7 @@ package hu.perit.spvitamin.spring.auth.provider.authservice;
 
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.config.SysMicroservices;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.rest.client.AuthClient;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
@@ -39,7 +39,7 @@ public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthe
 
 
     public static String getServiceUrl() {
-        SysMicroservices sysMicroservices = SysConfig.getSysMicroservices();
-        return sysMicroservices.getAuthService().getUrl();
+        MicroserviceCollectionProperties microserviceCollectionProperties = SysConfig.getSysMicroservices();
+        return microserviceCollectionProperties.get("auth-service").getUrl();
     }
 }
