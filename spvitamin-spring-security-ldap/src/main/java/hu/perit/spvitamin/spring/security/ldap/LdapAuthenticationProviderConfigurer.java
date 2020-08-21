@@ -21,7 +21,7 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
-import hu.perit.spvitamin.spring.config.LdapProperties;
+import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,29 +36,29 @@ import java.util.Map;
 public class LdapAuthenticationProviderConfigurer
 {
     public static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
-    private final LdapProperties ldapProperties;
+    private final LdapCollectionProperties ldapCollectionProperties;
 
-    public LdapAuthenticationProviderConfigurer(LdapProperties ldapProperties) {
-        this.ldapProperties = ldapProperties;
+    public LdapAuthenticationProviderConfigurer(LdapCollectionProperties ldapCollectionProperties) {
+        this.ldapCollectionProperties = ldapCollectionProperties;
     }
 
     public void configure(AuthenticationManagerBuilder auth)
     {
-        for (Map.Entry<String, LdapProperties.SingleLdapProperties> entry : this.ldapProperties.getLdaps().entrySet()) {
+        for (Map.Entry<String, LdapCollectionProperties.LdapProperties> entry : this.ldapCollectionProperties.getLdaps().entrySet()) {
 
-            LdapProperties.SingleLdapProperties singleLdapProperties = entry.getValue();
+            LdapCollectionProperties.LdapProperties ldapProperties = entry.getValue();
 
             Map<String, Object> ctxEnvironmentProps = new HashMap<>();
-            ctxEnvironmentProps.put(LDAP_CONNECT_TIMEOUT_KEY, String.valueOf(singleLdapProperties.getConnectTimeoutMs()));
+            ctxEnvironmentProps.put(LDAP_CONNECT_TIMEOUT_KEY, String.valueOf(ldapProperties.getConnectTimeoutMs()));
 
-            if (singleLdapProperties.isEnabled()) {
+            if (ldapProperties.isEnabled()) {
                 LdapAuthenticationProvider provider = this.createProvider(
                         entry.getKey(),
-                        singleLdapProperties.getUrl(),
-                        singleLdapProperties.getDomain(),
-                        singleLdapProperties.getFilter(),
-                        singleLdapProperties.isUserprincipalWithDomain(),
-                        singleLdapProperties.getRootDN());
+                        ldapProperties.getUrl(),
+                        ldapProperties.getDomain(),
+                        ldapProperties.getFilter(),
+                        ldapProperties.isUserprincipalWithDomain(),
+                        ldapProperties.getRootDN());
 
                 provider.setContextEnvironmentProperties(ctxEnvironmentProps);
 

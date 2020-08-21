@@ -17,7 +17,6 @@
 buildscript {
     ext {
         springBootVersion = '2.3.2.RELEASE'
-		springCloudVersion = 'Hoxton.SR6'
     }
     repositories {
         jcenter()
@@ -57,7 +56,6 @@ sourceCompatibility = 11
 dependencies {
 	compile project(':spvitamin-core')
     compile project(':spvitamin-spring-general')
-    compile project(':spvitamin-spring-server')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -66,25 +64,11 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // Spring Boot
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework:spring-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-    // JJWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-
-    // JAXB (JDK > 8 miatt)
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-
-    // H2
-    runtimeOnly 'com.h2database:h2'
-    // PostgreSQL
-    runtimeOnly 'org.postgresql:postgresql'
 
     // javax.validation
-    implementation group: 'javax.validation', name: 'validation-api'
+    implementation 'javax.validation:validation-api'
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -92,10 +76,6 @@ dependencies {
     }
 
     testImplementation 'org.springframework.security:spring-security-test'
-
-    // Swagger
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
@@ -105,24 +85,7 @@ dependencies {
     implementation('log4j:log4j:1.2.17')
 
     // ModelMapper
-    implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
-
-    // OpenFeign
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
-
-    // OpenCSV
-    implementation group: 'com.opencsv', name: 'opencsv', version: '4.0'
-
-    // Micrometer Prometheus plugin
-    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
-}
-
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
+    implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
 }
 
 

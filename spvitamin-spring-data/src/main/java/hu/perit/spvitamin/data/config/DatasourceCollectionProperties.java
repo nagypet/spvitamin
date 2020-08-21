@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.config;
+package hu.perit.spvitamin.data.config;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -28,20 +26,7 @@ import java.util.Map;
 @Data
 @Component
 @ConfigurationProperties
-public class LdapProperties {
+public class DatasourceCollectionProperties {
 
-    private Map<String, SingleLdapProperties> ldaps = new HashMap<>();
-
-    @Getter
-    @Setter
-    public static class SingleLdapProperties {
-
-        private boolean enabled = true;
-        private String url;
-        private String rootDN;
-        private String filter = "(&(objectClass=user)(sAMAccountName={0}))";
-        private boolean userprincipalWithDomain = false;
-        private String domain;
-        private int connectTimeoutMs = 1000;
-    }
+    private Map<String, DatasourceProperties> datasource = new HashMap<>();
 }

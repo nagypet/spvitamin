@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.data.dynamicdatasource;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import lombok.Getter;

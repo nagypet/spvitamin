@@ -30,9 +30,16 @@ class ProjectConfigurer {
 	void doIt() {
 		long startTime = System.currentTimeMillis()
 		println "Included projects:"
+		
+		// Step 1.
 		this.discoverProjects(this.rootDir.getParentFile())
-		Set<String> deps = this.getDependendentProjects(this.rootDir)
+		
+		// Step 2.
+		Set<String> deps = this.getDependendentProjects(this.rootDir, 0)
+		
+		// Step 3.
 		this.includeDependentProjects(deps)		
+		
 		println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
 	}
 
@@ -60,17 +67,18 @@ class ProjectConfigurer {
 	}
 	
 
-	private Set<String> getDependendentProjects(File root) {
-		def deps = [] as Set
+	private Set<String> getDependendentProjects(File root, int level) {
+		Set<String> deps = [] as Set
 		File buildGradleFile = new File(root, "build.gradle")
 		if (buildGradleFile.exists()) {
 			buildGradleFile.eachLine {line ->
-				if (line =~ /compile\s*project/) {
+				if (!(line =~ /^\s*\/\//) && line =~ /compile\s*project/) {
 					def matcher = line =~ /:[a-z-A-Z0-9]*/
 					if (matcher.size() == 1) {
 						def projName = matcher[0].substring(1)
 						deps += projName
-						deps += this.getDependendentProjects(this.projectMap[projName])
+						//println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
+						deps += this.getDependendentProjects(this.projectMap[projName], level + 1)
 					}
 				}
 			}

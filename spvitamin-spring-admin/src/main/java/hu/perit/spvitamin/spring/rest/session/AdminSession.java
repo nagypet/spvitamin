@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.rest.session;
 
-import hu.perit.spvitamin.spring.admin.serverparameter.ShutdownManager;
+import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
 import hu.perit.spvitamin.spring.manifest.ManifestReader;

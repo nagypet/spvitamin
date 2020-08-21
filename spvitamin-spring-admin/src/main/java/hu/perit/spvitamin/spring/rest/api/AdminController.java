@@ -19,7 +19,7 @@ package hu.perit.spvitamin.spring.rest.api;
 import com.google.common.reflect.AbstractInvocationHandler;
 import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.admin.serverparameter.ShutdownManager;
+import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
 import hu.perit.spvitamin.spring.auth.AuthorizationService;

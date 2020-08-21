@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.admin.serverparameter;
+package hu.perit.spvitamin.spring.admin;
 
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.extern.log4j.Log4j;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.data.dynamicdatasource;
+package hu.perit.spvitamin.data.config;
 
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;
@@ -66,4 +66,22 @@ public class DatasourceProperties {
     */
     private Long socketTimeout = 100000L;
     private String ddlAuto = "none";
+
+    @Override
+    public String toString() {
+        return "DatasourceProperties{" +
+                "dbType='" + dbType + '\'' +
+                ", host='" + host + '\'' +
+                ", port='" + port + '\'' +
+                ", dbName='" + dbName + '\'' +
+                ", username='" + username + '\'' +
+                ", encryptedPassword='" + encryptedPassword + '\'' +
+                ", dialect='" + dialect + '\'' +
+                ", maxPoolSize=" + maxPoolSize +
+                ", connectionTimeout=" + connectionTimeout +
+                ", leakDetectionThreshold=" + leakDetectionThreshold +
+                ", socketTimeout=" + socketTimeout +
+                ", ddlAuto='" + ddlAuto + '\'' +
+                '}';
+    }
 }

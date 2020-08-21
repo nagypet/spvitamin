@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.config;
+package hu.perit.spvitamin.spring.security.ldap.config;
 
 import lombok.Data;
 import lombok.Getter;
