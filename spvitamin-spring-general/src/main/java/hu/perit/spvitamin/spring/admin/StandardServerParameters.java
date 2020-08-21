@@ -19,12 +19,21 @@ package hu.perit.spvitamin.spring.admin;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import hu.perit.spvitamin.spring.config.*;
+import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Peter Nagy
@@ -64,6 +73,18 @@ class StandardServerParameters
         for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet()) {
             params.add(ServerParameterList.of(entry.getValue(), "microservices." + entry.getKey()));
         }
+
+        /*
+        Environment env = SpringEnvironment.getInstance().get();
+
+        List<ServerParameter> parameter = params.getParameter();
+        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+        StreamSupport.stream(propSrcs.spliterator(), false)
+                .filter(ps -> ps instanceof EnumerablePropertySource)
+                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
+                .flatMap(Arrays::<String>stream)
+                .forEach(propName -> parameter.add(new ServerParameter("Environment." + propName, env.getProperty(propName), false)));
+        */
 
         return params;
     }

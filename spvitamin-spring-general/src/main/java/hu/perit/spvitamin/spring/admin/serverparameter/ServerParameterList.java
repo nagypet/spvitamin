@@ -38,31 +38,31 @@ public class ServerParameterList {
 
     private final List<ServerParameter> parameter = new ArrayList<>();
 
-    private static final Set<String> WRAPPER_TYPES = new HashSet<>();
+    private static final Set<Class<?>> WRAPPER_TYPES = new HashSet<>();
 
     static {
-        WRAPPER_TYPES.add(Boolean.class.getName());
-        WRAPPER_TYPES.add(boolean.class.getName());
-        WRAPPER_TYPES.add(Byte.class.getName());
-        WRAPPER_TYPES.add(byte.class.getName());
-        WRAPPER_TYPES.add(Character.class.getName());
-        WRAPPER_TYPES.add(char.class.getName());
-        WRAPPER_TYPES.add(Short.class.getName());
-        WRAPPER_TYPES.add(short.class.getName());
-        WRAPPER_TYPES.add(Integer.class.getName());
-        WRAPPER_TYPES.add(int.class.getName());
-        WRAPPER_TYPES.add(Long.class.getName());
-        WRAPPER_TYPES.add(long.class.getName());
-        WRAPPER_TYPES.add(Double.class.getName());
-        WRAPPER_TYPES.add(double.class.getName());
-        WRAPPER_TYPES.add(Float.class.getName());
-        WRAPPER_TYPES.add(float.class.getName());
-        WRAPPER_TYPES.add(String.class.getName());
-        WRAPPER_TYPES.add(TimeZone.class.getName());
-        WRAPPER_TYPES.add(Map.class.getName());
-        WRAPPER_TYPES.add(Set.class.getName());
-        WRAPPER_TYPES.add(List.class.getName());
-        WRAPPER_TYPES.add(TimeUnit.class.getName());
+        WRAPPER_TYPES.add(Boolean.class);
+        WRAPPER_TYPES.add(boolean.class);
+        WRAPPER_TYPES.add(Byte.class);
+        WRAPPER_TYPES.add(byte.class);
+        WRAPPER_TYPES.add(Character.class);
+        WRAPPER_TYPES.add(char.class);
+        WRAPPER_TYPES.add(Short.class);
+        WRAPPER_TYPES.add(short.class);
+        WRAPPER_TYPES.add(Integer.class);
+        WRAPPER_TYPES.add(int.class);
+        WRAPPER_TYPES.add(Long.class);
+        WRAPPER_TYPES.add(long.class);
+        WRAPPER_TYPES.add(Double.class);
+        WRAPPER_TYPES.add(double.class);
+        WRAPPER_TYPES.add(Float.class);
+        WRAPPER_TYPES.add(float.class);
+        WRAPPER_TYPES.add(String.class);
+        WRAPPER_TYPES.add(TimeZone.class);
+        WRAPPER_TYPES.add(Map.class);
+        WRAPPER_TYPES.add(Set.class);
+        WRAPPER_TYPES.add(List.class);
+        WRAPPER_TYPES.add(TimeUnit.class);
     }
 
 
@@ -213,16 +213,17 @@ public class ServerParameterList {
     }
 
     private static boolean isHidden(String fieldName) {
-        if (fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("secret")) {
-            return true;
-        }
-
-        return false;
+        return fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("secret");
     }
 
     private static boolean isPrimitiveType(Class<?> clazz) {
         if (clazz.getName().startsWith("com.netflix")) return true;
-        return WRAPPER_TYPES.contains(clazz.getName());
+
+        for (Class<?> type : WRAPPER_TYPES) {
+            if (type.isAssignableFrom(clazz)) return true;
+        }
+
+        return false;
     }
 
 
