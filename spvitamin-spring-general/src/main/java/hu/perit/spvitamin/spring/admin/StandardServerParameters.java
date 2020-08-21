@@ -65,8 +65,6 @@ class StandardServerParameters
             params.add(ServerParameterList.of(entry.getValue(), "microservices." + entry.getKey()));
         }
 
-        params.add(ServerParameterList.of(this.microserviceCollectionProperties));
-
         return params;
     }
 
