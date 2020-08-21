@@ -29,7 +29,7 @@ import java.util.List;
  */
 
 @Log4j
-public class InvokerTest
+class InvokerTest
 {
     class Example implements Invoker
     {
@@ -49,7 +49,7 @@ public class InvokerTest
 
 
     @Test
-    public void getMyMethodName() throws InvocationTargetException
+    void getMyMethodName() throws InvocationTargetException
     {
         Example example = new Example();
 

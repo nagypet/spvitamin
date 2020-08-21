@@ -73,7 +73,7 @@ public class ServerException extends RuntimeException implements ServerException
 
 
     @Override
-    public boolean instanceOf(Class anExceptionClass) {
+    public boolean instanceOf(Class<? extends Throwable> anExceptionClass) {
         return this.superClassNames.contains(anExceptionClass.getName());
     }
 

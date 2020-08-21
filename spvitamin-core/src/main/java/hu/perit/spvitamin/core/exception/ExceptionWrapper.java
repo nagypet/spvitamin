@@ -49,7 +49,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     }
 
 
-    public boolean causedBy(Class anExceptionClass) {
+    public boolean causedBy(Class<? extends Throwable> anExceptionClass) {
         return causedBy(this.exception, anExceptionClass, null);
     }
 
@@ -59,7 +59,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     }
 
 
-    public boolean causedBy(Class anExceptionClass, String messageStart) {
+    public boolean causedBy(Class<? extends Throwable> anExceptionClass, String messageStart) {
         return causedBy(this.exception, anExceptionClass, messageStart);
     }
 
@@ -91,7 +91,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     }
 
 
-    public Optional<Throwable> getFromCauseChain(Class anExceptionClass) {
+    public Optional<Throwable> getFromCauseChain(Class<? extends Throwable> anExceptionClass) {
         List<Throwable> allCauses = this.getAllCauses();
         allCauses.add(this.exception);
         List<Throwable> throwables = allCauses.stream()
@@ -128,7 +128,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     }
 
 
-    private static boolean causedBy(Throwable root, Class anExceptionClass, String messageStart) {
+    private static boolean causedBy(Throwable root, Class<? extends Throwable> anExceptionClass, String messageStart) {
         return causedBy(root, anExceptionClass.getName(), messageStart);
     }
 
@@ -183,7 +183,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
 
 
     @Override
-    public boolean instanceOf(Class anExceptionClass) {
+    public boolean instanceOf(Class<? extends Throwable> anExceptionClass) {
         return isInstanceOf(this.exception, anExceptionClass);
     }
 
@@ -200,7 +200,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
      * @param anExceptionClass
      * @return
      */
-    public static boolean isInstanceOf(Throwable throwable, Class anExceptionClass) {
+    public static boolean isInstanceOf(Throwable throwable, Class<? extends Throwable> anExceptionClass) {
         if (throwable instanceof ServerException) {
             return ((ServerException) throwable).instanceOf(anExceptionClass);
         }
@@ -254,7 +254,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     private static List<String> extractSuperClassNames(Throwable exception) {
 
         List<String> superClasses = new ArrayList<>();
-        Class aClass = exception.getClass();
+        Class<?> aClass = exception.getClass();
         while (aClass != null) {
             superClasses.add(aClass.getName());
             aClass = aClass.getSuperclass();

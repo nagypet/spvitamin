@@ -58,7 +58,7 @@ public abstract class SimpleConnectableContextHolder<T extends ConnectableContex
 
     public synchronized void cleanup(boolean onlyIdleContexts)
     {
-        ConnectableContextCollection contextCollection = this.getContextCollection();
+        ConnectableContextCollection<T> contextCollection = this.getContextCollection();
         boolean hasChanged = false;
         try
         {

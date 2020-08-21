@@ -26,10 +26,10 @@ import org.junit.jupiter.api.Test;
  */
 
 @Log4j
-public class ServerExceptionTest {
+class ServerExceptionTest {
 
     @Test
-    public void test() {
+    void test() {
         String expected;
         String actual = null;
         try {
@@ -53,7 +53,7 @@ public class ServerExceptionTest {
     }
 
     @Test
-    public void test2() {
+    void test2() {
         String expected;
         String actual = null;
         try {

@@ -29,10 +29,10 @@ import java.util.Optional;
  */
 
 @Log4j
-public class StackTracerTest
+class StackTracerTest
 {
     @Test
-    public void testNullPointerException()
+    void testNullPointerException()
     {
         try
         {
@@ -49,7 +49,7 @@ public class StackTracerTest
     }
 
     @Test
-    public void testRuntimeException()
+    void testRuntimeException()
     {
         try
         {
@@ -79,7 +79,7 @@ public class StackTracerTest
     }
 
     @Test
-    public void testCheckedException()
+    void testCheckedException()
     {
         try
         {
@@ -96,7 +96,7 @@ public class StackTracerTest
     }
 
     @Test
-    public void testEmbeddedException()
+    void testEmbeddedException()
     {
         try
         {
@@ -122,7 +122,7 @@ public class StackTracerTest
 
 
     @Test
-    public void testEmptyStackTrace()
+    void testEmptyStackTrace()
     {
         try
         {
@@ -152,7 +152,7 @@ public class StackTracerTest
 
 
     @Test
-    public void testEmptyStackTrace2()
+    void testEmptyStackTrace2()
     {
         try
         {

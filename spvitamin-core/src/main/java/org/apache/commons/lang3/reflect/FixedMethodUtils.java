@@ -970,18 +970,16 @@ public class FixedMethodUtils
 
         Validate.isTrue(cls != null, "The class must not be null");
         Validate.isTrue(annotationCls != null, "The annotation class must not be null");
-        final List<Class<?>> classes = (searchSupers ? getAllSuperclassesAndInterfaces(cls)
-                : new ArrayList<Class<?>>());
-        classes.add(0, cls);
+        final List<Class<?>> classes = (searchSupers ? getAllSuperclassesAndInterfaces(cls) : new ArrayList<Class<?>>());
         final List<Method> annotatedMethods = new ArrayList<>();
-        for (final Class<?> acls : classes)
-        {
-            final Method[] methods = (ignoreAccess ? acls.getDeclaredMethods() : acls.getMethods());
-            for (final Method method : methods)
-            {
-                if (method.getAnnotation(annotationCls) != null)
-                {
-                    annotatedMethods.add(method);
+        if (classes != null) {
+            classes.add(0, cls);
+            for (final Class<?> acls : classes) {
+                final Method[] methods = (ignoreAccess ? acls.getDeclaredMethods() : acls.getMethods());
+                for (final Method method : methods) {
+                    if (method.getAnnotation(annotationCls) != null) {
+                        annotatedMethods.add(method);
+                    }
                 }
             }
         }

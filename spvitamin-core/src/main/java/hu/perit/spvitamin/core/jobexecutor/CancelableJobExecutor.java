@@ -33,7 +33,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
 
 
     public CancelableJobExecutor(int poolSize) {
-        super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     }
 
 
@@ -94,7 +94,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
     public synchronized void cancelJob(T id) {
         //log.debug(String.format("cancelJob(%d)", id));
         if (this.futureMap.contains(id)) {
-            Future future = this.futureMap.get(id);
+            Future<?> future = this.futureMap.get(id);
             if (!future.isDone()) {
                 future.cancel(true);
                 this.purge();

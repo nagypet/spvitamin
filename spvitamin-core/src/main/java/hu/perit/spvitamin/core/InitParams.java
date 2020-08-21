@@ -40,7 +40,6 @@ public class InitParams {
     private static InitParams myInstance = null;
     private static final String USER_DIR = "user.dir";
 
-    private String configFileLocation;
     private String configFileName = "application.properties";
     private Properties properties = null;
 
@@ -78,8 +77,8 @@ public class InitParams {
      */
     private Properties loadPropertiesFromFile(String fileName) throws IOException {
         String workingDir = System.getProperty(USER_DIR);
-        this.configFileLocation = new File(workingDir, "config").getAbsolutePath();
-        File iniFile = new File(this.configFileLocation, fileName);
+        String configFileLocation = new File(workingDir, "config").getAbsolutePath();
+        File iniFile = new File(configFileLocation, fileName);
         InputStream inStream = null;
         try {
             inStream = new FileInputStream(iniFile);
@@ -103,16 +102,16 @@ public class InitParams {
 
 
     public String getParam(String paramName) {
-        return this._getParam(paramName, true);
+        return this.getParamInternal(paramName, true);
     }
 
 
     public boolean isParamAvailable(String paramName) {
-        return !this._getParam(paramName, false).isEmpty();
+        return !this.getParamInternal(paramName, false).isEmpty();
     }
 
 
-    private String _getParam(String paramName, boolean warn) {
+    private String getParamInternal(String paramName, boolean warn) {
         //log.warn(String.format("WARNING: '%s' could not be found in '%s', trying: '%s'!", paramNameComputerDep, PROPERTY_FILE_NAME, paramName));
         String retval = properties.getProperty(paramName);
         if (retval == null || retval.isEmpty()) {
@@ -141,7 +140,7 @@ public class InitParams {
         Properties result = new Properties();
         for (String propName : properties.stringPropertyNames()) {
             if (propName.startsWith(paramPrefix)) {
-                String value = this._getParam(propName, false);
+                String value = this.getParamInternal(propName, false);
                 if (!value.isEmpty()) {
                     result.setProperty(propName, value);
                 }
@@ -157,7 +156,7 @@ public class InitParams {
     public List<String> fromProperties(Properties props) {
         List<String> retval = new ArrayList<>();
 
-        Enumeration iter = props.propertyNames();
+        Enumeration<?> iter = props.propertyNames();
         while (iter.hasMoreElements()) {
             String key = iter.nextElement().toString();
             retval.add(props.getProperty(key, ""));

@@ -30,10 +30,10 @@ import java.sql.SQLException;
  */
 
 @Log4j
-public class ExceptionWrapperTest {
+class ExceptionWrapperTest {
 
     @Test
-    public void getAllCauses() {
+    void getAllCauses() {
         // With original exception
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException("another problem", new NullPointerException()));
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
@@ -52,7 +52,7 @@ public class ExceptionWrapperTest {
     }
 
     @Test
-    public void getAllCauses2() {
+    void getAllCauses2() {
         // With original exception
         RuntimeException ex = new RuntimeException("some problem");
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
@@ -69,7 +69,7 @@ public class ExceptionWrapperTest {
     }
 
     @Test
-    public void getAllCauses3() {
+    void getAllCauses3() {
         RuntimeException ex = new RuntimeException("some problem\nmultiline error text\nthird row");
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
         String causes = exceptionWrapper.toStringWithCauses();
@@ -78,7 +78,7 @@ public class ExceptionWrapperTest {
     }
 
     @Test
-    public void causedBy() {
+    void causedBy() {
         // With original exception
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException(new NullPointerException()));
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
@@ -97,7 +97,7 @@ public class ExceptionWrapperTest {
     }
 
     @Test
-    public void causedBy_withMessageText() {
+    void causedBy_withMessageText() {
         // With original exception
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException(new NullPointerException()));
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
@@ -118,7 +118,7 @@ public class ExceptionWrapperTest {
     }
 
     @Test
-    public void getFromCauseChain() {
+    void getFromCauseChain() {
         // With original exception
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException(new NullPointerException()));
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);

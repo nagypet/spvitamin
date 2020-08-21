@@ -27,31 +27,31 @@ import java.util.Arrays;
  */
 
 @Log4j
-public class DomainUserTest {
+class DomainUserTest {
 
     @Test
-    public void equals1() {
+    void equals1() {
         DomainUser user1 = DomainUser.newInstance("IDXAPI");
         DomainUser user2 = DomainUser.newInstance("IDXAPI");
-        Assertions.assertTrue(user1.equals(user2));
+        Assertions.assertEquals(user1, user2);
     }
 
     @Test
-    public void equals2() {
+    void equals2() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("kozpont\\ps_sap_mw_T1");
-        Assertions.assertTrue(user1.equals(user2));
+        Assertions.assertEquals(user1, user2);
     }
 
     @Test
-    public void equals3() {
+    void equals3() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("IDXAPI");
-        Assertions.assertFalse(user1.equals(user2));
+        Assertions.assertNotEquals(user1, user2);
     }
 
     @Test
-    public void equals4() {
+    void equals4() {
         String technicalUsers = "IDXAPI,irfi\\nagypeter,ps_sap_mw_T1@kozpont.otp";
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         boolean b = Arrays.stream(technicalUsers.split(",")).map(DomainUser::newInstance).anyMatch(i -> {
@@ -62,7 +62,7 @@ public class DomainUserTest {
     }
 
     @Test
-    public void equals5() {
+    void equals5() {
         String technicalUsers = "IDXAPI,irfi\\nagypeter,ps_sap_mw_T1@kozpont.otp";
         DomainUser user1 = DomainUser.newInstance("IDXAPI");
         boolean b = Arrays.stream(technicalUsers.split(",")).map(DomainUser::newInstance).anyMatch(i -> {
@@ -73,7 +73,7 @@ public class DomainUserTest {
     }
 
     @Test
-    public void equals6() {
+    void equals6() {
         String technicalUsers = "*";
         DomainUser user1 = DomainUser.newInstance("IDXAPI");
         boolean b = Arrays.stream(technicalUsers.split(",")).map(DomainUser::newInstance).anyMatch(i -> {
@@ -84,7 +84,7 @@ public class DomainUserTest {
     }
 
     @Test
-    public void equals7() {
+    void equals7() {
         String technicalUsers = "IDXAPI,irfi\\nagypeter,ps_sap_mw_T1@kozpont.otp";
         DomainUser user1 = DomainUser.newInstance("IDXAPI3");
         boolean b = Arrays.stream(technicalUsers.split(",")).map(DomainUser::newInstance).anyMatch(i -> {
@@ -96,7 +96,7 @@ public class DomainUserTest {
 
 
     @Test
-    public void equals8() {
+    void equals8() {
         String technicalUsers = "IDXAPI,irfi\\nagypeter,ps_sap_mw_T1@kozpont.otp";
         DomainUser user1 = DomainUser.newInstance("kozpont\\PS_SAP_MW_T1");
         boolean b = Arrays.stream(technicalUsers.split(",")).map(DomainUser::newInstance).anyMatch(i -> {

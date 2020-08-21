@@ -25,7 +25,7 @@ import java.util.List;
 
 public interface ServerExceptionInterface {
     String getClassName();
-    boolean instanceOf(Class anExceptionClass);
+    boolean instanceOf(Class<? extends Throwable> anExceptionClass);
     boolean instanceOf(String anExceptionClassName);
     List<String> getSuperClassNames();
     Annotation[] getAnnotations();

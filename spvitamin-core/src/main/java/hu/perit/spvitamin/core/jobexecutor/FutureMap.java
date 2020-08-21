@@ -29,10 +29,10 @@ import java.util.concurrent.Future;
 @NoArgsConstructor
 public class FutureMap<T> {
 
-    private Map<T, Future> queueItemsMap = new HashMap<>();
-    private Map<Future, T> queueItemsMapBackwards = new HashMap<>();
+    private Map<T, Future<?>> queueItemsMap = new HashMap<>();
+    private Map<Future<?>, T> queueItemsMapBackwards = new HashMap<>();
 
-    public synchronized void put(T id, Future future) {
+    public synchronized void put(T id, Future<?> future) {
         this.queueItemsMap.put(id, future);
         this.queueItemsMapBackwards.put(future, id);
     }
@@ -40,7 +40,7 @@ public class FutureMap<T> {
 
     public synchronized void remove(T id) {
         if (this.queueItemsMap.containsKey(id)) {
-            Future futureToRemove = this.queueItemsMap.get(id);
+            Future<?> futureToRemove = this.queueItemsMap.get(id);
             this.queueItemsMap.remove(id);
             this.queueItemsMapBackwards.remove(futureToRemove);
         }
@@ -52,11 +52,11 @@ public class FutureMap<T> {
     }
 
 
-    public synchronized Future get(T id) {
+    public synchronized Future<?> get(T id) {
         return this.queueItemsMap.get(id);
     }
 
-    public synchronized T get(Future future) {
+    public synchronized T get(Future<?> future) {
         return this.queueItemsMapBackwards.get(future);
     }
 

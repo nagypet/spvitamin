@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
  */
 
 @Log4j
-public class TookTest
+class TookTest
 {
     @Test
-    public void took()
+    void took()
     {
         try (Took took = new Took())
         {
@@ -36,7 +36,7 @@ public class TookTest
     }
 
     @Test
-    public void took2()
+    void took2()
     {
         try (Took took = new Took(false))
         {
