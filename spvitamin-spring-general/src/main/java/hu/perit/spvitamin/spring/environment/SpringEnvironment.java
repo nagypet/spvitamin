@@ -38,7 +38,9 @@ public class SpringEnvironment {
         return environment;
     }
 
-    public void set(Environment environment) {
-        this.environment = environment;
+    public void setEnvironment(Environment environment) {
+        if (this.environment == null) {
+            this.environment = environment;
+        }
     }
 }

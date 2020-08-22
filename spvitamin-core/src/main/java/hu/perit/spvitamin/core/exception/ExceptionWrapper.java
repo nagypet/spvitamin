@@ -79,7 +79,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
         return sb.toString();
     }
 
-    private static String removeLineSeparators(String text) {
+    static String removeLineSeparators(String text) {
         return text
                 .replaceAll("\r\n", "|")
                 .replaceAll("\n", "|");

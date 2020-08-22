@@ -234,6 +234,7 @@ public class KeystoreUtils {
 
 
     private static File searchInClasspath(List<String> pathes, String fileName) {
+        //log.debug(String.format("searchInClasspath() fileName: '%s', classpath: '%s'", fileName, pathes.toString()));
         File trustStoreFile = null;
         for (String path : pathes) {
             trustStoreFile = new File(path, fileName);
@@ -246,8 +247,11 @@ public class KeystoreUtils {
 
 
     private static List<String> extractClassPathes(String classPath) {
-        // A classPath vagy egy jar, aminek a manifestjében van a felsorolás, vagy egy pontosvesszővel elválasztott lista
-        // C:\Users\nagy_peter\AppData\Local\Temp\classpath1737236763.jar
+        //log.debug(String.format("extractClassPathes() classpath: '%s'", classPath));
+        // A classPath vagy
+        // -- egy jar, aminek a manifestjében van a felsorolás (C:\Users\nagy_peter\AppData\Local\Temp\classpath1737236763.jar),
+        // -- vagy egy pontosvesszővel elválasztott lista (Windows)
+        // -- vagy egy kettősponttal elválasztott lista (Linux)
 
         Optional<String> optClassPathFromManifest = getClassPathFromManifest(classPath);
         if (optClassPathFromManifest.isPresent()) {
@@ -269,7 +273,7 @@ public class KeystoreUtils {
                     .collect(Collectors.toList());
         }
         else {
-            return Stream.of(classPath.split(";"))
+            return Stream.of(classPath.split(File.pathSeparator))
                     .map(String::strip)
                     .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
                     .collect(Collectors.toList());

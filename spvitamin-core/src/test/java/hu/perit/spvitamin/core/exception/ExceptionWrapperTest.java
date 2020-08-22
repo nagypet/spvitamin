@@ -39,9 +39,9 @@ class ExceptionWrapperTest {
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
         String causes = exceptionWrapper.toStringWithCauses();
         log.debug(causes);
-        Assertions.assertEquals("java.lang.RuntimeException: some problem\r\n" +
+        Assertions.assertEquals(ExceptionWrapper.removeLineSeparators("java.lang.RuntimeException: some problem\r\n" +
                 "  caused by java.lang.RuntimeException: another problem\r\n" +
-                "    caused by java.lang.NullPointerException", causes);
+                "    caused by java.lang.NullPointerException"), ExceptionWrapper.removeLineSeparators(causes));
 
         // With ServerException
         ServerException serverException = new ServerException(ex);

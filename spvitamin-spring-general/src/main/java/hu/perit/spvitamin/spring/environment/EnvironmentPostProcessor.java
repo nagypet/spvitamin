@@ -40,7 +40,7 @@ public class EnvironmentPostProcessor implements ApplicationListener {
     private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
         if (!event.getApplicationContext().isActive()) {
             // Initializing a singleton object with the current Environment
-            SpringEnvironment.getInstance().set(event.getApplicationContext().getEnvironment());
+            SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
 
             KeystoreUtils.locateJksStores();
         }
