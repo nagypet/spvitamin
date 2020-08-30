@@ -116,6 +116,6 @@ public class ServerException extends RuntimeException implements ServerException
 
 
     private void safeSetStackTrace(StackTraceElement[] stackTrace) {
-        this.setStackTrace(Objects.requireNonNullElseGet(stackTrace, () -> new StackTraceElement[0]));
+        this.setStackTrace(stackTrace != null ? stackTrace : new StackTraceElement[0]);
     }
 }

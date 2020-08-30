@@ -76,11 +76,11 @@ public class DomainUser {
 
 
     public void setDomain(String domain) {
-        this.domain = domain != null ? domain.strip() : null;
+        this.domain = domain != null ? domain.trim() : null;
     }
 
     public void setUsername(String username) {
-        this.username = username != null ? username.strip() : null;
+        this.username = username != null ? username.trim() : null;
     }
 
     @Override

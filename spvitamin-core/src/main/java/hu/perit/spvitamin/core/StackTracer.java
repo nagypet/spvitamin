@@ -20,12 +20,33 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Peter Nagy
  */
 
 public class StackTracer {
+
+    private static Set<String> ownPackages = new HashSet<>();
+    private static ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    static {
+    	addOwnPackage("hu.perit");
+	}
+
+	public static void addOwnPackage(String packageName) {
+    	lock.writeLock().lock();
+    	try {
+			ownPackages.add(packageName);
+		}
+		finally {
+    		lock.writeLock().unlock();
+		}
+	}
 
     private StackTracer() {
         throw new IllegalStateException("Utility class");
@@ -103,7 +124,13 @@ public class StackTracer {
 
 
     private static boolean isOwnPackage(String className) {
-        return className.startsWith("hu.perit");
+		lock.readLock().lock();
+		try {
+			return ownPackages.stream().anyMatch(className::startsWith);
+		}
+		finally {
+			lock.readLock().unlock();
+		}
     }
 
 

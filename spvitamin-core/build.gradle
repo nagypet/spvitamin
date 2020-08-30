@@ -30,6 +30,9 @@ buildscript {
 // Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+
+sourceCompatibility = 1.8
+
 apply from: '../gradle/common.gradle'
 
 
@@ -41,8 +44,6 @@ repositories {
     }
 }
 
-
-sourceCompatibility = 11
 
 dependencies {
 

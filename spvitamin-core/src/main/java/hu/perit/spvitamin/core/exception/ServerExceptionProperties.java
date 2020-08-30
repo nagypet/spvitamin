@@ -97,7 +97,7 @@ public class ServerExceptionProperties {
                     Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class);
                     retval = (Exception) declaredConstructor.newInstance(this.message);
                 }
-                retval.setStackTrace(Objects.requireNonNullElseGet(stackTrace, () -> new StackTraceElement[0]));
+                retval.setStackTrace(stackTrace != null ? stackTrace : new StackTraceElement[0]);
                 return retval;
             }
             return serverException;

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,6 +57,6 @@ class InvokerTest
         String message = (String) example.invoke(example, "func1", "alma", null);
         Assertions.assertEquals("title: 'null', text: 'alma'", message);
 
-        example.invoke(example, "internalQueryDocumentEx", "8004075b-359c-4e2e-a6b3-dbcac9a09d73", List.of("ECOL"), null, "ACCNUM ASC", "ACCNUM like '%IOBSTEST%' AND CLINO = '33628543' ", 10);
+        example.invoke(example, "internalQueryDocumentEx", "8004075b-359c-4e2e-a6b3-dbcac9a09d73", Arrays.asList("ECOL"), null, "ACCNUM ASC", "ACCNUM like '%IOBSTEST%' AND CLINO = '33628543' ", 10);
     }
 }
