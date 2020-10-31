@@ -16,16 +16,17 @@
 
 package hu.perit.spvitamin.core.exception;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class ServerExceptionTest {
 
     @Test

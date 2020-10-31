@@ -16,14 +16,15 @@
 
 package hu.perit.spvitamin.core.took;
 
-import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.Test;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class TookTest
 {
     @Test

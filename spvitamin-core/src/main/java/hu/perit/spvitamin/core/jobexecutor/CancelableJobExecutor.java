@@ -16,16 +16,21 @@
 
 package hu.perit.spvitamin.core.jobexecutor;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
-import lombok.extern.log4j.Log4j;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import java.util.concurrent.*;
+import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
 
     // A sorbanálló job-ok

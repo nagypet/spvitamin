@@ -16,8 +16,6 @@
 
 package hu.perit.spvitamin.core.connectablecontext;
 
-import lombok.extern.log4j.Log4j;
-
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -26,13 +24,15 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import lombok.extern.log4j.Log4j2;
+
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j
+@Log4j2
 public class ConnectableContextCollection<T extends ConnectableContext> extends HashMap<ContextKey, T>
 {
     private String contextTypeName = "ConnectableContext";

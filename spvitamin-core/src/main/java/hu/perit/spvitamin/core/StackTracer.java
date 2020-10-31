@@ -56,7 +56,7 @@ public class StackTracer {
         StringBuilder sb = new StringBuilder();
         sb.append(removeLineSeparators(ex.toString()));
 
-        appendWithLineSeparator(sb, getPartialStackTrace(ex, !(ex instanceof NullPointerException)));
+        appendWithLineSeparator(sb, getPartialStackTrace(ex, false));
 
         if (ex.getCause() != null) {
             appendWithLineSeparator(sb, "    caused by: " + toString(ex.getCause()));

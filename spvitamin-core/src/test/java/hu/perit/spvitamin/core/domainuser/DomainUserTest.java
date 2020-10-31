@@ -16,17 +16,18 @@
 
 package hu.perit.spvitamin.core.domainuser;
 
-import lombok.extern.log4j.Log4j;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class DomainUserTest {
 
     @Test

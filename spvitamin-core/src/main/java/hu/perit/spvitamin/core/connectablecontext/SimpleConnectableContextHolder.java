@@ -17,17 +17,17 @@
 
 package hu.perit.spvitamin.core.connectablecontext;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j;
-
 import java.util.Iterator;
+
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j
+@Log4j2
 public abstract class SimpleConnectableContextHolder<T extends ConnectableContext>
 {
     protected abstract ConnectableContextCollection<T> getContextCollection();

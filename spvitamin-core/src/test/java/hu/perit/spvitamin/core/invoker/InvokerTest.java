@@ -16,20 +16,21 @@
 
 package hu.perit.spvitamin.core.invoker;
 
-import lombok.extern.log4j.Log4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import lombok.extern.log4j.Log4j2;
+
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class InvokerTest
 {
     class Example implements Invoker

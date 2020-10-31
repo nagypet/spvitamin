@@ -16,18 +16,18 @@
 
 package hu.perit.spvitamin.core.batchprocessing;
 
+import java.util.concurrent.Callable;
+
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
-
-import java.util.concurrent.Callable;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 @Getter
 @Setter
 public abstract class BatchJob implements Callable<Boolean> {

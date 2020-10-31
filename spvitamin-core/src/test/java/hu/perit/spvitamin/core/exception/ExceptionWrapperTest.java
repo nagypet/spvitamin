@@ -16,20 +16,21 @@
 
 package hu.perit.spvitamin.core.exception;
 
-import lombok.extern.log4j.Log4j;
+import java.lang.annotation.Annotation;
+import java.security.InvalidParameterException;
+import java.sql.SQLException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.lang.annotation.Annotation;
-import java.security.InvalidParameterException;
-import java.sql.SQLException;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class ExceptionWrapperTest {
 
     @Test

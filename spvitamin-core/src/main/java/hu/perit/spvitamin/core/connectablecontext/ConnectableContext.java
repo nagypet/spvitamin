@@ -16,19 +16,19 @@
 
 package hu.perit.spvitamin.core.connectablecontext;
 
-import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j
+@Log4j2
 @NoArgsConstructor
 public abstract class ConnectableContext
 {

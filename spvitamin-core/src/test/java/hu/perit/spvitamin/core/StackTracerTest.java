@@ -16,19 +16,20 @@
 
 package hu.perit.spvitamin.core;
 
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
-import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
-import lombok.extern.log4j.Log4j;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 class StackTracerTest
 {
     @Test

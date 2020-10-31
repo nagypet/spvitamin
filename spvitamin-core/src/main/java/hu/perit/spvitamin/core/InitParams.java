@@ -16,8 +16,6 @@
 
 package hu.perit.spvitamin.core;
 
-import lombok.extern.log4j.Log4j;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,6 +25,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Parameters from properties file.
  * The property file must be located in the classes folder.
@@ -34,7 +34,7 @@ import java.util.Properties;
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 public class InitParams {
 
     private static InitParams myInstance = null;

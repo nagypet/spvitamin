@@ -30,6 +30,7 @@ buildscript {
 // Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 
@@ -62,10 +63,31 @@ dependencies {
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
 
     // Log4J
-    implementation('log4j:log4j:1.2.17')
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.10.0'
 }
 
 
 test {
     useJUnitPlatform()
+}
+
+
+publishing {
+    repositories {
+        maven {
+            name = "spvitamin"
+            url = uri("https://maven.pkg.github.com/nagypet/spvitamin")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }

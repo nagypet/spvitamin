@@ -16,21 +16,25 @@
 
 package hu.perit.spvitamin.core.batchprocessing;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j
+@Log4j2
 public abstract class BatchProcessor {
 
     private int threadPoolSize;

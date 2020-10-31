@@ -16,20 +16,20 @@
 
 package hu.perit.spvitamin.core.took;
 
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
-
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
+
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Log4j2
 @Getter
 public class Took implements AutoCloseable {
 
