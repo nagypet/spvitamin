@@ -16,29 +16,40 @@
 
 package hu.perit.spvitamin.core.event;
 
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
  * @author Peter Nagy
  */
 
+@Slf4j
 public class Event<T> {
 
-    private int lastID = 1;
-    private Map<Integer, Consumer<T>> subscribers = new HashMap<>();
+    private final AtomicInteger lastId = new AtomicInteger(0);
+    private final Map<Integer, Consumer<T>> subscribers = new HashMap<>();
 
     public Subscription subscribe(Consumer<T> subscriber) {
-        Subscription subscription = new Subscription(this, this.lastID);
-        this.subscribers.put(lastID++, subscriber);
+        Subscription subscription = new Subscription(this, this.lastId.incrementAndGet());
+        synchronized (this) {
+            this.subscribers.put(subscription.id, subscriber);
+        }
         return subscription;
     }
 
 
-    public void fire(T args) {
-        for (Consumer<T> subscriber : this.subscribers.values()) {
-            subscriber.accept(args);
+    public synchronized void fire(T args) {
+        try {
+            for (Consumer<T> subscriber : this.subscribers.values()) {
+                subscriber.accept(args);
+            }
+        } catch (Exception ex) {
+            log.error(StackTracer.toString(ex));
         }
     }
 
