@@ -16,11 +16,6 @@
 
 package hu.perit.spvitamin.spring.auth.provider.authservice;
 
-import hu.perit.spvitamin.spring.auth.BasicAuthHeader;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,8 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import hu.perit.spvitamin.spring.auth.BasicAuthHeader;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+
 @Service
-@Log4j
 public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServiceAuthenticationProvider {
 
     private final RestTemplate restTemplate;

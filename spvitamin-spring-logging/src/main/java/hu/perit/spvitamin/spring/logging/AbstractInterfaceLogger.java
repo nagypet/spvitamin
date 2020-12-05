@@ -16,20 +16,26 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.lang3.StringUtils;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 // Please start the Java VM with -Djava.net.preferIPv4Stack=true
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public abstract class AbstractInterfaceLogger {
 
     private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
@@ -157,7 +163,7 @@ public abstract class AbstractInterfaceLogger {
                 String headerName = iterator.next();
                 sb.append(String.format("%s=%s;", headerName, this.hidePasswords(headerName)));
             }
-            log.debug(sb);
+            log.debug(sb.toString());
         }
         catch (IllegalStateException ex) {
             log.warn("HTTP headers: HTTP request is empty!");

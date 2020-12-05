@@ -83,8 +83,10 @@ dependencies {
     // Swagger
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
-    // Log4J
-    implementation('log4j:log4j:1.2.17')
+    // Slf4J
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    testImplementation('log4j:log4j:1.2.17')
 	
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

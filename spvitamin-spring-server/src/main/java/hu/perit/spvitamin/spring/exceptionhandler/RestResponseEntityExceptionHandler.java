@@ -16,11 +16,10 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
-import hu.perit.spvitamin.core.exception.InputException;
-import io.jsonwebtoken.JwtException;
-import lombok.extern.log4j.Log4j;
+import java.lang.annotation.Annotation;
+
+import javax.validation.ValidationException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +30,17 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
-import javax.validation.ValidationException;
-import java.lang.annotation.Annotation;
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.exception.InputException;
+import io.jsonwebtoken.JwtException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     protected final ResponseEntity<Object> exceptionHandler(Exception ex, WebRequest request) {

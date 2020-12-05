@@ -16,12 +16,6 @@
 
 package hu.perit.spvitamin.spring.connectablecontext;
 
-import hu.perit.spvitamin.core.connectablecontext.ConnectableContext;
-import hu.perit.spvitamin.core.connectablecontext.SimpleConnectableContextHolder;
-import lombok.extern.log4j.Log4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 /**
  * @author Peter Nagy
  */
@@ -29,7 +23,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 
-@Log4j
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import hu.perit.spvitamin.core.connectablecontext.ConnectableContext;
+import hu.perit.spvitamin.core.connectablecontext.SimpleConnectableContextHolder;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public abstract class ConnectableContextHolder<T extends ConnectableContext> extends SimpleConnectableContextHolder<T>
 {

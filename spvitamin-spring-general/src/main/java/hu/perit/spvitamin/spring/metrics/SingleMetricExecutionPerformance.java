@@ -16,22 +16,23 @@
 
 package hu.perit.spvitamin.spring.metrics;
 
-import hu.perit.spvitamin.spring.config.MetricsProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import hu.perit.spvitamin.spring.config.MetricsProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class SingleMetricExecutionPerformance
 {
     private static int myQueueSize = 10;

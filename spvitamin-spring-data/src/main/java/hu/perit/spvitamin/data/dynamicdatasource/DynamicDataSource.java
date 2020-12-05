@@ -16,18 +16,20 @@
 
 package hu.perit.spvitamin.data.dynamicdatasource;
 
-import com.zaxxer.hikari.HikariDataSource;
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
-
-import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
+
+import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Ez az implementáció ténylegesen close-olható. Close hívása esetén új DataSource objektumot hoz létre, így a korábbitól
@@ -36,7 +38,7 @@ import java.util.logging.Logger;
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class DynamicDataSource implements DataSource, Closeable {
 
     private HikariDataSource dataSource;

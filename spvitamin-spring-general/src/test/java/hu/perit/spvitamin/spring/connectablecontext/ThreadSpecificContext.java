@@ -19,13 +19,13 @@ package hu.perit.spvitamin.spring.connectablecontext;
 import hu.perit.spvitamin.core.connectablecontext.ActivityLock;
 import hu.perit.spvitamin.core.connectablecontext.ConnectableContext;
 import hu.perit.spvitamin.core.connectablecontext.ContextKey;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class ThreadSpecificContext extends ConnectableContext
 {
     private static final int IDLETIMESEC = 2;

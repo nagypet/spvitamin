@@ -16,13 +16,11 @@
 
 package hu.perit.spvitamin.spring.auth.jwt;
 
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.impl.DefaultClaims;
-import lombok.extern.log4j.Log4j;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,9 +36,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.impl.DefaultClaims;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -50,7 +50,7 @@ import java.util.List;
 @ActiveProfiles({"default", "unittest"})
 @TestPropertySource("classpath:application-unittest.properties")
 @ContextConfiguration(classes = JwtTokenProviderTest.ContextConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
-@Log4j
+@Slf4j
 class JwtTokenProviderTest {
 
     @Profile("unittest")

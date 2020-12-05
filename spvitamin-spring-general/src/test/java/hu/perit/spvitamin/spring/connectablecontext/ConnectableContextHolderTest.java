@@ -16,19 +16,20 @@
 
 package hu.perit.spvitamin.spring.connectablecontext;
 
-import hu.perit.spvitamin.core.connectablecontext.ThreadContextKey;
-import lombok.extern.log4j.Log4j;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
+import hu.perit.spvitamin.core.connectablecontext.ThreadContextKey;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class ConnectableContextHolderTest
 {
     @Test
@@ -41,7 +42,7 @@ public class ConnectableContextHolderTest
         IntStream.range(0, 10).parallel().forEach(i ->
         {
             ThreadSpecificContext threadContext = threadContextHolder.getContext(new ThreadContextKey());
-            log.debug(threadContext);
+            log.debug(threadContext.toString());
         });
 
         // should finish in 5 seconds

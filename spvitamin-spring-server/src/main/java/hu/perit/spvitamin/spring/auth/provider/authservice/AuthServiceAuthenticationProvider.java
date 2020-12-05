@@ -16,21 +16,22 @@
 
 package hu.perit.spvitamin.spring.auth.provider.authservice;
 
-import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
-import hu.perit.spvitamin.spring.auth.jwt.TokenClaims;
-import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import lombok.extern.log4j.Log4j;
+import java.util.Collection;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
+import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.auth.jwt.TokenClaims;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 public abstract class AuthServiceAuthenticationProvider implements AuthenticationProvider {
 
     @Override

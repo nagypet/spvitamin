@@ -16,18 +16,18 @@
 
 package hu.perit.spvitamin.spring.manifest;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.spring.rest.api.AdminController;
-import hu.perit.spvitamin.spring.rest.model.ResourceUrlDecoder;
-import lombok.extern.log4j.Log4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-@Log4j
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.spring.rest.api.AdminController;
+import hu.perit.spvitamin.spring.rest.model.ResourceUrlDecoder;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ManifestReader {
 
     public static Properties getManifestAttributes()

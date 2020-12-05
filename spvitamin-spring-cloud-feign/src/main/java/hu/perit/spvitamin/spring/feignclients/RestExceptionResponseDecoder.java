@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.spring.feignclients;
 
+import java.io.IOException;
+
 import feign.FeignException;
 import feign.Response;
 import feign.Util;
@@ -23,15 +25,13 @@ import feign.codec.ErrorDecoder;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
-import lombok.extern.log4j.Log4j;
-
-import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class RestExceptionResponseDecoder implements ErrorDecoder {
 
     @Override

@@ -15,12 +15,19 @@
   -->
 
 <configuration>
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="spring-message" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p SPR [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
 		</encoder>
 	</appender>
 
+	<appender name="application-message" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p --- [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Spring framework loggers -->
 	<logger name="org.reflections" level="ERROR"/>
 	<logger name="org.springframework.security.authentication" level="DEBUG"/>
 	<logger name="org.springframework.boot.web.embedded.tomcat" level="INFO"/>
@@ -31,6 +38,14 @@
 	<logger name="org.springframework.orm.jpa.vendor" level="ERROR"/>
 	<logger name="org.springframework.security.web.context" level="DEBUG"/>
 
+	<!-- Application specific loggers -->
+	<logger name="hu.perit.spvitamin.spring" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.data.dynamicdatasource" level="INFO" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+
 	<!--
 	<logger name="org.springframework.security.web.util.matcher" level="DEBUG"/>
 	<logger name="org.springframework.transaction" level="DEBUG"/>
@@ -40,12 +55,13 @@
 	#logging.level.org.springframework.web=OFF
 	#logging.level.org.hibernate=TRACE
 	#logging.level.org.hibernate.SQL=DEBUG
-	#logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+		#logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 	#logging.level.org.springframework.ws.transport.http=DEBUG
 	#logging.level.org.springframework.ws=DEBUG
 	-->
 
+	<!-- Default log level -->
 	<root level="WARN">
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="spring-message"/>
 	</root>
 </configuration>

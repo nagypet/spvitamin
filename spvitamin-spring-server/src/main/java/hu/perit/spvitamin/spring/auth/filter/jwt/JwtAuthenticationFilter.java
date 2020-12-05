@@ -16,13 +16,13 @@
 
 package hu.perit.spvitamin.spring.auth.filter.jwt;
 
-import hu.perit.spvitamin.spring.auth.filter.AbstractTokenAuthenticationFilter;
-import hu.perit.spvitamin.spring.auth.filter.JwtString;
-import lombok.extern.log4j.Log4j;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import hu.perit.spvitamin.spring.auth.filter.AbstractTokenAuthenticationFilter;
+import hu.perit.spvitamin.spring.auth.filter.JwtString;
 
 /**
  * This class is intentionally no container. It should be invoked only for Jwt endpoints.
@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author Peter Nagy
  */
 
-@Log4j
 public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter {
 
     @Override

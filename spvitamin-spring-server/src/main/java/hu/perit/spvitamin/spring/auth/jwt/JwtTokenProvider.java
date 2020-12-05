@@ -16,6 +16,18 @@
 
 package hu.perit.spvitamin.spring.auth.jwt;
 
+import java.io.IOException;
+import java.security.Key;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import org.springframework.stereotype.Component;
+
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
@@ -25,25 +37,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.security.Key;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 @AllArgsConstructor
 @Component
 public class JwtTokenProvider {

@@ -25,7 +25,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Parameters from properties file.
@@ -34,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Peter Nagy
  */
 
-@Log4j2
+@Slf4j
 public class InitParams {
 
     private static InitParams myInstance = null;

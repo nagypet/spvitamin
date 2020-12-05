@@ -16,18 +16,17 @@
 
 package hu.perit.spvitamin.spring.auth;
 
-import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import lombok.extern.log4j.Log4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.spring.config.SysConfig;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j
 public class QuickPasswordEncoder implements PasswordEncoder {
 
     @Override

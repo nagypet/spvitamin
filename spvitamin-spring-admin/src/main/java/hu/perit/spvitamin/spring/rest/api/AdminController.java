@@ -16,32 +16,35 @@
 
 package hu.perit.spvitamin.spring.rest.api;
 
-import com.google.common.reflect.AbstractInvocationHandler;
-import hu.perit.spvitamin.spring.config.Constants;
-import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.admin.ShutdownManager;
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
-import hu.perit.spvitamin.spring.rest.session.AdminSession;
-import lombok.extern.log4j.Log4j;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.reflect.AbstractInvocationHandler;
+
+import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.admin.ShutdownManager;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
+import hu.perit.spvitamin.spring.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.config.Constants;
+import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
+import hu.perit.spvitamin.spring.rest.session.AdminSession;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Peter Nagy
  */
 
 @RestController
-@Log4j
+@Slf4j
 public class AdminController implements AdminApi
 {
     private final AdminApi proxy;
@@ -88,7 +91,7 @@ public class AdminController implements AdminApi
      * ============== PROXY Implementation =============================================================================
      */
 
-    @Log4j
+    @Slf4j
     private static class ProxyImpl extends AbstractInvocationHandler {
         private final ShutdownManager sm;
         private final ServerParameterProvider serverParameterProvider;
@@ -128,7 +131,7 @@ public class AdminController implements AdminApi
             }
         }
 
-        @Log4j
+        @Slf4j
         private static class Logger extends AbstractInterfaceLogger {
 
             Logger(HttpServletRequest httpRequest) {

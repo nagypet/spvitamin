@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -32,7 +32,7 @@ import lombok.extern.log4j.Log4j2;
  */
 
 
-@Log4j2
+@Slf4j
 public class ConnectableContextCollection<T extends ConnectableContext> extends HashMap<ContextKey, T>
 {
     private String contextTypeName = "ConnectableContext";

@@ -16,13 +16,6 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import hu.perit.spvitamin.spring.config.Constants;
-import lombok.extern.log4j.Log4j;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,11 +23,17 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
+import hu.perit.spvitamin.spring.config.Constants;
+
 /**
  * @author Peter Nagy
  */
 
-@Log4j
 public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
     @Override

@@ -16,37 +16,42 @@
 
 package hu.perit.spvitamin.spring.rest.session;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.connectablecontext.ActivityLock;
-import hu.perit.spvitamin.core.connectablecontext.ConnectableContext;
-import hu.perit.spvitamin.spring.keystore.CertInfo;
-import hu.perit.spvitamin.spring.keystore.KeystoreEntry;
-import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
-import hu.perit.spvitamin.spring.rest.model.CertificateFile;
-import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.io.FileUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.connectablecontext.ActivityLock;
+import hu.perit.spvitamin.core.connectablecontext.ConnectableContext;
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.keystore.CertInfo;
+import hu.perit.spvitamin.spring.keystore.KeystoreEntry;
+import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
+import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
+import hu.perit.spvitamin.spring.rest.model.CertificateFile;
+import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class KeystoreSession extends ConnectableContext implements KeystoreApi
 {
     private static final int IDLETIMESEC = 30;

@@ -16,15 +16,17 @@
 
 package hu.perit.spvitamin.spring.time;
 
-import hu.perit.spvitamin.spring.config.SystemProperties;
-import lombok.extern.log4j.Log4j;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
+import hu.perit.spvitamin.spring.config.SystemProperties;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
-@Log4j
+@Slf4j
 public class TimeZoneConfig {
 
     private final SystemProperties systemProperties;

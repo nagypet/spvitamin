@@ -27,14 +27,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j2
+@Slf4j
 public abstract class BatchProcessor {
 
     private int threadPoolSize;
@@ -138,7 +138,7 @@ public abstract class BatchProcessor {
             return true;
         }
         catch (InterruptedException ex) {
-            log.warn(ex);
+            log.warn(ex.toString());
             shutdownImmediately = true;
             throw ex;
         }

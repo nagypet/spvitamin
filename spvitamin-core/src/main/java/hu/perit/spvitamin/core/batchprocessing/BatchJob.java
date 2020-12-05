@@ -21,13 +21,13 @@ import java.util.concurrent.Callable;
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j2
+@Slf4j
 @Getter
 @Setter
 public abstract class BatchJob implements Callable<Boolean> {

@@ -23,13 +23,13 @@ import org.junit.jupiter.api.Test;
 
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j2
+@Slf4j
 class StackTracerTest
 {
     @Test
@@ -43,8 +43,8 @@ class StackTracerTest
         catch (Exception ex)
         {
             String message = StackTracer.toString(ex);
+            log.error(message);
             Assertions.assertTrue(message.startsWith("java.lang.NullPointerException\n    => 1: hu.perit.spvitamin.core.StackTracerTest.testNullPointerException(StackTracerTest.java:"));
-            log.error(StackTracer.toString(ex));
         }
         log.debug("next line");
     }

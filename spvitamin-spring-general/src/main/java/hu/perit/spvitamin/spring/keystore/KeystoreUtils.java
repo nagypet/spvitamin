@@ -16,34 +16,44 @@
 
 package hu.perit.spvitamin.spring.keystore;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
+
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.env.Environment;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class KeystoreUtils {
 
     private KeystoreUtils() {

@@ -24,13 +24,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j2
+@Slf4j
 public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
 
     // A sorbanálló job-ok
@@ -91,7 +91,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
             }
         }
         if (t != null) {
-            log.error(t);
+            log.error(t.toString());
         }
     }
 

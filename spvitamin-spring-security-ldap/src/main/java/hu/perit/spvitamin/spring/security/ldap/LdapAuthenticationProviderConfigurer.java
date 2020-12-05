@@ -21,16 +21,17 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
-import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Log4j
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.stereotype.Component;
+
+import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Getter
 @Component
 public class LdapAuthenticationProviderConfigurer

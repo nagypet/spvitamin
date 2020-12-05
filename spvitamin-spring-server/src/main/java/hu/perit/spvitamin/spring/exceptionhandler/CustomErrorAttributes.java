@@ -17,14 +17,15 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import lombok.extern.log4j.Log4j;
+import java.util.Map;
+
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Map;
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -32,7 +33,7 @@ import java.util.Map;
 
 
 @Component
-@Log4j
+@Slf4j
 public class CustomErrorAttributes extends DefaultErrorAttributes {
 
     private final ServerProperties serverProperties;

@@ -16,13 +16,15 @@
 
 package hu.perit.spvitamin.spring.security;
 
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import lombok.extern.log4j.Log4j;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 import java.security.Provider;
 import java.security.Security;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * #know-how:disable-ssl-certificate-validation
@@ -31,7 +33,7 @@ import java.security.Security;
  */
 
 @Component
-@Log4j
+@Slf4j
 public class NullSecurityProviderConfigurer {
 
     private final ServerProperties serverProperties;

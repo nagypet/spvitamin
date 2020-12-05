@@ -16,14 +16,15 @@
 
 package hu.perit.spvitamin.spring.admin;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Component
-@Log4j
+@Slf4j
 public class ShutdownManager extends Thread
 {
     @Autowired

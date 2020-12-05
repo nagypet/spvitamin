@@ -16,15 +16,17 @@
 
 package hu.perit.spvitamin.spring.auth.filter.securitycontextremover;
 
-import lombok.extern.log4j.Log4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Session handling could be denied in WebSecurityConfig, thogh we do not want to completely deny session handling. We
@@ -33,7 +35,7 @@ import java.io.IOException;
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class SecurityContextRemoverFilter extends OncePerRequestFilter {
 
     @Override

@@ -16,11 +16,6 @@
 
 package hu.perit.spvitamin.spring.auth;
 
-import hu.perit.spvitamin.spring.auth.filter.jwt.JwtAuthenticationFilter;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.rest.api.AdminApi;
-import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
-import lombok.extern.log4j.Log4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,12 +23,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
+import hu.perit.spvitamin.spring.auth.filter.jwt.JwtAuthenticationFilter;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.rest.api.AdminApi;
+import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
+
 /**
  * @author Peter Nagy
  */
 
 @EnableWebSecurity
-@Log4j
 public class SpvitaminWebSecurityConfig {
     /*
      * ============== Config for the endpoints with JWT auth ===========================================================

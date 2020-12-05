@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.data.dynamicdatasource;
 
+import org.modelmapper.ModelMapper;
+
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
@@ -23,8 +25,7 @@ import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.log4j.Log4j;
-import org.modelmapper.ModelMapper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A convenience class, which creates a JDBC connection string using the raw datasource properties for the popular database systems.
@@ -35,7 +36,7 @@ import org.modelmapper.ModelMapper;
 @Getter
 @Setter
 @ToString
-@Log4j
+@Slf4j
 public class ConnectionParam extends DatasourceProperties {
 
     public static final String DBTYPE_SQLSERVER = "sqlserver";

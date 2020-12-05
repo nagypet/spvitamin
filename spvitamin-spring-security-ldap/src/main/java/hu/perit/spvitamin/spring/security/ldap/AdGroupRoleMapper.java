@@ -16,16 +16,17 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
-import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import lombok.extern.log4j.Log4j;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Maps AD groups and users to roles
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  */
 
 @Component
-@Log4j
+@Slf4j
 public class AdGroupRoleMapper {
 
     private final RoleMappingProperties roleMappingProperties;

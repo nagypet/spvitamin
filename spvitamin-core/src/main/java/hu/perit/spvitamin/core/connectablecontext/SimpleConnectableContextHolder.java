@@ -20,14 +20,14 @@ package hu.perit.spvitamin.core.connectablecontext;
 import java.util.Iterator;
 
 import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
 
-@Log4j2
+@Slf4j
 public abstract class SimpleConnectableContextHolder<T extends ConnectableContext>
 {
     protected abstract ConnectableContextCollection<T> getContextCollection();

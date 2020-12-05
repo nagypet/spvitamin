@@ -16,17 +16,16 @@
 
 package hu.perit.spvitamin.spring.auth.provider.authservice;
 
+import org.springframework.stereotype.Service;
+
 import feign.auth.BasicAuthRequestInterceptor;
-import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.rest.client.AuthClient;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import lombok.extern.log4j.Log4j;
-import org.springframework.stereotype.Service;
 
 @Service
-@Log4j
 public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthenticationProvider {
 
     protected AuthorizationToken getAuthorizationToken(String userName, String password) {

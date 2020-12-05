@@ -16,18 +16,16 @@
 
 package hu.perit.spvitamin.spring.metrics;
 
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Iterator;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 /**
  * @author Peter Nagy
  */
 
-@Log4j
 public class SingleMetricAverageOfLastNValueGeneric<T extends Number>
 {
     private static int myQueueSize = 50;

@@ -16,14 +16,15 @@
 
 package hu.perit.spvitamin.spring.security;
 
-import lombok.extern.log4j.Log4j;
+import java.net.Socket;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.net.Socket;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * #know-how:disable-ssl-certificate-validation
@@ -31,7 +32,7 @@ import java.security.cert.X509Certificate;
  * @author Peter Nagy
  */
 
-@Log4j
+@Slf4j
 public class NullTrustManager extends X509ExtendedTrustManager implements X509TrustManager {
 
     private void logWarning() {
