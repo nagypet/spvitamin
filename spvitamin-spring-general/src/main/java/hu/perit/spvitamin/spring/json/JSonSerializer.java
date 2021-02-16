@@ -16,12 +16,18 @@
 
 package hu.perit.spvitamin.spring.json;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import hu.perit.spvitamin.spring.config.Constants;
 
@@ -31,18 +37,86 @@ import hu.perit.spvitamin.spring.config.Constants;
 
 public final class JSonSerializer
 {
+	private static ObjectMapper jsonMapper;
+	private static ObjectMapper yamlMapper;
 
 	public String toJson(Object object) throws JsonProcessingException
 	{
-		ObjectMapper mapper = new ObjectMapper();
+		return getJsonMapper().writeValueAsString(object);
+	}
+
+
+	public String toYaml(Object object) throws JsonProcessingException
+	{
+		return getYamlMapper().writeValueAsString(object);
+	}
+
+
+	public static <T> T fromJson(String jsonString, Class<?> target) throws IOException
+	{
+		return getJsonMapper().readValue(jsonString, getJsonMapper().getTypeFactory().constructType(target));
+	}
+
+
+	public static <T> T fromYaml(String jsonString, Class<?> target) throws IOException
+	{
+		return getYamlMapper().readValue(jsonString, getYamlMapper().getTypeFactory().constructType(target));
+	}
+
+
+	private static ObjectMapper getJsonMapper()
+	{
+		if (jsonMapper == null)
+		{
+			synchronized (JSonSerializer.class)
+			{
+				if (jsonMapper == null)
+				{
+					jsonMapper = createMapper(MapperType.JSON);
+				}
+			}
+		}
+
+		return jsonMapper;
+	}
+
+
+	private static ObjectMapper getYamlMapper()
+	{
+		if (yamlMapper == null)
+		{
+			synchronized (JSonSerializer.class)
+			{
+				if (yamlMapper == null)
+				{
+					yamlMapper = createMapper(MapperType.YAML);
+				}
+			}
+		}
+
+		return yamlMapper;
+	}
+
+	private enum MapperType
+	{
+		JSON, YAML
+	}
+
+	private static ObjectMapper createMapper(MapperType type)
+	{
+		ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		// We encode timestamps with millisecond presision
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		// We encode timestamps with millisecond precision
 		mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
 		SimpleModule module = new SimpleModule();
 		module.addSerializer(new CustomLocalDateSerializer());
 		module.addSerializer(new CustomLocalDateTimeSerializer());
+		module.addDeserializer(Date.class, new CustomDateDeserializer());
+		module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+		module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
 		mapper.registerModule(module);
 
-		return mapper.writeValueAsString(object);
+		return mapper;
 	}
 }

@@ -16,64 +16,68 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author Peter Nagy
  */
 
-public interface JsonSerializable {
+public interface JsonSerializable
+{
 
-    default String toJson() throws JsonProcessingException {
-        return new JSonSerializer().toJson(this);
-    }
+	default String toJson() throws JsonProcessingException
+	{
+		return new JSonSerializer().toJson(this);
+	}
 
-    static <T> T fromJson(String jsonString, Class<?> target) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Date.class, new CustomDateDeserializer());
-        module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
-        module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
-        mapper.registerModule(module);
 
-        T obj = mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
-        if (obj instanceof JsonSerializable) {
-            ((JsonSerializable) obj).finalizeJsonDeserialization();
-        }
-        return obj;
-    }
+	default String toYaml() throws JsonProcessingException
+	{
+		return new JSonSerializer().toYaml(this);
+	}
 
-    default void finalizeJsonDeserialization() {
-        // Override if you want to some post processing. E.g. if you have a member containing a data type information
-        // you may want to case the data member to have the real data type.
-    }
+
+	static <T> T fromJson(String jsonString, Class<?> target) throws IOException
+	{
+		T obj = JSonSerializer.fromJson(jsonString, target);
+
+		if (obj instanceof JsonSerializable)
+		{
+			((JsonSerializable) obj).finalizeJsonDeserialization();
+		}
+		return obj;
+	}
+
+
+	static <T> T fromYaml(String jsonString, Class<?> target) throws IOException
+	{
+		T obj = JSonSerializer.fromYaml(jsonString, target);
+
+		if (obj instanceof JsonSerializable)
+		{
+			((JsonSerializable) obj).finalizeJsonDeserialization();
+		}
+		return obj;
+	}
+
+
+	default void finalizeJsonDeserialization()
+	{
+		// Override if you want to some post processing. E.g. if you have a member
+		// containing a data type information
+		// you may want to case the data member to have the real data type.
+	}
 }
-
 
 /*
-// Requirements:
-// - a default constructor
-// - Getter methods or @JsonProperty annotation
-class Example implements JsonSerializable
-{
-    @JsonProperty
-    private final String name;
-    @JsonProperty
-    private final int age;
-
-    public Example()
-    {
-        this.name = null;
-        age = 0;
-    }
-}
-*/
+ * // Requirements: // - a default constructor // - Getter methods
+ * or @JsonProperty annotation class Example implements JsonSerializable {
+ * 
+ * @JsonProperty private final String name;
+ * 
+ * @JsonProperty private final int age;
+ * 
+ * public Example() { this.name = null; age = 0; } }
+ */
