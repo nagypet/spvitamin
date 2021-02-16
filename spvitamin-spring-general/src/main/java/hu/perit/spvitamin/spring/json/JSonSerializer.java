@@ -16,31 +16,33 @@
 
 package hu.perit.spvitamin.spring.json;
 
+import java.text.SimpleDateFormat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import hu.perit.spvitamin.spring.config.Constants;
 
-import java.text.SimpleDateFormat;
+import hu.perit.spvitamin.spring.config.Constants;
 
 /**
  * @author Peter Nagy
  */
 
+public final class JSonSerializer
+{
 
-public final class JSonSerializer {
+	public String toJson(Object object) throws JsonProcessingException
+	{
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		// We encode timestamps with millisecond presision
+		mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
+		SimpleModule module = new SimpleModule();
+		module.addSerializer(new CustomLocalDateSerializer());
+		module.addSerializer(new CustomLocalDateTimeSerializer());
+		mapper.registerModule(module);
 
-    public String toJson(Object object) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // We encode timestamps with millisecond presision
-        mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(new CustomLocalDateSerializer());
-        module.addSerializer(new CustomLocalDateTimeSerializer());
-        mapper.registerModule(module);
-
-        return mapper.writeValueAsString(object);
-    }
+		return mapper.writeValueAsString(object);
+	}
 }

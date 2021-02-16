@@ -90,6 +90,11 @@ dependencies {
 }
 
 
+configurations {
+    compile.exclude module: 'spring-boot-starter-logging'
+}
+
+
 test {
     useJUnitPlatform()
 }
