@@ -71,13 +71,15 @@ public interface JsonSerializable
 	}
 }
 
-/*
- * // Requirements: // - a default constructor // - Getter methods
- * or @JsonProperty annotation class Example implements JsonSerializable {
- * 
- * @JsonProperty private final String name;
- * 
- * @JsonProperty private final int age;
- * 
- * public Example() { this.name = null; age = 0; } }
- */
+//	Requirements:
+//	- a default constructor 
+//	- Getter methods or @JsonProperty annotation 
+//	
+//	class Example implements JsonSerializable {
+//		@JsonProperty private final String name;
+//		@JsonProperty private final int age;
+//		public Example() { 
+//			this.name = null; 
+//			age = 0; 
+//		} 
+//	}
