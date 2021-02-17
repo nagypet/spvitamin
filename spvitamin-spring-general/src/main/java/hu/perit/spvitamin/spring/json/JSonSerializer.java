@@ -52,13 +52,13 @@ public final class JSonSerializer
 	}
 
 
-	public static <T> T fromJson(String jsonString, Class<?> target) throws IOException
+	public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
 	{
 		return getJsonMapper().readValue(jsonString, getJsonMapper().getTypeFactory().constructType(target));
 	}
 
 
-	public static <T> T fromYaml(String jsonString, Class<?> target) throws IOException
+	public static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
 	{
 		return getYamlMapper().readValue(jsonString, getYamlMapper().getTypeFactory().constructType(target));
 	}

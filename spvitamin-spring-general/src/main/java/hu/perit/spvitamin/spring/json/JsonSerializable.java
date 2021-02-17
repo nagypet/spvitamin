@@ -39,7 +39,7 @@ public interface JsonSerializable
 	}
 
 
-	static <T> T fromJson(String jsonString, Class<?> target) throws IOException
+	static <T> T fromJson(String jsonString, Class<T> target) throws IOException
 	{
 		T obj = JSonSerializer.fromJson(jsonString, target);
 
@@ -51,7 +51,7 @@ public interface JsonSerializable
 	}
 
 
-	static <T> T fromYaml(String jsonString, Class<?> target) throws IOException
+	static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
 	{
 		T obj = JSonSerializer.fromYaml(jsonString, target);
 
