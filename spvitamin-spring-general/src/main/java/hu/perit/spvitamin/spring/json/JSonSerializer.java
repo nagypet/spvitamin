@@ -37,8 +37,8 @@ import hu.perit.spvitamin.spring.config.Constants;
 
 public final class JSonSerializer
 {
-	private static ObjectMapper jsonMapper;
-	private static ObjectMapper yamlMapper;
+	private static volatile ObjectMapper jsonMapper;
+	private static volatile ObjectMapper yamlMapper;
 
 	public String toJson(Object object) throws JsonProcessingException
 	{
@@ -64,6 +64,7 @@ public final class JSonSerializer
 	}
 
 
+	// Double checked locking pattern for better performance
 	private static ObjectMapper getJsonMapper()
 	{
 		if (jsonMapper == null)
@@ -81,6 +82,7 @@ public final class JSonSerializer
 	}
 
 
+	// Double checked locking pattern for better performance
 	private static ObjectMapper getYamlMapper()
 	{
 		if (yamlMapper == null)
