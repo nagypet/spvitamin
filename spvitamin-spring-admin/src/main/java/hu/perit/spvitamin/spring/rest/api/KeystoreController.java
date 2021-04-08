@@ -36,7 +36,6 @@ import com.google.common.reflect.AbstractInvocationHandler;
 
 import hu.perit.spvitamin.core.connectablecontext.StringContextKey;
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.keystore.KeystoreEntry;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
@@ -44,6 +43,7 @@ import hu.perit.spvitamin.spring.rest.model.CertificateFile;
 import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSession;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSessionHolder;
+import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.data.admin;
+package hu.perit.spvitamin.spring.data.admin;
 
-import hu.perit.spvitamin.data.config.DatasourceCollectionProperties;
-import hu.perit.spvitamin.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
+import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
+import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 
 
+@SuppressWarnings("serial")
 @ResponseStatus(value = HttpStatus.SERVICE_UNAVAILABLE, code = HttpStatus.SERVICE_UNAVAILABLE)
 public class CannotConnectException extends RuntimeException {
 

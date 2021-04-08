@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.data.dynamicdatasource;
+package hu.perit.spvitamin.spring.data.dynamicdatasource;
 
 import org.modelmapper.ModelMapper;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.Setter;

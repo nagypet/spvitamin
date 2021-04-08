@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 
 
+@SuppressWarnings("serial")
 @ResponseStatus(value = HttpStatus.CONFLICT, code = HttpStatus.CONFLICT)
 public class ResourceAlreadyExistsException extends RuntimeException {
 

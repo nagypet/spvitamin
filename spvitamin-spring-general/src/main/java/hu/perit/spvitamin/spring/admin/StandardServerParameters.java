@@ -16,24 +16,23 @@
 
 package hu.perit.spvitamin.spring.admin;
 
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
-import hu.perit.spvitamin.spring.config.*;
-import hu.perit.spvitamin.spring.environment.SpringEnvironment;
-import lombok.AllArgsConstructor;
+import java.util.Map;
+
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.StreamSupport;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
+import hu.perit.spvitamin.spring.config.CryptoProperties;
+import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.MetricsProperties;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
+import hu.perit.spvitamin.spring.config.MicroserviceProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import hu.perit.spvitamin.spring.config.SystemProperties;
+import lombok.AllArgsConstructor;
 
 /**
  * @author Peter Nagy

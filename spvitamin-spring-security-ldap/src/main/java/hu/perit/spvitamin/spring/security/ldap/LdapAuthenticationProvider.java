@@ -16,13 +16,35 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
-import hu.perit.spvitamin.core.StackTracer;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.naming.AuthenticationException;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.ldap.InitialLdapContext;
+
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.ldap.support.LdapUtils;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,17 +54,7 @@ import org.springframework.security.ldap.authentication.AbstractLdapAuthenticati
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import javax.naming.AuthenticationException;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.OperationNotSupportedException;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.ldap.InitialLdapContext;
-import java.io.Serializable;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import hu.perit.spvitamin.core.StackTracer;
 
 
 /**

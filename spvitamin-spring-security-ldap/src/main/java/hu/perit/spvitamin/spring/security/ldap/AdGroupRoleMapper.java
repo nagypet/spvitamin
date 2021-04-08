@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Maps AD groups and users to roles
@@ -35,39 +34,42 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Component
-@Slf4j
-public class AdGroupRoleMapper {
+public class AdGroupRoleMapper
+{
 
-    private final RoleMappingProperties roleMappingProperties;
+	private final RoleMappingProperties roleMappingProperties;
 
-    public AdGroupRoleMapper(RoleMappingProperties roleMappingProperties) {
-        this.roleMappingProperties = roleMappingProperties;
-    }
-
-    public AuthenticatedUser mapGrantedAuthorities(AuthenticatedUser authenticatedUser) {
-        Collection<? extends GrantedAuthority> adGroups = authenticatedUser.getAuthorities();
-
-        Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(authenticatedUser.getUsername(), adGroups);
-
-        return AuthenticatedUser.builder()
-                .username(authenticatedUser.getUsername())
-                .authorities(roles)
-                .userId(authenticatedUser.getUserId())
-                .build();
-    }
+	public AdGroupRoleMapper(RoleMappingProperties roleMappingProperties)
+	{
+		this.roleMappingProperties = roleMappingProperties;
+	}
 
 
-    private Collection<GrantedAuthority> mapAdGroupsAndUsers(String username, Collection<? extends GrantedAuthority> adGroups) {
-        Set<String> roles = this.roleMappingProperties.getUserRoles(username);
-        for (GrantedAuthority adGroup : adGroups) {
-            if (adGroup.getAuthority().startsWith("ROLE_")) {
-                roles.add(adGroup.getAuthority().substring(5));
-            }
-            else {
-                roles.addAll(this.roleMappingProperties.getGroupRoles(adGroup.getAuthority()));
-            }
-        }
+	public AuthenticatedUser mapGrantedAuthorities(AuthenticatedUser authenticatedUser)
+	{
+		Collection<? extends GrantedAuthority> adGroups = authenticatedUser.getAuthorities();
 
-        return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())).collect(Collectors.toSet());
-    }
+		Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(authenticatedUser.getUsername(), adGroups);
+
+		return AuthenticatedUser.builder().username(authenticatedUser.getUsername()).authorities(roles).userId(authenticatedUser.getUserId()).build();
+	}
+
+
+	private Collection<GrantedAuthority> mapAdGroupsAndUsers(String username, Collection<? extends GrantedAuthority> adGroups)
+	{
+		Set<String> roles = this.roleMappingProperties.getUserRoles(username);
+		for (GrantedAuthority adGroup : adGroups)
+		{
+			if (adGroup.getAuthority().startsWith("ROLE_"))
+			{
+				roles.add(adGroup.getAuthority().substring(5));
+			}
+			else
+			{
+				roles.addAll(this.roleMappingProperties.getGroupRoles(adGroup.getAuthority()));
+			}
+		}
+
+		return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())).collect(Collectors.toSet());
+	}
 }

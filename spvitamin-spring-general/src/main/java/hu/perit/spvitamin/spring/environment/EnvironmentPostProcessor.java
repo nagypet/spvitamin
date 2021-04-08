@@ -16,33 +16,41 @@
 
 package hu.perit.spvitamin.spring.environment;
 
-import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
+import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
+
 /**
- * A utility class for post processing some properties. This must be done just after the property sources have been loaded
- * but before any further initialization of our SpringApplication. The loaded environment will be stored in a singleton,
- * so it can be used for initializing beans, where autowired values would not be ready for use.
+ * A utility class for post processing some properties. This must be done just
+ * after the property sources have been loaded but before any further
+ * initialization of our SpringApplication. The loaded environment will be
+ * stored in a singleton, so it can be used for initializing beans, where
+ * autowired values would not be ready for use.
  */
 
-public class EnvironmentPostProcessor implements ApplicationListener {
+public class EnvironmentPostProcessor implements ApplicationListener<ApplicationEvent>
+{
 
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ApplicationPreparedEvent) {
-            this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
-        }
-    }
+	@Override
+	public void onApplicationEvent(ApplicationEvent event)
+	{
+		if (event instanceof ApplicationPreparedEvent)
+		{
+			this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
+		}
+	}
 
 
-    private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
-        if (!event.getApplicationContext().isActive()) {
-            // Initializing a singleton object with the current Environment
-            SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
+	private void onApplicationPreparedEvent(ApplicationPreparedEvent event)
+	{
+		if (!event.getApplicationContext().isActive())
+		{
+			// Initializing a singleton object with the current Environment
+			SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
 
-            KeystoreUtils.locateJksStores();
-        }
-    }
+			KeystoreUtils.locateJksStores();
+		}
+	}
 }

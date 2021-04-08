@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 
 
+@SuppressWarnings("serial")
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, code = HttpStatus.BAD_REQUEST)
 public class InvalidInputException extends RuntimeException {
 

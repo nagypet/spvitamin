@@ -33,10 +33,10 @@ import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.session.AdminSession;
+import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 
 /**

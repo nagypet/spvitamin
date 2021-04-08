@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.auth;
+package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;

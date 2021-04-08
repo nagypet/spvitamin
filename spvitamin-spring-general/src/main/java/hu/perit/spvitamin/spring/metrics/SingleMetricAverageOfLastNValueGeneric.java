@@ -38,7 +38,7 @@ public class SingleMetricAverageOfLastNValueGeneric<T extends Number>
 
     public SingleMetricAverageOfLastNValueGeneric()
     {
-        this.queue = new CircularFifoQueue(myQueueSize);
+        this.queue = new CircularFifoQueue<>(myQueueSize);
     }
 
 

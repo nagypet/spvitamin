@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.data.dynamicdatasource;
+package hu.perit.spvitamin.spring.data.dynamicdatasource;
 
 import java.io.Closeable;
 import java.io.PrintWriter;
