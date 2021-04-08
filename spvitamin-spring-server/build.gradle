@@ -72,12 +72,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Eureka client
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-
-    // Zuul
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
-
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
@@ -86,13 +80,6 @@ dependencies {
 
     // javax.validation
     implementation group: 'javax.validation', name: 'validation-api'
-
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    testImplementation 'org.springframework.security:spring-security-test'
 
     // Swagger
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
@@ -111,11 +98,15 @@ dependencies {
     implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
     //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
 
-    // OpenCSV
-    implementation group: 'com.opencsv', name: 'opencsv', version: '4.0'
-
     // Micrometer Prometheus plugin
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+	
+	// Test framework
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 
