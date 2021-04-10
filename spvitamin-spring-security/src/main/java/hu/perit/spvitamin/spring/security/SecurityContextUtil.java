@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.auth;
+package hu.perit.spvitamin.spring.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 
 public class SecurityContextUtil {
 
