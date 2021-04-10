@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.filter.authservice;
+package hu.perit.spvitamin.spring.security.auth.authservice.filter;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,8 +24,8 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.feignclients.ForwardingAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.rest.client.AuthClient;
+import hu.perit.spvitamin.spring.security.auth.authservice.provider.AuthServiceAuthenticationProviderWithFeign;
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
-import hu.perit.spvitamin.spring.security.auth.provider.authservice.AuthServiceAuthenticationProviderWithFeign;
 
 /**
  * An alternative way of using AuthServiceAuthentication

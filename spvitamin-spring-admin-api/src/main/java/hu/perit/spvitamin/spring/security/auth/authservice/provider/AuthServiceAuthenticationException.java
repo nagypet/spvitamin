@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.provider.authservice;
+package hu.perit.spvitamin.spring.security.auth.authservice.provider;
 
 import org.springframework.security.core.AuthenticationException;
 
-public class AuthServiceAuthenticationException extends AuthenticationException {
+@SuppressWarnings("serial")
+public class AuthServiceAuthenticationException extends AuthenticationException
+{
 
-    public AuthServiceAuthenticationException(String msg, Throwable t) {
-        super(msg, t);
-    }
+	public AuthServiceAuthenticationException(String msg, Throwable t)
+	{
+		super(msg, t);
+	}
 
-    public AuthServiceAuthenticationException(String msg) {
-        super(msg);
-    }
+
+	public AuthServiceAuthenticationException(String msg)
+	{
+		super(msg);
+	}
 }

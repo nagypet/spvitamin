@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.resttemplate;
+package hu.perit.spvitamin.spring.resttemplate;
 
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;

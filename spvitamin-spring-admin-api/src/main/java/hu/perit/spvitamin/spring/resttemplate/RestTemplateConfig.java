@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.resttemplate;
+package hu.perit.spvitamin.spring.resttemplate;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

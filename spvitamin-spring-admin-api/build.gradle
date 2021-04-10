@@ -55,17 +55,27 @@ bootJar {
 sourceCompatibility = 11
 
 dependencies {
-	compile project(':spvitamin-spring-general')
+    compile project(':spvitamin-spring-general')
+	compile project(':spvitamin-spring-security')
+	compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     // Spring
-    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JJWT
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
     // Swagger
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
+    // FasterXML
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

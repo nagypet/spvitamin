@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.provider.authservice;
+package hu.perit.spvitamin.spring.security.auth.authservice.provider;
 
 import org.springframework.stereotype.Service;
 
