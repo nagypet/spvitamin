@@ -25,17 +25,16 @@
 * exceptionhandler
 * json
 * keystore
+* manifest (ManifestReader.java, ResourceUrlDecoder.java)
 * metrics
 * security
 * time
 
 
 ### spvitamin-spring-server
-* auth
 * exceptionhandler
 * info
 * metrics
-* resttemplate
 * GCTimer.java
 
 
@@ -43,12 +42,16 @@
 ### spvitamin-spring-admin
 * admin (ShutdownManager.java)
 * auth (SecurityContextUtil.java)
-* manifest (ManifestReader.java)
 * rest (AdminApi.java, Bearer, /admin; AuthApi.java, Basic, /authenticate; KeystoreApi.java, Bearer, /keystore, /truststore;)
 
 
 ### spvitamin-spring-admin-api
 * rest (AuthClient.java; /authenticate)
+
+
+### spvitamin-spring-security
+* auth
+* resttemplate
 
 
 ## ConfigProperties
@@ -86,7 +89,7 @@
 
 
 ## Dependency graph
-![](https://github.com/nagypet/spvitamin/blob/master/docs/images/spvitamin_dependency_graph.jpg)
+![](https://github.com/nagypet/spvitamin/blob/master/docs/images/spvitamin_dependency_graph.png)
 Gethering dependent projects in settings.gradle is usually not hard, but in case of a project library we have to define not only direct dependencies, but also the dpendencies of all dependent projects. It is boylerplate code and totally unnecessary, because dependencies are already defined in our build.gradle files. I have implemented a groovy script to automate inclusion of dependent projects. It searches patterns in build.gradle files with 'compile project' and recursively includes the listed projects.
 
 In order to use, place this script in a common folder in your project and reference it from your settings.gradle.

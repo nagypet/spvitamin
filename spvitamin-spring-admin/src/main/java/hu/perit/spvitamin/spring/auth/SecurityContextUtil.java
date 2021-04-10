@@ -16,8 +16,6 @@
 
 package hu.perit.spvitamin.spring.auth;
 
-import hu.perit.spvitamin.spring.rest.model.AbstractAuthorizationToken;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

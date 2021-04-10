@@ -59,7 +59,6 @@ dependencies {
 	compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-security')
     compile project(':spvitamin-spring-logging')
-    compile project(':spvitamin-spring-admin-api')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

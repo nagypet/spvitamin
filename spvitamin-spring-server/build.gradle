@@ -17,7 +17,6 @@
 buildscript {
     ext {
         springBootVersion = '2.3.2.RELEASE'
-		springCloudVersion = 'Hoxton.SR6'
     }
     repositories {
         jcenter()
@@ -57,9 +56,6 @@ sourceCompatibility = 11
 dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
-	compile project(':spvitamin-spring-security')
-    compile project(':spvitamin-spring-cloud-feign')
-    compile project(':spvitamin-spring-admin')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -93,27 +89,8 @@ dependencies {
     //testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
     //testImplementation('log4j:log4j:1.2.17')
 
-    // OpenFeign
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
-    //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
-
     // Micrometer Prometheus plugin
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
-	
-	// Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    testImplementation 'org.springframework.security:spring-security-test'
-}
-
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 

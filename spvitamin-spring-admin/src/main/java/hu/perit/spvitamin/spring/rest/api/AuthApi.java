@@ -16,12 +16,18 @@
 
 package hu.perit.spvitamin.spring.rest.api;
 
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Peter Nagy

@@ -55,6 +55,8 @@ bootJar {
 sourceCompatibility = 11
 
 dependencies {
+	compile project(':spvitamin-spring-general')
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

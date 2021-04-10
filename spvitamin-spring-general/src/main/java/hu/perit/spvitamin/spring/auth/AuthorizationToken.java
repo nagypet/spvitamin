@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rest.client;
+package hu.perit.spvitamin.spring.auth;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Peter Nagy
  */
 
-public interface AuthClient {
+@Data
+@NoArgsConstructor
+public class AuthorizationToken implements AbstractAuthorizationToken {
 
-    String BASE_URL_AUTHENTICATE = "/authenticate";
-	
-    /*
-     * ============== authenticate =====================================================================================
-     */
-    @RequestLine("GET " + BASE_URL_AUTHENTICATE)
-    @Headers({
-            "Content-Type: application/json",
-            "processID: {processID}"
-    })
-    AuthorizationToken authenticate(
-            @Param("processID") String processID
-    );
+    private String sub;
+    private String jwt;
+    private LocalDateTime iat;
+    private LocalDateTime exp;
+
+    public AuthorizationToken(String sub, String jwt, LocalDateTime iat, LocalDateTime exp) {
+        this.sub = sub;
+        this.jwt = jwt;
+        this.iat = iat;
+        this.exp = exp;
+    }
 }

@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rest.client;
+package hu.perit.spvitamin.spring.security.auth;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Peter Nagy
  */
 
-public interface AuthClient {
 
-    String BASE_URL_AUTHENTICATE = "/authenticate";
-	
-    /*
-     * ============== authenticate =====================================================================================
-     */
-    @RequestLine("GET " + BASE_URL_AUTHENTICATE)
-    @Headers({
-            "Content-Type: application/json",
-            "processID: {processID}"
-    })
-    AuthorizationToken authenticate(
-            @Param("processID") String processID
-    );
+@Configuration
+public class PasswordEncoderConfig {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PasswordEncoder passwordEncoder() {
+        return new QuickPasswordEncoder();
+    }
 }
