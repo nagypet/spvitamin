@@ -1,4 +1,90 @@
 # spvitamin
+
+## Components
+
+### spvitamin-core
+* batchprocessing
+* connectablecontext
+* crypto
+* domainuser
+* event
+* exception
+* invoker
+* jobexecutor
+* took
+* InitParams
+* NpCollections
+* StackTracer
+
+### spvitamin-spring-general
+* admin (serverparameter)
+* config (xxxProperties)
+* connectablecontext
+* environment
+* exception
+* exceptionhandler
+* json
+* keystore
+* metrics
+* security
+* time
+
+
+### spvitamin-spring-server
+* auth
+* exceptionhandler
+* info
+* metrics
+* resttemplate
+* GCTimer.java
+
+
+
+### spvitamin-spring-admin
+* admin (ShutdownManager.java)
+* auth (SecurityContextUtil.java)
+* manifest (ManifestReader.java)
+* rest (AdminApi.java, Bearer, /admin; AuthApi.java, Basic, /authenticate; KeystoreApi.java, Bearer, /keystore, /truststore;)
+
+
+### spvitamin-spring-admin-api
+* rest (AuthClient.java; /authenticate)
+
+
+## ConfigProperties
+
+| Name                                     | Type    | Default         | Sample                              | Description |
+|------------------------------------------|---------|-----------------|-------------------------------------|-------------|
+| system.time-zone                         | string  | Europe/Budapest |                                     |             |
+| crypto.secret                            | string  | secret          |                                     |             |
+| jwt.private-key-alias                    | string  | -               | templatekey                         |             |
+| jwt.private-key-encryptedPassword        | string  | -               | jdP5CKDIu5v2VUafF33pPQ==            |             |
+| jwt.public-key-alias                     | string  | -               | templatekey                         |             |
+| jwt.expiration-in-minutes                | string  | -               | 60                                  |             |
+| metrics.performance-itemcount            | int     | 50              |                                     |             |
+| security.admin-user-name                 | string  | -               | admin                               |             |
+| security.admin-user-encryptedPassword    | string  | -               | 7MmoozfTexI=                        |             |
+| security.allowed-origins                 | string  | -               |                                     |             |
+| security.allowed-headers                 | string  | -               |                                     |             |
+| security.allowed-methods                 | string  | -               |                                     |             |
+| security.swagger-access                  | string  | *               |                                     |             |
+| security.management-endpoints-access     | string  | *               |                                     |             |
+| security.admin-gui-access                | string  | *               |                                     |             |
+| security.admin-endpoints-access          | string  | *               |                                     |             |
+| server.fqdn                              | string  | localhost       |                                     |             |
+| server.port                              | int     | 8080            |                                     |             |
+| server.ssl.enabled                       | boolean | FALSE           |                                     |             |
+| server.ssl.key-store                     | string  | -               | classpath:jks/server-keystore.jks   |             |
+| server.ssl.key-store-password            | string  | -               | changeit                            |             |
+| server.ssl.key-alias                     | string  | -               | templatekey                         |             |
+| server.ssl.key-password                  | string  | -               | changeit                            |             |
+| server.ssl.trust-store                   | string  | -               | classpath:jks/client-truststore.jks |             |
+| server.ssl.trust-store-password          | string  | -               | changeit                            |             |
+| server.ssl.ignore-certificate-validation | boolean | FALSE           |                                     |             |
+
+
+
+
 ## Dependency graph
 ![](https://github.com/nagypet/spvitamin/blob/master/docs/images/spvitamin_dependency_graph.jpg)
 Gethering dependent projects in settings.gradle is usually not hard, but in case of a project library we have to define not only direct dependencies, but also the dpendencies of all dependent projects. It is boylerplate code and totally unnecessary, because dependencies are already defined in our build.gradle files. I have implemented a groovy script to automate inclusion of dependent projects. It searches patterns in build.gradle files with 'compile project' and recursively includes the listed projects.
