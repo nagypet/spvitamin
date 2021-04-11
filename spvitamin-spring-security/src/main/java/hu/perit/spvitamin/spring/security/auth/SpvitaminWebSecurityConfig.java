@@ -34,79 +34,85 @@ import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilte
 @EnableWebSecurity
 public class SpvitaminWebSecurityConfig
 {
-	/*
-	 * ============== Config for the endpoints with JWT auth
-	 * ===========================================================
-	 */
-	@Configuration
-	@Order(98)
-	public static class WebSecurityConfigurationAdapterForJwt extends WebSecurityConfigurerAdapter
-	{
+    /*
+     * ============== Config for the endpoints with JWT auth ===========================================================
+     */
+    @Configuration
+    @Order(98)
+    public static class WebSecurityConfigurationAdapterForJwt extends WebSecurityConfigurerAdapter
+    {
 
-		private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-		private final CustomAccessDeniedHandler accessDeniedHandler;
+        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+        private final CustomAccessDeniedHandler accessDeniedHandler;
 
-		public WebSecurityConfigurationAdapterForJwt(SecurityProperties securityProperties, CustomAuthenticationEntryPoint authenticationEntryPoint,
-				CustomAccessDeniedHandler accessDeniedHandler)
-		{
-			this.authenticationEntryPoint = authenticationEntryPoint;
-			this.accessDeniedHandler = accessDeniedHandler;
-		}
-
-
-		@Override
-		protected void configure(HttpSecurity http) throws Exception
-		{
-			SimpleHttpSecurityBuilder.newInstance(http).scope(
-					Constants.BASE_URL_ADMIN + "/**", Constants.BASE_URL_KEYSTORE + "/**", Constants.BASE_URL_TRUSTSTORE + "/**"
-			).defaults().exceptionHandler(this.authenticationEntryPoint, this.accessDeniedHandler).ignorePersistedSecurity()
-					// /admin/** endpoints
-					.authorizeAdminRestEndpoints().and()
-					// any other requests
-					.authorizeRequests().anyRequest().authenticated();
-
-			// applying JWT Filter
-			http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
-		}
-	}
-
-	/*
-	 * ============== Config for the rest
-	 * =============================================================================
-	 * =
-	 */
-	@Configuration(proxyBeanMethods = false)
-	@Order(99)
-	public class DefaultWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter
-	{
-
-		private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-		private final CustomAccessDeniedHandler accessDeniedHandler;
-
-		public DefaultWebSecurityConfigurationAdapter(CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler)
-		{
-			this.authenticationEntryPoint = authenticationEntryPoint;
-			this.accessDeniedHandler = accessDeniedHandler;
-		}
+        public WebSecurityConfigurationAdapterForJwt(SecurityProperties securityProperties,
+            CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler)
+        {
+            this.authenticationEntryPoint = authenticationEntryPoint;
+            this.accessDeniedHandler = accessDeniedHandler;
+        }
 
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception
-		{
-			SimpleHttpSecurityBuilder.newInstance(http).defaults().logout()
-					// h2 console uses frames
-					.allowFrames().authorizeSwagger().authorizeActuator().authorizeAdminGui().and().authorizeRequests().antMatchers(
-							// H2
-							"/h2/**",
+        @Override
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http) //
+                .scope( //
+                    Constants.BASE_URL_ADMIN + "/**", //
+                    Constants.BASE_URL_KEYSTORE + "/**", //
+                    Constants.BASE_URL_TRUSTSTORE + "/**").defaults() //
+                .exceptionHandler(this.authenticationEntryPoint, this.accessDeniedHandler) //
+                .ignorePersistedSecurity()
+                // /admin/** endpoints
+                .authorizeAdminRestEndpoints().and()
+                // any other requests
+                .authorizeRequests().anyRequest().authenticated();
 
-							// Health endpoint
-							"/actuator/health", "/actuator/prometheus",
+            // applying JWT Filter
+            http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+        }
+    }
 
-							// Logout endpoint
-							"/logout"
-					).permitAll()
-					// any other requests
-					.anyRequest().authenticated();
-		}
-	}
+    /*
+     * ============== Config for the rest ==============================================================================
+     */
+    @Configuration(proxyBeanMethods = false)
+    @Order(99)
+    public class DefaultWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter
+    {
+
+        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+        private final CustomAccessDeniedHandler accessDeniedHandler;
+
+        public DefaultWebSecurityConfigurationAdapter(CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler)
+        {
+            this.authenticationEntryPoint = authenticationEntryPoint;
+            this.accessDeniedHandler = accessDeniedHandler;
+        }
+
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http).defaults().logout()
+                // h2 console uses frames
+                .allowFrames() //
+                .authorizeSwagger() //
+                .authorizeActuator() //
+                .authorizeAdminGui().and() //
+                .authorizeRequests() //
+                .antMatchers(
+                    // H2
+                    "/h2/**",
+
+                    // Health endpoint
+                    "/actuator/health", "/actuator/prometheus",
+
+                    // Logout endpoint
+                    "/logout").permitAll()
+                // any other requests
+                .anyRequest().authenticated();
+        }
+    }
 }
