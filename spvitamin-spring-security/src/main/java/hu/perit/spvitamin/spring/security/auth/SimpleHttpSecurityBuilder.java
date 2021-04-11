@@ -43,233 +43,245 @@ import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.Sec
 public class SimpleHttpSecurityBuilder
 {
 
-	private final HttpSecurity http;
+    private final HttpSecurity http;
 
-	public static SimpleHttpSecurityBuilder newInstance(HttpSecurity http)
-	{
-		return new SimpleHttpSecurityBuilder(http);
-	}
-
-
-	private SimpleHttpSecurityBuilder(HttpSecurity http)
-	{
-		this.http = http;
-	}
+    public static SimpleHttpSecurityBuilder newInstance(HttpSecurity http)
+    {
+        return new SimpleHttpSecurityBuilder(http);
+    }
 
 
-	public SimpleHttpSecurityBuilder defaultCors() throws Exception
-	{
-		http.cors().configurationSource(corsConfigurationSource());
-		return this;
-	}
+    private SimpleHttpSecurityBuilder(HttpSecurity http)
+    {
+        this.http = http;
+    }
 
 
-	public SimpleHttpSecurityBuilder defaultCsrf() throws Exception
-	{
-		http.csrf().disable();
-		return this;
-	}
+    public SimpleHttpSecurityBuilder defaultCors() throws Exception
+    {
+        http.cors().configurationSource(corsConfigurationSource());
+        return this;
+    }
 
 
-	public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint exceptionHandler, AccessDeniedHandler accessDeniedHandler) throws Exception
-	{
-		http.exceptionHandling().authenticationEntryPoint(exceptionHandler).accessDeniedHandler(accessDeniedHandler);
-		return this;
-	}
+    public SimpleHttpSecurityBuilder defaultCsrf() throws Exception
+    {
+        http.csrf().disable();
+        return this;
+    }
 
 
-	public SimpleHttpSecurityBuilder defaults() throws Exception
-	{
-		return this.defaultCors().defaultCsrf();
-	}
+    public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint exceptionHandler, AccessDeniedHandler accessDeniedHandler)
+        throws Exception
+    {
+        http.exceptionHandling().authenticationEntryPoint(exceptionHandler).accessDeniedHandler(accessDeniedHandler);
+        return this;
+    }
 
 
-	public SimpleHttpSecurityBuilder scope(String... antPatterns)
-	{
-		http.requestMatchers().antMatchers(antPatterns);
-		return this;
-	}
+    public SimpleHttpSecurityBuilder defaults() throws Exception
+    {
+        return this.defaultCors().defaultCsrf();
+    }
 
 
-	public void basicAuth() throws Exception
-	{
-		CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-		CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-		this.defaults().exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and().authorizeRequests().anyRequest()
-				.authenticated().and().httpBasic().authenticationEntryPoint(authenticationEntryPoint);
-	}
+    public SimpleHttpSecurityBuilder scope(String... antPatterns)
+    {
+        http.requestMatchers().antMatchers(antPatterns);
+        return this;
+    }
 
 
-	public void basicAuth(String role) throws Exception
-	{
-		CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-		CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+    public void basicAuth() throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
-		this.defaults().exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and().authorizeRequests().anyRequest()
-				.hasRole(role).and().httpBasic().authenticationEntryPoint(authenticationEntryPoint);
-	}
-
-
-	public void jwtAuth() throws Exception
-	{
-		CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-		CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-		this.defaults().exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and().authorizeRequests().anyRequest()
-				.authenticated();
-
-		// applying JWT Filter
-		this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
-	}
+        this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .ignorePersistedSecurity().and() //
+            .authorizeRequests() //
+            .anyRequest().authenticated().and() //
+            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+    }
 
 
-	public void permitAll() throws Exception
-	{
-		CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-		CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+    public void basicAuth(String role) throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
-		this.defaults().exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and().authorizeRequests().anyRequest()
-				.permitAll();
-	}
-
-
-	public HttpSecurity and()
-	{
-		return this.http;
-	}
+        this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .ignorePersistedSecurity().and() //
+            .authorizeRequests() //
+            .anyRequest().hasRole(role).and() //
+            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+    }
 
 
-	public SimpleHttpSecurityBuilder authorizeAdminRestEndpoints() throws Exception
-	{
-		SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+    public void jwtAuth() throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
-		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry = http.authorizeRequests().antMatchers(
-				// Admin REST API
-				String.format("%s/version", Constants.BASE_URL_ADMIN), String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)
-		).permitAll();
+        this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .ignorePersistedSecurity().and() //
+            .authorizeRequests().anyRequest().authenticated();
 
-		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry.antMatchers(
-				String.format("%s/settings", Constants.BASE_URL_ADMIN), Constants.BASE_URL_KEYSTORE + "/**", Constants.BASE_URL_TRUSTSTORE + "/**"
-		);
-
-		if ("*".equals(securityProperties.getAdminEndpointsAccess()))
-		{
-			adminUrls.permitAll();
-		}
-		else
-		{
-			adminUrls.hasRole(securityProperties.getAdminEndpointsAccess());
-		}
-
-		return this;
-	}
+        // applying JWT Filter
+        this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+    }
 
 
-	public SimpleHttpSecurityBuilder authorizeSwagger() throws Exception
-	{
-		SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+    public void permitAll() throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
-		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests().antMatchers(
-				// Swagger UI related endpoints and resources
-				"/swagger-ui.html", "/swagger-ui.html/**", "/swagger-resources/**", "/api-docs/**", "/v2/api-docs/**", "/webjars/springfox-swagger-ui/**"
-		);
-
-		if ("*".equals(securityProperties.getSwaggerAccess()))
-		{
-			swaggerUrls.permitAll();
-		}
-		else
-		{
-			swaggerUrls.hasRole(securityProperties.getSwaggerAccess());
-		}
-		return this;
-	}
+        this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and() //
+            .authorizeRequests().anyRequest().permitAll();
+    }
 
 
-	public SimpleHttpSecurityBuilder authorizeActuator() throws Exception
-	{
-		SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-
-		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests().antMatchers("/actuator/**");
-
-		if ("*".equals(securityProperties.getManagementEndpointsAccess()))
-		{
-			actuatorUrls.permitAll();
-		}
-		else
-		{
-			actuatorUrls.hasRole(securityProperties.getManagementEndpointsAccess());
-		}
-		return this;
-	}
+    public HttpSecurity and()
+    {
+        return this.http;
+    }
 
 
-	public SimpleHttpSecurityBuilder authorizeAdminGui() throws Exception
-	{
-		SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+    public SimpleHttpSecurityBuilder authorizeAdminRestEndpoints() throws Exception
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests().antMatchers(
-				// Admin GUI controller
-				"/", "/*.*", "/css/**", "/assets/**"
-		);
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry = http.authorizeRequests().antMatchers(
+            // Admin REST API
+            String.format("%s/version", Constants.BASE_URL_ADMIN),
+            String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
 
-		if ("*".equals(securityProperties.getAdminGuiAccess()))
-		{
-			adminGuiUrls.permitAll();
-		}
-		else
-		{
-			adminGuiUrls.hasRole(securityProperties.getAdminGuiAccess());
-		}
-		return this;
-	}
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry.antMatchers(
+            String.format("%s/settings", Constants.BASE_URL_ADMIN), Constants.BASE_URL_KEYSTORE + "/**",
+            Constants.BASE_URL_TRUSTSTORE + "/**");
 
+        if ("*".equals(securityProperties.getAdminEndpointsAccess()))
+        {
+            adminUrls.permitAll();
+        }
+        else
+        {
+            adminUrls.hasRole(securityProperties.getAdminEndpointsAccess());
+        }
 
-	public SimpleHttpSecurityBuilder logout() throws Exception
-	{
-		this.http.logout().invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true).logoutSuccessUrl("/");
-		return this;
-	}
+        return this;
+    }
 
 
-	public SimpleHttpSecurityBuilder allowFrames() throws Exception
-	{
-		this.http.headers().frameOptions().sameOrigin();
-		return this;
-	}
+    public SimpleHttpSecurityBuilder authorizeSwagger() throws Exception
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests().antMatchers(
+            // Swagger UI related endpoints and resources
+            "/swagger-ui.html", "/swagger-ui.html/**", "/swagger-resources/**", "/api-docs/**", "/v2/api-docs/**",
+            "/webjars/springfox-swagger-ui/**");
+
+        if ("*".equals(securityProperties.getSwaggerAccess()))
+        {
+            swaggerUrls.permitAll();
+        }
+        else
+        {
+            swaggerUrls.hasRole(securityProperties.getSwaggerAccess());
+        }
+        return this;
+    }
 
 
-	public SimpleHttpSecurityBuilder ignorePersistedSecurity()
-	{
-		this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextPersistenceFilter.class);
-		return this;
-	}
+    public SimpleHttpSecurityBuilder authorizeActuator() throws Exception
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests().antMatchers(
+            "/actuator/**");
+
+        if ("*".equals(securityProperties.getManagementEndpointsAccess()))
+        {
+            actuatorUrls.permitAll();
+        }
+        else
+        {
+            actuatorUrls.hasRole(securityProperties.getManagementEndpointsAccess());
+        }
+        return this;
+    }
 
 
-	private static CorsConfigurationSource corsConfigurationSource()
-	{
-		SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+    public SimpleHttpSecurityBuilder authorizeAdminGui() throws Exception
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins()));
-		configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders()));
-		configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods()));
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests().antMatchers(
+            // Admin GUI controller
+            "/", "/*.*", "/css/**", "/assets/**");
+
+        if ("*".equals(securityProperties.getAdminGuiAccess()))
+        {
+            adminGuiUrls.permitAll();
+        }
+        else
+        {
+            adminGuiUrls.hasRole(securityProperties.getAdminGuiAccess());
+        }
+        return this;
+    }
 
 
-	private static List<String> getListFromArray(String[] input)
-	{
-		if (input == null || input.length == 0)
-		{
-			return List.of("*");
-		}
-		else
-		{
-			return List.of(input);
-		}
-	}
+    public SimpleHttpSecurityBuilder logout() throws Exception
+    {
+        this.http.logout().invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true).logoutSuccessUrl("/");
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder allowFrames() throws Exception
+    {
+        this.http.headers().frameOptions().sameOrigin();
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder ignorePersistedSecurity()
+    {
+        this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextPersistenceFilter.class);
+        return this;
+    }
+
+
+    private static CorsConfigurationSource corsConfigurationSource()
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins()));
+        configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders()));
+        configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods()));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
+    private static List<String> getListFromArray(String[] input)
+    {
+        if (input == null || input.length == 0)
+        {
+            return List.of("*");
+        }
+        else
+        {
+            return List.of(input);
+        }
+    }
 }
