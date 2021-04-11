@@ -41,7 +41,6 @@
 
 ### spvitamin-spring-admin
 * admin (ShutdownManager.java)
-* auth (SecurityContextUtil.java)
 * rest (AdminApi.java, Bearer, /admin; AuthApi.java, Basic, /authenticate; KeystoreApi.java, Bearer, /keystore, /truststore;)
 
 
