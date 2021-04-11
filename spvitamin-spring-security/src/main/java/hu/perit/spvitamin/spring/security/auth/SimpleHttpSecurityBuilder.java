@@ -51,6 +51,12 @@ public class SimpleHttpSecurityBuilder
     }
 
 
+    public static AfterAuthorizationBuilder afterAuthorization(HttpSecurity http)
+    {
+        return new AfterAuthorizationBuilder(http);
+    }
+
+
     private SimpleHttpSecurityBuilder(HttpSecurity http)
     {
         this.http = http;
@@ -143,6 +149,18 @@ public class SimpleHttpSecurityBuilder
         this.defaults() //
             .exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and() //
             .authorizeRequests().anyRequest().permitAll();
+    }
+
+
+    public ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry authorizeRequests() throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+
+        return this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .ignorePersistedSecurity().and() //
+            .authorizeRequests();
     }
 
 
@@ -283,5 +301,24 @@ public class SimpleHttpSecurityBuilder
         {
             return List.of(input);
         }
+    }
+
+
+    public static class AfterAuthorizationBuilder
+    {
+        private final HttpSecurity http;
+        
+        private AfterAuthorizationBuilder(HttpSecurity http)
+        {
+            this.http = http;
+        }
+        
+        public void basicAuth() throws Exception
+        {
+            CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+
+            this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+        }
+
     }
 }
