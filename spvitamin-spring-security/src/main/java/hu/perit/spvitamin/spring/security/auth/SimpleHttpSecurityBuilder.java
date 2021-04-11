@@ -320,5 +320,12 @@ public class SimpleHttpSecurityBuilder
             this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
         }
 
+        
+        public void jwtAuth()
+        {
+            // applying JWT Filter
+            this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+        }
+
     }
 }
