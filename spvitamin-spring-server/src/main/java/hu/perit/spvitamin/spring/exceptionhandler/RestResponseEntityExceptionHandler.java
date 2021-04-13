@@ -23,8 +23,6 @@ import javax.validation.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -33,7 +31,6 @@ import org.springframework.web.util.WebUtils;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.InputException;
-import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,37 +38,43 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler
+{
 
-    protected final ResponseEntity<Object> exceptionHandler(Exception ex, WebRequest request) {
+    protected final ResponseEntity<Object> exceptionHandler(Exception ex, WebRequest request)
+    {
         String path = request != null ? request.getDescription(false) : "";
 
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
 
         // ========== UNAUTHORIZED =====================================================================================
-        if (exception.instanceOf(AuthenticationException.class)
-                || exception.instanceOf(JwtException.class)) {
+        if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
+            || exception.instanceOf("io.jsonwebtoken.JwtException"))
+        {
             log.warn(StackTracer.toString(ex));
             RestExceptionResponse exceptionResponse = new RestExceptionResponse(HttpStatus.UNAUTHORIZED, ex, path);
             return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
         }
 
         // ========== FORBIDDEN ========================================================================================
-        else if (exception.instanceOf(AccessDeniedException.class)) {
+        else if (exception.instanceOf("org.springframework.security.access.AccessDeniedException"))
+        {
             log.warn(StackTracer.toString(ex));
             RestExceptionResponse exceptionResponse = new RestExceptionResponse(HttpStatus.FORBIDDEN, ex, path);
             return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
         }
 
         // ========== BAD_REQUEST ======================================================================================
-        else if (exception.instanceOf(ValidationException.class) || exception.instanceOf(InputException.class)) {
+        else if (exception.instanceOf(ValidationException.class) || exception.instanceOf(InputException.class))
+        {
             log.warn(StackTracer.toString(ex));
             RestExceptionResponse exceptionResponse = new RestExceptionResponse(HttpStatus.BAD_REQUEST, ex, path);
             return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
         }
 
         // ========== NOT_IMPLEMENTED ==================================================================================
-        else if (exception.instanceOf(UnsupportedOperationException.class)) {
+        else if (exception.instanceOf(UnsupportedOperationException.class))
+        {
             // kiloggoljuk WARNING-gal
             log.error(StackTracer.toString(ex));
             RestExceptionResponse exceptionResponse = new RestExceptionResponse(HttpStatus.NOT_IMPLEMENTED, ex, path);
@@ -88,7 +91,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         */
 
         // ========== INTERNAL_SERVER_ERROR ============================================================================
-        else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class)) {
+        else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
+        {
             HttpStatus httpStatus = getHttpStatusFromAnnotation(ex);
             this.logByHttpStatus(httpStatus, ex);
             RestExceptionResponse exceptionResponse = new RestExceptionResponse(httpStatus, ex, path);
@@ -96,12 +100,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         }
 
         // ========== EVERYTHING ELSE ==================================================================================
-        else {
-            try {
+        else
+        {
+            try
+            {
                 log.error(StackTracer.toString(ex));
                 return super.handleException(ex, request);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 RestExceptionResponse exceptionResponse = new RestExceptionResponse(getHttpStatusFromAnnotation(ex), ex, path);
                 return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
             }
@@ -109,10 +116,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
 
-    private static HttpStatus getHttpStatusFromAnnotation(Throwable ex) {
+    private static HttpStatus getHttpStatusFromAnnotation(Throwable ex)
+    {
         Annotation[] annotations = ExceptionWrapper.of(ex).getAnnotations();
-        for (Annotation annotation : annotations) {
-            if (annotation instanceof ResponseStatus) {
+        for (Annotation annotation : annotations)
+        {
+            if (annotation instanceof ResponseStatus)
+            {
                 return ((ResponseStatus) annotation).value();
             }
         }
@@ -120,38 +130,40 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
 
-    private void logByHttpStatus(HttpStatus httpStatus, Throwable ex) {
-        switch (classifyHttpStatus(httpStatus)) {
-            case NONE:
+    private void logByHttpStatus(HttpStatus httpStatus, Throwable ex)
+    {
+        switch (classifyHttpStatus(httpStatus))
+        {
+            case NONE :
                 return;
-            case WARNING:
+            case WARNING :
                 log.warn(StackTracer.toString(ex));
                 break;
-            case ERROR:
+            case ERROR :
                 log.error(StackTracer.toString(ex));
                 break;
         }
     }
 
-    private enum LogStatus {
-        NONE,
-        WARNING,
-        ERROR
+    private enum LogStatus
+    {
+        NONE, WARNING, ERROR
     }
 
-    private LogStatus classifyHttpStatus(HttpStatus httpStatus) {
-        if (httpStatus.value() < 400
-                || httpStatus == HttpStatus.CONFLICT
-                || httpStatus == HttpStatus.NOT_FOUND
-        ) {
+    private LogStatus classifyHttpStatus(HttpStatus httpStatus)
+    {
+        if (httpStatus.value() < 400 || httpStatus == HttpStatus.CONFLICT || httpStatus == HttpStatus.NOT_FOUND)
+        {
             // Intentionally no logging: business as usual
             return LogStatus.NONE;
         }
-        else if (httpStatus.value() >= 500) {
+        else if (httpStatus.value() >= 500)
+        {
             return LogStatus.ERROR;
         }
         // between 400 and 499
-        else if (httpStatus == HttpStatus.REQUEST_TIMEOUT) {
+        else if (httpStatus == HttpStatus.REQUEST_TIMEOUT)
+        {
             return LogStatus.ERROR;
         }
 
@@ -160,8 +172,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 
     @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status)) {
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status,
+        WebRequest request)
+    {
+        if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status))
+        {
             request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
         }
         String path = request != null ? request.getDescription(false) : "";
