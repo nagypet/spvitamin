@@ -41,7 +41,9 @@ public class CustomDateDeserializer extends JsonDeserializer<Date> {
                     "yyyy-MM-dd HH:mm",
                     "yyyy-MM-dd",
                     // 2020-05-12T09:59:09.276+0000
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+                    // 2021-04-14T17:30:25.740+02:00
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         }
         catch (ParseException e) {
             throw new InvalidFormatException(jp, e.getMessage(), jp.getText(), Date.class);
