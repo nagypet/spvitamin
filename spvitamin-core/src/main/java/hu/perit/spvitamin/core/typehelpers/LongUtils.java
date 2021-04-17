@@ -186,9 +186,22 @@ public class LongUtils
         return compare(bi1, bi2, true);
     }
 
+    
+    public static boolean isBlank(Long l)
+    {
+        return (l == null || l.equals(0L));
+    }
+
+    
+    public static boolean isNotBlank(Long l)
+    {
+        return !isBlank(l);
+    }
+
 
     private LongUtils()
     {
         // private constructor for the utility class
     }
+       
 }
