@@ -16,8 +16,8 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.3.2.RELEASE'
-		springCloudVersion = 'Hoxton.SR6'
+        springBootVersion = '2.4.5'
+	springCloudVersion = '2020.0.2'
     }
     repositories {
         jcenter()
