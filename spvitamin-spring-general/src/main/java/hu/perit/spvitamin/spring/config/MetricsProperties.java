@@ -31,4 +31,5 @@ import org.springframework.stereotype.Component;
 public class MetricsProperties {
 
     private int performanceItemcount = 50;
+    private int timeoutMillis = 2000;
 }
