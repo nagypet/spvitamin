@@ -16,9 +16,10 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import lombok.Data;
 
 /**
  * @author Peter Nagy
@@ -28,8 +29,10 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "metrics")
-public class MetricsProperties {
+public class MetricsProperties
+{
 
     private int performanceItemcount = 50;
-    private int timeoutMillis = 2000;
+    private long timeoutMillis = 2_000;
+    private long metricsGatheringHysteresisMillis = 30_000;
 }

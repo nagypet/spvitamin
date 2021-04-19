@@ -49,8 +49,20 @@ public class DatasourceProperties {
     connectionTimeout controls the maximum number of milliseconds that a client (that's you) will wait for a connection
     from the pool. If this time is exceeded without a connection becoming available, a SQLException will be thrown.
     Lowest acceptable connection timeout is 250 ms. Default: 30000 (30 seconds)
+    
+    Set to 5 seconds, since DynamicDataSource has a retry mechanism with 5 seconds delay multiplied by 2 in each attempt.
+    1st timeout 5 s
+    delay       10 s
+    2nd timeout 5 s
+    delay       20 s
+    3rd timeout 5 s
+    delay       40 s
+    4th timeout 5 s
+    end
+    
+    Sums up to 90 seconds alltogether.
     */
-    private Long connectionTimeout = 30000L;
+    private Long connectionTimeout = 5_000L;
 
     /*
     leakDetectionThreshold controls the amount of time that a connection can be out of the pool before a message is

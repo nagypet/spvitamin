@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+
 import com.zaxxer.hikari.HikariDataSource;
 
 import hu.perit.spvitamin.core.StackTracer;
@@ -32,26 +35,29 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Ez az implementáció ténylegesen close-olható. Close hívása esetén új DataSource objektumot hoz létre, így a korábbitól
- * különböző paraméterekkel újrainicializálható.
+ * This implementation can actually be closed. When you call close(), it creates a new DataSource object 
+ * so that it can be re-initialized with different parameters than before.
  *
  * @author Peter Nagy
  */
 
 @Slf4j
-public class DynamicDataSource implements DataSource, Closeable {
+public class DynamicDataSource implements DataSource, Closeable
+{
 
     private HikariDataSource dataSource;
     @Getter
     private boolean connected;
     private boolean initialized = false;
 
-    public DynamicDataSource() {
+    public DynamicDataSource()
+    {
         this.dataSource = new HikariDataSource();
         this.init();
     }
 
-    public void setConnectionParam(ConnectionParam connParam) {
+    public void setConnectionParam(ConnectionParam connParam)
+    {
         this.dataSource.setDriverClassName(connParam.getDriverClassName());
         this.dataSource.setJdbcUrl(connParam.getJdbcUrl());
         this.dataSource.setUsername(connParam.getUsername());
@@ -59,18 +65,22 @@ public class DynamicDataSource implements DataSource, Closeable {
         this.dataSource.setMaximumPoolSize(connParam.getMaxPoolSize());
         this.dataSource.setConnectionTimeout(connParam.getConnectionTimeout());
         this.dataSource.setLeakDetectionThreshold(connParam.getLeakDetectionThreshold());
-        try {
+        try
+        {
             dataSource.setLoginTimeout(5);
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             log.error(StackTracer.toString(e));
         }
-        finally {
+        finally
+        {
             this.initialized = true;
         }
     }
 
-    private void init() {
+    private void init()
+    {
         this.connected = false;
         // Ez a minimális konfig, amivel már elindul a szerver. A valódi kapcsolati paramétereket később állítjuk be.
         //this.dataSource.setJdbcUrl("jdbc:sqlserver://localhost");
@@ -78,7 +88,8 @@ public class DynamicDataSource implements DataSource, Closeable {
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
         this.dataSource.close();
         this.dataSource = new HikariDataSource();
         this.init();
@@ -86,69 +97,87 @@ public class DynamicDataSource implements DataSource, Closeable {
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
-        if (!this.initialized) {
+    @Retryable(maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 2.0, maxDelay = 60_000))
+    public Connection getConnection() throws SQLException
+    {
+        if (!this.initialized)
+        {
             throw new SQLException("Data source connection parameter is not set!");
         }
 
-        try {
+        try
+        {
             Connection connection = this.dataSource.getConnection();
             log.debug("DynamicDataSource created a new Connection.");
             this.connected = true;
             return connection;
         }
-        catch (SQLException ex) {
+        catch (SQLException ex)
+        {
+            log.error(ex.toString());
             this.connected = false;
             throw ex;
         }
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        try {
+    @Retryable(maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 2.0, maxDelay = 60_000))
+    public Connection getConnection(String username, String password) throws SQLException
+    {
+        try
+        {
             Connection connection = this.dataSource.getConnection(username, password);
             log.debug("DynamicDataSource created a new Connection.");
             this.connected = true;
             return connection;
         }
-        catch (SQLException ex) {
+        catch (SQLException ex)
+        {
+            log.error(ex.toString());
             this.connected = false;
             throw ex;
         }
     }
 
     @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <T> T unwrap(Class<T> iface) throws SQLException
+    {
         return this.dataSource.unwrap(iface);
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    public boolean isWrapperFor(Class<?> iface) throws SQLException
+    {
         return this.dataSource.isWrapperFor(iface);
     }
 
     @Override
-    public PrintWriter getLogWriter() throws SQLException {
+    public PrintWriter getLogWriter() throws SQLException
+    {
         return this.dataSource.getLogWriter();
     }
 
     @Override
-    public void setLogWriter(PrintWriter out) throws SQLException {
+    public void setLogWriter(PrintWriter out) throws SQLException
+    {
         this.dataSource.setLogWriter(out);
     }
 
     @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
+    public void setLoginTimeout(int seconds) throws SQLException
+    {
         this.dataSource.setLoginTimeout(seconds);
     }
 
     @Override
-    public int getLoginTimeout() throws SQLException {
+    public int getLoginTimeout() throws SQLException
+    {
         return this.dataSource.getLoginTimeout();
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException
+    {
         return this.dataSource.getParentLogger();
     }
 }
