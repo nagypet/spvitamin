@@ -16,23 +16,25 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * #know-how:custom-rest-error-response
@@ -73,7 +75,8 @@ import java.util.Set;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class RestExceptionResponse implements JsonSerializable {
+public class RestExceptionResponse implements JsonSerializable
+{
 
     private Date timestamp;
     private int status;
@@ -82,32 +85,50 @@ public class RestExceptionResponse implements JsonSerializable {
     private ServerExceptionProperties exception;
 
 
-    public RestExceptionResponse(HttpStatus status, Exception ex, String path) {
+    public RestExceptionResponse(HttpStatus status, Exception ex, String path)
+    {
         this.timestamp = new Date();
         this.status = status.value();
         this.path = path;
         this.exception = new ServerExceptionProperties(ex);
 
-        if (ex instanceof ConstraintViolationException) {
+        if (ex instanceof ConstraintViolationException)
+        {
             //Get all errors
             Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ex).getConstraintViolations();
             List<String> errors = new ArrayList<>();
-            for (ConstraintViolation<?> violation : violations) {
+            for (ConstraintViolation<?> violation : violations)
+            {
                 errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
             }
             this.error = errors;
         }
-        else if (ex instanceof MethodArgumentNotValidException) {
+        else if (ex instanceof MethodArgumentNotValidException)
+        {
             BindingResult bindingResult = ((MethodArgumentNotValidException) ex).getBindingResult();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
             List<String> errors = new ArrayList<>();
-            for (FieldError fieldError : fieldErrors) {
-                errors.add(String.format("%s %s! Rejected value: '%s'", fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue().toString()));
+            for (FieldError fieldError : fieldErrors)
+            {
+                errors.add(String.format("%s %s! Rejected value: '%s'", fieldError.getField(), fieldError.getDefaultMessage(),
+                    getRejectedValueAsText(fieldError.getRejectedValue())));
             }
             this.error = errors;
         }
-        else {
+        else
+        {
             this.error = status.getReasonPhrase();
         }
+    }
+
+
+    private String getRejectedValueAsText(Object rejectedValue)
+    {
+        if (rejectedValue == null)
+        {
+            return "null";
+        }
+
+        return rejectedValue.toString();
     }
 }
