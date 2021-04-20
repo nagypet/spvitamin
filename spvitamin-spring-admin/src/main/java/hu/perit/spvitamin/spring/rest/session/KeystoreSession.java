@@ -136,7 +136,8 @@ public class KeystoreSession extends ConnectableContext implements KeystoreApi
             if (key != null) {
                 Certificate[] chain = certKeystore.getCertificateChain(request.getAlias());
                 CertInfo certInfo = KeystoreUtils.getInfoFromCertificate(chain[0]);
-                String keyStorePassword = System.getProperty("server.ssl.key-store-password");
+                ServerProperties serverProperties = SysConfig.getServerProperties();
+                String keyStorePassword = serverProperties.getSsl().getKeyStorePassword();
 
                 this.serverKeystore.setKeyEntry(certInfo.getSubjectCN(), key, keyStorePassword.toCharArray(), chain);
             }
