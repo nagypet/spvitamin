@@ -135,7 +135,7 @@ task prepareIntegTest(type: Copy) {
 }
 
 task integtest(type: Test) {
-    dependsOn 'prepareTest'
+    dependsOn 'prepareIntegTest'
 	if (project.hasProperty('sourceSets')) {
 		testClassesDirs = sourceSets.integtest.output.classesDirs
 		classpath = sourceSets.integtest.runtimeClasspath
