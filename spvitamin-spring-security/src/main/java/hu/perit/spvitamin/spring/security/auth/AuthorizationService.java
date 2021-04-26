@@ -16,10 +16,9 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import hu.perit.spvitamin.spring.exception.AuthorizationException;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import java.security.Principal;
+import java.util.Collections;
 
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -27,7 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import hu.perit.spvitamin.spring.exception.AuthorizationException;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 
 /**
  * @author Peter Nagy
@@ -47,7 +47,6 @@ public class AuthorizationService {
     }
 
 
-    @SuppressWarnings("rawtypes")
     public AuthenticatedUser getAuthenticatedUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
@@ -79,10 +78,11 @@ public class AuthorizationService {
                     .userId(-1)
                     .build();
         }
-        else if (principal instanceof KeycloakPrincipal)
+        // So that we do not need the keycloak dependency 
+        else if ("org.keycloak.KeycloakPrincipal".equals(principal.getClass().getName()))
         {
             return AuthenticatedUser.builder()
-                .username(((KeycloakPrincipal) principal).getName())
+                .username(((Principal) principal).getName())
                 .authorities(authentication.getAuthorities())
                 .userId(-1)
                 .build();

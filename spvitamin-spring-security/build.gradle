@@ -46,11 +46,6 @@ repositories {
 }
 
 
-ext {
-	set('keycloakVersion', '7.0.1')
-}
-
-
 // it will be a library, no fat jar
 bootJar {
    enabled = false
@@ -75,7 +70,6 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.keycloak:keycloak-spring-boot-starter'
 
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
@@ -86,13 +80,6 @@ dependencies {
     }
 
     testImplementation 'org.springframework.security:spring-security-test'
-}
-
-
-dependencyManagement {
-    imports {
-        mavenBom "org.keycloak.bom:keycloak-adapter-bom:${keycloakVersion}"
-    }
 }
 
 
