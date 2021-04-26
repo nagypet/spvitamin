@@ -171,11 +171,12 @@ public abstract class AbstractInterfaceLogger {
     }
 
     private String hidePasswords(String headerName) {
+        String header = this.httpRequest.getHeader(headerName);
         if (headerNamesToHide.stream().anyMatch(i -> i.equalsIgnoreCase(headerName))) {
-            return "***";
+            return StringUtils.abbreviate(header, Math.min(40, header.length() / 2));
         }
         else {
-            return this.httpRequest.getHeader(headerName);
+            return header;
         }
     }
 

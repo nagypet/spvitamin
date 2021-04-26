@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rest.client;
+package hu.perit.spvitamin.spring.security.authservice.restclient;
 
 import feign.Headers;
 import feign.Param;

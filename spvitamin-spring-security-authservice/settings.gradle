@@ -30,4 +30,4 @@ pluginManagement {
 
 apply from: '../gradle/include-project-dependencies.gradle'
 
-rootProject.name = 'spvitamin-spring-admin-api'
+rootProject.name = 'spvitamin-spring-security-authservice'

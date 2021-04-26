@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.authservice.provider;
+package hu.perit.spvitamin.spring.security.authservice.provider;
 
 import java.util.Collection;
 

@@ -17,6 +17,7 @@
 buildscript {
     ext {
         springBootVersion = '2.4.5'
+	springCloudVersion = '2020.0.2'
     }
     repositories {
         jcenter()
@@ -46,11 +47,6 @@ repositories {
 }
 
 
-ext {
-	set('keycloakVersion', '7.0.1')
-}
-
-
 // it will be a library, no fat jar
 bootJar {
    enabled = false
@@ -59,43 +55,39 @@ bootJar {
 sourceCompatibility = 11
 
 dependencies {
-    compile project(':spvitamin-core')
     compile project(':spvitamin-spring-general')
+	compile project(':spvitamin-spring-security')
+	compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-
-    // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.keycloak:keycloak-spring-boot-starter'
 
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    // Swagger
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
-    testImplementation 'org.springframework.security:spring-security-test'
+    // FasterXML
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Slf4J
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    testImplementation('log4j:log4j:1.2.17')
+	
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
-
 
 dependencyManagement {
     imports {
-        mavenBom "org.keycloak.bom:keycloak-adapter-bom:${keycloakVersion}"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
-}
-
-
-test {
-    useJUnitPlatform()
 }

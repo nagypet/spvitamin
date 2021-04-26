@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.authservice.provider;
+package hu.perit.spvitamin.spring.security.authservice.provider;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.client.AuthClient;
+import hu.perit.spvitamin.spring.security.authservice.restclient.AuthClient;
 
 @Service
 public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthenticationProvider {

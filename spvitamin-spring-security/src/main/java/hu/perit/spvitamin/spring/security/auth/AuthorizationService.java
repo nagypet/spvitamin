@@ -18,6 +18,8 @@ package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+
+import org.keycloak.KeycloakPrincipal;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -45,6 +47,7 @@ public class AuthorizationService {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public AuthenticatedUser getAuthenticatedUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
@@ -75,6 +78,14 @@ public class AuthorizationService {
                     .authorities(Collections.emptyList())
                     .userId(-1)
                     .build();
+        }
+        else if (principal instanceof KeycloakPrincipal)
+        {
+            return AuthenticatedUser.builder()
+                .username(((KeycloakPrincipal) principal).getName())
+                .authorities(authentication.getAuthorities())
+                .userId(-1)
+                .build();
         }
 
         throw new AuthorizationException(String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
