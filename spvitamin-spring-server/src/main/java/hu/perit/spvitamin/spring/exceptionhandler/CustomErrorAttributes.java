@@ -18,6 +18,7 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,8 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> attributes = super.getErrorAttributes(webRequest, includeStackTrace);
 
+        logAttributes(attributes);
+        
         Object status = webRequest.getAttribute("javax.servlet.error.status_code", RequestAttributes.SCOPE_REQUEST);
 
         if ((status instanceof Integer) && (((Integer) status).intValue() == 404)) {
@@ -60,5 +63,12 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
         }
 
         return attributes;
+    }
+    
+    
+    private void logAttributes(Map<String, Object> attributes)
+    {
+        String errorText = attributes.entrySet().stream().map(e -> String.format("%s: %s", e.getKey(), e.getValue())).collect(Collectors.joining("; "));
+        log.warn(errorText);
     }
 }
