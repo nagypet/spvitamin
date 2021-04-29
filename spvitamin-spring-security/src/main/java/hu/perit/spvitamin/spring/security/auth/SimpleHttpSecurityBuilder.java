@@ -77,10 +77,10 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint exceptionHandler, AccessDeniedHandler accessDeniedHandler)
+    public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint, AccessDeniedHandler accessDeniedHandler)
         throws Exception
     {
-        http.exceptionHandling().authenticationEntryPoint(exceptionHandler).accessDeniedHandler(accessDeniedHandler);
+        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler);
         return this;
     }
 
