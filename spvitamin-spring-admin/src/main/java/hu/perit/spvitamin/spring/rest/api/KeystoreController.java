@@ -133,7 +133,6 @@ public class KeystoreController implements KeystoreApi {
                 this.logger.traceIn(null, user.getUsername(), method, args);
                 KeystoreSession userContext = this.userContextHolder.getContext(new StringContextKey(user.getUsername()));
                 Object retval = method.invoke(userContext, args);
-                this.logger.traceOut(null, user.getUsername(), method);
                 return retval;
             }
             catch (IllegalAccessException ex) {

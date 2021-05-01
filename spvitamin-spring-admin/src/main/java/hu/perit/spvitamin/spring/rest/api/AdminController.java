@@ -118,7 +118,6 @@ public class AdminController implements AdminApi
                 this.logger.traceIn(null, user.getUsername(), method, args);
                 AdminSession session = new AdminSession(this.sm, this.serverParameterProvider);
                 Object retval = method.invoke(session, args);
-                this.logger.traceOut(null, user.getUsername(), method);
                 return retval;
             }
             catch (IllegalAccessException ex) {

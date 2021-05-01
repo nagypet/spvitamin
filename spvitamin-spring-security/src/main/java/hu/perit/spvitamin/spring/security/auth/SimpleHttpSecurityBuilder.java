@@ -77,8 +77,8 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint, AccessDeniedHandler accessDeniedHandler)
-        throws Exception
+    public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
+        AccessDeniedHandler accessDeniedHandler) throws Exception
     {
         http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler);
         return this;
@@ -147,7 +147,8 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler).ignorePersistedSecurity().and() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .ignorePersistedSecurity().and() //
             .authorizeRequests().anyRequest().permitAll();
     }
 
@@ -179,9 +180,11 @@ public class SimpleHttpSecurityBuilder
             String.format("%s/version", Constants.BASE_URL_ADMIN),
             String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
 
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry.antMatchers(
-            String.format("%s/settings", Constants.BASE_URL_ADMIN), Constants.BASE_URL_KEYSTORE + "/**",
-            Constants.BASE_URL_TRUSTSTORE + "/**");
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry //
+            .antMatchers( //
+                Constants.BASE_URL_ADMIN + "/**", //
+                Constants.BASE_URL_KEYSTORE + "/**", //
+                Constants.BASE_URL_TRUSTSTORE + "/**");
 
         if ("*".equals(securityProperties.getAdminEndpointsAccess()))
         {
@@ -200,10 +203,15 @@ public class SimpleHttpSecurityBuilder
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests().antMatchers(
-            // Swagger UI related endpoints and resources
-            "/swagger-ui.html", "/swagger-ui.html/**", "/swagger-resources/**", "/api-docs/**", "/v2/api-docs/**",
-            "/webjars/springfox-swagger-ui/**");
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests() //
+            .antMatchers( //
+                // Swagger UI related endpoints and resources
+                "/swagger-ui.html", //
+                "/swagger-ui.html/**", //
+                "/swagger-resources/**", //
+                "/api-docs/**", //
+                "/v2/api-docs/**", //
+                "/webjars/springfox-swagger-ui/**");
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
         {
@@ -221,8 +229,8 @@ public class SimpleHttpSecurityBuilder
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests().antMatchers(
-            "/actuator/**");
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests() //
+            .antMatchers("/actuator/**");
 
         if ("*".equals(securityProperties.getManagementEndpointsAccess()))
         {
@@ -240,9 +248,10 @@ public class SimpleHttpSecurityBuilder
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests().antMatchers(
-            // Admin GUI controller
-            "/", "/*.*", "/css/**", "/assets/**");
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests() //
+            .antMatchers(
+                // Admin GUI controller
+                "/", "/*.*", "/css/**", "/assets/**");
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))
         {
@@ -307,12 +316,12 @@ public class SimpleHttpSecurityBuilder
     public static class AfterAuthorizationBuilder
     {
         private final HttpSecurity http;
-        
+
         private AfterAuthorizationBuilder(HttpSecurity http)
         {
             this.http = http;
         }
-        
+
         public void basicAuth() throws Exception
         {
             CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
@@ -320,7 +329,7 @@ public class SimpleHttpSecurityBuilder
             this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
         }
 
-        
+
         public void jwtAuth()
         {
             // applying JWT Filter
