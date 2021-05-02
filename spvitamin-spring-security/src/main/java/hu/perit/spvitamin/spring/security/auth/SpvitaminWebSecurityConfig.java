@@ -111,9 +111,6 @@ public class SpvitaminWebSecurityConfig
                     // error
                     "/error",
 
-                    // sso/login
-                    "/sso/login",
-                    
                     // Logout endpoint
                     "/logout").permitAll()
                 // any other requests
