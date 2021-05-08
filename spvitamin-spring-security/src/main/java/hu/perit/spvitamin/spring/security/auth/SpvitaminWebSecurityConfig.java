@@ -104,10 +104,6 @@ public class SpvitaminWebSecurityConfig
                     // H2
                     "/h2/**",
 
-                    // Health endpoint
-                    "/actuator/health", //
-                    "/actuator/prometheus",
-
                     // error
                     "/error",
 

@@ -229,6 +229,13 @@ public class SimpleHttpSecurityBuilder
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
+        http.authorizeRequests() //
+            .antMatchers(
+                // Health and Prometheus endpoint
+                "/actuator/health", //
+                "/actuator/prometheus") //
+            .permitAll();
+
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests() //
             .antMatchers("/actuator/**");
 
