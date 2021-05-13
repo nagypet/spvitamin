@@ -23,6 +23,7 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -87,13 +88,31 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder defaults() throws Exception
     {
-        return this.defaultCors().defaultCsrf();
+        return this.defaultCors().defaultCsrf().allowAdditionalSecurityHeaders();
     }
 
 
     public SimpleHttpSecurityBuilder scope(String... antPatterns)
     {
         http.requestMatchers().antMatchers(antPatterns);
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders() throws Exception
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        if (securityProperties.getAdditionalSecurityHeaders() != null)
+        {
+            for (String header : securityProperties.getAdditionalSecurityHeaders().values())
+            {
+                // pl: X-Content-Security-Policy=default-src 'self'
+                String[] headerParts = header.split("=");
+                http.headers().addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1]));
+            }
+        }
+
         return this;
     }
 
@@ -139,7 +158,6 @@ public class SimpleHttpSecurityBuilder
         // applying JWT Filter
         this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
     }
-
 
     public void permitAll() throws Exception
     {

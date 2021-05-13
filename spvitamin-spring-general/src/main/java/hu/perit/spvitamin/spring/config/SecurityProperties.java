@@ -16,9 +16,13 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import lombok.Data;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import lombok.Data;
 
 /**
  * @author Peter Nagy
@@ -28,7 +32,8 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("security")
-public class SecurityProperties {
+public class SecurityProperties
+{
 
     private String adminUserName;
     @ConfigProperty(hidden = true)
@@ -40,4 +45,10 @@ public class SecurityProperties {
     private String managementEndpointsAccess = "*";
     private String adminGuiAccess = "*";
     private String adminEndpointsAccess = "*";
+    
+    /**
+     * Example configuration
+     * security.additional-security-headers.FP=Feature-Policy=accelerometer 'none'; ambient-light-sensor 'none'; autoplay 'none'; battery 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; usb 'none'
+     */
+    private Map<String, String> additionalSecurityHeaders = new HashMap<>();
 }

@@ -37,6 +37,7 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.auth.CustomAccessDeniedHandler;
+import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 
 /**
  * @author Peter Nagy
@@ -71,6 +72,9 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
         //CustomKeycloakAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(
         //    CustomKeycloakAuthenticationEntryPoint.class);
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+
+        SimpleHttpSecurityBuilder.newInstance(http) //
+            .allowAdditionalSecurityHeaders();
 
         http //
             .csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher()) //
