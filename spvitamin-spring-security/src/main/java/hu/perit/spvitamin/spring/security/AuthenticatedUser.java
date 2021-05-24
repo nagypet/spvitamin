@@ -16,48 +16,58 @@
 
 package hu.perit.spvitamin.spring.security;
 
-import lombok.Builder;
-import lombok.Data;
+import java.util.Collection;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * @author Peter Nagy
  */
 
 
+@SuppressWarnings("serial")
 @Data
 @Builder
-public class AuthenticatedUser implements UserDetails {
+public class AuthenticatedUser implements UserDetails
+{
 
     private String username;
     private long userId;
     private Collection<? extends GrantedAuthority> authorities;
+    @Builder.Default
+    private boolean anonymous = true;
 
     @Override
-    public String getPassword() {
+    public String getPassword()
+    {
         throw new UnsupportedOperationException("getPassword()");
     }
 
     @Override
-    public boolean isAccountNonExpired() {
+    public boolean isAccountNonExpired()
+    {
         return true;
     }
 
     @Override
-    public boolean isAccountNonLocked() {
+    public boolean isAccountNonLocked()
+    {
         return true;
     }
 
     @Override
-    public boolean isCredentialsNonExpired() {
+    public boolean isCredentialsNonExpired()
+    {
         return true;
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return true;
     }
 }

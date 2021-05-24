@@ -117,6 +117,20 @@ public class SimpleHttpSecurityBuilder
     }
 
 
+    public void basicAuthWithSession() throws Exception
+    {
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+
+        this.defaults() //
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+            .and() //
+            .authorizeRequests() //
+            .anyRequest().authenticated().and() //
+            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+    }
+
+
     public void basicAuth() throws Exception
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);

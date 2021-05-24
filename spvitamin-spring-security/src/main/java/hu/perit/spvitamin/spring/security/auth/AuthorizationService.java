@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth;
 import java.security.Principal;
 import java.util.Collections;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,59 +36,72 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 
 
 @Service
-public class AuthorizationService {
+public class AuthorizationService
+{
 
-    public void setAuthenticatedUser(AuthenticatedUser authenticatedUser) {
+    public void setAuthenticatedUser(AuthenticatedUser authenticatedUser)
+    {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
 
-        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
+        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken( //
+            authenticatedUser, // 
+            null, authenticatedUser.getAuthorities());
         newAuthentication.setDetails(authentication.getDetails());
         SecurityContextHolder.getContext().setAuthentication(newAuthentication);
     }
 
 
-    public AuthenticatedUser getAuthenticatedUser() {
+    public AuthenticatedUser getAuthenticatedUser()
+    {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        if (authentication == null) {
-            return AuthenticatedUser.builder()
-                    .username("No authentication")
-                    .authorities(Collections.emptyList())
-                    .userId(-1)
-                    .build();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken)
+        {
+            return AuthenticatedUser.builder() //
+                .username("anonymousUser") //
+                .authorities(Collections.emptyList()) //
+                .userId(-1) //
+                .anonymous(true) //
+                .build();
         }
 
         Object principal = authentication.getPrincipal();
 
-        if (principal instanceof AuthenticatedUser) {
+        if (principal instanceof AuthenticatedUser)
+        {
             return (AuthenticatedUser) principal;
         }
-        else if (principal instanceof UserDetails) {
-            return AuthenticatedUser.builder()
-                    .username(((UserDetails) principal).getUsername())
-                    .authorities(((UserDetails) principal).getAuthorities())
-                    .userId(-1)
-                    .build();
+        else if (principal instanceof UserDetails)
+        {
+            return AuthenticatedUser.builder() //
+                .username(((UserDetails) principal).getUsername()) //
+                .authorities(((UserDetails) principal).getAuthorities()) //
+                .userId(-1) //
+                .anonymous(false) //
+                .build();
         }
-        else if (principal instanceof String) {
+        else if (principal instanceof String)
+        {
             String username = (String) principal;
-            return AuthenticatedUser.builder()
-                    .username(username)
-                    .authorities(Collections.emptyList())
-                    .userId(-1)
-                    .build();
+            return AuthenticatedUser.builder() //
+                .username(username) //
+                .authorities(Collections.emptyList()) //
+                .userId(-1) //
+                .anonymous(false) //
+                .build();
         }
         // So that we do not need the keycloak dependency 
         else if ("org.keycloak.KeycloakPrincipal".equals(principal.getClass().getName()))
         {
-            return AuthenticatedUser.builder()
-                .username(((Principal) principal).getName())
-                .authorities(authentication.getAuthorities())
-                .userId(-1)
-                .build();
+            return AuthenticatedUser.builder() //
+                .username(((Principal) principal).getName()) //
+                .authorities(authentication.getAuthorities()) //
+                .userId(-1) //
+                .anonymous(false).build();
         }
 
-        throw new AuthorizationException(String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
+        throw new AuthorizationException(
+            String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
     }
 }
