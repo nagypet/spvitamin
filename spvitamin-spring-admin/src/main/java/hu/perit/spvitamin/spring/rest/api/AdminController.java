@@ -36,7 +36,7 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
 import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.session.AdminSession;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.security.auth.SpvitaminAuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,7 +50,7 @@ public class AdminController implements AdminApi
     private final AdminApi proxy;
 
     // Injecting dependencies
-    public AdminController(ShutdownManager sm, ServerParameterProvider serverParameterProvider, AuthorizationService authorizationService, HttpServletRequest httpRequest)
+    public AdminController(ShutdownManager sm, ServerParameterProvider serverParameterProvider, SpvitaminAuthorizationService authorizationService, HttpServletRequest httpRequest)
     {
         this.proxy = (AdminApi) Proxy.newProxyInstance(
                 AdminApi.class.getClassLoader(),
@@ -95,10 +95,10 @@ public class AdminController implements AdminApi
     private static class ProxyImpl extends AbstractInvocationHandler {
         private final ShutdownManager sm;
         private final ServerParameterProvider serverParameterProvider;
-        private final AuthorizationService authorizationService;
+        private final SpvitaminAuthorizationService authorizationService;
         private final ProxyImpl.Logger logger;
 
-        public ProxyImpl(ShutdownManager sm, ServerParameterProvider serverParameterProvider, AuthorizationService authorizationService, HttpServletRequest httpRequest) {
+        public ProxyImpl(ShutdownManager sm, ServerParameterProvider serverParameterProvider, SpvitaminAuthorizationService authorizationService, HttpServletRequest httpRequest) {
             this.logger = new ProxyImpl.Logger(httpRequest);
             this.sm = sm;
             this.serverParameterProvider = serverParameterProvider;

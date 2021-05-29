@@ -43,7 +43,7 @@ import hu.perit.spvitamin.spring.rest.model.CertificateFile;
 import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSession;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSessionHolder;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.security.auth.SpvitaminAuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -57,7 +57,7 @@ public class KeystoreController implements KeystoreApi {
     private final KeystoreApi proxy;
 
     // Injecting dependencies
-    public KeystoreController(KeystoreSessionHolder userContextHolder, AuthorizationService authorizationService, HttpServletRequest httpRequest) {
+    public KeystoreController(KeystoreSessionHolder userContextHolder, SpvitaminAuthorizationService authorizationService, HttpServletRequest httpRequest) {
         proxy = (KeystoreApi) Proxy.newProxyInstance(
                 KeystoreApi.class.getClassLoader(),
                 new Class[]{KeystoreApi.class},
@@ -111,10 +111,10 @@ public class KeystoreController implements KeystoreApi {
     @Slf4j
     private static class ProxyImpl extends AbstractInvocationHandler {
         private final KeystoreSessionHolder userContextHolder;
-        private final AuthorizationService authorizationService;
+        private final SpvitaminAuthorizationService authorizationService;
         private final Logger logger;
 
-        public ProxyImpl(HttpServletRequest httpRequest, KeystoreSessionHolder userContextHolder, AuthorizationService authorizationService) {
+        public ProxyImpl(HttpServletRequest httpRequest, KeystoreSessionHolder userContextHolder, SpvitaminAuthorizationService authorizationService) {
             this.userContextHolder = userContextHolder;
             this.authorizationService = authorizationService;
             this.logger = new Logger(httpRequest);
