@@ -78,6 +78,9 @@ class ProjectConfigurer {
 						def projName = matcher[0].substring(1)
 						deps += projName
 						//println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
+						if (this.projectMap[projName] == null) {
+							println 'Project does not exist: ' + projName
+						}
 						deps += this.getDependendentProjects(this.projectMap[projName], level + 1)
 					}
 				}

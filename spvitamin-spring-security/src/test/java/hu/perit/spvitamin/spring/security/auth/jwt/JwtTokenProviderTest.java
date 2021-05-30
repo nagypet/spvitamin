@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -47,117 +47,111 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @SpringBootTest
-@ActiveProfiles({ "default", "unittest" })
+@ActiveProfiles({"default", "unittest"})
 @TestPropertySource("classpath:application-unittest.properties")
-@ContextConfiguration(classes = JwtTokenProviderTest.ContextConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = JwtTokenProviderTest.ContextConfiguration.class, initializers = ConfigDataApplicationContextInitializer.class)
 @Slf4j
 class JwtTokenProviderTest
 {
 
-	@Profile("unittest")
-	@EnableConfigurationProperties
-	@Configuration
-	@ComponentScan(basePackages = { "hu.perit.spvitamin.spring.security.auth.jwt", "hu.perit.spvitamin.spring.config" })
-	public static class ContextConfiguration
-	{
-	}
+    @Profile("unittest")
+    @EnableConfigurationProperties
+    @Configuration
+    @ComponentScan(basePackages = {"hu.perit.spvitamin.spring.security.auth.jwt", "hu.perit.spvitamin.spring.config"})
+    public static class ContextConfiguration
+    {
+    }
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-	@Test
-	void testValidToken()
-	{
-		log.debug("-----------------------------------------------------------------------------------------------------");
-		log.debug("testValidToken()");
+    @Test
+    void testValidToken()
+    {
+        log.debug("-----------------------------------------------------------------------------------------------------");
+        log.debug("testValidToken()");
 
-		final AuthorizationToken token = this.jwtTokenProvider.generateToken(
-				"nagy_peter", new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
+        final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
+            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
 
-		TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
+        TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 
-		Assertions.assertEquals("nagy_peter", claims.getSubject());
-		Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
-		Assertions.assertEquals(List.of(new SimpleGrantedAuthority("ADMIN")), authorities);
-	}
+        Assertions.assertEquals("nagy_peter", claims.getSubject());
+        Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
+        Assertions.assertEquals(List.of(new SimpleGrantedAuthority("ADMIN")), authorities);
+    }
 
+    @Test
+    void testInvalidToken()
+    {
+        log.debug("-----------------------------------------------------------------------------------------------------");
+        log.debug("testInvalidToken()");
 
-	@Test
-	void testInvalidToken()
-	{
-		log.debug("-----------------------------------------------------------------------------------------------------");
-		log.debug("testInvalidToken()");
+        final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
+            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
+        Assertions.assertThrows(JwtException.class, () -> this.jwtTokenProvider.getClaims(token.getJwt().substring(2)));
+    }
 
-		final AuthorizationToken token = this.jwtTokenProvider.generateToken(
-				"nagy_peter", new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
-		Assertions.assertThrows(JwtException.class, () -> this.jwtTokenProvider.getClaims(token.getJwt().substring(2)));
-	}
+    private static class SpecialTokenClaims extends DefaultClaims
+    {
 
-	private static class SpecialTokenClaims extends DefaultClaims
-	{
+        private static final String ROLES = "rls";
+        private static final String USERID = "uid";
 
-		private static final String ROLES = "rls";
-		private static final String USERID = "uid";
+        public SpecialTokenClaims(Claims claims)
+        {
+            super(claims);
+        }
 
-		public SpecialTokenClaims(Claims claims)
-		{
-			super(claims);
-		}
+        public SpecialTokenClaims(long userId, Collection<? extends GrantedAuthority> authorities)
+        {
+            this.setUserId(userId);
+            this.setAuthorities(authorities);
+        }
 
+        public long getUserId()
+        {
+            return this.get(USERID, Long.class);
+        }
 
-		public SpecialTokenClaims(long userId, Collection<? extends GrantedAuthority> authorities)
-		{
-			this.setUserId(userId);
-			this.setAuthorities(authorities);
-		}
+        public void setUserId(long userId)
+        {
+            this.put(USERID, userId);
+        }
 
+        public Collection<GrantedAuthority> getAuthorities()
+        {
+            List authorities = this.get(ROLES, List.class);
 
-		public long getUserId()
-		{
-			return this.get(USERID, Long.class);
-		}
+            List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+            for (Object authority : authorities)
+            {
+                grantedAuthorities.add(new SimpleGrantedAuthority(authority.toString()));
+            }
 
+            return grantedAuthorities;
+        }
 
-		public void setUserId(long userId)
-		{
-			this.put(USERID, userId);
-		}
+        public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
+        {
+            this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
+        }
 
+    }
 
-		public Collection<GrantedAuthority> getAuthorities()
-		{
-			List authorities = this.get(ROLES, List.class);
+    @Test
+    void testSpecializedTokenClaim()
+    {
+        log.debug("-----------------------------------------------------------------------------------------------------");
+        log.debug("testSpecializedTokenClaim()");
 
-			List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-			for (Object authority : authorities)
-			{
-				grantedAuthorities.add(new SimpleGrantedAuthority(authority.toString()));
-			}
+        final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
+            new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
 
-			return grantedAuthorities;
-		}
+        SpecialTokenClaims claims = new SpecialTokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 
-
-		public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
-		{
-			this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
-		}
-
-	}
-
-	@Test
-	void testSpecializedTokenClaim()
-	{
-		log.debug("-----------------------------------------------------------------------------------------------------");
-		log.debug("testSpecializedTokenClaim()");
-
-		final AuthorizationToken token = this.jwtTokenProvider.generateToken(
-				"nagy_peter", new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
-
-		SpecialTokenClaims claims = new SpecialTokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
-
-		Assertions.assertEquals("nagy_peter", claims.getSubject());
-		Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
-		Assertions.assertEquals(List.of(new SimpleGrantedAuthority("ADMIN")), authorities);
-	}
+        Assertions.assertEquals("nagy_peter", claims.getSubject());
+        Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
+        Assertions.assertEquals(List.of(new SimpleGrantedAuthority("ADMIN")), authorities);
+    }
 }
