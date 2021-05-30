@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import hu.perit.spvitamin.spring.config.AdminProperties;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
@@ -287,10 +288,24 @@ public class SimpleHttpSecurityBuilder
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests() //
-            .antMatchers(
-                // Admin GUI controller
-                "/", "/*.*", "/css/**", "/assets/**", "/admin-gui/**");
+        AdminProperties adminProperties = SysConfig.getAdminProperties();
+
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls;
+        if (adminProperties.getAdminGuiUrl().isBlank())
+        {
+            adminGuiUrls = http.authorizeRequests() //
+                .antMatchers(
+                    // Admin GUI controller
+                    "/", "/*.*", "/css/**", "/assets/**");
+        }
+        else
+        {
+            adminGuiUrls = http.authorizeRequests() //
+                .antMatchers(
+                    // Admin GUI controller
+                    "/",
+                    String.format("%s/**", adminProperties.getAdminGuiUrl()));
+        }
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))
         {

@@ -21,29 +21,41 @@ package hu.perit.spvitamin.spring.config;
  */
 
 
-public class SysConfig {
+public class SysConfig
+{
 
-    public static JwtProperties getJwtProperties() {
+    public static JwtProperties getJwtProperties()
+    {
         return SpringContext.getBean(JwtProperties.class);
     }
 
-    public static SecurityProperties getSecurityProperties() {
+    public static SecurityProperties getSecurityProperties()
+    {
         return SpringContext.getBean(SecurityProperties.class);
     }
 
-    public static ServerProperties getServerProperties() {
+    public static ServerProperties getServerProperties()
+    {
         return SpringContext.getBean(ServerProperties.class);
     }
 
-    public static MetricsProperties getMetricsProperties() {
+    public static MetricsProperties getMetricsProperties()
+    {
         return SpringContext.getBean(MetricsProperties.class);
     }
 
-    public static CryptoProperties getCryptoProperties() {
+    public static CryptoProperties getCryptoProperties()
+    {
         return SpringContext.getBean(CryptoProperties.class);
     }
 
-    public static MicroserviceCollectionProperties getSysMicroservices() {
+    public static AdminProperties getAdminProperties()
+    {
+        return SpringContext.getBean(AdminProperties.class);
+    }
+
+    public static MicroserviceCollectionProperties getSysMicroservices()
+    {
         return SpringContext.getBean(MicroserviceCollectionProperties.class);
     }
 }

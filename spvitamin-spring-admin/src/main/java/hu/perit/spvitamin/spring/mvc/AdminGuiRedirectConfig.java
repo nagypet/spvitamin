@@ -4,15 +4,32 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+
 @Configuration
 public class AdminGuiRedirectConfig implements WebMvcConfigurer
 {
-    private static final String REDIRECT_TARGET = "redirect:/admin-gui/";
-
     @Override
     public void addViewControllers(ViewControllerRegistry registry)
     {
-        registry.addViewController("/admin-gui").setViewName(REDIRECT_TARGET);
-        registry.addViewController("/admin-gui/").setViewName("forward:/admin-gui/index.html");
+        // adminProperties.getAdminGuiUrl() must be e.g.: /admin-gui
+        AdminProperties adminProperties = SysConfig.getAdminProperties();
+
+        if (!adminProperties.getDefaultSiteUrl().isBlank())
+        {
+            String target = String.format("redirect:%s/%s", adminProperties.getDefaultSiteUrl(),
+                adminProperties.getDefaultSiteRootFileName());
+
+            registry.addViewController("/").setViewName(target);
+        }
+
+        if (!adminProperties.getAdminGuiUrl().isBlank())
+        {
+            String target = String.format("redirect:%s/%s", adminProperties.getAdminGuiUrl(), adminProperties.getAdminGuiRootFileName());
+
+            registry.addViewController(adminProperties.getAdminGuiUrl()).setViewName(target);
+            registry.addViewController(adminProperties.getAdminGuiUrl() + "/").setViewName(target);
+        }
     }
 }
