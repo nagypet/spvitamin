@@ -290,7 +290,7 @@ public class SimpleHttpSecurityBuilder
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = http.authorizeRequests() //
             .antMatchers(
                 // Admin GUI controller
-                "/", "/*.*", "/css/**", "/assets/**");
+                "/", "/*.*", "/css/**", "/assets/**", "/admin-gui/**");
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))
         {
