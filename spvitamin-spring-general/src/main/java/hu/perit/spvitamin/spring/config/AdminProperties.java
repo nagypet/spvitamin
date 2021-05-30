@@ -16,9 +16,9 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -42,11 +42,12 @@ public class AdminProperties
     private String adminGuiUrl = "";
     private String adminGuiRootFileName = "index.html";
 
-    @PostConstruct
-    void postConstruct()
+    @EventListener
+    private void onApplicationEvent(ContextStartedEvent event)
     {
         ServerProperties serverProperties = SysConfig.getServerProperties();
-        log.info(String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl, this.defaultSiteRootFileName));
+        log.info(
+            String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl, this.defaultSiteRootFileName));
         log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
     }
 }
