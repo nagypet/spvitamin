@@ -35,8 +35,8 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
  */
 
 
-@Service
-public class SpvitaminAuthorizationService
+@Service(value = "SpvitaminAuthorizationService")
+public class AuthorizationService
 {
 
     public void setAuthenticatedUser(AuthenticatedUser authenticatedUser)
