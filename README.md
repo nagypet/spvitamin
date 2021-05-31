@@ -1,5 +1,34 @@
 # spvitamin
 
+## Releases
+
+1.1.0-RELEASE: 2021-05-31
+
+## Build
+
+build.gradle
+```
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url "http://perit.hu/maven"
+    }
+}
+
+ext {
+	set('spvitaminVersion', '1.1.0-RELEASE')
+}
+
+dependencies {
+	implementation "hu.perit.spvitamin:spvitamin-core:${spvitaminVersion}"
+	implementation "hu.perit.spvitamin:spvitamin-spring-server:${spvitaminVersion}"
+	implementation "hu.perit.spvitamin:spvitamin-spring-admin:${spvitaminVersion}"
+	implementation "hu.perit.spvitamin:spvitamin-spring-logging:${spvitaminVersion}"
+	implementation "hu.perit.spvitamin:spvitamin-spring-security:${spvitaminVersion}"
+	implementation "hu.perit.spvitamin:spvitamin-spring-data:${spvitaminVersion}"
+```
+
 ## Components
 
 ### spvitamin-core
