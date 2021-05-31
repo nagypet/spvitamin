@@ -22,11 +22,20 @@ ext {
 
 dependencies {
 	implementation 'hu.perit.spvitamin:spvitamin-core'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-server'
 	implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-ribbon'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-zuul	'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-data'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-general'
 	implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
 	implementation 'hu.perit.spvitamin:spvitamin-spring-security'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-data'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-server'
 }	
 
 dependencyManagement {
