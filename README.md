@@ -21,12 +21,22 @@ ext {
 }
 
 dependencies {
-	implementation "hu.perit.spvitamin:spvitamin-core:${spvitaminVersion}"
-	implementation "hu.perit.spvitamin:spvitamin-spring-server:${spvitaminVersion}"
-	implementation "hu.perit.spvitamin:spvitamin-spring-admin:${spvitaminVersion}"
-	implementation "hu.perit.spvitamin:spvitamin-spring-logging:${spvitaminVersion}"
-	implementation "hu.perit.spvitamin:spvitamin-spring-security:${spvitaminVersion}"
-	implementation "hu.perit.spvitamin:spvitamin-spring-data:${spvitaminVersion}"
+	implementation 'hu.perit.spvitamin:spvitamin-core'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-server'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-security'
+	implementation 'hu.perit.spvitamin:spvitamin-spring-data'
+}	
+
+dependencyManagement {
+    imports {
+        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
+    }
+}
+
+
+	
 ```
 
 ## Components
