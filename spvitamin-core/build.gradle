@@ -86,8 +86,12 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
-            from(components.java)
+        maven(MavenPublication) {
+            groupId = 'hu.perit.spvitamin'
+            artifactId = 'spvitamin-core'
+            version = '1.1.0-RELEASE'
+
+            from components.java
         }
     }
 }

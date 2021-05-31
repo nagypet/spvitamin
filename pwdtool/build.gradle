@@ -36,8 +36,6 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
 
-    //implementation('hu.perit:spvitamin-core:1.0.0-SNAPSHOT')
-
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
