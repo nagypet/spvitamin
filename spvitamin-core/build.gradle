@@ -77,12 +77,14 @@ test {
 publishing {
     repositories {
         maven {
-            name = "spvitamin"
-            url = uri("https://maven.pkg.github.com/nagypet/spvitamin")
+            name = "perit.hu"
+            url = uri("http://perit.hu/maven")
+			/*
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
             }
+			*/
         }
     }
     publications {
