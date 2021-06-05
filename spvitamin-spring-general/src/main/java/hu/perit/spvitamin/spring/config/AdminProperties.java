@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.config;
 import javax.annotation.PostConstruct;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @ConfigurationProperties(prefix = "admin")
 @Slf4j
+@DependsOn("serverProperties")
 public class AdminProperties
 {
     private String defaultSiteUrl = "";
@@ -45,7 +47,10 @@ public class AdminProperties
     @PostConstruct
     private void postConstruct()
     {
-        log.info(String.format("Default site: %s/%s", this.defaultSiteUrl, this.defaultSiteRootFileName));
-        log.info(String.format("AdminGUI: %s/%s", this.adminGuiUrl, this.adminGuiRootFileName));
+        ServerProperties serverProperties = SysConfig.getServerProperties();
+
+        log.info(
+            String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl, this.defaultSiteRootFileName));
+        log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
     }
 }
