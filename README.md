@@ -2,7 +2,27 @@
 
 ## Releases
 
-1.1.0-RELEASE: 2021-05-31
+### 1.1.1-RELEASE 2021-06-06
+AD Group mapping can be configured as follows.
+
+```
+#-----------------------------------------------------------------------------------------------------------------------
+# AD group -> role mapping
+#-----------------------------------------------------------------------------------------------------------------------
+roles.ROLE_ADMIN.groups=Team1
+roles.ROLE_ADMIN.includes=ROLE_PUBLIC
+#roles.ROLE_ADMIN.users=nagy.peter
+#roles.ROLE_PUBLIC.groups=DeliveryTeam
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Role -> permission mapping
+#-----------------------------------------------------------------------------------------------------------------------
+rolemap.ROLE_ADMIN=BACKEND_WRITE_ACCESS
+rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
+```
+
+### 1.1.0-RELEASE 2021-05-31
 
 ## Build
 
