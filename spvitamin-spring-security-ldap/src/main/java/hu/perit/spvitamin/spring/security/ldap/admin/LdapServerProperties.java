@@ -16,23 +16,24 @@
 
 package hu.perit.spvitamin.spring.security.ldap.admin;
 
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
-import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
-import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
+import hu.perit.spvitamin.spring.rolemapper.AdGroup2RoleMappingProperties;
+import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
 
 @Component
 public class LdapServerProperties {
 
     private final LdapCollectionProperties ldapCollectionProperties;
-    private final RoleMappingProperties roleMappingProperties;
+    private final AdGroup2RoleMappingProperties roleMappingProperties;
 
     @Autowired
-    public LdapServerProperties(LdapCollectionProperties ldapCollectionProperties, RoleMappingProperties roleMappingProperties) {
+    public LdapServerProperties(LdapCollectionProperties ldapCollectionProperties, AdGroup2RoleMappingProperties roleMappingProperties) {
         this.ldapCollectionProperties = ldapCollectionProperties;
         this.roleMappingProperties = roleMappingProperties;
     }
@@ -46,7 +47,7 @@ public class LdapServerProperties {
             params.add(ServerParameterList.of(entry.getValue(), "ldaps." + entry.getKey()));
         }
 
-        for (Map.Entry<String, RoleMappingProperties.RoleMapping> entry : this.roleMappingProperties.getRoles().entrySet()) {
+        for (Map.Entry<String, AdGroup2RoleMappingProperties.RoleMapping> entry : this.roleMappingProperties.getRoles().entrySet()) {
             params.add(ServerParameterList.of(entry.getValue(), "role." + entry.getKey()));
         }
 

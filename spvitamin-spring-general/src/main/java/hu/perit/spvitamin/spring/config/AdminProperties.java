@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,8 @@ package hu.perit.spvitamin.spring.config;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -34,23 +34,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @ConfigurationProperties(prefix = "admin")
 @Slf4j
-@DependsOn("serverProperties")
-public class AdminProperties
-{
-    private String defaultSiteUrl = "";
-    private String defaultSiteRootFileName = "index.html";
+public class AdminProperties {
+	@Autowired
+	private ServerProperties serverProperties;
 
-    // e.g. admin.admin-gui-url=/alma
-    private String adminGuiUrl = "";
-    private String adminGuiRootFileName = "index.html";
+	private String defaultSiteUrl = "";
+	private String defaultSiteRootFileName = "index.html";
 
-    @PostConstruct
-    private void postConstruct()
-    {
-        ServerProperties serverProperties = SysConfig.getServerProperties();
+	// e.g. admin.admin-gui-url=/alma
+	private String adminGuiUrl = "";
+	private String adminGuiRootFileName = "index.html";
 
-        log.info(
-            String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl, this.defaultSiteRootFileName));
-        log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
-    }
+	@PostConstruct
+	private void postConstruct() {
+		log.info(String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl,
+				this.defaultSiteRootFileName));
+		log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
+	}
 }

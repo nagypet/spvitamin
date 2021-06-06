@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.ldap;
+package hu.perit.spvitamin.spring.rolemapper;
 
 import java.util.Collection;
 import java.util.Set;
@@ -25,7 +25,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
 
 /**
  * Maps AD groups and users to roles
@@ -37,9 +36,9 @@ import hu.perit.spvitamin.spring.security.ldap.config.RoleMappingProperties;
 public class AdGroupRoleMapper
 {
 
-	private final RoleMappingProperties roleMappingProperties;
+	private final AdGroup2RoleMappingProperties roleMappingProperties;
 
-	public AdGroupRoleMapper(RoleMappingProperties roleMappingProperties)
+	public AdGroupRoleMapper(AdGroup2RoleMappingProperties roleMappingProperties)
 	{
 		this.roleMappingProperties = roleMappingProperties;
 	}
@@ -51,7 +50,12 @@ public class AdGroupRoleMapper
 
 		Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(authenticatedUser.getUsername(), adGroups);
 
-		return AuthenticatedUser.builder().username(authenticatedUser.getUsername()).authorities(roles).userId(authenticatedUser.getUserId()).build();
+		return AuthenticatedUser.builder() //
+				.username(authenticatedUser.getUsername()) //
+				.authorities(roles) //
+				.userId(authenticatedUser.getUserId()) //
+				.anonymous(authenticatedUser.isAnonymous())
+				.build();
 	}
 
 
@@ -62,7 +66,7 @@ public class AdGroupRoleMapper
 		{
 			if (adGroup.getAuthority().startsWith("ROLE_"))
 			{
-				roles.add(adGroup.getAuthority().substring(5));
+				roles.add(adGroup.getAuthority());
 			}
 			else
 			{
@@ -70,6 +74,17 @@ public class AdGroupRoleMapper
 			}
 		}
 
-		return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())).collect(Collectors.toSet());
+		return roles.stream().map(role -> new SimpleGrantedAuthority(prefixWithRole(role.toUpperCase()))).collect(Collectors.toSet());
+	}
+	
+	
+	private String prefixWithRole(String roleName)
+	{
+		if (roleName == null)
+		{
+			return "";
+		}
+		
+		return roleName.startsWith("ROLE_") ? roleName : "ROLE_" + roleName;
 	}
 }
