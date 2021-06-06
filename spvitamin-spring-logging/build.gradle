@@ -92,7 +92,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'hu.perit.spvitamin'
             artifactId = 'spvitamin-spring-logging'
-            version = '1.1.0-RELEASE'
+            version = "${version}"
 
             from components.java
         }
