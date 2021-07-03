@@ -44,6 +44,7 @@ public class DatasourceProperties {
     protected String encryptedPassword;
     protected String dialect;
     protected Integer maxPoolSize = 10;
+    protected String connectionInitSql;
 
     /*
     connectionTimeout controls the maximum number of milliseconds that a client (that's you) will wait for a connection

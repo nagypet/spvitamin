@@ -65,6 +65,7 @@ public class DynamicDataSource implements DataSource, Closeable
         this.dataSource.setMaximumPoolSize(connParam.getMaxPoolSize());
         this.dataSource.setConnectionTimeout(connParam.getConnectionTimeout());
         this.dataSource.setLeakDetectionThreshold(connParam.getLeakDetectionThreshold());
+        this.dataSource.setConnectionInitSql(connParam.getConnectionInitSql());
         try
         {
             dataSource.setLoginTimeout(5);

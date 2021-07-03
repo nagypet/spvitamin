@@ -2,6 +2,23 @@
 
 ## Releases
 
+### 1.2.0-RELEASE 2021-07-03
+New database config parameter to set an initial sql for the connection.
+```
+#-----------------------------------------------------------------------------------------------------------------------
+# datasource repodb on oracle
+#-----------------------------------------------------------------------------------------------------------------------
+datasource.repodb.db-type=oracle
+datasource.repodb.host=db_host
+datasource.repodb.port=1521
+datasource.repodb.db-name=ORCL
+datasource.repodb.username=username
+datasource.repodb.encrypted-password=LiCBRVVpyts=
+datasource.repodb.ddl-auto=validate
+datasource.repodb.connection-init-sql=ALTER SESSION SET CURRENT_SCHEMA=MY_SCHEMA
+```
+
+
 ### 1.1.1-RELEASE 2021-06-06
 AD Group mapping can be configured as follows.
 
