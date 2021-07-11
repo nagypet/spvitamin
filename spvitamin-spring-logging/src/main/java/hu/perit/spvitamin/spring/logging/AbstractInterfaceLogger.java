@@ -36,47 +36,59 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public abstract class AbstractInterfaceLogger {
+public abstract class AbstractInterfaceLogger
+{
 
-    private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
-    private static final Set<String> headerNamesToHide = Set.of("password", "authorization");
+    private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
+        "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
+    private static final Set<String> HEADER_NAMES_TO_HIDE = Set.of("password");
+    private static final Set<String> HEADER_NAMES_TO_ABBREVIATE = Set.of("authorization");
 
     protected HttpServletRequest httpRequest;
 
-    protected AbstractInterfaceLogger(HttpServletRequest httpRequest) {
+    protected AbstractInterfaceLogger(HttpServletRequest httpRequest)
+    {
         this.httpRequest = httpRequest;
     }
 
     protected abstract String getSubsystemName();
 
-    public void traceIn(String processId, String user, Method method, Object... args) {
+    public void traceIn(String processId, String user, Method method, Object... args)
+    {
         log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), getSubject(args), true));
     }
 
-    public void traceIn(String processId, String user, String methodName, int eventId, Object... args) {
+    public void traceIn(String processId, String user, String methodName, int eventId, Object... args)
+    {
         log.debug(iptrace(processId, user, eventId, methodName, getSubject(args), true));
     }
 
-    public void traceOut(String processId, String user, Method method, Throwable ex) {
+    public void traceOut(String processId, String user, Method method, Throwable ex)
+    {
         log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), ex.toString(), false));
     }
 
-    public void traceOut(String processId, String user, Method method) {
+    public void traceOut(String processId, String user, Method method)
+    {
         log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), "SUCCESS", false));
     }
 
-    public void traceOut(String processId, String user, String methodName, int eventId, Throwable ex) {
+    public void traceOut(String processId, String user, String methodName, int eventId, Throwable ex)
+    {
         log.debug(iptrace(processId, user, eventId, methodName, ex.toString(), false));
     }
 
-    public void traceOut(String processId, String user, String methodName, int eventId) {
+    public void traceOut(String processId, String user, String methodName, int eventId)
+    {
         log.debug(iptrace(processId, user, eventId, methodName, "SUCCESS", false));
     }
 
-    private int getEventLogId(Method method) {
+    private int getEventLogId(Method method)
+    {
         Objects.requireNonNull(method);
         EventLogId annotation = method.getAnnotation(EventLogId.class);
-        if (annotation != null) {
+        if (annotation != null)
+        {
             return annotation.eventId();
         }
 
@@ -98,19 +110,15 @@ public abstract class AbstractInterfaceLogger {
     }
 
 
-    protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn) {
+    protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
+    {
         this.logRequestHeaders();
 
         String eventLogString = String.format("%s | %s | %s | user: %s | host: %s | system: %s | eventId: %d | event: %s | %s ",
-                isDirectionIn ? ">>>" : "<<<",
-                this.getClientIpAddr(),
-                StringUtils.defaultIfBlank(processID, "null"),
-                StringUtils.defaultIfBlank(user, "null"),
-                StringUtils.defaultString(this.getHostName(), "null"),
-                StringUtils.defaultIfBlank(this.getSubsystemName(), "null"),
-                eventID,
-                StringUtils.defaultIfBlank(eventText, "null"),
-                StringUtils.defaultIfBlank(subject, "null"));
+            isDirectionIn ? ">>>" : "<<<", this.getClientIpAddr(), StringUtils.defaultIfBlank(processID, "null"),
+            StringUtils.defaultIfBlank(user, "null"), StringUtils.defaultString(this.getHostName(), "null"),
+            StringUtils.defaultIfBlank(this.getSubsystemName(), "null"), eventID, StringUtils.defaultIfBlank(eventText, "null"),
+            StringUtils.defaultIfBlank(subject, "null"));
 
         // Place to forward the event log entry to a log server
 
@@ -118,29 +126,38 @@ public abstract class AbstractInterfaceLogger {
     }
 
 
-    public String getHostName() {
+    public String getHostName()
+    {
         String hostname = System.getenv("HOSTNAME");
-        if (hostname != null) return hostname;
+        if (hostname != null)
+            return hostname;
 
         String computerName = System.getenv("COMPUTERNAME");
-        if (computerName != null) return computerName;
+        if (computerName != null)
+            return computerName;
 
         return null;
     }
 
 
-    public String getClientIpAddr() {
-        try {
-            for (String ipHeader : IP_HEADERS) {
+    public String getClientIpAddr()
+    {
+        try
+        {
+            for (String ipHeader : IP_HEADERS)
+            {
                 String ip = this.httpRequest.getHeader(ipHeader);
-                if (ip != null && !ip.isEmpty() && !ip.equalsIgnoreCase("unknown")) {
-                    if (ipHeader.equalsIgnoreCase("X-Forwarded-For")) {
+                if (ip != null && !ip.isEmpty() && !ip.equalsIgnoreCase("unknown"))
+                {
+                    if (ipHeader.equalsIgnoreCase("X-Forwarded-For"))
+                    {
                         // X-Forwarded-For: <client>, <proxy1>, <proxy2>
                         // If a request goes through multiple proxies, the IP addresses of each successive proxy is listed.
                         // This means, the right-most IP address is the IP address of the most recent proxy and
                         // the left-most IP address is the IP address of the originating client.
                         String[] clients = ip.split(",");
-                        if (clients != null && clients.length > 0) {
+                        if (clients != null && clients.length > 0)
+                        {
                             return clients[0];
                         }
                     }
@@ -149,38 +166,69 @@ public abstract class AbstractInterfaceLogger {
             }
             return this.httpRequest.getRemoteAddr();
         }
-        catch (IllegalStateException ex) {
+        catch (IllegalStateException ex)
+        {
             return "";
         }
     }
 
-    private void logRequestHeaders() {
-        try {
+    private void logRequestHeaders()
+    {
+        try
+        {
             Iterator<String> iterator = this.httpRequest.getHeaderNames().asIterator();
             StringBuilder sb = new StringBuilder();
             sb.append("HTTP headers: ");
-            while (iterator.hasNext()) {
+            while (iterator.hasNext())
+            {
                 String headerName = iterator.next();
                 sb.append(String.format("%s=%s;", headerName, this.hidePasswords(headerName)));
             }
             log.debug(sb.toString());
         }
-        catch (IllegalStateException ex) {
+        catch (IllegalStateException ex)
+        {
             log.warn("HTTP headers: HTTP request is empty!");
         }
     }
 
-    private String hidePasswords(String headerName) {
-        String header = this.httpRequest.getHeader(headerName);
-        if (headerNamesToHide.stream().anyMatch(i -> i.equalsIgnoreCase(headerName))) {
-            return StringUtils.abbreviate(header, Math.min(40, header.length() / 2));
+
+    private String hidePasswords(String headerName)
+    {
+        String headerValue = this.httpRequest.getHeader(headerName);
+        return getMaskedHeaderValue(headerName, headerValue);
+    }
+
+
+    protected static String getMaskedHeaderValue(String headerName, String headerValue)
+    {
+        if (HEADER_NAMES_TO_ABBREVIATE.stream().anyMatch(i -> i.equalsIgnoreCase(headerName)))
+        {
+            if (headerValue.length() <= 4)
+            {
+                return "***";
+            }
+            else if (headerValue.length() <= 6)
+            {
+                return StringUtils.abbreviate(headerValue, Math.max(4, headerValue.length() - 1));
+            }
+            else
+            {
+                return StringUtils.abbreviate(headerValue, Math.max(4, Math.min(40, (headerValue.length() / 2) + 3)));
+            }
         }
-        else {
-            return header;
+        else if (HEADER_NAMES_TO_HIDE.stream().anyMatch(i -> i.equalsIgnoreCase(headerName)))
+        {
+            return "***";
+        }
+        else
+        {
+            return headerValue;
         }
     }
 
-    public String getMyMethodName() {
+    public String getMyMethodName()
+    {
         StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
         return stackTraceElement.getMethodName();
     }

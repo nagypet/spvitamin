@@ -2,6 +2,10 @@
 
 ## Releases
 
+### 1.2.1-RELEASE 2021-07-11
+A bug fixed in the class AbstractInterfaceLogger. There was a failure in case of too short authorization or password header.
+
+
 ### 1.2.0-RELEASE 2021-07-03
 New database config parameter to set an initial sql for the connection.
 ```
