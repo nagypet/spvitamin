@@ -79,13 +79,13 @@ if (project.hasProperty('bootJar')) {
 /********************************************************************************************************
  * Version information
  *******************************************************************************************************/
-if (new File("version.ver").exists())
+if (new File("${projectDir}/version.ver").exists())
 {
-	version = rootProject.file("version.ver").text.trim()
+	version = rootProject.file("${projectDir}/version.ver").text.trim()
 }
-else if (new File("../version.ver").exists())
+else if (new File("${projectDir}/../version.ver").exists())
 {
-	version = rootProject.file("../version.ver").text.trim()
+	version = rootProject.file("${projectDir}/../version.ver").text.trim()
 }
 else
 {
