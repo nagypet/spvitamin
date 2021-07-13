@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.data.admin;
-
-import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
-import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
-import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
+package hu.perit.spvitamin.spring.data.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,17 +31,5 @@ class DataServerParameters
     @Autowired
     public DataServerParameters(DatasourceCollectionProperties datasourceCollectionProperties) {
         this.datasourceCollectionProperties = datasourceCollectionProperties;
-    }
-
-    @Bean(name = "DataServerParameters")
-    public ServerParameterList getParameterList()
-    {
-        ServerParameterList params = new ServerParameterList();
-
-        for (Map.Entry<String, DatasourceProperties> entry : this.datasourceCollectionProperties.getDatasource().entrySet()) {
-            params.add(ServerParameterList.of(entry.getValue(), "datasource." + entry.getKey()));
-        }
-
-        return params;
     }
 }

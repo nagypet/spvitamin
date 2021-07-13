@@ -87,7 +87,7 @@ public class ServerException extends RuntimeException implements ServerException
     @Override
     public Annotation[] getAnnotations() {
         try {
-            return Class.forName(this.className).getAnnotations();
+            return Class.forName(this.className).getAnnotations(); // NOSONAR
         }
         catch (ClassNotFoundException e) {
             return new Annotation[0];

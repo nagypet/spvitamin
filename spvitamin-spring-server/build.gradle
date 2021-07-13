@@ -33,6 +33,9 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
+
+sourceCompatibility = 11
+
 apply from: '../gradle/common.gradle'
 
 
@@ -52,7 +55,6 @@ bootJar {
    enabled = false
 }
 
-sourceCompatibility = 11
 
 dependencies {
 	compile project(':spvitamin-core')

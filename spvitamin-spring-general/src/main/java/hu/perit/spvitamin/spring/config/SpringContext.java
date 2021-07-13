@@ -16,13 +16,14 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 
 /**
  * #know-how:access-spring-managed-beans-from-outside
@@ -32,13 +33,15 @@ import org.springframework.stereotype.Component;
 
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Component
-public class SpringContext implements ApplicationContextAware {
+@Component(value = "SpvitaminSpringContext")
+public class SpringContext implements ApplicationContextAware
+{
 
     private static ApplicationContext context;
 
     @Override
-    public void setApplicationContext(ApplicationContext context) throws BeansException {
+    public void setApplicationContext(ApplicationContext context) throws BeansException
+    {
         // store ApplicationContext reference to access required beans later on
         SpringContext.context = context;
     }
@@ -51,29 +54,35 @@ public class SpringContext implements ApplicationContextAware {
      * @param beanClass
      * @return
      */
-    public static <T> T getBean(Class<T> beanClass) {
+    public static <T> T getBean(Class<T> beanClass)
+    {
         validateSelf();
         return context.getBean(beanClass);
     }
 
-    public static <T> T getBean(String name, Class<T> beanClass) {
+    public static <T> T getBean(String name, Class<T> beanClass)
+    {
         validateSelf();
         return context.getBean(name, beanClass);
     }
 
-    public static String[] getBeanNamesForType(Class<?> beanClass) {
+    public static String[] getBeanNamesForType(Class<?> beanClass)
+    {
         validateSelf();
         return context.getBeanNamesForType(beanClass);
     }
 
-    public static boolean isBeanAvailable(Class<?> beanClass) {
+    public static boolean isBeanAvailable(Class<?> beanClass)
+    {
         validateSelf();
         String[] names = context.getBeanNamesForType(beanClass);
         return names.length > 0;
     }
 
-    private static void validateSelf() {
-        if (SpringContext.context == null) {
+    private static void validateSelf()
+    {
+        if (SpringContext.context == null)
+        {
             throw new UnexpectedConditionException("There is no injected ApplicationContext!");
         }
     }

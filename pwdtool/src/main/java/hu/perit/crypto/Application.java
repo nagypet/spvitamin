@@ -9,6 +9,8 @@ package hu.perit.crypto;
 
 
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.crypto.CryptoException;
+import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import lombok.extern.log4j.Log4j;
 
 
@@ -18,7 +20,7 @@ public class Application
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args)
+    public static void main(String[] args) // NOSONAR
     {
         Options options = new Options(args);
         if (!options.parse())

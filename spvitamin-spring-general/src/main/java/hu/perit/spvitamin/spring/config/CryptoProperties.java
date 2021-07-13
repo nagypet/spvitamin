@@ -30,5 +30,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "crypto")
 public class CryptoProperties {
 
-    private String secret = "secret";
+    private String secret = "secret"; // NOSONAR
 }

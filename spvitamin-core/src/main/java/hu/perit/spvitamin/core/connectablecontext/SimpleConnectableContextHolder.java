@@ -32,9 +32,9 @@ public abstract class SimpleConnectableContextHolder<T extends ConnectableContex
 {
     protected abstract ConnectableContextCollection<T> getContextCollection();
 
-    // CUS-8859: Nagy terhelés beindulásakor, mivel a getContext() synchronized volt, ezért a context.connect() hívások csak
-    // egymás után tudtak lefutni. Ez gondot okoz, mert a szálak felfűtése indokolatlanul lassan történik. Ezért a
-    // context.connect() hívást kiveszem a synchronized blockból, hogy több szálon is párhuzamosan futhasson.
+    // CUS-8859: Nagy terheles beindulasakor, mivel a getContext() synchronized volt, ezert a context.connect() hivasok csak
+    // egymas utan tudtak lefutni. Ez gondot okoz, mert a szalak felfutese indokolatlanul lassan tortenik. Ezert a
+    // context.connect() hivast kiveszem a synchronized blockbol, hogy tobb szalon is parhuzamosan futhasson.
     public T getContext(ContextKey key)
     {
         T context = null;

@@ -216,7 +216,7 @@ public class ExceptionWrapper implements ServerExceptionInterface {
         }
         else {
             try {
-                return Class.forName(anExceptionClassName).isInstance(throwable);
+                return Class.forName(anExceptionClassName).isInstance(throwable); // NOSONAR
             }
             catch (ClassNotFoundException e) {
                 return false;

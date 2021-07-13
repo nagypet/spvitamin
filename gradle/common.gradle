@@ -28,6 +28,10 @@ if (project.hasProperty('compileJava')) {
 		}
 	}
 	compileJava.finalizedBy createBuildTimeTxt
+	
+	compileJava { 
+		options.encoding = "CP1252" 
+	}
 }
 
 
@@ -89,7 +93,7 @@ else if (new File("${projectDir}/../version.ver").exists())
 }
 else
 {
-	throw new RuntimeException("version.ver not found!")
+	throw new RuntimeException("version.ver not found while processing ${project.name}!")
 }
 
 

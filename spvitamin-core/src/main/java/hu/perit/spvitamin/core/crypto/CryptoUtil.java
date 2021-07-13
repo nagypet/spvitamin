@@ -16,11 +16,6 @@
 
 package hu.perit.spvitamin.core.crypto;
 
-import org.apache.commons.lang3.StringUtils;
-
-import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -30,18 +25,27 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Peter Nagy
  */
 
 
-public class CryptoUtil {
+public class CryptoUtil
+{
 
     // 8-byte Salt
-    private byte[] salt = {
-            (byte) 0xA9, (byte) 0x9B, (byte) 0xC8, (byte) 0x32,
-            (byte) 0x56, (byte) 0x35, (byte) 0xE3, (byte) 0x03
-    };
+    private byte[] salt = {(byte) 0xA9, (byte) 0x9B, (byte) 0xC8, (byte) 0x32, (byte) 0x56, (byte) 0x35, (byte) 0xE3, (byte) 0x03};
     // Iteration count
     private int iterationCount = 19;
 
@@ -50,12 +54,15 @@ public class CryptoUtil {
      * @param plainText Text input to be encrypted
      * @return Returns encrypted text
      */
-    public String encrypt(String secretKey, String plainText) {
-        if (!StringUtils.isNoneBlank(secretKey, plainText)) {
+    public String encrypt(String secretKey, String plainText)
+    {
+        if (!StringUtils.isNoneBlank(secretKey, plainText))
+        {
             return null;
         }
 
-        try {
+        try
+        {
             //Key generation for enc and desc
             KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), salt, iterationCount);
             SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
@@ -63,21 +70,16 @@ public class CryptoUtil {
             AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt, iterationCount);
 
             //Enc process
-            Cipher ecipher = Cipher.getInstance(key.getAlgorithm());
+            Cipher ecipher = Cipher.getInstance(key.getAlgorithm()); // NOSONAR
             ecipher.init(Cipher.ENCRYPT_MODE, key, paramSpec);
             String charSet = "UTF-8";
             byte[] in = plainText.getBytes(charSet);
             byte[] out = ecipher.doFinal(in);
             return new String(Base64.getEncoder().encode(out));
         }
-        catch (InvalidKeySpecException
-                | InvalidKeyException
-                | BadPaddingException
-                | InvalidAlgorithmParameterException
-                | NoSuchPaddingException
-                | IllegalBlockSizeException
-                | UnsupportedEncodingException
-                | NoSuchAlgorithmException e) {
+        catch (InvalidKeySpecException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException
+            | NoSuchPaddingException | IllegalBlockSizeException | UnsupportedEncodingException | NoSuchAlgorithmException e)
+        {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -87,33 +89,31 @@ public class CryptoUtil {
      * @param encryptedText encrypted text input to decrypt
      * @return Returns plain text after decryption
      */
-    public String decrypt(String secretKey, String encryptedText) {
-        if (!StringUtils.isNoneBlank(secretKey, encryptedText)) {
+    public String decrypt(String secretKey, String encryptedText)
+    {
+        if (!StringUtils.isNoneBlank(secretKey, encryptedText))
+        {
             return null;
         }
 
-        try {
+        try
+        {
             //Key generation for enc and desc
             KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), salt, iterationCount);
             SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
             // Prepare the parameter to the ciphers
             AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt, iterationCount);
             //Decryption process; same key will be used for decr
-            Cipher dcipher = Cipher.getInstance(key.getAlgorithm());
+            Cipher dcipher = Cipher.getInstance(key.getAlgorithm()); // NOSONAR
             dcipher.init(Cipher.DECRYPT_MODE, key, paramSpec);
             byte[] enc = Base64.getDecoder().decode(encryptedText);
             byte[] utf8 = dcipher.doFinal(enc);
             String charSet = "UTF-8";
             return new String(utf8, charSet);
         }
-        catch (InvalidKeySpecException
-                | InvalidKeyException
-                | BadPaddingException
-                | InvalidAlgorithmParameterException
-                | NoSuchPaddingException
-                | IllegalBlockSizeException
-                | UnsupportedEncodingException
-                | NoSuchAlgorithmException e) {
+        catch (InvalidKeySpecException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException
+            | NoSuchPaddingException | IllegalBlockSizeException | UnsupportedEncodingException | NoSuchAlgorithmException e)
+        {
             throw new CryptoException(e.getMessage(), e);
         }
     }

@@ -68,9 +68,14 @@ public class ConnectableContextCollection<T extends ConnectableContext> extends 
     @Override
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (!(o instanceof ConnectableContextCollection)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (this.getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
 
         ConnectableContextCollection<?> that = (ConnectableContextCollection<?>) o;
         return Objects.equals(contextSupplier, that.contextSupplier);

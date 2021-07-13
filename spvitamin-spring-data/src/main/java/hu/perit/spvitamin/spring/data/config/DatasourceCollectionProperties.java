@@ -28,5 +28,5 @@ import java.util.Map;
 @ConfigurationProperties
 public class DatasourceCollectionProperties {
 
-    private Map<String, DatasourceProperties> datasource = new HashMap<>();
+    private Map<String, DatasourceProperties> datasource = new HashMap<>(); // NOSONAR
 }

@@ -35,7 +35,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class InitParams {
+public class InitParams
+{
 
     private static InitParams myInstance = null;
     private static final String USER_DIR = "user.dir";
@@ -43,16 +44,21 @@ public class InitParams {
     private String configFileName = "application.properties";
     private Properties properties = null;
 
-    private InitParams() throws IOException {
+    private InitParams() throws IOException
+    {
         this.properties = this.loadPropertiesFromFile(this.configFileName);
     }
 
-    public static synchronized InitParams getInstance() {
-        if (myInstance == null) {
-            try {
+    public static synchronized InitParams getInstance()
+    {
+        if (myInstance == null)
+        {
+            try
+            {
                 myInstance = new InitParams();
             }
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 log.error(e.toString());
                 myInstance = null;
             }
@@ -75,48 +81,68 @@ public class InitParams {
      * @return
      * @throws IOException
      */
-    private Properties loadPropertiesFromFile(String fileName) throws IOException {
-        String workingDir = System.getProperty(USER_DIR);
-        String configFileLocation = new File(workingDir, "config").getAbsolutePath();
-        File iniFile = new File(configFileLocation, fileName);
+    private Properties loadPropertiesFromFile(String fileName) throws IOException
+    {
         InputStream inStream = null;
-        try {
-            inStream = new FileInputStream(iniFile);
-        }
-        catch (IOException ioe) {
-            //log.warn(String.format("%s - trying to load from resources", ioe.toString()));
-            // trying to load from the resource
-            inStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        }
+        try
+        {
+            String workingDir = System.getProperty(USER_DIR);
+            String configFileLocation = new File(workingDir, "config").getAbsolutePath();
+            File iniFile = new File(configFileLocation, fileName);
+            try
+            {
+                inStream = new FileInputStream(iniFile);
+            }
+            catch (IOException ioe)
+            {
+                //log.warn(String.format("%s - trying to load from resources", ioe.toString()));
+                // trying to load from the resource
+                inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+            }
 
-        if (inStream == null) {
-            throw new IOException("File not found " + fileName);
+            if (inStream == null)
+            {
+                throw new IOException("File not found " + fileName);
+            }
+
+            log.debug(String.format("Loaded config file '%s'", iniFile.getAbsolutePath()));
+
+            Properties props = new Properties();
+            props.load(inStream);
+            return props;
         }
-
-        log.debug(String.format("Loaded config file '%s'", iniFile.getAbsolutePath()));
-
-        Properties props = new Properties();
-        props.load(inStream);
-        return props;
+        finally
+        {
+            if (inStream != null)
+            {
+                inStream.close();
+            }
+        }
     }
 
 
-    public String getParam(String paramName) {
+    public String getParam(String paramName)
+    {
         return this.getParamInternal(paramName, true);
     }
 
 
-    public boolean isParamAvailable(String paramName) {
+    public boolean isParamAvailable(String paramName)
+    {
         return !this.getParamInternal(paramName, false).isEmpty();
     }
 
 
-    private String getParamInternal(String paramName, boolean warn) {
+    private String getParamInternal(String paramName, boolean warn)
+    {
         //log.warn(String.format("WARNING: '%s' could not be found in '%s', trying: '%s'!", paramNameComputerDep, PROPERTY_FILE_NAME, paramName));
         String retval = properties.getProperty(paramName);
-        if (retval == null || retval.isEmpty()) {
-            if (warn) {
-                log.warn(String.format("WARNING: '%s' could not be found in '%s'! Origin: %s", paramName, this.configFileName, StackTracer.currentThreadToString()));
+        if (retval == null || retval.isEmpty())
+        {
+            if (warn)
+            {
+                log.warn(String.format("WARNING: '%s' could not be found in '%s'! Origin: %s", paramName, this.configFileName,
+                    StackTracer.currentThreadToString()));
             }
             retval = "";
         }
@@ -124,9 +150,11 @@ public class InitParams {
     }
 
 
-    public String getParam(String paramName, String defaultValue) {
+    public String getParam(String paramName, String defaultValue)
+    {
         String retval = this.getParam(paramName);
-        if (retval == null || retval.isEmpty()) {
+        if (retval == null || retval.isEmpty())
+        {
             retval = defaultValue;
         }
         return retval;
@@ -136,28 +164,36 @@ public class InitParams {
     /*
      * Returns all the key-values where key begins with paramPrefix
      */
-    public Properties getParams(String paramPrefix) {
+    public Properties getParams(String paramPrefix)
+    {
         Properties result = new Properties();
-        for (String propName : properties.stringPropertyNames()) {
-            if (propName.startsWith(paramPrefix)) {
+        for (String propName : properties.stringPropertyNames())
+        {
+            if (propName.startsWith(paramPrefix))
+            {
                 String value = this.getParamInternal(propName, false);
-                if (!value.isEmpty()) {
+                if (!value.isEmpty())
+                {
                     result.setProperty(propName, value);
                 }
             }
         }
-        if (result.isEmpty()) {
-            log.warn(String.format("WARNING: '%s' could not be found in '%s'! Origin: %s", paramPrefix, this.configFileName, StackTracer.currentThreadToString()));
+        if (result.isEmpty())
+        {
+            log.warn(String.format("WARNING: '%s' could not be found in '%s'! Origin: %s", paramPrefix, this.configFileName,
+                StackTracer.currentThreadToString()));
         }
         return result;
     }
 
 
-    public List<String> fromProperties(Properties props) {
+    public List<String> fromProperties(Properties props)
+    {
         List<String> retval = new ArrayList<>();
 
         Enumeration<?> iter = props.propertyNames();
-        while (iter.hasMoreElements()) {
+        while (iter.hasMoreElements())
+        {
             String key = iter.nextElement().toString();
             retval.add(props.getProperty(key, ""));
         }
@@ -165,26 +201,29 @@ public class InitParams {
     }
 
 
-    public boolean getBooleanParam(String paramName, boolean defaultValue) {
+    public boolean getBooleanParam(String paramName, boolean defaultValue)
+    {
         String val = this.getParam(paramName);
-        switch (val) {
-            case "0":
+        switch (val)
+        {
+            case "0" :
                 return false;
-            case "1":
+            case "1" :
                 return true;
-            case "true":
-            case "True":
+            case "true" :
+            case "True" :
                 return true;
-            case "false":
-            case "False":
+            case "false" :
+            case "False" :
                 return false;
-            default:
+            default :
                 return defaultValue;
         }
     }
 
 
-    public List<String> getKeys() {
+    public List<String> getKeys()
+    {
         return new ArrayList<>(this.properties.stringPropertyNames());
     }
 }

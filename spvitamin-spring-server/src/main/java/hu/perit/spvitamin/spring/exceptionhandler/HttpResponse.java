@@ -35,7 +35,7 @@ public class HttpResponse {
     }
 
     public Date getTimestamp() {
-        return timestamp;
+        return timestamp; // NOSONAR
     }
 
     public String getText() {

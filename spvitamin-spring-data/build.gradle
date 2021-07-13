@@ -33,6 +33,9 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
+
+sourceCompatibility = 11
+
 apply from: '../gradle/common.gradle'
 
 
@@ -52,7 +55,6 @@ bootJar {
    enabled = false
 }
 
-sourceCompatibility = 11
 
 dependencies {
 	compile project(':spvitamin-core')
@@ -72,13 +74,6 @@ dependencies {
     // javax.validation
     implementation 'javax.validation:validation-api'
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    testImplementation 'org.springframework.security:spring-security-test'
-
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
@@ -90,6 +85,13 @@ dependencies {
 
     // ModelMapper
     implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
+	
+	    // Test framework
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 

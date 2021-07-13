@@ -24,8 +24,8 @@ import hu.perit.spvitamin.core.took.Took;
 
 public class TookWithMetric extends Took
 {
-    DualMetric myMetric;
-    MeasurementItem execTimer;
+    private DualMetric myMetric;
+    private MeasurementItem execTimer;
 
     public TookWithMetric(DualMetric myMetric)
     {

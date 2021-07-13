@@ -220,7 +220,7 @@ public class FixedMethodUtils
                     methodName, parameterTypes);
             if (method != null && !method.isAccessible())
             {
-                method.setAccessible(true);
+                method.setAccessible(true); // NOSONAR
             }
         }
         else

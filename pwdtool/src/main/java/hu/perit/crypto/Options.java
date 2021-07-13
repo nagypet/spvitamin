@@ -31,7 +31,7 @@ public class Options
     {
         InitParams ini = InitParams.getInstance();
         this.key = ini.getParam("crypto.secret", "secret");
-        this.args = args;
+        this.args = args; // NOSONAR
     }
 
     public boolean parse()

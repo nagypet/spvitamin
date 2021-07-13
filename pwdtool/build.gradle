@@ -8,6 +8,9 @@
 plugins {
     id 'application'
 }
+
+sourceCompatibility = 11
+
 apply from: '../gradle/common.gradle'
 
 repositories {
@@ -26,7 +29,6 @@ application {
 }
 
 
-sourceCompatibility = 11
   
 dependencies {	
 	compile project(':spvitamin-core')

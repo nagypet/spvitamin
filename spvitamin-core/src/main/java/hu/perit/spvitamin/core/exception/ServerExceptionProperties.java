@@ -88,7 +88,7 @@ public class ServerExceptionProperties {
             if (serverException.instanceOf(Exception.class)) {
                 // Try to regenerate the original exception
                 Exception retval;
-                Class<?> aClass = Class.forName(this.exceptionClass);
+                Class<?> aClass = Class.forName(this.exceptionClass); // NOSONAR
                 if (this.cause != null) {
                     Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class, Throwable.class);
                     retval = (Exception) declaredConstructor.newInstance(this.message, this.cause.toException());

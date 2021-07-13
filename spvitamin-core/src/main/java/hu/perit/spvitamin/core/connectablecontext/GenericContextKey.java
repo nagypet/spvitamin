@@ -27,7 +27,9 @@ public class GenericContextKey<T> extends ContextKey
 {
     protected T keyValue;
 
-    public GenericContextKey() {}
+    public GenericContextKey()
+    {
+    }
 
     public GenericContextKey(T keyValue)
     {
@@ -41,7 +43,11 @@ public class GenericContextKey<T> extends ContextKey
         {
             return true;
         }
-        if (!(o instanceof GenericContextKey))
+        if (o == null)
+        {
+            return false;
+        }
+        if (this.getClass() != o.getClass())
         {
             return false;
         }
@@ -58,8 +64,6 @@ public class GenericContextKey<T> extends ContextKey
     @Override
     public String toString()
     {
-        return this.getClass().getSimpleName() + "{" +
-                "keyValue=" + keyValue +
-                '}';
+        return this.getClass().getSimpleName() + "{" + "keyValue=" + keyValue + '}';
     }
 }

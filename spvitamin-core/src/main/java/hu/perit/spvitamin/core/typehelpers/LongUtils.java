@@ -69,7 +69,7 @@ public class LongUtils
      */
     public static int compare(final Long l1, final Long l2, final boolean nullIsLess)
     {
-        if (l1 == l2)
+        if (l1 == l2) // NOSONAR
         {
             return 0;
         }

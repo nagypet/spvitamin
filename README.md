@@ -2,6 +2,12 @@
 
 ## Releases
 
+### 1.3.0-RELEASE 2021-07-12
+- Changes merged back from customer project
+- CodingException and ProcessingException in spvitamin-core
+- DataServerParameters moved into the 'hu.perit.spvitamin.spring.data.config' package
+
+
 ### 1.2.1-RELEASE 2021-07-11
 A bug fixed in the class AbstractInterfaceLogger. There was a failure in case of too short authorization or password header.
 
@@ -58,7 +64,7 @@ repositories {
 }
 
 ext {
-	set('spvitaminVersion', '1.1.0-RELEASE')
+	set('spvitaminVersion', '1.3.0-RELEASE')
 }
 
 dependencies {
@@ -148,11 +154,25 @@ dependencyManagement {
 |------------------------------------------|---------|-----------------|-------------------------------------|-------------|
 | system.time-zone                         | string  | Europe/Budapest |                                     |             |
 | crypto.secret                            | string  | secret          |                                     |             |
+| datasource.xyz.db-type                   | string  |                 | oracle, sqlserver, mysql, etc...    |             |
+| datasource.xyz.host                      | string  |                 |                                     |             |
+| datasource.xyz.port                      | string  |                 | 1521                                |             |
+| datasource.xyz.db-name                   | string  |                 |                                     |             |
+| datasource.xyz.username                  | string  |                 |                                     |             |
+| datasource.xyz.encrypted-password        | string  |                 |                                     |             |
+| datasource.xyz.dialect                   | string  |                 |                                     |             |
+| datasource.xyz.max-pool-size             | int     | 10              |                                     |             |
+| datasource.xyz.connection-timeout        | long    | 90.000 ms       |                                     |             |
+| datasource.xyz.leak-detection-threashold | long    | 0               |                                     |             |
+| datasource.xyz.socket-timeout            | long    | 100.000 ms      |                                     |             |
+| datasource.xyz.ddl-auto                  | string  | none            | update, validate                    |             |
 | jwt.private-key-alias                    | string  | -               | templatekey                         |             |
 | jwt.private-key-encryptedPassword        | string  | -               | jdP5CKDIu5v2VUafF33pPQ==            |             |
 | jwt.public-key-alias                     | string  | -               | templatekey                         |             |
 | jwt.expiration-in-minutes                | string  | -               | 60                                  |             |
 | metrics.performance-itemcount            | int     | 50              |                                     |             |
+| metrics.timeout-millis                   | long    | 2.000           |                                     |             |
+| metrics.metrics-gathering-hysteresis-millis| long    | 30.000          |                                     |             |
 | security.admin-user-name                 | string  | -               | admin                               |             |
 | security.admin-user-encryptedPassword    | string  | -               | 7MmoozfTexI=                        |             |
 | security.allowed-origins                 | string  | -               |                                     |             |

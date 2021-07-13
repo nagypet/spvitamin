@@ -16,11 +16,11 @@
 
 package hu.perit.spvitamin.spring.data.config;
 
+import javax.validation.constraints.NotNull;
+
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Loads datasource properties from the properties file and sets defaults.
@@ -30,7 +30,8 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class DatasourceProperties {
+public class DatasourceProperties
+{
 
     protected String dbType = "sqlserver";
     protected String host = "localhost";
@@ -77,24 +78,15 @@ public class DatasourceProperties {
     SQL transaction, or 30 seconds, whichever is longer. However, your own recovery time targets should determine
     the appropriate timeout for your application.
     */
-    private Long socketTimeout = 100000L;
+    private Long socketTimeout = 100_000L;
     private String ddlAuto = "none";
 
     @Override
-    public String toString() {
-        return "DatasourceProperties{" +
-                "dbType='" + dbType + '\'' +
-                ", host='" + host + '\'' +
-                ", port='" + port + '\'' +
-                ", dbName='" + dbName + '\'' +
-                ", username='" + username + '\'' +
-                ", encryptedPassword='" + encryptedPassword + '\'' +
-                ", dialect='" + dialect + '\'' +
-                ", maxPoolSize=" + maxPoolSize +
-                ", connectionTimeout=" + connectionTimeout +
-                ", leakDetectionThreshold=" + leakDetectionThreshold +
-                ", socketTimeout=" + socketTimeout +
-                ", ddlAuto='" + ddlAuto + '\'' +
-                '}';
+    public String toString()
+    {
+        return "DatasourceProperties{" + "dbType='" + dbType + '\'' + ", host='" + host + '\'' + ", port='" + port + '\'' + ", dbName='"
+            + dbName + '\'' + ", username='" + username + '\'' + ", encryptedPassword='" + encryptedPassword + '\'' + ", dialect='"
+            + dialect + '\'' + ", maxPoolSize=" + maxPoolSize + ", connectionTimeout=" + connectionTimeout + ", leakDetectionThreshold="
+            + leakDetectionThreshold + ", socketTimeout=" + socketTimeout + ", ddlAuto='" + ddlAuto + '\'' + '}';
     }
 }
