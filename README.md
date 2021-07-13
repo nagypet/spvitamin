@@ -6,6 +6,50 @@
 - Changes merged back from customer project
 - CodingException and ProcessingException in spvitamin-core
 - DataServerParameters moved into the 'hu.perit.spvitamin.spring.data.config' package
+- SpringContext has been given a new Bean name because of conflicting names in Camunda
+
+Please change your db config as follows:
+
+```Java
+@Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(basePackages = RepodbDbConfig.PACKAGES, //
+		entityManagerFactoryRef = RepodbDbConfig.ENTITY_MANAGER_FACTORY, //
+		transactionManagerRef = RepodbDbConfig.TRANSACTION_MANAGER)
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+@Slf4j
+public class RepodbDbConfig {
+	static final String PACKAGES = "<package name of this class>";
+	static final String ENTITY_MANAGER_FACTORY = "entityManagerFactory";
+	static final String TRANSACTION_MANAGER = "transactionManager";
+
+	public static final String PERSISTENCE_UNIT = "repodb";
+	private static final String DATASOURCE = "dataSource";
+
+	private final ConnectionParam connectionParam;
+
+	public RepodbDbConfig(DatasourceCollectionProperties dbProperties) {
+		this.connectionParam = new ConnectionParam(dbProperties.getDatasource().get(PERSISTENCE_UNIT));
+	}
+
+	@Primary
+	@Bean(name = DATASOURCE)
+	@DependsOn("SpvitaminSpringContext") <=== springContext has to be changed to SpvitaminSpringContext from version 1.3.0 and above
+	public DataSource dataSource() {
+		log.debug(String.format("creating DataSource for '%s'", PERSISTENCE_UNIT));
+
+		// False bug report: Use try-with-resources or close this "DynamicDataSource" in
+		// a "finally" clause
+		DynamicDataSource ds = new DynamicDataSource(); // NOSONAR
+
+		ds.setConnectionParam(this.connectionParam);
+
+		return ds;
+	}
+	...
+```
+
+
 
 
 ### 1.2.1-RELEASE 2021-07-11
