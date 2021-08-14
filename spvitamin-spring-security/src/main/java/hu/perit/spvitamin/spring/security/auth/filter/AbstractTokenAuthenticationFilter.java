@@ -61,6 +61,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                                     .username(claims.getSubject())
                                     .authorities(authorities)
                                     .userId(claims.getUserId())
+                                    .anonymous(false)
                                     .build();
 
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authorities);

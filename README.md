@@ -2,6 +2,10 @@
 
 ## Releases
 
+### 1.3.1-RELEASE 2021-08-14
+- Bug in AbstractTokenAuthenticationFilter fixed
+
+
 ### 1.3.0-RELEASE 2021-07-12
 - Changes merged back from customer project
 - CodingException and ProcessingException in spvitamin-core
