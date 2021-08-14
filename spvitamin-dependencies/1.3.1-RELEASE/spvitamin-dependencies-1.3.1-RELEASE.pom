@@ -9,11 +9,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>hu.perit.spvitamin</groupId>
   <artifactId>spvitamin-dependencies</artifactId>
-  <version>1.3.0-RELEASE</version>
+  <version>1.3.1-RELEASE</version>
   <packaging>pom</packaging>
   <name>spvitamin-dependencies</name>
   <properties>
-    <spvitamin.version>1.3.0-RELEASE</spvitamin.version>
+    <spvitamin.version>1.3.1-RELEASE</spvitamin.version>
   </properties>
   <dependencyManagement>
     <dependencies>
