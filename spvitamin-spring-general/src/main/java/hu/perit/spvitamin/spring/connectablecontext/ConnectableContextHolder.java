@@ -42,6 +42,7 @@ public abstract class ConnectableContextHolder<T extends ConnectableContext> ext
     }
 
     @PreDestroy
+    @Override
     public void cleanup()
     {
         log.debug("cleanup on @PreDestroy");
