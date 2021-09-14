@@ -78,9 +78,9 @@ public class ConnectionParam extends DatasourceProperties {
         /*
         jdbc:oracle:thin:@(DESCRIPTION =
           (CONNECT_TIMEOUT=90)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=50)(RETRY_DELAY=3)
-          (ADDRESS = (PROTOCOL = TCP)(HOST = ext1vm02-scan.noc.fiducia.de)(PORT = 5211 ))
-          (ADDRESS = (PROTOCOL = TCP)(HOST = ext2vm02-scan.noc.fiducia.de )(PORT = 5211 ))
-          (CONNECT_DATA = (SERVICE_NAME = kdf1_e_paydirek.bankenit.de ))) 
+          (ADDRESS = (PROTOCOL = TCP)(HOST = host1)(PORT = port1 ))
+          (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
+          (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
         */        //jdbc:h2:mem:testdb
         //jdbc:postgresql://localhost:5432/postgres_demo
         String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptions();
@@ -224,9 +224,9 @@ public class ConnectionParam extends DatasourceProperties {
         /*
         jdbc:oracle:thin:@(DESCRIPTION =
           (CONNECT_TIMEOUT=90)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=50)(RETRY_DELAY=3)
-          (ADDRESS = (PROTOCOL = TCP)(HOST = ext1vm02-scan.noc.fiducia.de)(PORT = 5211 ))
-          (ADDRESS = (PROTOCOL = TCP)(HOST = ext2vm02-scan.noc.fiducia.de )(PORT = 5211 ))
-          (CONNECT_DATA = (SERVICE_NAME = kdf1_e_paydirek.bankenit.de ))) 
+          (ADDRESS = (PROTOCOL = TCP)(HOST = host1)(PORT = port1 ))
+          (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
+          (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
         */
         
         StringBuilder b = new  StringBuilder();
