@@ -47,21 +47,21 @@ public class ConnectionParam extends DatasourceProperties {
 
     private static final String NOT_YET_SUPPORTED = "'%s' not yet supported";
 
+    private final String portDelimiter;
 
     public ConnectionParam(DatasourceProperties properties) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(properties, this);
 
-        if (this.dialect == null) {
-            this.dialect = this.getDefaultDialect();
+        if (dialect == null) {
+            dialect = getDefaultDialect();
         }
 
-        if (this.port == null) {
-            this.port = this.getDefaultPortString();
+        if (port == null) {
+            port = getDefaultPortString();
         }
-        else if (!this.port.isBlank() && !this.port.startsWith(":")) {
-            this.port = ":" + this.port;
-        }
+        
+        portDelimiter = port.isBlank() ? "" : ":";
     }
 
 
@@ -75,7 +75,13 @@ public class ConnectionParam extends DatasourceProperties {
         //jdbc:sqlserver://localhost;databaseName=FLC_DB;socketTimeout=10000
         //jdbc:mysql://192.168.1.7:3306/lms
         //jdbc:oracle:thin:@192.168.7.25:1521/XE
-        //jdbc:h2:mem:testdb
+        /*
+        jdbc:oracle:thin:@(DESCRIPTION =
+          (CONNECT_TIMEOUT=90)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=50)(RETRY_DELAY=3)
+          (ADDRESS = (PROTOCOL = TCP)(HOST = ext1vm02-scan.noc.fiducia.de)(PORT = 5211 ))
+          (ADDRESS = (PROTOCOL = TCP)(HOST = ext2vm02-scan.noc.fiducia.de )(PORT = 5211 ))
+          (CONNECT_DATA = (SERVICE_NAME = kdf1_e_paydirek.bankenit.de ))) 
+        */        //jdbc:h2:mem:testdb
         //jdbc:postgresql://localhost:5432/postgres_demo
         String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptions();
         log.info(url);
@@ -148,21 +154,21 @@ public class ConnectionParam extends DatasourceProperties {
 
 
     private String getDefaultPortString() {
-        switch (this.dbType) {
+        switch (dbType) {
             case DBTYPE_SQLSERVER:
-                return ":1433";
+                return "1433";
 
             case DBTYPE_ORACLE:
-                return ":1521";
+                return "1521";
 
             case DBTYPE_MYSQL:
-                return ":3306";
+                return "3306";
 
             case DBTYPE_H2:
                 return "";
 
             case DBTYPE_POSTGRESQL:
-                return ":5432";
+                return "5432";
 
             default:
                 throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
@@ -171,65 +177,93 @@ public class ConnectionParam extends DatasourceProperties {
 
 
     private String getDbTypeString() {
-        if (this.dbType == null || this.dbType.isEmpty()) {
+        if (dbType == null || dbType.isEmpty()) {
             return "";
         }
-        else {
-            switch (this.dbType) {
-                case DBTYPE_SQLSERVER:
-                case DBTYPE_MYSQL:
-                case DBTYPE_H2:
-                case DBTYPE_POSTGRESQL:
-                    return ":" + this.dbType;
+        
+        switch (dbType) {
+            case DBTYPE_SQLSERVER:
+            case DBTYPE_MYSQL:
+            case DBTYPE_H2:
+            case DBTYPE_POSTGRESQL:
+                return ":" + dbType;
 
-                case DBTYPE_ORACLE:
-                    return ":" + this.dbType + ":thin";
+            case DBTYPE_ORACLE:
+                return ":" + dbType + ":thin";
 
-                default:
-                    throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
-            }
+            default:
+                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, dbType));
         }
     }
 
     private String getHostString() {
-        if (this.host == null || this.host.isEmpty()) {
+        if (host == null || host.isEmpty()) {
             return "";
         }
-        else {
-            if (DBTYPE_ORACLE.equalsIgnoreCase(this.dbType)) {
-                return ":@" + this.host + this.port;
-            }
-            else if (DBTYPE_H2.equalsIgnoreCase(this.dbType)) {
-                return ":" + this.host;
-            }
-            else {
-                return "://" + this.host + this.port;
-            }
+        
+        if (DBTYPE_ORACLE.equalsIgnoreCase(dbType)) {
+            return getHostStringOracle();
         }
+        else if (DBTYPE_H2.equalsIgnoreCase(dbType)) {
+            return ":" + host;
+        }
+        else {
+            return "://" + host + portDelimiter + port;
+        }
+    }
+    
+    private String getHostStringOracle()  {
+        if (host == null || host.isEmpty()) {
+            return "";
+        }
+        
+        if(host2 == null || port2 == null) {
+            return ":@" + host + portDelimiter + port; 
+        }
+        
+        /*
+        jdbc:oracle:thin:@(DESCRIPTION =
+          (CONNECT_TIMEOUT=90)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=50)(RETRY_DELAY=3)
+          (ADDRESS = (PROTOCOL = TCP)(HOST = ext1vm02-scan.noc.fiducia.de)(PORT = 5211 ))
+          (ADDRESS = (PROTOCOL = TCP)(HOST = ext2vm02-scan.noc.fiducia.de )(PORT = 5211 ))
+          (CONNECT_DATA = (SERVICE_NAME = kdf1_e_paydirek.bankenit.de ))) 
+        */
+        
+        StringBuilder b = new  StringBuilder();
+        b.append(":@(DESCRIPTION = ");
+        b.append(String.format("(CONNECT_TIMEOUT = %d)", getConnectionTimeout() / 1000));
+        b.append(String.format("(TRANSPORT_CONNECT_TIMEOUT = %d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000));
+        b.append(String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host, port));
+        b.append(String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host2, port2));
+        b.append(String.format("(CONNECT_DATA = (SERVICE_NAME = %s )))", dbName));
+        return b.toString();
     }
 
     private String getDbNameString() {
         if (this.dbName == null || this.dbName.isEmpty()) {
             return "";
         }
-        else {
-            switch (this.dbType) {
-                case DBTYPE_SQLSERVER:
-                    return ";databaseName=" + this.dbName;
+        
+        switch (this.dbType) {
+            case DBTYPE_SQLSERVER:
+                return ";databaseName=" + this.dbName;
 
-                case DBTYPE_ORACLE:
-                case DBTYPE_POSTGRESQL:
-                    return "/" + this.dbName;
+            case DBTYPE_ORACLE:
+                if(host2 != null && port2 != null) {
+                    return "";
+                }
+                return "/" + dbName;
+            case DBTYPE_POSTGRESQL:
+                return "/" + this.dbName;
 
-                case DBTYPE_MYSQL:
-                    return "/" + this.dbName + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+            case DBTYPE_MYSQL:
+                return "/" + this.dbName + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
-                case DBTYPE_H2:
-                    return ":" + this.dbName;
+            case DBTYPE_H2:
+                return ":" + this.dbName;
 
-                default:
-                    throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
-            }
+            default:
+                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
         }
     }
 }
