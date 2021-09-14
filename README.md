@@ -2,6 +2,10 @@
 
 ## Releases
 
+
+### 1.3.2-RELEASE 2021-09-14
+- Oracle JDBC URL can now contain 2 address.
+
 ### 1.3.1-RELEASE 2021-08-14
 - Bug in AbstractTokenAuthenticationFilter fixed
 
