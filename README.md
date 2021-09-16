@@ -4,7 +4,14 @@
 
 
 ### 1.3.2-RELEASE 2021-09-14
-- Oracle JDBC URL can now contain 2 address.
+- Oracle JDBC URL can now contain 2 address. In that case the jdbc connection string will be formatted as follows:
+```
+jdbc:oracle:thin:@(DESCRIPTION =
+  (CONNECT_TIMEOUT=90)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=50)(RETRY_DELAY=3)
+  (ADDRESS = (PROTOCOL = TCP)(HOST = host1)(PORT = port1 ))
+  (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
+  (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
+```
 
 ### 1.3.1-RELEASE 2021-08-14
 - Bug in AbstractTokenAuthenticationFilter fixed
@@ -208,7 +215,9 @@ dependencyManagement {
 | crypto.secret                            | string  | secret          |                                     |             |
 | datasource.xyz.db-type                   | string  |                 | oracle, sqlserver, mysql, etc...    |             |
 | datasource.xyz.host                      | string  |                 |                                     |             |
-| datasource.xyz.port                      | string  |                 | 1521                                |             |
+| datasource.xyz.port                      | string  | db dependent    | e.g. at oracle: 1521, etc.          |             |
+| datasource.xyz.host2                     | string  |                 |                                     | optional alternative host |
+| datasource.xyz.port2                     | string  |                 |                                     | optional alternative port |
 | datasource.xyz.db-name                   | string  |                 |                                     |             |
 | datasource.xyz.username                  | string  |                 |                                     |             |
 | datasource.xyz.encrypted-password        | string  |                 |                                     |             |

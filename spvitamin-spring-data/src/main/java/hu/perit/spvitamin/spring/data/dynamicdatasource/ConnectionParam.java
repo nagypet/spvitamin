@@ -81,7 +81,8 @@ public class ConnectionParam extends DatasourceProperties {
           (ADDRESS = (PROTOCOL = TCP)(HOST = host1)(PORT = port1 ))
           (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
           (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
-        */        //jdbc:h2:mem:testdb
+        */        
+    	//jdbc:h2:mem:testdb
         //jdbc:postgresql://localhost:5432/postgres_demo
         String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptions();
         log.info(url);
