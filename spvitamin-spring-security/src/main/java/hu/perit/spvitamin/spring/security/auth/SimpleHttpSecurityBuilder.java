@@ -238,13 +238,17 @@ public class SimpleHttpSecurityBuilder
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests() //
             .antMatchers( //
-                // Swagger UI related endpoints and resources
+                // Swagger 2 UI related endpoints and resources
                 "/swagger-ui.html", //
                 "/swagger-ui.html/**", //
                 "/swagger-resources/**", //
                 "/api-docs/**", //
                 "/v2/api-docs/**", //
-                "/webjars/springfox-swagger-ui/**");
+                "/webjars/springfox-swagger-ui/**",
+                
+                // Swagger 3
+                "/swagger-ui/**"    
+            );
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
         {

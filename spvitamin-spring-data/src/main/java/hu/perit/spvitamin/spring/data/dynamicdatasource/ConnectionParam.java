@@ -50,6 +50,10 @@ public class ConnectionParam extends DatasourceProperties {
     private final String portDelimiter;
 
     public ConnectionParam(DatasourceProperties properties) {
+    	if (properties == null) {
+    		throw new IllegalArgumentException("DatasourceProperties is 'null'! Most probably the application cannot access the database configuration. Please make sure, the application.properties is available.");
+    	}
+    	
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(properties, this);
 

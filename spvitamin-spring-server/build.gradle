@@ -79,9 +79,6 @@ dependencies {
     // javax.validation
     implementation group: 'javax.validation', name: 'validation-api'
 
-    // Swagger
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'

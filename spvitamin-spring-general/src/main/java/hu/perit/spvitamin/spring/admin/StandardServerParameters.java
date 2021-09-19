@@ -97,6 +97,6 @@ class StandardServerParameters
     }
 
     private String getSwaggerUrl() {
-        return this.serverProperties.getServiceUrl() + "/swagger-ui.html";
+        return this.serverProperties.getServiceUrl() + "/swagger-ui/index.html";
     }
 }

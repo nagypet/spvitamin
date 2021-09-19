@@ -71,9 +71,6 @@ dependencies {
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
-    // Swagger
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-
     // FasterXML
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'

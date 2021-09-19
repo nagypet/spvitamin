@@ -3,11 +3,9 @@
 ## Releases
 
 
-### 1.3.3-RELEASE 2021-09-19
+### Not yet released
+- Swagger 3.0.0
 - ApplicationException and ApplicationRuntimeException for localized, user friendly exception messages
-
-
-### 1.3.2-RELEASE 2021-09-14
 - Oracle JDBC URL can now contain 2 address. In that case the jdbc connection string will be formatted as follows:
 ```
 jdbc:oracle:thin:@(DESCRIPTION =
