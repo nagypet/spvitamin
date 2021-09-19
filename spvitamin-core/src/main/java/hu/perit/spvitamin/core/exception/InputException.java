@@ -22,7 +22,9 @@ package hu.perit.spvitamin.core.exception;
 
 public abstract class InputException extends RuntimeException {
 
-    public InputException(String message) {
+	private static final long serialVersionUID = -8765195971685260005L;
+
+	public InputException(String message) {
         super(message);
     }
 

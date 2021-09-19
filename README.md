@@ -3,6 +3,10 @@
 ## Releases
 
 
+### 1.3.3-RELEASE 2021-09-19
+- ApplicationException and ApplicationRuntimeException for localized, user friendly exception messages
+
+
 ### 1.3.2-RELEASE 2021-09-14
 - Oracle JDBC URL can now contain 2 address. In that case the jdbc connection string will be formatted as follows:
 ```
@@ -233,7 +237,7 @@ dependencyManagement {
 | jwt.expiration-in-minutes                | string  | -               | 60                                  |             |
 | metrics.performance-itemcount            | int     | 50              |                                     |             |
 | metrics.timeout-millis                   | long    | 2.000           |                                     |             |
-| metrics.metrics-gathering-hysteresis-millis| long    | 30.000          |                                     |             |
+| metrics.metrics-gathering-hysteresis-millis| long  | 30.000          |                                     |             |
 | security.admin-user-name                 | string  | -               | admin                               |             |
 | security.admin-user-encryptedPassword    | string  | -               | 7MmoozfTexI=                        |             |
 | security.allowed-origins                 | string  | -               |                                     |             |
@@ -245,6 +249,7 @@ dependencyManagement {
 | security.admin-endpoints-access          | string  | *               |                                     |             |
 | server.fqdn                              | string  | localhost       |                                     |             |
 | server.port                              | int     | 8080            |                                     |             |
+| server.stacktrace-enabled                | boolean | TRUE            |                                     |             |
 | server.ssl.enabled                       | boolean | FALSE           |                                     |             |
 | server.ssl.key-store                     | string  | -               | classpath:jks/server-keystore.jks   |             |
 | server.ssl.key-store-password            | string  | -               | changeit                            |             |
@@ -253,8 +258,6 @@ dependencyManagement {
 | server.ssl.trust-store                   | string  | -               | classpath:jks/client-truststore.jks |             |
 | server.ssl.trust-store-password          | string  | -               | changeit                            |             |
 | server.ssl.ignore-certificate-validation | boolean | FALSE           |                                     |             |
-
-
 
 
 ## Dependency graph

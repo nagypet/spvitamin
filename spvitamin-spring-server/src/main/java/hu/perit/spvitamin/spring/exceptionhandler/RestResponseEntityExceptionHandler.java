@@ -29,8 +29,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.util.WebUtils;
 
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ApplicationException;
+import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
+import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.InputException;
+import hu.perit.spvitamin.core.exception.LogLevel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -99,6 +103,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
         }
 
+        // ========== APPLICATION_SPECIFIC_EXCEPTION ===================================================================
+		else if (exception.instanceOf(ApplicationRuntimeException.class) || exception.instanceOf(ApplicationException.class)) 
+		{
+			ApplicationSpecificException ase = (ApplicationSpecificException) ex;
+			logByLogLevel(ex, ase.getType().getLevel());
+			RestExceptionResponse exceptionResponse = new RestExceptionResponse(
+					HttpStatus.valueOf(ase.getType().getHttpStatusCode()), ex, path);
+			return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
+		}
+        
         // ========== EVERYTHING ELSE ==================================================================================
         else
         {
@@ -145,6 +159,31 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         }
     }
 
+    
+	private void logByLogLevel(Throwable ex, LogLevel level) {
+		switch (level) {
+			case DEBUG:
+				log.debug(StackTracer.toString(ex));
+				break;
+			case ERROR:
+				log.error(StackTracer.toString(ex));
+				break;
+			case INFO:
+				log.info(StackTracer.toString(ex));
+				break;
+			case TRACE:
+				log.trace(StackTracer.toString(ex));
+				break;
+			case WARN:
+				log.warn(StackTracer.toString(ex));
+				break;
+			default:
+				log.error(StackTracer.toString(ex));
+				break;
+		}
+	}
+
+	
     private enum LogStatus
     {
         NONE, WARNING, ERROR

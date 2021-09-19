@@ -29,6 +29,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import lombok.EqualsAndHashCode;
@@ -75,6 +79,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
+@JsonInclude(Include.NON_NULL)
 public class RestExceptionResponse implements JsonSerializable
 {
 
@@ -83,6 +88,7 @@ public class RestExceptionResponse implements JsonSerializable
     private Object error;
     private String path;
     private ServerExceptionProperties exception;
+	private String type;
 
 
     public RestExceptionResponse(HttpStatus status, Exception ex, String path)
@@ -115,6 +121,11 @@ public class RestExceptionResponse implements JsonSerializable
             }
             this.error = errors;
         }
+        else if (ex instanceof ApplicationSpecificException) 
+        {
+			ApplicationSpecificException ase = (ApplicationSpecificException) ex;
+			this.type = ase.getType().name();
+		}
         else
         {
             this.error = status.getReasonPhrase();

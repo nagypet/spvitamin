@@ -16,11 +16,10 @@
 
 package hu.perit.spvitamin.core.exception;
 
-import lombok.Getter;
-
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Objects;
+
+import lombok.Getter;
 
 /**
  * #know-how:custom-rest-error-response
@@ -41,7 +40,9 @@ import java.util.Objects;
 @Getter
 public class ServerException extends RuntimeException implements ServerExceptionInterface {
 
-    private final String className;
+	private static final long serialVersionUID = 2272746029581472203L;
+	
+	private final String className;
     private final List<String> superClassNames;
 
     public static <T> T throwFrom(Throwable ex) {
