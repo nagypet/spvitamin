@@ -79,6 +79,9 @@ dependencies {
     // javax.validation
     implementation group: 'javax.validation', name: 'validation-api'
 
+	// Guava
+	implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
+
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
