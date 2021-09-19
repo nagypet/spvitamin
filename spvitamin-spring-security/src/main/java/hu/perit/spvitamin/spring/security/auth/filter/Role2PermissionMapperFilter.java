@@ -62,17 +62,17 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter {
 			if (!authenticatedUser.isAnonymous()) {
 
 				AdGroupRoleMapper mapper = SpringContext.getBean(AdGroupRoleMapper.class);
-				AuthenticatedUser mappedAuthenticatedUser = mapper.mapGrantedAuthorities(authenticatedUser);
+				AuthenticatedUser authenticatedUserWithRoles = mapper.mapGrantedAuthorities(authenticatedUser);
 
-				log.debug(String.format("Authentication succeeded for user: '%s'", mappedAuthenticatedUser.toString()));
+				log.debug(String.format("Authentication succeeded for user: '%s'", authenticatedUserWithRoles.toString()));
 
-				// Mapping of user roles to privileges
+				// Mapping of user privileges to roles
+				Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
 				AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
-						.username(mappedAuthenticatedUser.getUsername()) //
-						.authorities(mapRolesToPrivileges(mappedAuthenticatedUser.getAuthorities())) //
-						.anonymous(mappedAuthenticatedUser.isAnonymous())
-						.build();
-				log.debug(String.format("Roles mapped to privileges: '%s'", authenticatedUserWithPrivileges.toString()));
+						.username(authenticatedUserWithRoles.getUsername()) //
+						.authorities(privileges) //
+						.anonymous(authenticatedUserWithRoles.isAnonymous()).build();
+				log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
 				authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);
 			}
@@ -95,7 +95,7 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter {
 	}
 
 
-	private Collection<? extends GrantedAuthority> mapRolesToPrivileges(Collection<? extends GrantedAuthority> authorities) {
+	private Collection<? extends GrantedAuthority> mapPrivileges2Roles(Collection<? extends GrantedAuthority> authorities) {
 
 		Role2PermissionMappingProperties role2PermissionMapping = SpringContext.getBean(Role2PermissionMappingProperties.class);
 
