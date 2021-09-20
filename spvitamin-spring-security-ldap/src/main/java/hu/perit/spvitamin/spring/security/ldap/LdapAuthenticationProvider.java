@@ -161,6 +161,10 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
             logger.error("Failed to locate directory entry for authenticated user: " + username, e);
             throw badCredentials(e);
         }
+        catch (BadCredentialsException e) {
+        	logger.debug(e.getMessage());
+        	throw e;
+		}
         catch (Exception ex) {
             logger.error(StackTracer.toString(ex));
             throw new LdapAuthenticationException("", "Ldap authentication failed!", ex);

@@ -35,9 +35,6 @@ import lombok.Data;
 public class SecurityProperties
 {
 
-    private String adminUserName;
-    @ConfigProperty(hidden = true)
-    private String adminUserEncryptedPassword;
     private String[] allowedOrigins;
     private String[] allowedHeaders;
     private String[] allowedMethods;
