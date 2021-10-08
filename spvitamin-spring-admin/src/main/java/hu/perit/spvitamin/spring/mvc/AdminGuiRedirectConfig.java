@@ -38,7 +38,11 @@ public class AdminGuiRedirectConfig implements WebMvcConfigurer {
         if (adminProperties.getDefaultSiteStaticContentsPath() != null) {
             registry
                     .addResourceHandler(adminProperties.getDefaultSiteUrl() + "/**")
-                    .addResourceLocations(adminProperties.getDefaultSiteStaticContentsPath());
+                    .addResourceLocations(
+                            !adminProperties.getDefaultSiteStaticContentsPath().endsWith("/") ?
+                            adminProperties.getDefaultSiteStaticContentsPath() + "/" :
+                            adminProperties.getDefaultSiteStaticContentsPath()
+                    );
         }
     }
 
