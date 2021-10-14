@@ -40,6 +40,7 @@ public class AdminProperties {
 
 	private String defaultSiteUrl = "";
 	private String defaultSiteRootFileName = "index.html";
+	private String defaultSiteStaticContentsPath;
 
 	// e.g. admin.admin-gui-url=/alma
 	private String adminGuiUrl = "";
