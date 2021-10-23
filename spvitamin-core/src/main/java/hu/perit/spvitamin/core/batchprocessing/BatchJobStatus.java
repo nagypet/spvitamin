@@ -27,7 +27,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BatchJobStatus {
+public class BatchJobStatus
+{
 
     private boolean fatalError;
 }

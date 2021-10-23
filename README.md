@@ -2,6 +2,10 @@
 
 ## Releases
 
+### 1.3.3 (not yet released)
+- BatchProcessor improved: 
+  - the first job is not removed from the input list
+  - shutdown of the ExecutorService is more robust
 
 ### 1.3.2-RELEASE 2021-10-20
 - NativeQueryRepoImpl new function: `public List<?> getResultList(String sql, List<Object> params, boolean logSql)`

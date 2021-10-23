@@ -30,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
-public abstract class BatchJob implements Callable<Boolean> {
+public abstract class BatchJob implements Callable<Boolean>
+{
 
     // Ez a status a batch-hez tartozó összes job-ban ugyanarra az objektumra hivatkozik, így detektálni lehet, hogy fellépett egy
     // fatal error, ilyenkor a batch feldolgozását meg kell szakítani, illetve ha még csak eteti az ExecutorService-t,
@@ -39,33 +40,44 @@ public abstract class BatchJob implements Callable<Boolean> {
 
     @Override
     @SuppressWarnings("squid:S1193")
-    public Boolean call() throws Exception {
-        try {
+    public Boolean call() throws Exception
+    {
+        try
+        {
             return this.execute();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             boolean fatal = this.isFatalException(ex);
 
-            if (!(ex instanceof InterruptedException)) {
-                if (ex instanceof NullPointerException) {
-                    if (fatal) {
+            if (!(ex instanceof InterruptedException))
+            {
+                if (ex instanceof NullPointerException)
+                {
+                    if (fatal)
+                    {
                         log.error(StackTracer.toString(ex));
                     }
-                    else {
+                    else
+                    {
                         log.warn(StackTracer.toString(ex));
                     }
                 }
-                else {
-                    if (fatal) {
+                else
+                {
+                    if (fatal)
+                    {
                         log.error(ex.toString());
                     }
-                    else {
+                    else
+                    {
                         log.warn(ex.toString());
                     }
                 }
             }
 
-            if (fatal && this.status != null) {
+            if (fatal && this.status != null)
+            {
                 this.status.setFatalError(true);
             }
             throw ex;
