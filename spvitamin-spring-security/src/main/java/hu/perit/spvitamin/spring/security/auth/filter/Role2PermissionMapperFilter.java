@@ -47,73 +47,87 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class Role2PermissionMapperFilter extends OncePerRequestFilter {
+public class Role2PermissionMapperFilter extends OncePerRequestFilter
+{
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException
+    {
 
-		try {
+        try
+        {
+            log.debug("Role2PermissionMapperFilter called.");
 
-			AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
+            AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
 
-			AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
+            AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
 
-			if (!authenticatedUser.isAnonymous()) {
+            if (!authenticatedUser.isAnonymous())
+            {
 
-				AdGroupRoleMapper mapper = SpringContext.getBean(AdGroupRoleMapper.class);
-				AuthenticatedUser authenticatedUserWithRoles = mapper.mapGrantedAuthorities(authenticatedUser);
+                AdGroupRoleMapper mapper = SpringContext.getBean(AdGroupRoleMapper.class);
+                AuthenticatedUser authenticatedUserWithRoles = mapper.mapGrantedAuthorities(authenticatedUser);
 
-				log.debug(String.format("Authentication succeeded for user: '%s'", authenticatedUserWithRoles.toString()));
+                log.debug(String.format("Mapping privileges to roles for authenticated user: '%s'", authenticatedUserWithRoles.toString()));
 
-				// Mapping of user privileges to roles
-				Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
-				AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
-						.username(authenticatedUserWithRoles.getUsername()) //
-						.authorities(privileges) //
-						.anonymous(authenticatedUserWithRoles.isAnonymous()).build();
-				log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
+                // Mapping of user privileges to roles
+                Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
+                AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
+                        .username(authenticatedUserWithRoles.getUsername()) //
+                        .authorities(privileges) //
+                        .anonymous(authenticatedUserWithRoles.isAnonymous()).build();
+                log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
-				authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);
-			}
+                authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);
+            }
 
-			filterChain.doFilter(request, response);
-		} catch (AuthenticationException ex) {
-			SecurityContextHolder.clearContext();
-			HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-			if (resolver.resolveException(request, response, null, ex) == null) {
-				throw ex;
-			}
-		} catch (Exception ex) {
-			SecurityContextHolder.clearContext();
-			HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-			if (resolver.resolveException(request, response, null,
-					new FilterAuthenticationException("Authentication failed!", ex)) == null) {
-				throw ex;
-			}
-		}
-	}
+            filterChain.doFilter(request, response);
+        }
+        catch (AuthenticationException ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null, ex) == null)
+            {
+                throw ex;
+            }
+        }
+        catch (Exception ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null,
+                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            {
+                throw ex;
+            }
+        }
+    }
 
 
-	private Collection<? extends GrantedAuthority> mapPrivileges2Roles(Collection<? extends GrantedAuthority> authorities) {
+    private Collection<? extends GrantedAuthority> mapPrivileges2Roles(Collection<? extends GrantedAuthority> authorities)
+    {
 
-		Role2PermissionMappingProperties role2PermissionMapping = SpringContext.getBean(Role2PermissionMappingProperties.class);
+        Role2PermissionMappingProperties role2PermissionMapping = SpringContext.getBean(Role2PermissionMappingProperties.class);
 
-		Set<GrantedAuthority> permissions = new HashSet<>();
+        Set<GrantedAuthority> permissions = new HashSet<>();
 
-		// filtering only ROLEs
-		List<? extends GrantedAuthority> roles = authorities.stream().filter(a -> a.getAuthority().startsWith("ROLE_"))
-				.collect(Collectors.toList());
-		for (GrantedAuthority role : roles) {
-			// Adding the role itself
-			permissions.add(role);
+        // filtering only ROLEs
+        List<? extends GrantedAuthority> roles = authorities.stream().filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .collect(Collectors.toList());
+        for (GrantedAuthority role : roles)
+        {
+            // Adding the role itself
+            permissions.add(role);
 
-			if (role2PermissionMapping.getRolemap().containsKey(role.getAuthority())) {
-				List<String> permissionList = role2PermissionMapping.getRolemap().get(role.getAuthority());
-				permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).collect(Collectors.toList()));
-			}
-		}
+            if (role2PermissionMapping.getRolemap().containsKey(role.getAuthority()))
+            {
+                List<String> permissionList = role2PermissionMapping.getRolemap().get(role.getAuthority());
+                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).collect(Collectors.toList()));
+            }
+        }
 
-		return permissions;
-	}
+        return permissions;
+    }
 }

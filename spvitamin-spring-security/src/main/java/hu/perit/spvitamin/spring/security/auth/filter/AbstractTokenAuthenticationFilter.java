@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,33 +39,42 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 
-public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter {
+@Slf4j
+public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
+{
 
     protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
+    {
+        try
+        {
+            log.debug("AbstractTokenAuthenticationFilter called.");
+
             AbstractAuthorizationToken token = getJwtFromRequest(request);
-            if (token != null) {
+            if (token != null)
+            {
                 String jwt = token.getJwt();
 
-                if (StringUtils.hasText(jwt)) {
-
+                if (StringUtils.hasText(jwt))
+                {
                     JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
-                    Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
+                    Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
 
                     AuthenticatedUser authenticatedUser =
                             AuthenticatedUser.builder()
                                     .username(claims.getSubject())
-                                    .authorities(authorities)
+                                    .authorities(privileges)
                                     .userId(claims.getUserId())
                                     .anonymous(false)
                                     .build();
 
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authorities);
+                    log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
+
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, privileges);
                     authentication.setDetails(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
@@ -72,17 +82,21 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
             filterChain.doFilter(request, response);
         }
-        catch (AuthenticationException ex) {
+        catch (AuthenticationException ex)
+        {
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, ex) == null) {
+            if (resolver.resolveException(request, response, null, ex) == null)
+            {
                 throw ex;
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null) {
+            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            {
                 throw ex;
             }
         }
