@@ -6,6 +6,14 @@
 - BatchProcessor improved: 
   - the first job is not removed from the input list
   - shutdown of the ExecutorService is more robust
+- HttpLogger logs request and response details
+  ```xml
+  logback.xml
+  
+  <logger name="hu.perit.spvitamin.spring.httplogging" level="DEBUG" additivity="false">
+      <appender-ref ref="application-message"/>
+  </logger>
+  ```
 
 ### 1.3.2-RELEASE 2021-10-20
 - NativeQueryRepoImpl new function: `public List<?> getResultList(String sql, List<Object> params, boolean logSql)`

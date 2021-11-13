@@ -16,21 +16,18 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 // Please start the Java VM with -Djava.net.preferIPv4Stack=true
+
 /**
  * @author Peter Nagy
  */
@@ -38,11 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractInterfaceLogger
 {
-
     private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
-        "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
-    private static final Set<String> HEADER_NAMES_TO_HIDE = Set.of("password");
-    private static final Set<String> HEADER_NAMES_TO_ABBREVIATE = Set.of("authorization");
+            "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
 
     protected HttpServletRequest httpRequest;
 
@@ -112,13 +106,11 @@ public abstract class AbstractInterfaceLogger
 
     protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        this.logRequestHeaders();
-
         String eventLogString = String.format("%s | %s | %s | user: %s | host: %s | system: %s | eventId: %d | event: %s | %s ",
-            isDirectionIn ? ">>>" : "<<<", this.getClientIpAddr(), StringUtils.defaultIfBlank(processID, "null"),
-            StringUtils.defaultIfBlank(user, "null"), StringUtils.defaultString(this.getHostName(), "null"),
-            StringUtils.defaultIfBlank(this.getSubsystemName(), "null"), eventID, StringUtils.defaultIfBlank(eventText, "null"),
-            StringUtils.defaultIfBlank(subject, "null"));
+                isDirectionIn ? ">>>" : "<<<", this.getClientIpAddr(), StringUtils.defaultIfBlank(processID, "null"),
+                StringUtils.defaultIfBlank(user, "null"), StringUtils.defaultString(this.getHostName(), "null"),
+                StringUtils.defaultIfBlank(this.getSubsystemName(), "null"), eventID, StringUtils.defaultIfBlank(eventText, "null"),
+                StringUtils.defaultIfBlank(subject, "null"));
 
         // Place to forward the event log entry to a log server
 
@@ -130,11 +122,15 @@ public abstract class AbstractInterfaceLogger
     {
         String hostname = System.getenv("HOSTNAME");
         if (hostname != null)
+        {
             return hostname;
+        }
 
         String computerName = System.getenv("COMPUTERNAME");
         if (computerName != null)
+        {
             return computerName;
+        }
 
         return null;
     }
@@ -172,60 +168,6 @@ public abstract class AbstractInterfaceLogger
         }
     }
 
-    private void logRequestHeaders()
-    {
-        try
-        {
-            Iterator<String> iterator = this.httpRequest.getHeaderNames().asIterator();
-            StringBuilder sb = new StringBuilder();
-            sb.append("HTTP headers: ");
-            while (iterator.hasNext())
-            {
-                String headerName = iterator.next();
-                sb.append(String.format("%s=%s;", headerName, this.hidePasswords(headerName)));
-            }
-            log.debug(sb.toString());
-        }
-        catch (IllegalStateException ex)
-        {
-            log.warn("HTTP headers: HTTP request is empty!");
-        }
-    }
-
-
-    private String hidePasswords(String headerName)
-    {
-        String headerValue = this.httpRequest.getHeader(headerName);
-        return getMaskedHeaderValue(headerName, headerValue);
-    }
-
-
-    protected static String getMaskedHeaderValue(String headerName, String headerValue)
-    {
-        if (HEADER_NAMES_TO_ABBREVIATE.stream().anyMatch(i -> i.equalsIgnoreCase(headerName)))
-        {
-            if (headerValue.length() <= 4)
-            {
-                return "***";
-            }
-            else if (headerValue.length() <= 6)
-            {
-                return StringUtils.abbreviate(headerValue, Math.max(4, headerValue.length() - 1));
-            }
-            else
-            {
-                return StringUtils.abbreviate(headerValue, Math.max(4, Math.min(40, (headerValue.length() / 2) + 3)));
-            }
-        }
-        else if (HEADER_NAMES_TO_HIDE.stream().anyMatch(i -> i.equalsIgnoreCase(headerName)))
-        {
-            return "***";
-        }
-        else
-        {
-            return headerValue;
-        }
-    }
 
     public String getMyMethodName()
     {

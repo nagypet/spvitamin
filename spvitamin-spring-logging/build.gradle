@@ -74,7 +74,9 @@ dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
     testImplementation('log4j:log4j:1.2.17')
-	
+
+    implementation group: 'commons-io', name: 'commons-io', version: '2.10.0'
+
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
