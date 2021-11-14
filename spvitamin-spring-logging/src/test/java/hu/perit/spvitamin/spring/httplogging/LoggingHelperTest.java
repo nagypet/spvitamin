@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.logging;
+package hu.perit.spvitamin.spring.httplogging;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import org.junit.jupiter.api.Test;
 
 import lombok.extern.slf4j.Slf4j;

@@ -17,9 +17,6 @@
 package hu.perit.spvitamin.spring.httplogging;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.spring.logging.HttpRequestWrapper;
-import hu.perit.spvitamin.spring.logging.HttpResponseWrapper;
-import hu.perit.spvitamin.spring.logging.LoggingHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.logging.log4j.ThreadContext;

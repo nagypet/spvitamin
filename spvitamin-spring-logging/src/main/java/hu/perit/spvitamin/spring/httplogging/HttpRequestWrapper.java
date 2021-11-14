@@ -1,4 +1,4 @@
-package hu.perit.spvitamin.spring.logging;
+package hu.perit.spvitamin.spring.httplogging;
 
 import lombok.RequiredArgsConstructor;
 
@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 
 @RequiredArgsConstructor
-public class HttpRequestWrapper implements HttpWrapper
+class HttpRequestWrapper implements HttpWrapper
 {
     private final HttpServletRequest httpRequest;
 

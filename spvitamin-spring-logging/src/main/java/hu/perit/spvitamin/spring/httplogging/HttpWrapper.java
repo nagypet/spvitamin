@@ -1,8 +1,8 @@
-package hu.perit.spvitamin.spring.logging;
+package hu.perit.spvitamin.spring.httplogging;
 
 import java.util.Iterator;
 
-public interface HttpWrapper
+interface HttpWrapper
 {
     Iterator<String> getHeaderNames();
     String getHeader(String name);

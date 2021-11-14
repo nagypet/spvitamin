@@ -1,4 +1,4 @@
-package hu.perit.spvitamin.spring.logging;
+package hu.perit.spvitamin.spring.httplogging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 @Slf4j
-public class LoggingHelper
+class LoggingHelper
 {
     private static final Set<String> HEADER_NAMES_TO_HIDE = Set.of("password");
     private static final Set<String> HEADER_NAMES_TO_ABBREVIATE = Set.of("authorization");
