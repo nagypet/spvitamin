@@ -34,13 +34,15 @@ import java.util.concurrent.TimeUnit;
 
 
 @Getter
-public class ServerParameterList {
+public class ServerParameterList
+{
 
     private final List<ServerParameter> parameter = new ArrayList<>();
 
     private static final Set<Class<?>> WRAPPER_TYPES = new HashSet<>();
 
-    static {
+    static
+    {
         WRAPPER_TYPES.add(Boolean.class);
         WRAPPER_TYPES.add(boolean.class);
         WRAPPER_TYPES.add(Byte.class);
@@ -66,15 +68,18 @@ public class ServerParameterList {
     }
 
 
-    public static ServerParameterList of(Object o) {
+    public static ServerParameterList of(Object o)
+    {
         return of(o, null);
     }
 
 
-    public static ServerParameterList of(Object o, String namePrefix) {
+    public static ServerParameterList of(Object o, String namePrefix)
+    {
         ServerParameterList serverParameterList = new ServerParameterList();
 
-        if (o != null) {
+        if (o != null)
+        {
             getPropertiesByFields(serverParameterList, o, namePrefix);
             getPropertiesByGetters(serverParameterList, o, namePrefix);
         }
@@ -83,32 +88,42 @@ public class ServerParameterList {
     }
 
 
-    private static void getPropertiesByFields(ServerParameterList serverParameterList, Object o, String namePrefix) {
+    private static void getPropertiesByFields(ServerParameterList serverParameterList, Object o, String namePrefix)
+    {
 
         Class<?> objectClass = o.getClass();
 
         Field[] fields = objectClass.getDeclaredFields();
-        for (Field field : fields) {
+        for (Field field : fields)
+        {
             String fieldName = String.format("%s.%s", StringUtils.isNotBlank(namePrefix) ? namePrefix : objectClass.getSimpleName(), field.getName());
-            if (isHidden(field) || isHidden(fieldName)) {
+            if (isHidden(field) || isHidden(fieldName))
+            {
                 serverParameterList.add(new ServerParameter(fieldName, "*** [hidden]", false));
             }
-            else {
-                try {
+            else
+            {
+                try
+                {
                     Object fieldValue = getFieldValue(field, o);
-                    if (fieldValue != null) {
-                        if (isPrimitiveType(fieldValue.getClass())) {
+                    if (fieldValue != null)
+                    {
+                        if (isPrimitiveType(fieldValue.getClass()) || fieldValue.getClass().isEnum())
+                        {
                             serverParameterList.add(new ServerParameter(fieldName, fieldValue.toString(), false));
                         }
-                        else {
+                        else
+                        {
                             serverParameterList.add(ServerParameterList.of(fieldValue, fieldName));
                         }
                     }
                 }
-                catch (IllegalAccessException e) {
+                catch (IllegalAccessException e)
+                {
                     // private property
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     serverParameterList.parameter.add(new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
                 }
             }
@@ -116,64 +131,82 @@ public class ServerParameterList {
     }
 
 
-    private static Object getFieldValue(Field field, Object o) throws InvocationTargetException, IllegalAccessException {
+    private static Object getFieldValue(Field field, Object o) throws InvocationTargetException, IllegalAccessException
+    {
         Object subject = getSubject(field, o);
-        if (field.canAccess(subject)) {
+        if (field.canAccess(subject))
+        {
             return field.get(subject);
         }
-        else {
+        else
+        {
             return tryInvokeGetter(field, o);
         }
     }
 
 
-    private static Object getSubject(Field field, Object o) {
+    private static Object getSubject(Field field, Object o)
+    {
         Object subject = o;
         int modifiers = field.getModifiers();
-        if ((modifiers & Modifier.STATIC) != 0) {
+        if ((modifiers & Modifier.STATIC) != 0)
+        {
             subject = null;
         }
         return subject;
     }
 
 
-    private static Object getSubject(Method method, Object o) {
+    private static Object getSubject(Method method, Object o)
+    {
         Object subject = o;
         int modifiers = method.getModifiers();
-        if ((modifiers & Modifier.STATIC) != 0) {
+        if ((modifiers & Modifier.STATIC) != 0)
+        {
             subject = null;
         }
         return subject;
     }
 
 
-    private static void getPropertiesByGetters(ServerParameterList serverParameterList, Object o, String namePrefix) {
+    private static void getPropertiesByGetters(ServerParameterList serverParameterList, Object o, String namePrefix)
+    {
 
         Class<?> objectClass = o.getClass();
 
         Method[] declaredMethods = objectClass.getDeclaredMethods();
-        for (Method method : declaredMethods) {
-            if (isGetter(method)) {
+        for (Method method : declaredMethods)
+        {
+            if (isGetter(method))
+            {
                 String fieldName = String.format("%s.%s", StringUtils.isNotBlank(namePrefix) ? namePrefix : objectClass.getSimpleName(), getFieldNameFromGetter(method));
-                if (isHidden(fieldName)) {
+                if (isHidden(fieldName))
+                {
                     serverParameterList.add(new ServerParameter(fieldName, "*** [hidden]", false));
                 }
-                else {
-                    try {
+                else
+                {
+                    try
+                    {
                         Object fieldValue = invokeGetter(method, o);
-                        if (fieldValue != null) {
-                            if (isPrimitiveType(fieldValue.getClass())) {
+                        if (fieldValue != null)
+                        {
+                            if (isPrimitiveType(fieldValue.getClass()))
+                            {
                                 serverParameterList.add(new ServerParameter(fieldName, fieldValue.toString(), false));
                             }
-                            else {
+                            else
+                            {
                                 serverParameterList.add(ServerParameterList.of(fieldValue, fieldName));
                             }
                         }
                     }
-                    catch (IllegalAccessException e) {
+                    catch (IllegalAccessException e)
+                    {
                         // private property
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         serverParameterList.add(new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
                     }
                 }
@@ -182,11 +215,14 @@ public class ServerParameterList {
     }
 
 
-    private static String getFieldNameFromGetter(Method method) {
-        if (method.getName().startsWith("get")) {
+    private static String getFieldNameFromGetter(Method method)
+    {
+        if (method.getName().startsWith("get"))
+        {
             return lowerCamelCase(method.getName().substring(3));
         }
-        else if (method.getName().startsWith("is")) {
+        else if (method.getName().startsWith("is"))
+        {
             return lowerCamelCase(method.getName().substring(2));
         }
 
@@ -194,47 +230,65 @@ public class ServerParameterList {
     }
 
 
-    private static String lowerCamelCase(String name) {
+    private static String lowerCamelCase(String name)
+    {
         return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
 
-    private static boolean isGetter(Method method) {
+    private static boolean isGetter(Method method)
+    {
         return method.getParameters().length == 0 && (method.getName().startsWith("get") || method.getName().startsWith("is"));
     }
 
 
-    private static boolean isHidden(Field field) {
+    private static boolean isHidden(Field field)
+    {
         ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
-        if (configProperty == null) {
+        if (configProperty == null)
+        {
             return false;
         }
         return configProperty.hidden();
     }
 
-    private static boolean isHidden(String fieldName) {
+    private static boolean isHidden(String fieldName)
+    {
         return fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("secret");
     }
 
-    private static boolean isPrimitiveType(Class<?> clazz) {
-        if (clazz.getName().startsWith("com.netflix")) return true;
+    private static boolean isPrimitiveType(Class<?> clazz)
+    {
+        if (clazz.getName().startsWith("com.netflix"))
+        {
+            return true;
+        }
 
-        for (Class<?> type : WRAPPER_TYPES) {
-            if (type.isAssignableFrom(clazz)) return true;
+        for (Class<?> type : WRAPPER_TYPES)
+        {
+            if (type.isAssignableFrom(clazz))
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
 
-    private static Object tryInvokeGetter(Field field, Object o) throws InvocationTargetException, IllegalAccessException {
-        for (Method method : o.getClass().getDeclaredMethods()) {
-            if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase()) && isGetter(method)) {
+    private static Object tryInvokeGetter(Field field, Object o) throws InvocationTargetException, IllegalAccessException
+    {
+        for (Method method : o.getClass().getDeclaredMethods())
+        {
+            if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase()) && isGetter(method))
+            {
                 if ((method.getName().startsWith("get") && (method.getName().length() == (field.getName().length() + 3)))
                         || (method.getName().startsWith("is") && (method.getName().length() == (field.getName().length() + 2)))
-                ) {
+                )
+                {
                     Object subject = getSubject(method, o);
-                    if (method.canAccess(subject)) {
+                    if (method.canAccess(subject))
+                    {
                         return method.invoke(subject);
                     }
                 }
@@ -245,10 +299,13 @@ public class ServerParameterList {
     }
 
 
-    private static Object invokeGetter(Method method, Object o) throws InvocationTargetException, IllegalAccessException {
-        if (isGetter(method)) {
+    private static Object invokeGetter(Method method, Object o) throws InvocationTargetException, IllegalAccessException
+    {
+        if (isGetter(method))
+        {
             Object subject = getSubject(method, o);
-            if (method.canAccess(subject)) {
+            if (method.canAccess(subject))
+            {
                 return method.invoke(subject);
             }
         }
@@ -257,14 +314,17 @@ public class ServerParameterList {
     }
 
 
-    public void add(ServerParameter serverParameter) {
-        if (this.parameter.stream().noneMatch(i -> i.equals(serverParameter))) {
+    public void add(ServerParameter serverParameter)
+    {
+        if (this.parameter.stream().noneMatch(i -> i.equals(serverParameter)))
+        {
             this.parameter.add(serverParameter);
         }
     }
 
 
-    public void add(ServerParameterList serverParameterList) {
+    public void add(ServerParameterList serverParameterList)
+    {
         serverParameterList.parameter.forEach(this::add);
     }
 }
