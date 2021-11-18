@@ -28,7 +28,7 @@ class LoggingHelper
             while (iterator.hasNext())
             {
                 String headerName = iterator.next();
-                sb.append(String.format("%s=%s;", headerName, hidePasswords(httpWrapper, headerName)));
+                sb.append(String.format("%s=%s|", headerName, hidePasswords(httpWrapper, headerName)));
             }
             return sb.toString();
         }
