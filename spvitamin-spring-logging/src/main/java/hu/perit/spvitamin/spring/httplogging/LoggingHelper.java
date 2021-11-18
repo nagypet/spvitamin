@@ -25,7 +25,6 @@ class LoggingHelper
         {
             Iterator<String> iterator = httpWrapper.getHeaderNames();
             StringBuilder sb = new StringBuilder();
-            sb.append("HTTP headers: ");
             while (iterator.hasNext())
             {
                 String headerName = iterator.next();
