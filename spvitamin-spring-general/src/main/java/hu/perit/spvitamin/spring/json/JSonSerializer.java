@@ -85,12 +85,12 @@ public final class JSonSerializer
         return yamlMapper;
     }
 
-	private enum MapperType
+	protected enum MapperType
 	{
 		JSON, YAML
 	}
 
-	private static ObjectMapper createMapper(MapperType type)
+	protected static ObjectMapper createMapper(MapperType type)
 	{
 		ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

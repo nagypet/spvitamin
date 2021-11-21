@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +30,12 @@ import java.util.Date;
  */
 
 @Configuration
-public class JacksonConfiguration {
+public class JacksonConfiguration
+{
 
     @Bean
-    public com.fasterxml.jackson.databind.Module createCustomModule() {
+    public com.fasterxml.jackson.databind.Module createCustomModule()
+    {
         SimpleModule module = new SimpleModule();
         module.addSerializer(new CustomLocalDateSerializer());
         module.addSerializer(new CustomLocalDateTimeSerializer());
@@ -41,5 +44,11 @@ public class JacksonConfiguration {
         module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
 
         return module;
+    }
+
+    @Bean
+    public ObjectMapper createMapper()
+    {
+        return JSonSerializer.createMapper(JSonSerializer.MapperType.JSON);
     }
 }
