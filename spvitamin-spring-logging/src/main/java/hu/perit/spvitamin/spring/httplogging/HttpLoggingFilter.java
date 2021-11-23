@@ -37,7 +37,7 @@ public class HttpLoggingFilter implements Filter
 {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
     {
-        if (!log.isDebugEnabled())
+        if (!(log.isDebugEnabled() || log.isInfoEnabled()))
         {
             chain.doFilter(request, response);
         }
@@ -59,7 +59,12 @@ public class HttpLoggingFilter implements Filter
                 try
                 {
                     this.prepareLogMessageRequest(logMessage, httpServletRequest);
-                    log.debug(logMessage.toString());
+                    if (log.isInfoEnabled()) {
+                        log.info(logMessage.toString());
+                    } else
+                    {
+                        log.debug(logMessage.toString());
+                    }
                 }
                 catch (Throwable ex)
                 {
@@ -96,13 +101,23 @@ public class HttpLoggingFilter implements Filter
             body = ((HttpLoggingFilter.BufferedRequestWrapper) bufferedRequest).getRequestBody();
         }
 
-        logMessage.append(">>> HTTP REQUEST - ")
-                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-                .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
-                .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ")
-                .append("[REQUEST BODY: ").append(body).append("]");
+        if (log.isDebugEnabled())
+        {
+            logMessage.append(">>> HTTP REQUEST - ")
+                    .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+                    .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+                    .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+                    .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
+                    .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ")
+                    .append("[REQUEST BODY: ").append(body).append("]");
+        } else if (log.isInfoEnabled()) {
+            logMessage.append(">>> HTTP REQUEST - ")
+                    .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+                    .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+                    .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+                    .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
+                    .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
+        }
     }
 
 
