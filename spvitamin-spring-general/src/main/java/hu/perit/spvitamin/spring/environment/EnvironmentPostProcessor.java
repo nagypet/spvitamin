@@ -16,11 +16,12 @@
 
 package hu.perit.spvitamin.spring.environment;
 
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-
-import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 
 /**
  * A utility class for post processing some properties. This must be done just
@@ -30,27 +31,36 @@ import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
  * autowired values would not be ready for use.
  */
 
+@Slf4j
 public class EnvironmentPostProcessor implements ApplicationListener<ApplicationEvent>
 {
 
-	@Override
-	public void onApplicationEvent(ApplicationEvent event)
-	{
-		if (event instanceof ApplicationPreparedEvent)
-		{
-			this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
-		}
-	}
+    @Override
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ApplicationPreparedEvent)
+        {
+            this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
+        }
+    }
 
 
-	private void onApplicationPreparedEvent(ApplicationPreparedEvent event)
-	{
-		if (!event.getApplicationContext().isActive())
-		{
-			// Initializing a singleton object with the current Environment
-			SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
+    private void onApplicationPreparedEvent(ApplicationPreparedEvent event)
+    {
+        if (!event.getApplicationContext().isActive())
+        {
+            try
+            {
+                // Initializing a singleton object with the current Environment
+                SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
 
-			KeystoreUtils.locateJksStores();
-		}
-	}
+                KeystoreUtils.locateJksStores();
+            }
+            catch (RuntimeException ex)
+            {
+                log.error(StackTracer.toString(ex));
+                throw ex;
+            }
+        }
+    }
 }

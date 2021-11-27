@@ -16,18 +16,6 @@
 
 package hu.perit.spvitamin.spring.security.auth.jwt;
 
-import java.io.IOException;
-import java.security.Key;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-
-import org.springframework.stereotype.Component;
-
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
@@ -38,6 +26,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
  * @author Peter Nagy
@@ -69,7 +63,7 @@ public class JwtTokenProvider {
 
             return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
         }
-        catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException | CertificateException e) {
+        catch (Exception e) {
             throw new JwtException("Token creation failed!", e);
         }
     }
@@ -83,7 +77,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(jwt)
                     .getBody());
         }
-        catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException ex) {
+        catch (Exception ex) {
             throw new JwtException("JWT token parse failed!", ex);
         }
     }
