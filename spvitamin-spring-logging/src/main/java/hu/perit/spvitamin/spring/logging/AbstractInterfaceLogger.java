@@ -16,8 +16,8 @@
 
 package hu.perit.spvitamin.spring.logging;
 
+import hu.perit.spvitamin.core.event.Event;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class AbstractInterfaceLogger
 {
+    public static final Event<LogEvent> LOG_EVENT = new Event<>();
+
     private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
             "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
 
@@ -106,15 +108,21 @@ public abstract class AbstractInterfaceLogger
 
     protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        String eventLogString = String.format("%s | %s | %s | user: %s | host: %s | system: %s | eventId: %d | event: %s | %s ",
-                isDirectionIn ? ">>>" : "<<<", this.getClientIpAddr(), StringUtils.defaultIfBlank(processID, "null"),
-                StringUtils.defaultIfBlank(user, "null"), StringUtils.defaultString(this.getHostName(), "null"),
-                StringUtils.defaultIfBlank(this.getSubsystemName(), "null"), eventID, StringUtils.defaultIfBlank(eventText, "null"),
-                StringUtils.defaultIfBlank(subject, "null"));
+        LogEvent logEvent = new LogEvent();
+        logEvent.setDirection(isDirectionIn);
+        logEvent.setClientIpAddr(this.getClientIpAddr());
+        logEvent.setTraceId(processID);
+        logEvent.setUser(user);
+        logEvent.setHostName(this.getHostName());
+        logEvent.setSubsystemName(this.getSubsystemName());
+        logEvent.setEventId(eventID);
+        logEvent.setEventText(eventText);
+        logEvent.setParameters(subject);
 
         // Place to forward the event log entry to a log server
+        LOG_EVENT.fire(logEvent);
 
-        return eventLogString;
+        return logEvent.toString();
     }
 
 
