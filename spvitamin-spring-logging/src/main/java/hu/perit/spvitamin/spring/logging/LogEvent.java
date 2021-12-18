@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class LogEvent
 {
-    private boolean direction;
+    private boolean directionInput;
     private String clientIpAddr;
     private String traceId;
     private String user;
@@ -20,7 +20,7 @@ public class LogEvent
     public String toString()
     {
         return String.format("%s | %s | %s | user: %s | host: %s | system: %s | eventId: %d | event: %s | %s ",
-                this.direction ? ">>>" : "<<<",
+                this.directionInput ? ">>>" : "<<<",
                 this.clientIpAddr,
                 StringUtils.defaultIfBlank(this.traceId, "null"),
                 StringUtils.defaultIfBlank(this.user, "null"),

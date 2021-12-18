@@ -109,7 +109,7 @@ public abstract class AbstractInterfaceLogger
     protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
         LogEvent logEvent = new LogEvent();
-        logEvent.setDirection(isDirectionIn);
+        logEvent.setDirectionInput(isDirectionIn);
         logEvent.setClientIpAddr(this.getClientIpAddr());
         logEvent.setTraceId(processID);
         logEvent.setUser(user);
