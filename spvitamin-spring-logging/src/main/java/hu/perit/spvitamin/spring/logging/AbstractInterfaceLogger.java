@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -109,6 +110,7 @@ public abstract class AbstractInterfaceLogger
     protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
         LogEvent logEvent = new LogEvent();
+        logEvent.setEventTime(LocalDateTime.now());
         logEvent.setDirectionInput(isDirectionIn);
         logEvent.setClientIpAddr(this.getClientIpAddr());
         logEvent.setTraceId(processID);

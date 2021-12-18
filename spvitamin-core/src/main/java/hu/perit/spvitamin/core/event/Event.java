@@ -19,7 +19,9 @@ package hu.perit.spvitamin.core.event;
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -29,43 +31,60 @@ import java.util.function.Consumer;
  */
 
 @Slf4j
-public class Event<T> {
+public class Event<T>
+{
 
     private final AtomicInteger lastId = new AtomicInteger(0);
     private final Map<Integer, Consumer<T>> subscribers = new HashMap<>();
 
-    public Subscription subscribe(Consumer<T> subscriber) {
+    public Subscription subscribe(Consumer<T> subscriber)
+    {
         Subscription subscription = new Subscription(this, this.lastId.incrementAndGet());
-        synchronized (this) {
+        synchronized (this)
+        {
             this.subscribers.put(subscription.id, subscriber);
         }
         return subscription;
     }
 
 
-    public synchronized void fire(T args) {
-        try {
-            for (Consumer<T> subscriber : this.subscribers.values()) {
+    public synchronized void fire(T args)
+    {
+        List<Exception> exceptionList = new ArrayList<>();
+        for (Consumer<T> subscriber : this.subscribers.values())
+        {
+            try
+            {
                 subscriber.accept(args);
             }
-        } catch (Exception ex) {
-            log.error(StackTracer.toString(ex));
+            catch (Exception ex)
+            {
+                exceptionList.add(ex);
+                log.error(StackTracer.toString(ex));
+            }
+        }
+        if (!exceptionList.isEmpty())
+        {
+            throw new EventFireException(exceptionList);
         }
     }
 
 
-    public class Subscription implements AutoCloseable {
+    public class Subscription implements AutoCloseable
+    {
 
         private Event<T> event;
         private int id;
 
-        public Subscription(Event<T> event, int id) {
+        public Subscription(Event<T> event, int id)
+        {
             this.event = event;
             this.id = id;
         }
 
         @Override
-        public void close() /*throws Exception*/ {
+        public void close() /*throws Exception*/
+        {
             event.subscribers.remove(this.id);
         }
     }
