@@ -4,6 +4,10 @@ Vitamin for Spring. A general purpose library to use in a spring based microserv
 
 ## Releases
 
+### 1.3.4-RELEASE 2021-12-19
+- spvitamin-spring-security LocalUserProperties
+
+
 ### 1.3.3-RELEASE 2021-12-19
 - BatchProcessor improved: 
   - the first job is not removed from the input list
