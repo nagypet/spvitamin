@@ -1,5 +1,7 @@
 # spvitamin
 
+Vitamin for Spring. A general purpose library to use in a spring based microservice environment.
+
 ## Releases
 
 ### 1.3.3 (not yet released)
