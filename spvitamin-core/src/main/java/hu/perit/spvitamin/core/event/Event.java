@@ -27,6 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
+ *  This is an implementation of the observer pattern. The class holds a strong reference to the Consumer subscribed
+ *  to changes, preventing subscribers to be garbage collected. Please make sure to close the returned Subscription object
+ *  to prevent memory leaks.
+ *
  * @author Peter Nagy
  */
 
