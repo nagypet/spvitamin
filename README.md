@@ -20,6 +20,7 @@ Vitamin for Spring. A general purpose library to use in a spring based microserv
 - AbstractInterfaceLogger notifies listeners in case of a log even
 - Improved exception handling at Event.fire() method
 - EventWithWeakRef  
+- spvitamin-spring-data WriteBehindCache
 
 ### 1.3.2-RELEASE 2021-10-20
 - NativeQueryRepoImpl new function: `public List<?> getResultList(String sql, List<Object> params, boolean logSql)`
