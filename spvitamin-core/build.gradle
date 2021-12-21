@@ -21,9 +21,6 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
-		flatDir {
-			dirs '../gradle/localrepo'
-		}
     }
 }
 
@@ -31,6 +28,8 @@ buildscript {
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 
@@ -71,29 +70,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-
-publishing {
-    repositories {
-        maven {
-            name = "perit.hu"
-            url = uri("http://perit.hu/maven")
-			/*
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-            }
-			*/
-        }
-    }
-    publications {
-        maven(MavenPublication) {
-            groupId = 'hu.perit.spvitamin'
-            artifactId = 'spvitamin-core'
-            version = "${version}"
-
-            from components.java
-        }
-    }
 }

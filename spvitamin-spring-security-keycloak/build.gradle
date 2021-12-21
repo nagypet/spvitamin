@@ -34,6 +34,11 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+sourceCompatibility = 1.8
+
 apply from: '../gradle/common.gradle'
 
 
@@ -58,8 +63,6 @@ bootJar {
    enabled = false
 }
 
-sourceCompatibility = 11
-
 dependencies {
     compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-security')
@@ -77,18 +80,5 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.keycloak.bom:keycloak-adapter-bom:${keycloakVersion}"
-    }
-}
-
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'hu.perit.spvitamin'
-            artifactId = 'spvitamin-spring-security-keycloak'
-            version = "${version}"
-
-            from components.java
-        }
     }
 }

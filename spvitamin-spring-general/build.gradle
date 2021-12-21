@@ -33,8 +33,10 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
-sourceCompatibility = 11
+sourceCompatibility = 1.8
 
 apply from: '../gradle/common.gradle'
 
@@ -102,17 +104,4 @@ configurations {
 
 test {
     useJUnitPlatform()
-}
-
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'hu.perit.spvitamin'
-            artifactId = 'spvitamin-spring-general'
-            version = "${version}"
-
-            from components.java
-        }
-    }
 }
