@@ -2,7 +2,50 @@
 
 Vitamin for Spring. A general purpose library to use in a spring based microservice environment.
 
+## Dependencies
+
+The spvitamin components are now available in the maven central repository.
+
+build.gradle
+```
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('spvitaminVersion', '1.3.5-RELEASE')
+}
+
+dependencies {
+    implementation 'hu.perit.spvitamin:spvitamin-core'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-ribbon'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-zuul	'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-data'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-server'
+}	
+
+dependencyManagement {
+    imports {
+        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
+    }
+}
+```
+
 ## Releases
+
+### 1.3.5-RELEASE 2021-12-22
+- No functional changes, but uploaded to the maven central repository
+
 
 ### 1.3.4-RELEASE 2021-12-19
 - spvitamin-spring-security LocalUserProperties
@@ -135,50 +178,6 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 ```
 
 ### 1.1.0-RELEASE 2021-05-31
-
-## Build
-
-build.gradle
-```
-repositories {
-    jcenter()
-    mavenCentral()
-    maven {
-        url "http://perit.hu/maven"
-    }
-}
-
-ext {
-	set('spvitaminVersion', '1.3.0-RELEASE')
-}
-
-dependencies {
-	implementation 'hu.perit.spvitamin:spvitamin-core'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-ribbon'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-zuul	'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-data'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-general'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-security'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
-	implementation 'hu.perit.spvitamin:spvitamin-spring-server'
-}	
-
-dependencyManagement {
-    imports {
-        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
-    }
-}
-
-
-	
-```
 
 ## Components
 
