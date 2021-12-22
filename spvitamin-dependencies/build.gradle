@@ -1,0 +1,152 @@
+/*
+ * Copyright 2020-2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+// Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
+apply plugin: 'java-platform'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+group = 'hu.perit.spvitamin'
+
+
+/********************************************************************************************************
+ * Version information
+ *******************************************************************************************************/
+if (new File("${projectDir}/version.ver").exists())
+{
+	version = rootProject.file("${projectDir}/version.ver").text.trim()
+}
+else if (new File("${projectDir}/../version.ver").exists())
+{
+	version = rootProject.file("${projectDir}/../version.ver").text.trim()
+}
+else
+{
+	throw new RuntimeException("version.ver not found while processing ${project.name}!")
+}
+
+
+
+dependencies {
+    constraints {
+		api project(":spvitamin-core")
+		api project(":spvitamin-spring-admin")
+		api project(":spvitamin-spring-cloud-client")
+		api project(":spvitamin-spring-cloud-eureka")
+		api project(":spvitamin-spring-cloud-feign")
+		api project(":spvitamin-spring-cloud-ribbon")
+		api project(":spvitamin-spring-cloud-zuul")
+		api project(":spvitamin-spring-data")
+		api project(":spvitamin-spring-general")
+		api project(":spvitamin-spring-logging")
+		api project(":spvitamin-spring-security")
+		api project(":spvitamin-spring-security-authservice")
+		api project(":spvitamin-spring-security-keycloak")
+		api project(":spvitamin-spring-security-ldap")
+		api project(":spvitamin-spring-server")
+    }
+}
+
+
+publishing {
+	repositories {
+		maven {
+			credentials {
+				username "${ossrhUsername}"
+				password "${ossrhPassword}"
+            }
+			name 'Staging'
+			url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+		}
+	}
+    publications {
+        spvitamin(MavenPublication) {
+			customizePom(pom)
+            from components.javaPlatform
+			
+			// create the sign pom artifact
+            pom.withXml {
+                def pomFile = file("${project.buildDir}/publications/spvitamin/pom-default.xml")
+                writeTo(pomFile)
+                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                artifact(pomAscFile) {
+                    classifier = null
+                    extension = 'pom.asc'
+                }
+            }
+        }
+    }
+}
+
+
+signing {
+	sign configurations.archives
+}
+
+
+
+task uploadArchives() {
+	dependsOn 'publishAllPublicationsToStagingRepository'
+}
+
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        // add all items necessary for maven central publication
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+			name "${project.group}:${project.name}"
+			description 'A general purpose library to use in a spring based microservice environment.'
+			url 'https://github.com/nagypet/spvitamin'
+
+			scm {
+				connection 'scm:git:git://github.com/nagypet/spvitamin.git'
+				developerConnection 'scm:git:ssh://github.com:nagypet/spvitamin.git'
+				url 'https://github.com/nagypet/spvitamin.git'
+			}
+
+			licenses {
+				license {
+					name 'The Apache License, Version 2.0'
+					url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+				}
+			}
+
+			developers {
+				developer {
+					id 'nagypet'
+					name 'Peter Nagy'
+					email 'peter.nagy@perit.hu'
+				}
+			}
+        }
+    }
+}

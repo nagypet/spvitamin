@@ -340,8 +340,12 @@ pluginManager.withPlugin('maven-publish') {
 	publishing {
 		repositories {
 			maven {
-				name = "perit.hu"
-				url = uri("http://perit.hu/maven")
+				credentials {
+					username "${ossrhUsername}"
+					password "${ossrhPassword}"
+				}
+				name 'Staging'
+				url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
 			}
 		}
 		publications {
