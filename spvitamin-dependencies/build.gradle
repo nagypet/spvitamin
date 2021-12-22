@@ -83,24 +83,13 @@ publishing {
         spvitamin(MavenPublication) {
 			customizePom(pom)
             from components.javaPlatform
-			
-			// create the sign pom artifact
-            pom.withXml {
-                def pomFile = file("${project.buildDir}/publications/spvitamin/pom-default.xml")
-                writeTo(pomFile)
-                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                artifact(pomAscFile) {
-                    classifier = null
-                    extension = 'pom.asc'
-                }
-            }
         }
     }
 }
 
 
 signing {
-	sign configurations.archives
+	sign publishing.publications.spvitamin
 }
 
 
