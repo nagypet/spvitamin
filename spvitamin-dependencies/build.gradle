@@ -68,29 +68,31 @@ dependencies {
 }
 
 
-publishing {
-	repositories {
-		maven {
-			credentials {
-				username "${ossrhUsername}"
-				password "${ossrhPassword}"
-            }
-			name 'Staging'
-			url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+if (project.hasProperty('ossrhUsername')) {
+	publishing {
+		repositories {
+			maven {
+				credentials {
+					username "${ossrhUsername}"
+					password "${ossrhPassword}"
+				}
+				name 'Staging'
+				url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+			}
+		}
+		publications {
+			spvitamin(MavenPublication) {
+				customizePom(pom)
+				from components.javaPlatform
+			}
 		}
 	}
-    publications {
-        spvitamin(MavenPublication) {
-			customizePom(pom)
-            from components.javaPlatform
-        }
-    }
+	
+	signing {
+		sign publishing.publications.spvitamin
+	}
 }
 
-
-signing {
-	sign publishing.publications.spvitamin
-}
 
 
 
@@ -100,17 +102,17 @@ task uploadArchives() {
 
 
 def customizePom(pom) {
-    pom.withXml {
-        def root = asNode()
+	pom.withXml {
+		def root = asNode()
 
-        // eliminate test-scoped dependencies (no need in maven central POMs)
-        root.dependencies.removeAll { dep ->
-            dep.scope == "test"
-        }
+		// eliminate test-scoped dependencies (no need in maven central POMs)
+		root.dependencies.removeAll { dep ->
+			dep.scope == "test"
+		}
 
-        // add all items necessary for maven central publication
-        root.children().last() + {
-            resolveStrategy = Closure.DELEGATE_FIRST
+		// add all items necessary for maven central publication
+		root.children().last() + {
+			resolveStrategy = Closure.DELEGATE_FIRST
 
 			name "${project.group}:${project.name}"
 			description 'A general purpose library to use in a spring based microservice environment.'
@@ -136,6 +138,9 @@ def customizePom(pom) {
 					email 'peter.nagy@perit.hu'
 				}
 			}
-        }
-    }
+		}
+	}
 }
+
+
+
