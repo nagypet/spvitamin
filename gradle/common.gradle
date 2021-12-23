@@ -337,24 +337,26 @@ if (project.hasProperty('java')) {
 
 
 pluginManager.withPlugin('maven-publish') {
-	publishing {
-		repositories {
-			maven {
-				credentials {
-					username "${ossrhUsername}"
-					password "${ossrhPassword}"
+	if (project.hasProperty('ossrhUsername')) {
+		publishing {
+			repositories {
+				maven {
+					credentials {
+						username "${ossrhUsername}"
+						password "${ossrhPassword}"
+					}
+					name 'Staging'
+					url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
 				}
-				name 'Staging'
-				url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
 			}
-		}
-		publications {
-			maven(MavenPublication) {
-				groupId = "${project.group}"
-				artifactId = "${project.name}"
-				version = "${version}"
+			publications {
+				maven(MavenPublication) {
+					groupId = "${project.group}"
+					artifactId = "${project.name}"
+					version = "${version}"
 
-				from components.java
+					from components.java
+				}
 			}
 		}
 	}
@@ -362,64 +364,66 @@ pluginManager.withPlugin('maven-publish') {
 
 
 pluginManager.withPlugin('maven') {
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+	if (project.hasProperty('ossrhUsername')) {
+		uploadArchives {
+			repositories {
+				mavenDeployer {
+					beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-				repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
-				}
-
-				snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
-				}
-
-				pom.project {
-					name "${project.group}:${project.name}"
-					packaging 'jar'
-					description 'A general purpose library to use in a spring based microservice environment.'
-					url 'https://github.com/nagypet/spvitamin'
-
-					scm {
-						connection 'scm:git:git://github.com/nagypet/spvitamin.git'
-						developerConnection 'scm:git:ssh://github.com:nagypet/spvitamin.git'
-						url 'https://github.com/nagypet/spvitamin.git'
+					repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+						authentication(userName: ossrhUsername, password: ossrhPassword)
 					}
 
-					licenses {
-						license {
-							name 'The Apache License, Version 2.0'
-							url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+						authentication(userName: ossrhUsername, password: ossrhPassword)
+					}
+
+					pom.project {
+						name "${project.group}:${project.name}"
+						packaging 'jar'
+						description 'A general purpose library to use in a spring based microservice environment.'
+						url 'https://github.com/nagypet/spvitamin'
+
+						scm {
+							connection 'scm:git:git://github.com/nagypet/spvitamin.git'
+							developerConnection 'scm:git:ssh://github.com:nagypet/spvitamin.git'
+							url 'https://github.com/nagypet/spvitamin.git'
 						}
-					}
 
-					developers {
-						developer {
-							id 'nagypet'
-							name 'Peter Nagy'
-							email 'peter.nagy@perit.hu'
+						licenses {
+							license {
+								name 'The Apache License, Version 2.0'
+								url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							}
+						}
+
+						developers {
+							developer {
+								id 'nagypet'
+								name 'Peter Nagy'
+								email 'peter.nagy@perit.hu'
+							}
 						}
 					}
 				}
 			}
 		}
-	}
 	
-	/*
-	task javadocJar(type: Jar) {
-		classifier = 'javadoc'
-		from javadoc
-	}
+		/*
+		task javadocJar(type: Jar) {
+			classifier = 'javadoc'
+			from javadoc
+		}
 
-	task sourcesJar(type: Jar) {
-		classifier = 'sources'
-		from sourceSets.main.allSource
-	}
-	*/
-	
-	artifacts {
-		archives javadocJar, sourcesJar
+		task sourcesJar(type: Jar) {
+			classifier = 'sources'
+			from sourceSets.main.allSource
+		}
+		*/
+		
+		artifacts {
+			archives javadocJar, sourcesJar
+		}
 	}
 }
 
