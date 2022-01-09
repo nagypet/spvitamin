@@ -54,7 +54,8 @@ public class LdapAuthenticationProviderConfigurer
                         ldapProperties.getDomain(),
                         ldapProperties.getFilter(),
                         ldapProperties.isUserprincipalWithDomain(),
-                        ldapProperties.getRootDN());
+                        ldapProperties.getRootDN(),
+                        ldapProperties.getBindUserPattern());
 
                 provider.setContextEnvironmentProperties(ctxEnvironmentProps);
 
@@ -64,7 +65,7 @@ public class LdapAuthenticationProviderConfigurer
     }
 
 
-    private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN)
+    private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN, String bindUserPattern)
     {
         log.debug(String.format("'%s' url: '%s', rootDN: '%s', filter: '%s', domain: '%s', with domain: '%b'", name, url, rootDN, filter, domain, withDomain));
 
@@ -73,6 +74,7 @@ public class LdapAuthenticationProviderConfigurer
         provider.setConvertSubErrorCodesToExceptions(true);
         provider.setUseAuthenticationRequestCredentials(true);
         provider.setUserprincipalwithdomain(withDomain);
+        provider.setBindUserPattern(bindUserPattern);
 
         return provider;
     }

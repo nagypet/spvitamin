@@ -16,35 +16,14 @@
 
 package hu.perit.spvitamin.spring.security.ldap;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.naming.AuthenticationException;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.OperationNotSupportedException;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.ldap.InitialLdapContext;
-
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.domainuser.DomainUser;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.ldap.support.LdapUtils;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -54,7 +33,17 @@ import org.springframework.security.ldap.authentication.AbstractLdapAuthenticati
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import hu.perit.spvitamin.core.StackTracer;
+import javax.naming.AuthenticationException;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.ldap.InitialLdapContext;
+import java.io.Serializable;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -120,9 +109,12 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
     private boolean convertSubErrorCodesToExceptions;
     private String searchFilter = "(&(objectClass=user)(userPrincipalName={0}))";
     private Map<String, Object> contextEnvironmentProperties = new HashMap<>();
+    private String bindUserPattern = null;
+
 
     // Only used to allow tests to substitute a mock LdapContext
     LdapAuthenticationProvider.ContextFactory contextFactory = new LdapAuthenticationProvider.ContextFactory();
+
 
     /**
      * @param domain the domain name (may be null or empty)
@@ -162,9 +154,9 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
             throw badCredentials(e);
         }
         catch (BadCredentialsException e) {
-        	logger.debug(e.getMessage());
-        	throw e;
-		}
+            logger.debug(e.getMessage());
+            throw e;
+        }
         catch (Exception ex) {
             logger.error(StackTracer.toString(ex));
             throw new LdapAuthenticationException("", "Ldap authentication failed!", ex);
@@ -176,19 +168,16 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         }
     }
 
+
     /*
      * ha domain nevet is tartalmaz a user név, azt levágjuk pl: innodox\nagy_peter => nagy_peter
      */
     private String preFilter(String userName) {
-        String[] userNameParts = userName.split("\\\\");
-        if (userNameParts.length < 2) {
-            return userName;
+        DomainUser domainUser = DomainUser.newInstance(userName);
+        try {
+            return domainUser.getUsername();
         }
-        else if (userNameParts.length == 2) {
-            logger.debug(String.format("Username with domain prefix provided, ignored '%s' => '%s'", userName, userNameParts[1]));
-            return userNameParts[1];
-        }
-        else {
+        catch (RuntimeException ex) {
             UsernameNotFoundException userNameNotFoundException = new UsernameNotFoundException(
                     String.format("Invalid user name format: '%s'", userName));
             throw badCredentials(userNameNotFoundException);
@@ -232,7 +221,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
 
         Hashtable<String, Object> env = new Hashtable<>(); // NOSONAR cant replace with HashMap
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        String bindPrincipal = createBindPrincipal(username);
+        String bindPrincipal = createBindUsername(username);
         env.put(Context.SECURITY_PRINCIPAL, bindPrincipal);
         env.put(Context.PROVIDER_URL, bindUrl);
         env.put(Context.SECURITY_CREDENTIALS, password);
@@ -354,8 +343,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         String bindPrincipal = createBindPrincipal(username);
-        String searchRoot = rootDn != null ? rootDn
-                : searchRootFromPrincipal(bindPrincipal);
+        String searchRoot = rootDn != null ? rootDn : searchRootFromPrincipal(bindPrincipal);
 
         try {
             // changed by Peter Nagy in order we can authenticate against AD with sAMAccountName
@@ -403,7 +391,17 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         return root.toString();
     }
 
-    String createBindPrincipal(String username) {
+
+    private String createBindUsername(String username) {
+        if (this.bindUserPattern != null) {
+            return this.bindUserPattern.replace("{0}", username);
+        }
+
+        return createBindPrincipal(username);
+    }
+
+
+    private String createBindPrincipal(String username) {
         if (domain == null || username.toLowerCase().endsWith(domain)) {
             return username;
         }
@@ -451,6 +449,9 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         this.userprincipalwithdomain = userprincipalwithdomain;
     }
 
+    public void setBindUserPattern(String bindUserPattern) {
+        this.bindUserPattern = bindUserPattern;
+    }
 
     /**
      * Allows a custom environment properties to be used to create initial LDAP context.

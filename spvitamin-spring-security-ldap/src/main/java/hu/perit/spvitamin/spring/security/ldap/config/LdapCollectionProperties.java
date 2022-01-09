@@ -43,5 +43,6 @@ public class LdapCollectionProperties {
         private boolean userprincipalWithDomain = false;
         private String domain;
         private int connectTimeoutMs = 1000;
+        private String bindUserPattern;
     }
 }
