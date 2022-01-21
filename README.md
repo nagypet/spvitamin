@@ -43,9 +43,12 @@ dependencyManagement {
 
 ## Releases
 
+### 1.3.6-RELEASE 2022-01-21
+- A new LDAP setting
+- HttpLoggingFilter improved in case of INFO level
+
 ### 1.3.5-RELEASE 2021-12-22
 - No functional changes, but uploaded to the maven central repository
-
 
 ### 1.3.4-RELEASE 2021-12-19
 - spvitamin-spring-security LocalUserProperties
@@ -279,6 +282,14 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | server.ssl.trust-store                   | string  | -               | classpath:jks/client-truststore.jks |             |
 | server.ssl.trust-store-password          | string  | -               | changeit                            |             |
 | server.ssl.ignore-certificate-validation | boolean | FALSE           |                                     |             |
+| ldaps.ad\<i\>.enabled                    | boolean | TRUE            |                                     |             |
+| ldaps.ad\<i\>.url                        | string  |                 | ldap://192.168.62.150:10389         |             |
+| ldaps.ad\<i\>.root-dn                    | string  |                 | OU=Users,DC=perit,DC=hu             |             |
+| ldaps.ad\<i\>.filter                     | string  |                 | (&(objectClass=user)(userPrincipalName={0})) |             |
+| ldaps.ad\<i\>.userprincipal-with-domain  | boolean | FALSE           |                                     |             |
+| ldaps.ad\<i\>.domain                     | string  |                 | perit.hu                            |             |
+| ldaps.ad\<i\>.connect-timeout-ms         | int     | 1000            |                                     |             |
+| ldaps.ad\<i\>.bind-user-pattern          | string  |                 | uid={0},ou=Users,dc=perit,dc=hu     |             |
 
 
 ## Dependency graph

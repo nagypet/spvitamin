@@ -59,9 +59,11 @@ public class HttpLoggingFilter implements Filter
                 try
                 {
                     this.prepareLogMessageRequest(logMessage, httpServletRequest);
-                    if (log.isInfoEnabled()) {
+                    if (log.isInfoEnabled())
+                    {
                         log.info(logMessage.toString());
-                    } else
+                    }
+                    else
                     {
                         log.debug(logMessage.toString());
                     }
@@ -78,7 +80,14 @@ public class HttpLoggingFilter implements Filter
                 {
                     logMessage = new StringBuilder();
                     this.prepareLogMessageResponse(logMessage, httpServletRequest, bufferedResponse);
-                    log.debug(logMessage.toString());
+                    if (log.isInfoEnabled())
+                    {
+                        log.info(logMessage.toString());
+                    }
+                    else
+                    {
+                        log.debug(logMessage.toString());
+                    }
                 }
                 catch (Throwable ex)
                 {
@@ -95,28 +104,27 @@ public class HttpLoggingFilter implements Filter
 
     private void prepareLogMessageRequest(StringBuilder logMessage, HttpServletRequest bufferedRequest) throws IOException
     {
-        String body = "Non JSON Data found; will not be printed";
+        String body;
         if (bufferedRequest instanceof HttpLoggingFilter.BufferedRequestWrapper)
         {
             body = ((HttpLoggingFilter.BufferedRequestWrapper) bufferedRequest).getRequestBody();
         }
+        else
+        {
+            body = "Non JSON Data";
+        }
+
+        logMessage
+                .append(">>> HTTP REQUEST - ")
+                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+                .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
+                .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
 
         if (log.isDebugEnabled())
         {
-            logMessage.append(">>> HTTP REQUEST - ")
-                    .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-                    .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-                    .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-                    .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
-                    .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ")
-                    .append("[REQUEST BODY: ").append(body).append("]");
-        } else if (log.isInfoEnabled()) {
-            logMessage.append(">>> HTTP REQUEST - ")
-                    .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-                    .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-                    .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-                    .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
-                    .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
+            logMessage.append("[REQUEST BODY: ").append(body).append("]");
         }
     }
 
@@ -124,15 +132,21 @@ public class HttpLoggingFilter implements Filter
     private void prepareLogMessageResponse(StringBuilder logMessage, HttpServletRequest bufferedRequest, BufferedResponseWrapper bufferedResponse) throws IOException
     {
         String contenttype = bufferedResponse.getContentType();
-        String body = contenttype != null && !contenttype.startsWith("application/json") ? "Non JSON Data found; will not be printed" : bufferedResponse.getContent();
+        String body = contenttype != null && !contenttype.startsWith("application/json") ? "Non JSON Data" : bufferedResponse.getContent();
         int httpStatus = bufferedResponse.getStatus();
-        logMessage.append("<<< HTTP RESPONSE - ")
+
+        logMessage
+                .append("<<< HTTP RESPONSE - ")
                 .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
                 .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
                 .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
                 .append("[RESPONSE STATUS: ").append(httpStatus).append("] ")
-                .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ")
-                .append("[RESPONSE BODY: ").append(body).append("]");
+                .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ");
+
+        if (log.isDebugEnabled())
+        {
+            logMessage.append("[RESPONSE BODY: ").append(body).append("]");
+        }
     }
 
 
