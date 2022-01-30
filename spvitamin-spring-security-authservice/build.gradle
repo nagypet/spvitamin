@@ -17,7 +17,7 @@
 buildscript {
     ext {
         springBootVersion = '2.4.5'
-	springCloudVersion = '2020.0.2'
+        springCloudVersion = '2020.0.5'
     }
     repositories {
         jcenter()
@@ -55,13 +55,13 @@ repositories {
 
 // it will be a library, no fat jar
 bootJar {
-   enabled = false
+    enabled = false
 }
 
 dependencies {
     compile project(':spvitamin-spring-general')
-	compile project(':spvitamin-spring-security')
-	compile project(':spvitamin-spring-cloud-feign')
+    compile project(':spvitamin-spring-security')
+    compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -79,10 +79,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // Slf4J
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
-	
+
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }

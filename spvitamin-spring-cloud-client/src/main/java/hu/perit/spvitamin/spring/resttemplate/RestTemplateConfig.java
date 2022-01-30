@@ -37,7 +37,7 @@ public class RestTemplateConfig
 	}
 
 
-	@Profile("discovery")
+	@Profile("resttemplate-loadbalanced")
 	@LoadBalanced
 	@Bean
 	RestTemplate restTemplateWithLoadBalance()
@@ -46,7 +46,7 @@ public class RestTemplateConfig
 	}
 
 
-	@Profile("!discovery")
+	@Profile("!resttemplate-loadbalanced")
 	@Bean
 	RestTemplate restTemplateWithoutLoadBalance()
 	{

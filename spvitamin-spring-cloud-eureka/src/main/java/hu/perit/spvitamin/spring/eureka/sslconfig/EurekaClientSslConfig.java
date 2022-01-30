@@ -16,34 +16,71 @@
 
 package hu.perit.spvitamin.spring.eureka.sslconfig;
 
-import com.netflix.discovery.DiscoveryClient;
-import hu.perit.spvitamin.core.exception.ServerException;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.ssl.SSLContexts;
+import com.netflix.discovery.AbstractDiscoveryClientOptionalArgs;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.configuration.SSLContextFactory;
+import org.springframework.cloud.configuration.TlsProperties;
+import org.springframework.cloud.netflix.eureka.http.EurekaClientHttpRequestFactorySupplier;
+import org.springframework.cloud.netflix.eureka.http.RestTemplateDiscoveryClientOptionalArgs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @Configuration
-public class EurekaClientSslConfig {
-
+@RequiredArgsConstructor
+@Slf4j
+public class EurekaClientSslConfig
+{
+    /*
     @Bean
-    public DiscoveryClient.DiscoveryClientOptionalArgs getTrustStoredEurekaClient() {
+    public AbstractDiscoveryClientOptionalArgs<?> getDiscoveryClientOptionalArgs()
+    {
         DiscoveryClient.DiscoveryClientOptionalArgs args = new DiscoveryClient.DiscoveryClientOptionalArgs();
         args.setSSLContext(this.getSslContext());
         args.setHostnameVerifier(new NoopHostnameVerifier());
+        //args.setEurekaJerseyClient(new EurekaJerseyClientImpl(2000, 5000, ));
         return args;
     }
 
-    private SSLContext getSslContext() {
+    private SSLContext getSslContext()
+    {
         // TrustSelfSignedStrategy
-        try {
+        try
+        {
             return SSLContexts.custom().loadTrustMaterial(null, new TrustAllStrategy()).build();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return ServerException.throwFrom(ex);
+        }
+    }
+
+     */
+
+
+    @Bean
+    public RestTemplateDiscoveryClientOptionalArgs restTemplateDiscoveryClientOptionalArgs(TlsProperties tlsProperties,
+                                                                                           EurekaClientHttpRequestFactorySupplier eurekaClientHttpRequestFactorySupplier)
+            throws GeneralSecurityException, IOException
+    {
+        log.info("Eureka HTTP Client uses RestTemplate.");
+        RestTemplateDiscoveryClientOptionalArgs result = new RestTemplateDiscoveryClientOptionalArgs(
+                eurekaClientHttpRequestFactorySupplier);
+        setupTLS(result, tlsProperties);
+        return result;
+    }
+
+
+    private static void setupTLS(AbstractDiscoveryClientOptionalArgs<?> args, TlsProperties properties)
+            throws GeneralSecurityException, IOException
+    {
+        if (properties.isEnabled())
+        {
+            SSLContextFactory factory = new SSLContextFactory(properties);
+            args.setSSLContext(factory.createSSLContext());
         }
     }
 }

@@ -24,7 +24,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 @Component
-@DependsOn("springContext")
+@DependsOn("SpvitaminSpringContext")
 public class ZuulServerParameters {
 
     @Bean(name = "ZuulServerParameters")

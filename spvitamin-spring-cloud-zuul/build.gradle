@@ -76,7 +76,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Zuul
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.3.RELEASE'
 
     // javax.validation
     implementation 'javax.validation:validation-api'
@@ -88,6 +88,15 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     // Log4J
     implementation('log4j:log4j:1.2.17')
+}
+
+
+configurations.all {
+    exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-loadbalancer'
+    exclude group: 'org.springframework.cloud', module: 'spring-cloud-loadbalancer'
+    //exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-netflix-ribbon'
+    //exclude group: 'org.springframework.cloud', module: 'spring-cloud-netflix-ribbon'
+    //exclude group: 'com.netflix.ribbon', module: '*'
 }
 
 

@@ -26,7 +26,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 @Component
-@DependsOn("springContext")
+@DependsOn("SpvitaminSpringContext")
 class EurekaServerParameters
 {
 
