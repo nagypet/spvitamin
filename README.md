@@ -43,6 +43,11 @@ dependencyManagement {
 
 ## Releases
 
+### 1.3.7-RELEASE not yet released
+- Spring cloud version updated 2020.0.2 => 2020.0.5
+- Unused dependencies have been removed from spvitamin-spring-cloud-client and spvitamin-spring-general.
+- Support for Zuul and Ribbon removed as these projects have been put into maintainance modus. There is a better alternative to Zuul: Spring Cloud Gateway. Please see the wstemplate project for usage.
+
 ### 1.3.6-RELEASE 2022-01-21
 - A new LDAP setting
 - HttpLoggingFilter improved in case of INFO level

@@ -61,16 +61,10 @@ bootJar {
 
 dependencies {
     compile project(':spvitamin-spring-general')
-    compile project(':spvitamin-spring-security')
-    compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
-    // Spring
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
