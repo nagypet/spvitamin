@@ -22,8 +22,6 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-ribbon'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-zuul	'
     implementation 'hu.perit.spvitamin:spvitamin-spring-data'
     implementation 'hu.perit.spvitamin:spvitamin-spring-general'
     implementation 'hu.perit.spvitamin:spvitamin-spring-logging'

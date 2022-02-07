@@ -54,8 +54,6 @@ dependencies {
 		api project(":spvitamin-spring-cloud-client")
 		api project(":spvitamin-spring-cloud-eureka")
 		api project(":spvitamin-spring-cloud-feign")
-		api project(":spvitamin-spring-cloud-ribbon")
-		api project(":spvitamin-spring-cloud-zuul")
 		api project(":spvitamin-spring-data")
 		api project(":spvitamin-spring-general")
 		api project(":spvitamin-spring-logging")
