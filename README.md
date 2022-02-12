@@ -27,6 +27,7 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
     implementation 'hu.perit.spvitamin:spvitamin-spring-server'
