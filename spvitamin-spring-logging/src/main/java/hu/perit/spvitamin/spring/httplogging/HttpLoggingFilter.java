@@ -115,7 +115,7 @@ public class HttpLoggingFilter implements Filter
         }
 
         logMessage
-                .append(">>> HTTP REQUEST - ")
+                .append("==> HTTP REQUEST - ")
                 .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
                 .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
                 .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
@@ -136,7 +136,7 @@ public class HttpLoggingFilter implements Filter
         int httpStatus = bufferedResponse.getStatus();
 
         logMessage
-                .append("<<< HTTP RESPONSE - ")
+                .append("<== HTTP RESPONSE - ")
                 .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
                 .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
                 .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")

@@ -69,14 +69,16 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
                 AdGroupRoleMapper mapper = SpringContext.getBean(AdGroupRoleMapper.class);
                 AuthenticatedUser authenticatedUserWithRoles = mapper.mapGrantedAuthorities(authenticatedUser);
 
-                log.debug(String.format("Mapping privileges to roles for authenticated user: '%s'", authenticatedUserWithRoles.toString()));
+                log.debug(String.format("Mapping roles => privileges for authenticated user: '%s'", authenticatedUserWithRoles.toString()));
 
-                // Mapping of user privileges to roles
+                // Mapping roles => privileges
                 Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
                 AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
                         .username(authenticatedUserWithRoles.getUsername()) //
                         .authorities(privileges) //
-                        .anonymous(authenticatedUserWithRoles.isAnonymous()).build();
+                        .anonymous(authenticatedUserWithRoles.isAnonymous())
+                        .userId(authenticatedUserWithRoles.getUserId())
+                        .build();
                 log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
                 authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);

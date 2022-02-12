@@ -45,6 +45,10 @@ dependencyManagement {
 - Spring cloud version updated 2020.0.2 => 2020.0.5
 - Unused dependencies have been removed from spvitamin-spring-cloud-client and spvitamin-spring-general.
 - Support for Zuul and Ribbon removed as these projects have been put into maintainance modus. There is a better alternative to Zuul: Spring Cloud Gateway. Please see the wstemplate project for usage.
+- spvitamin-spring-cloud-feign less dependencies
+- spvitamin-spring-general less dependencies, serverparameter package moved into spvitamin-spring-admin
+- spvitamin-spring-logging: HTTP REQUEST is logged with '==>' instead of '>>>'
+- spvitamin-spring-security-authservice: AuthClient.java moved into spvitamin-spring-security-authservice-api
 
 ### 1.3.6-RELEASE 2022-01-21
 - A new LDAP setting

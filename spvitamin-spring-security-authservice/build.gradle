@@ -61,6 +61,7 @@ bootJar {
 dependencies {
     compile project(':spvitamin-spring-general')
     compile project(':spvitamin-spring-security')
+    compile project(':spvitamin-spring-security-authservice-api')
     compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok

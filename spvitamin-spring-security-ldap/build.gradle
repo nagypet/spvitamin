@@ -59,6 +59,7 @@ bootJar {
 }
 
 dependencies {
+    compile project(':spvitamin-spring-admin')
     compile project(':spvitamin-spring-security')
 
     // Lombok
