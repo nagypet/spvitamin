@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.7-RELEASE')
+    set('spvitaminVersion', '1.3.8-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.3.8-RELEASE 2022-02-13
+- spvitamin-spring-security-authservice-api includes spvitamin-spring-cloud-client and spvitamin-spring-cloud-feign as runtime dependencies
+
 
 ### 1.3.7-RELEASE 2022-02-13
 - Spring cloud version updated 2020.0.2 => 2020.0.5

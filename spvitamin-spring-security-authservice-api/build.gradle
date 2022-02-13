@@ -59,6 +59,9 @@ bootJar {
 }
 
 dependencies {
+    runtime project(':spvitamin-spring-cloud-client')
+    runtime project(':spvitamin-spring-cloud-feign')
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
