@@ -17,11 +17,15 @@
 package hu.perit.spvitamin.spring.environment;
 
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * A utility class for post processing some properties. This must be done just
@@ -52,9 +56,14 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
             try
             {
                 // Initializing a singleton object with the current Environment
-                SpringEnvironment.getInstance().setEnvironment(event.getApplicationContext().getEnvironment());
+                ConfigurableEnvironment env = event.getApplicationContext().getEnvironment();
+                SpringEnvironment.getInstance().setEnvironment(env);
 
                 KeystoreUtils.locateJksStores();
+
+                ServerExceptionProperties.setStackTraceEnabled(ErrorProperties.IncludeStacktrace.ALWAYS.name().equals(env.getProperty("server.error.includeStacktrace", "ALWAYS")));
+                RestExceptionResponse.setExceptionEnabled(Boolean.parseBoolean(env.getProperty("server.error.includeException", "true")));
+                RestExceptionResponse.setMessageEnabled(ErrorProperties.IncludeAttribute.ALWAYS.name().equals(env.getProperty("server.error.includeMessage", "ALWAYS")));
             }
             catch (RuntimeException ex)
             {

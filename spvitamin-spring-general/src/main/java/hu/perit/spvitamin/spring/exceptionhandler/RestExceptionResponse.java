@@ -83,20 +83,41 @@ import lombok.ToString;
 public class RestExceptionResponse implements JsonSerializable
 {
 
+    private static boolean myExceptionEnabled = true;
+    private static boolean myMessageEnabled = true;
+
     private Date timestamp;
     private int status;
     private Object error;
     private String path;
     private ServerExceptionProperties exception;
 	private String type;
+    private String message;
 
 
-    public RestExceptionResponse(HttpStatus status, Exception ex, String path)
+    public static void setExceptionEnabled(boolean exceptionEnabled)
+    {
+        myExceptionEnabled = exceptionEnabled;
+    }
+
+    public static void setMessageEnabled(boolean messageEnabled)
+    {
+        myMessageEnabled = messageEnabled;
+    }
+
+    public RestExceptionResponse(HttpStatus status, Throwable ex, String path)
     {
         this.timestamp = new Date();
         this.status = status.value();
         this.path = path;
-        this.exception = new ServerExceptionProperties(ex);
+        if (myExceptionEnabled)
+        {
+            this.exception = new ServerExceptionProperties(ex);
+        }
+        else if (myMessageEnabled)
+        {
+            this.message = ex.getMessage();
+        }
 
         if (ex instanceof ConstraintViolationException)
         {

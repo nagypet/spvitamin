@@ -50,6 +50,10 @@ dependencyManagement {
 - spvitamin-spring-general less dependencies, serverparameter package moved into spvitamin-spring-admin
 - spvitamin-spring-logging: HTTP REQUEST is logged with '==>' instead of '>>>'
 - spvitamin-spring-security-authservice: AuthClient.java moved into spvitamin-spring-security-authservice-api
+- enabling stack trace in error response with the standard spring way through server.error.xxx parameters
+- NPE fixed in KeystoreUtils
+- RestResponseEntityExceptionHandler refactored: RestExceptionResponseFactory introduced so that it can be used in WebFlux projects as well
+
 
 ### 1.3.6-RELEASE 2022-01-21
 - A new LDAP setting
@@ -281,7 +285,6 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | security.admin-endpoints-access          | string  | *               |                                     |             |
 | server.fqdn                              | string  | localhost       |                                     |             |
 | server.port                              | int     | 8080            |                                     |             |
-| server.stacktrace-enabled                | boolean | TRUE            |                                     |             |
 | server.ssl.enabled                       | boolean | FALSE           |                                     |             |
 | server.ssl.key-store                     | string  | -               | classpath:jks/server-keystore.jks   |             |
 | server.ssl.key-store-password            | string  | -               | changeit                            |             |
@@ -290,6 +293,9 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | server.ssl.trust-store                   | string  | -               | classpath:jks/client-truststore.jks |             |
 | server.ssl.trust-store-password          | string  | -               | changeit                            |             |
 | server.ssl.ignore-certificate-validation | boolean | FALSE           |                                     |             |
+| server.error.includeException            | boolean | TRUE            |                                     |             |
+| server.error.includeStacktrace           | string  | ALWAYS          | ALWAYS, NEVER                       |             |
+| server.error.includeMessage              | string  | ALWAYS          | ALWAYS, NEVER                       | The message part is only displayed if exception is not enabled |
 | ldaps.ad\<i\>.enabled                    | boolean | TRUE            |                                     |             |
 | ldaps.ad\<i\>.url                        | string  |                 | ldap://192.168.62.150:10389         |             |
 | ldaps.ad\<i\>.root-dn                    | string  |                 | OU=Users,DC=perit,DC=hu             |             |

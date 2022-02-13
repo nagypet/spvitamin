@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
+ * The @ResponseStatus annotation is used in hu.perit.spvitamin.spring.exceptionhandler.RestResponseEntityExceptionHandler
+ *
  * @author Peter Nagy
  */
 

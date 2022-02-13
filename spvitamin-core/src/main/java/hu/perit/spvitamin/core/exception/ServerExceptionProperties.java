@@ -16,19 +16,18 @@
 
 package hu.perit.spvitamin.core.exception;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+
+import java.lang.reflect.Constructor;
+import java.util.List;
 
 /**
  * #know-how:custom-rest-error-response
- *
+ * <p>
  * Whenever an exception is thrown, this data object will be exposed via any REST interface from server to client.
  * This conversion is necessary, because an object of type Throwable cannot be deserialized from Json.
  *
@@ -39,91 +38,114 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class ServerExceptionProperties {
+public class ServerExceptionProperties
+{
 
-	public static final String STACKTRACE_ENABLED_KEY = "server.stacktrace-enabled";
+    private static boolean myStackTraceEnabled = true;
 
-	private String message;
-	private String exceptionClass;
-	private List<String> superClasses;
-	private StackTraceElement[] stackTrace;
-	private ServerExceptionProperties cause;
+    private String message;
+    private String exceptionClass;
+    private List<String> superClasses;
+    private StackTraceElement[] stackTrace;
+    private ServerExceptionProperties cause;
 
+    public static void setStackTraceEnabled(boolean stackTraceEnabled)
+    {
+        myStackTraceEnabled = stackTraceEnabled;
+    }
 
-	public ServerExceptionProperties(Throwable exception) {
-		ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(exception);
-		this.exceptionClass = exceptionWrapper.getClassName();
-		this.superClasses = exceptionWrapper.getSuperClassNames();
-		this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
-		this.stackTrace = limitedStackTrace(exception.getStackTrace());
-		if (exception.getCause() != null) {
-			this.cause = convertCauses(exception.getCause());
-		}
-	}
-
-
-	/**
-	 * If full stack trace is not allowed, we provide only the first item, the place of exception
-	 * 
-	 * @param stackTrace
-	 * @return
-	 */
-	private static StackTraceElement[] limitedStackTrace(StackTraceElement[] stackTrace) {
-		if (isStacktraceEnabled() || stackTrace == null || stackTrace.length == 0) {
-			return stackTrace;
-		}
-
-		return new StackTraceElement[] { stackTrace[0] };
-	}
+    public ServerExceptionProperties(Throwable exception)
+    {
+        ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(exception);
+        this.exceptionClass = exceptionWrapper.getClassName();
+        this.superClasses = exceptionWrapper.getSuperClassNames();
+        this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
+        this.stackTrace = limitedStackTrace(exception.getStackTrace());
+        if (exception.getCause() != null)
+        {
+            this.cause = convertCauses(exception.getCause());
+        }
+    }
 
 
-	private static boolean isStacktraceEnabled() {
-		return Boolean.parseBoolean(System.getProperty(STACKTRACE_ENABLED_KEY, "false"));
-	}
+    /**
+     * If full stack trace is not allowed, we provide only the first item, the place of exception
+     *
+     * @param stackTrace
+     * @return
+     */
+    private static StackTraceElement[] limitedStackTrace(StackTraceElement[] stackTrace)
+    {
+        if (isStacktraceEnabled() || stackTrace == null || stackTrace.length == 0)
+        {
+            return stackTrace;
+        }
+
+        return new StackTraceElement[] { stackTrace[0] };
+    }
 
 
-	// This one is called from RestExceptionResponseDecoder
-	public Exception toException() {
-		ServerException serverException = new ServerException(this);
-		try {
-			if (serverException.instanceOf(Exception.class)) {
-				// Try to regenerate the original exception
-				Exception retval;
-				Class<?> aClass = Class.forName(this.exceptionClass); // NOSONAR
-				if (this.cause != null) {
-					Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class, Throwable.class);
-					retval = (Exception) declaredConstructor.newInstance(this.message, this.cause.toException());
-				} else {
-					Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class);
-					retval = (Exception) declaredConstructor.newInstance(this.message);
-				}
-				retval.setStackTrace(stackTrace != null ? stackTrace : new StackTraceElement[0]);
-				return retval;
-			}
-			return serverException;
-		} catch (Exception ex) {
-			// In case of any problem, we return back an instance of a ServerException
-			return serverException;
-		}
-	}
+    private static boolean isStacktraceEnabled()
+    {
+        return myStackTraceEnabled;
+    }
 
 
-	private ServerExceptionProperties(Throwable exception, ServerExceptionProperties cause) {
-		ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(exception);
-		this.exceptionClass = exceptionWrapper.getClassName();
-		this.superClasses = exceptionWrapper.getSuperClassNames();
-		this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
-		this.cause = cause;
-	}
+    // This one is called from RestExceptionResponseDecoder
+    public Exception toException()
+    {
+        ServerException serverException = new ServerException(this);
+        try
+        {
+            if (serverException.instanceOf(Exception.class))
+            {
+                // Try to regenerate the original exception
+                Exception retval;
+                Class<?> aClass = Class.forName(this.exceptionClass); // NOSONAR
+                if (this.cause != null)
+                {
+                    Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class, Throwable.class);
+                    retval = (Exception) declaredConstructor.newInstance(this.message, this.cause.toException());
+                }
+                else
+                {
+                    Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(String.class);
+                    retval = (Exception) declaredConstructor.newInstance(this.message);
+                }
+                retval.setStackTrace(stackTrace != null ? stackTrace : new StackTraceElement[0]);
+                return retval;
+            }
+            return serverException;
+        }
+        catch (Exception ex)
+        {
+            // In case of any problem, we return back an instance of a ServerException
+            return serverException;
+        }
+    }
 
 
-	private static ServerExceptionProperties convertCauses(Throwable cause) {
-		if (cause == null) {
-			return null;
-		} else {
-			ServerExceptionProperties serverExceptionProperties = new ServerExceptionProperties(cause, convertCauses(cause.getCause()));
-			serverExceptionProperties.setStackTrace(limitedStackTrace(cause.getStackTrace()));
-			return serverExceptionProperties;
-		}
-	}
+    private ServerExceptionProperties(Throwable exception, ServerExceptionProperties cause)
+    {
+        ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(exception);
+        this.exceptionClass = exceptionWrapper.getClassName();
+        this.superClasses = exceptionWrapper.getSuperClassNames();
+        this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
+        this.cause = cause;
+    }
+
+
+    private static ServerExceptionProperties convertCauses(Throwable cause)
+    {
+        if (cause == null)
+        {
+            return null;
+        }
+        else
+        {
+            ServerExceptionProperties serverExceptionProperties = new ServerExceptionProperties(cause, convertCauses(cause.getCause()));
+            serverExceptionProperties.setStackTrace(limitedStackTrace(cause.getStackTrace()));
+            return serverExceptionProperties;
+        }
+    }
 }

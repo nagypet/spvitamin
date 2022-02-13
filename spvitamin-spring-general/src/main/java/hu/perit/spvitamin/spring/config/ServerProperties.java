@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.config;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,9 @@ public class ServerProperties {
 
     @NestedConfigurationProperty
     private Ssl ssl;
+
+    @NestedConfigurationProperty
+    private final ErrorProperties error = new ErrorProperties();
 
     public String getProtocollAsString() {
         if (this.ssl == null) return "http";

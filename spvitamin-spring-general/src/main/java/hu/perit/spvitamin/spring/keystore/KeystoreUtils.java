@@ -81,10 +81,13 @@ public class KeystoreUtils
 
         // truststore
         String trustStoreRelativePath = env.getProperty(SERVER_SSL_TRUSTSTORE);
-        File trustStoreFile = KeystoreUtils.getDesignatedFileLocation(trustStoreRelativePath);
-        log.debug(String.format("'%s' => '%s'", trustStoreRelativePath, trustStoreFile.getAbsolutePath()));
-        System.setProperty(SERVER_SSL_TRUSTSTORE, trustStoreFile.getAbsolutePath());
-        System.setProperty("javax.net.ssl.trustStore", trustStoreFile.getAbsolutePath());
+        if (StringUtils.isNotBlank(trustStoreRelativePath))
+        {
+            File trustStoreFile = KeystoreUtils.getDesignatedFileLocation(trustStoreRelativePath);
+            log.debug(String.format("'%s' => '%s'", trustStoreRelativePath, trustStoreFile.getAbsolutePath()));
+            System.setProperty(SERVER_SSL_TRUSTSTORE, trustStoreFile.getAbsolutePath());
+            System.setProperty("javax.net.ssl.trustStore", trustStoreFile.getAbsolutePath());
+        }
     }
 
 

@@ -34,7 +34,7 @@ class ServerExceptionPropertiesTest {
 
     @Test
     void testWithStackTraceDisabled() {
-        System.setProperty(ServerExceptionProperties.STACKTRACE_ENABLED_KEY, "false");
+        ServerExceptionProperties.setStackTraceEnabled(false);
 
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException(new NullPointerException()));
         ServerExceptionProperties exceptionProperties = new ServerExceptionProperties(ex);
@@ -56,7 +56,7 @@ class ServerExceptionPropertiesTest {
 
     @Test
     void testWithStackTraceEnabled() {
-        System.setProperty(ServerExceptionProperties.STACKTRACE_ENABLED_KEY, "true");
+        ServerExceptionProperties.setStackTraceEnabled(true);
 
         RuntimeException ex = new RuntimeException("some problem", new RuntimeException(new NullPointerException()));
         ServerExceptionProperties exceptionProperties = new ServerExceptionProperties(ex);
@@ -94,7 +94,7 @@ class ServerExceptionPropertiesTest {
 
     @Test
     void test3() {
-        System.setProperty(ServerExceptionProperties.STACKTRACE_ENABLED_KEY, "false");
+        ServerExceptionProperties.setStackTraceEnabled(false);
 
         ServerExceptionProperties exceptionProperties = new ServerExceptionProperties(new UnexpectedConditionException());
         ServerException serverException = new ServerException(exceptionProperties);
@@ -108,7 +108,7 @@ class ServerExceptionPropertiesTest {
 
     @Test
     void test4() {
-        System.setProperty(ServerExceptionProperties.STACKTRACE_ENABLED_KEY, "true");
+        ServerExceptionProperties.setStackTraceEnabled(true);
 
         ServerExceptionProperties exceptionProperties = new ServerExceptionProperties(new UnexpectedConditionException());
         ServerException serverException = new ServerException(exceptionProperties);
