@@ -47,6 +47,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         try
         {
+            // TODO create the same response structure as in the RestExceptionResponse
             return super.handleException(ex, request);
         }
         catch (Exception e)

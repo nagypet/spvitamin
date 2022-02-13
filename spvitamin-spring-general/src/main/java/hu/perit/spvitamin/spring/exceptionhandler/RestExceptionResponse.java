@@ -16,22 +16,8 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
@@ -39,38 +25,49 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * #know-how:custom-rest-error-response
- *
- *{
- *     "timestamp": "2020-07-23 12:47:01",
- *     "status": 401,
- *     "error": "Unauthorized",
- *     "path": "uri=/authenticate",
- *     "exception": {
- *         "exceptionClass": "org.springframework.security.authentication.InsufficientAuthenticationException",
- *         "superClasses": [
- *             "org.springframework.security.authentication.InsufficientAuthenticationException",
- *             "org.springframework.security.core.AuthenticationException",
- *             "java.lang.RuntimeException",
- *             "java.lang.Exception",
- *             "java.lang.Throwable",
- *             "java.lang.Object"
- *         ],
- *         "message": "Full authentication is required to access this resource",
- *         "stackTrace": [
- *             {
- *                 "classLoaderName": "app",
- *                 "moduleName": null,
- *                 "moduleVersion": null,
- *                 "methodName": "handleSpringSecurityException",
- *                 "fileName": "ExceptionTranslationFilter.java",
- *                 "lineNumber": 189,
- *                 "className": "org.springframework.security.web.access.ExceptionTranslationFilter",
- *                 "nativeMethod": false
- *             },
- *             ...
+ * <p>
+ * {
+ * "timestamp": "2020-07-23 12:47:01",
+ * "status": 401,
+ * "error": "Unauthorized",
+ * "path": "uri=/authenticate",
+ * "exception": {
+ * "exceptionClass": "org.springframework.security.authentication.InsufficientAuthenticationException",
+ * "superClasses": [
+ * "org.springframework.security.authentication.InsufficientAuthenticationException",
+ * "org.springframework.security.core.AuthenticationException",
+ * "java.lang.RuntimeException",
+ * "java.lang.Exception",
+ * "java.lang.Throwable",
+ * "java.lang.Object"
+ * ],
+ * "message": "Full authentication is required to access this resource",
+ * "stackTrace": [
+ * {
+ * "classLoaderName": "app",
+ * "moduleName": null,
+ * "moduleVersion": null,
+ * "methodName": "handleSpringSecurityException",
+ * "fileName": "ExceptionTranslationFilter.java",
+ * "lineNumber": 189,
+ * "className": "org.springframework.security.web.access.ExceptionTranslationFilter",
+ * "nativeMethod": false
+ * },
+ * ...
  *
  * @author Peter Nagy
  */
@@ -91,7 +88,7 @@ public class RestExceptionResponse implements JsonSerializable
     private Object error;
     private String path;
     private ServerExceptionProperties exception;
-	private String type;
+    private String type;
     private String message;
 
 
@@ -138,15 +135,15 @@ public class RestExceptionResponse implements JsonSerializable
             for (FieldError fieldError : fieldErrors)
             {
                 errors.add(String.format("%s %s! Rejected value: '%s'", fieldError.getField(), fieldError.getDefaultMessage(),
-                    getRejectedValueAsText(fieldError.getRejectedValue())));
+                        getRejectedValueAsText(fieldError.getRejectedValue())));
             }
             this.error = errors;
         }
-        else if (ex instanceof ApplicationSpecificException) 
+        else if (ex instanceof ApplicationSpecificException)
         {
-			ApplicationSpecificException ase = (ApplicationSpecificException) ex;
-			this.type = ase.getType().name();
-		}
+            ApplicationSpecificException ase = (ApplicationSpecificException) ex;
+            this.type = ase.getType().name();
+        }
         else
         {
             this.error = status.getReasonPhrase();
