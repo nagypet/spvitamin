@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.5-RELEASE')
+    set('spvitaminVersion', '1.3.7-RELEASE')
 }
 
 dependencies {
@@ -42,7 +42,7 @@ dependencyManagement {
 
 ## Releases
 
-### 1.3.7-RELEASE not yet released
+### 1.3.7-RELEASE 2022-02-13
 - Spring cloud version updated 2020.0.2 => 2020.0.5
 - Unused dependencies have been removed from spvitamin-spring-cloud-client and spvitamin-spring-general.
 - Support for Zuul and Ribbon removed as these projects have been put into maintainance modus. There is a better alternative to Zuul: Spring Cloud Gateway. Please see the wstemplate project for usage.
