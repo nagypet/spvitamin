@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.8-RELEASE')
+    set('spvitaminVersion', '1.3.9-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,9 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.3.9-RELEASE 2022-03-09
+- CustomDateDeserializer, CustomLocalDateDeserializer and CustomLocalDateTimeDeserializer changed to be able to deserialize every possible date formats
 
 ### 1.3.8-RELEASE 2022-02-13
 - spvitamin-spring-security-authservice-api includes spvitamin-spring-cloud-client and spvitamin-spring-cloud-feign as runtime dependencies

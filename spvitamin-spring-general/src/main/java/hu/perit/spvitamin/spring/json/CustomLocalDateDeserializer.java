@@ -19,9 +19,16 @@ package hu.perit.spvitamin.spring.json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -31,8 +38,37 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate> {
 
     @Override
     public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        return LocalDate.parse(jp.getText());
+        if (StringUtils.isBlank(jp.getText()))
+        {
+            return null;
+        }
+
+        List<String> formats = new ArrayList<>();
+        formats.add("yyyy-MM-dd HH:mm:ss.SSS");
+        formats.add("yyyy-MM-dd HH:mm:ss");
+        formats.add("yyyy-MM-dd HH:mm");
+        formats.add("yyyy-MM-dd");
+        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        DateTimeParseException exception = null;
+        for (String format : formats) {
+            try {
+                return this.tryParseWithFormat(jp.getText(), format);
+            }
+            catch (DateTimeParseException ex) {
+                // nem sikerült parse-olni, próbáljuk a következő formátummal
+                exception = ex;
+            }
+        }
+        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid LocalDate format!", jp.getText(), LocalDateTime.class);
     }
+
+
+    private LocalDate tryParseWithFormat(String value, String format) {
+        return LocalDate.parse(value, DateTimeFormatter.ofPattern(format));
+    }
+
 
     @Override
     public Class<LocalDate> handledType() {

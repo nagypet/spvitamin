@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
@@ -34,6 +35,12 @@ public class CustomDateDeserializer extends JsonDeserializer<Date> {
 
     @Override
     public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+
+        if (StringUtils.isBlank(jp.getText()))
+        {
+            return null;
+        }
+
         try {
             return DateUtils.parseDate(jp.getText(),
                     "yyyy-MM-dd HH:mm:ss.SSS",

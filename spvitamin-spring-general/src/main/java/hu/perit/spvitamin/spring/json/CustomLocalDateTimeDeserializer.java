@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import hu.perit.spvitamin.spring.config.Constants;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Peter Nagy
@@ -38,10 +39,19 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
 
     @Override
     public LocalDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+
+        if (StringUtils.isBlank(jp.getText()))
+        {
+            return null;
+        }
+
         List<String> formats = new ArrayList<>();
-        formats.add(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT);
+        formats.add("yyyy-MM-dd HH:mm:ss.SSS");
         formats.add("yyyy-MM-dd HH:mm:ss");
         formats.add("yyyy-MM-dd HH:mm");
+        formats.add("yyyy-MM-dd");
+        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         DateTimeParseException exception = null;
         for (String format : formats) {
