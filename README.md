@@ -45,8 +45,8 @@ dependencyManagement {
 ### 1.3.11-RELEASE 2022-04-16
 - SimpleKeycloakWebSecurityConfigurerAdapter changed
 
-### 1.3.10-RELEASE 2022-04-16
-- SimpleKeycloakWebSecurityConfigurerAdapter changed
+### 1.3.10-RELEASE 2022-04-09
+- AdminProperties defaultSiteRootFileName set to empty
 
 ### 1.3.9-RELEASE 2022-03-09
 - CustomDateDeserializer, CustomLocalDateDeserializer and CustomLocalDateTimeDeserializer changed to be able to deserialize every possible date formats
