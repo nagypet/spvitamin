@@ -16,6 +16,9 @@
 
 package hu.perit.spvitamin.spring.security.keycloak;
 
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.security.auth.CustomAccessDeniedHandler;
+import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
@@ -35,10 +38,6 @@ import org.springframework.security.web.authentication.session.RegisterSessionAu
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 
-import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.security.auth.CustomAccessDeniedHandler;
-import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
-
 /**
  * @author Peter Nagy
  */
@@ -54,9 +53,9 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
     }
 
 
-    public void scope(HttpSecurity http, String... antPatterns)
+    public HttpSecurity scope(HttpSecurity http, String... antPatterns)
     {
-        http.requestMatchers().antMatchers(antPatterns);
+        return http.requestMatchers().antMatchers(antPatterns).and();
     }
 
 
@@ -69,30 +68,26 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
 
     protected void configureKeycloak(HttpSecurity http) throws Exception
     {
-        //CustomKeycloakAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(
-        //    CustomKeycloakAuthenticationEntryPoint.class);
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         SimpleHttpSecurityBuilder.newInstance(http) //
-            .allowAdditionalSecurityHeaders();
+                .allowAdditionalSecurityHeaders();
 
         http //
-            .csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher()) //
-            .and() //
-            .sessionManagement() //
-            .sessionAuthenticationStrategy(sessionAuthenticationStrategy()) //
-            .and() //
-            .addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class) //
-            .addFilterBefore(keycloakAuthenticationProcessingFilter(), LogoutFilter.class) //
-            .addFilterAfter(keycloakSecurityContextRequestFilter(), SecurityContextHolderAwareRequestFilter.class) //
-            .addFilterAfter(keycloakAuthenticatedActionsRequestFilter(), KeycloakSecurityContextRequestFilter.class) //
-            .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).accessDeniedHandler(accessDeniedHandler).and() //
-            .logout() //
-            .addLogoutHandler(keycloakLogoutHandler()) //
-            .logoutUrl("/sso/logout").permitAll() //
-            .logoutSuccessUrl("/").and() //
-            .authorizeRequests() //
-            .anyRequest().fullyAuthenticated();
+                .csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher()) //
+                .and() //
+                .sessionManagement() //
+                .sessionAuthenticationStrategy(sessionAuthenticationStrategy()) //
+                .and() //
+                .addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class) //
+                .addFilterBefore(keycloakAuthenticationProcessingFilter(), LogoutFilter.class) //
+                .addFilterAfter(keycloakSecurityContextRequestFilter(), SecurityContextHolderAwareRequestFilter.class) //
+                .addFilterAfter(keycloakAuthenticatedActionsRequestFilter(), KeycloakSecurityContextRequestFilter.class) //
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).accessDeniedHandler(accessDeniedHandler).and() //
+                .logout() //
+                .addLogoutHandler(keycloakLogoutHandler()) //
+                .logoutUrl("/sso/logout").permitAll() //
+                .logoutSuccessUrl("/");
     }
 
 
@@ -106,7 +101,7 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
 
 
     /*
-     * By Default, the Spring Security Adapter looks for a keycloak.json configuration file. You can make sure it 
+     * By Default, the Spring Security Adapter looks for a keycloak.json configuration file. You can make sure it
      * looks at the configuration provided by the Spring Boot Adapter
      */
     @Bean
@@ -128,7 +123,7 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
     // Needed because Spring Boot eagerly registers filter beans to the web application context. This prevents them being registered twice.
     @Bean
     public FilterRegistrationBean<KeycloakAuthenticationProcessingFilter> keycloakAuthenticationProcessingFilterRegistrationBean(
-        KeycloakAuthenticationProcessingFilter filter)
+            KeycloakAuthenticationProcessingFilter filter)
     {
         FilterRegistrationBean<KeycloakAuthenticationProcessingFilter> registrationBean = new FilterRegistrationBean<>(filter);
         registrationBean.setEnabled(false);
@@ -138,7 +133,7 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
     // Needed because Spring Boot eagerly registers filter beans to the web application context. This prevents them being registered twice.
     @Bean
     public FilterRegistrationBean<KeycloakPreAuthActionsFilter> keycloakPreAuthActionsFilterRegistrationBean(
-        KeycloakPreAuthActionsFilter filter)
+            KeycloakPreAuthActionsFilter filter)
     {
         FilterRegistrationBean<KeycloakPreAuthActionsFilter> registrationBean = new FilterRegistrationBean<>(filter);
         registrationBean.setEnabled(false);
@@ -148,7 +143,7 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
     // Needed because Spring Boot eagerly registers filter beans to the web application context. This prevents them being registered twice.
     @Bean
     public FilterRegistrationBean<KeycloakAuthenticatedActionsFilter> keycloakAuthenticatedActionsFilterBean(
-        KeycloakAuthenticatedActionsFilter filter)
+            KeycloakAuthenticatedActionsFilter filter)
     {
         FilterRegistrationBean<KeycloakAuthenticatedActionsFilter> registrationBean = new FilterRegistrationBean<>(filter);
         registrationBean.setEnabled(false);
@@ -158,7 +153,7 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
     // Needed because Spring Boot eagerly registers filter beans to the web application context. This prevents them being registered twice.
     @Bean
     public FilterRegistrationBean<KeycloakSecurityContextRequestFilter> keycloakSecurityContextRequestFilterBean(
-        KeycloakSecurityContextRequestFilter filter)
+            KeycloakSecurityContextRequestFilter filter)
     {
         FilterRegistrationBean<KeycloakSecurityContextRequestFilter> registrationBean = new FilterRegistrationBean<>(filter);
         registrationBean.setEnabled(false);

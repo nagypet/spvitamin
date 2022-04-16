@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.9-RELEASE')
+    set('spvitaminVersion', '1.3.11-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,12 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.3.11-RELEASE 2022-04-16
+- SimpleKeycloakWebSecurityConfigurerAdapter changed
+
+### 1.3.10-RELEASE 2022-04-16
+- SimpleKeycloakWebSecurityConfigurerAdapter changed
 
 ### 1.3.9-RELEASE 2022-03-09
 - CustomDateDeserializer, CustomLocalDateDeserializer and CustomLocalDateTimeDeserializer changed to be able to deserialize every possible date formats
