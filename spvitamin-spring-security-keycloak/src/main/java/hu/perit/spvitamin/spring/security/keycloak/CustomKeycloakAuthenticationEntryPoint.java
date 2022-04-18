@@ -16,20 +16,20 @@
 
 package hu.perit.spvitamin.spring.security.keycloak;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import hu.perit.spvitamin.spring.config.SpringContext;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.adapters.AdapterDeploymentContext;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationEntryPoint;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import hu.perit.spvitamin.spring.config.SpringContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
+@Slf4j
 public class CustomKeycloakAuthenticationEntryPoint extends KeycloakAuthenticationEntryPoint
 {
 
@@ -46,7 +46,7 @@ public class CustomKeycloakAuthenticationEntryPoint extends KeycloakAuthenticati
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-        throws IOException, ServletException
+            throws IOException, ServletException
     {
         super.commence(request, response, authException);
         HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
@@ -54,5 +54,26 @@ public class CustomKeycloakAuthenticationEntryPoint extends KeycloakAuthenticati
         {
             resolver.resolveException(request, response, null, authException);
         }
+    }
+
+
+    /**
+     * Login redirect is disabled, because of CORS restrictions the Angular frontend is not able to redirect to the
+     * Keycloak login page if the redirect comes from the backend.
+     * After one and a half day desperate research I could not fix the CORS issue.
+     *
+     * Access to XMLHttpRequest at 'http://keycloak:8180/auth/realms/perit/protocol/openid-connect/auth?response_type=code
+     * &client_id=keycloak-study-fe&redirect_uri=http%3A%2F%2Fbackend%3A9400%2Fsso%2Flogin&state=b654066f-a683-47ae-8ff4-c7a30dc95fd2&login=true&scope=openid'
+     * (redirected from 'http://backend:9400/books') from origin 'http://backend:9400' has been blocked by CORS policy:
+     * No 'Access-Control-Allow-Origin' header is present on the requested resource.
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @Override
+    protected void commenceLoginRedirect(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        log.warn("Login redirect is disabled, because of CORS restrictions!");
     }
 }

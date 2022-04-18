@@ -344,7 +344,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    private static CorsConfigurationSource corsConfigurationSource()
+    public static CorsConfigurationSource corsConfigurationSource()
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 

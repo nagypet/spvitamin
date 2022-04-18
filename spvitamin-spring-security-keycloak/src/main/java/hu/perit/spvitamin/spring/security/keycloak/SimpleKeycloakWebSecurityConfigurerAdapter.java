@@ -16,7 +16,9 @@
 
 package hu.perit.spvitamin.spring.security.keycloak;
 
+import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.auth.CustomAccessDeniedHandler;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import org.keycloak.adapters.KeycloakConfigResolver;
@@ -37,6 +39,13 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -76,9 +85,11 @@ public class SimpleKeycloakWebSecurityConfigurerAdapter extends KeycloakWebSecur
         http //
                 .csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher()) //
                 .and() //
-                .sessionManagement() //
-                .sessionAuthenticationStrategy(sessionAuthenticationStrategy()) //
-                .and() //
+                .cors().configurationSource(SimpleHttpSecurityBuilder.corsConfigurationSource())
+                .and()
+                //.sessionManagement() //
+                //.sessionAuthenticationStrategy(sessionAuthenticationStrategy()) //
+                //.and() //
                 .addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class) //
                 .addFilterBefore(keycloakAuthenticationProcessingFilter(), LogoutFilter.class) //
                 .addFilterAfter(keycloakSecurityContextRequestFilter(), SecurityContextHolderAwareRequestFilter.class) //

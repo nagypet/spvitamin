@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.11-RELEASE')
+    set('spvitaminVersion', '1.3.12-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,9 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.3.12-RELEASE 2022-04-18
+- CustomKeycloakAuthenticationEntryPoint changed: because of CORS restrictions, the login redirect is disabled
 
 ### 1.3.11-RELEASE 2022-04-16
 - SimpleKeycloakWebSecurityConfigurerAdapter changed
