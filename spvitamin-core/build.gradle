@@ -19,7 +19,6 @@ buildscript {
         lombokVersion = '1.18.8'
     }
     repositories {
-        jcenter()
         mavenCentral()
     }
 }
@@ -37,11 +36,7 @@ apply from: '../gradle/common.gradle'
 
 
 repositories {
-    jcenter()
     mavenCentral()
-    flatDir {
-        dirs '../gradle/localrepo'
-    }
 }
 
 

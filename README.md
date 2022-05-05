@@ -42,6 +42,10 @@ dependencyManagement {
 
 ## Releases
 
+### 1.3.13-RELEASE not yet released
+- jcenter removed from build.gradle
+
+
 ### 1.3.12-RELEASE 2022-04-18
 - CustomKeycloakAuthenticationEntryPoint changed: because of CORS restrictions, the login redirect is disabled
 

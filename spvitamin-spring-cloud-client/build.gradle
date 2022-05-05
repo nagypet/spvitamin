@@ -20,7 +20,6 @@ buildscript {
         springCloudVersion = '2020.0.5'
     }
     repositories {
-        jcenter()
         mavenCentral()
     }
     dependencies {
