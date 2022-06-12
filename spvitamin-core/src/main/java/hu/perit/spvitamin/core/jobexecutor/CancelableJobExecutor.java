@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.core.jobexecutor;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -23,90 +25,108 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author Peter Nagy
  */
 
 @Slf4j
-public class CancelableJobExecutor<T> extends ThreadPoolExecutor {
+public class CancelableJobExecutor<T> extends ThreadPoolExecutor
+{
 
     // A sorbanálló job-ok
     protected FutureMap<T> futureMap = new FutureMap<>();
 
 
-    public CancelableJobExecutor(int poolSize) {
+    public CancelableJobExecutor(int poolSize)
+    {
         super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     }
 
 
     @Override
-    protected synchronized void beforeExecute(Thread t, Runnable r) {
+    protected synchronized void beforeExecute(Thread t, Runnable r)
+    {
+        log.debug("beforeExecute({}, {})", t, r);
         super.beforeExecute(t, r);
-        if (r instanceof Future<?>) {
+        if (r instanceof Future<?>)
+        {
             Future<?> future = (Future<?>) r;
             T id = this.futureMap.get(future);
-            if (id != null) {
-                log.debug(String.format("Job %s has started!", id.toString()));
+            if (id != null)
+            {
+                log.debug("beforeExecute(): Job {} has started!", id.toString());
             }
-            else {
-                throw new UnexpectedConditionException();
+            else
+            {
+                log.error("beforeExecute(): Future is not in the futureMap!");
             }
         }
     }
 
 
     @Override
-    protected synchronized void afterExecute(Runnable r, Throwable t) {
+    protected synchronized void afterExecute(Runnable r, Throwable t)
+    {
+        log.debug("afterExecute({}, {})", r, t);
         super.afterExecute(r, t);
 
-        if (t == null && r instanceof Future<?>) {
+        if (t == null && r instanceof Future<?>)
+        {
             Future<?> future = (Future<?>) r;
-            try {
+            try
+            {
                 future.get();
             }
-            catch (CancellationException ce) {
+            catch (CancellationException ce)
+            {
                 t = ce;
             }
-            catch (ExecutionException ee) {
+            catch (ExecutionException ee)
+            {
                 t = ee.getCause();
             }
-            catch (InterruptedException ie) {
+            catch (InterruptedException ie)
+            {
                 Thread.currentThread().interrupt(); // ignore/reset
             }
-            finally {
+            finally
+            {
                 T id = this.futureMap.get(future);
-                if (id != null) {
-                    log.debug(String.format("Job %s has terminated!", id.toString()));
+                if (id != null)
+                {
+                    log.debug("afterExecute(): Job {} has terminated!", id.toString());
 
-                    if (this.futureMap.contains(id)) {
+                    if (this.futureMap.contains(id))
+                    {
                         this.futureMap.remove(id);
                     }
                 }
-                else {
-                    log.error("Map of futures is inconsistant! You should consider a restart...");
-                }
             }
         }
-        if (t != null) {
+        if (t != null)
+        {
             log.error(t.toString());
         }
     }
 
 
-    public synchronized void cancelJob(T id) {
-        //log.debug(String.format("cancelJob(%d)", id));
-        if (this.futureMap.contains(id)) {
+    public synchronized boolean cancelJob(T id)
+    {
+        log.debug("cancelJob({})", id.toString());
+        if (this.futureMap.contains(id))
+        {
             Future<?> future = this.futureMap.get(id);
-            if (!future.isDone()) {
+            if (!future.isDone())
+            {
+                log.debug("Job {} will be cancelled!", id.toString());
                 future.cancel(true);
                 this.purge();
             }
+            this.futureMap.remove(id);
+            return true;
         }
-        else {
-            throw new JobNotFoundException(String.format("There is no job with id %s", id.toString()));
-        }
+
+        log.info("cancelJob({}): Job not found!", id.toString());
+        return false;
     }
 }
