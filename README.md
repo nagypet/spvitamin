@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.12-RELEASE')
+    set('spvitaminVersion', '1.3.13-RELEASE')
 }
 
 dependencies {
@@ -42,8 +42,9 @@ dependencyManagement {
 
 ## Releases
 
-### 1.3.13-RELEASE not yet released
+### 1.3.13-RELEASE 2022-06-12
 - jcenter removed from build.gradle
+- CancelableJobExecutor fixes
 
 
 ### 1.3.12-RELEASE 2022-04-18
