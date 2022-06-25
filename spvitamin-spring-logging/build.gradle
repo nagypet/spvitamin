@@ -54,6 +54,7 @@ bootJar {
 
 dependencies {
 	compile project(':spvitamin-core')
+    compile project(':spvitamin-spring-security')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -62,11 +63,16 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 	
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-core'
+
+    // Aspectj
+    runtimeOnly 'org.aspectj:aspectjrt:1.9.9.1'
+    implementation 'org.aspectj:aspectjweaver:1.9.9.1'
 
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

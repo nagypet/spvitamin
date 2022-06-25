@@ -16,16 +16,29 @@
 
 package hu.perit.spvitamin.spring.httplogging;
 
+import hu.perit.spvitamin.spring.logging.ObjectLogger;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 @Slf4j
-class LoggingHelper
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class LoggingHelper
 {
+    private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
+            "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
+
     private static final Set<String> HEADER_NAMES_TO_HIDE = Set.of("password");
     private static final Set<String> HEADER_NAMES_TO_ABBREVIATE = Set.of("authorization");
 
@@ -87,5 +100,95 @@ class LoggingHelper
         {
             return headerValue;
         }
+    }
+
+    public static String getClientIpAddr(HttpServletRequest httpRequest)
+    {
+        try
+        {
+            for (String ipHeader : IP_HEADERS)
+            {
+                String ip = httpRequest.getHeader(ipHeader);
+                if (ip != null && !ip.isEmpty() && !ip.equalsIgnoreCase("unknown"))
+                {
+                    if (ipHeader.equalsIgnoreCase("X-Forwarded-For"))
+                    {
+                        // X-Forwarded-For: <client>, <proxy1>, <proxy2>
+                        // If a request goes through multiple proxies, the IP addresses of each successive proxy is listed.
+                        // This means, the right-most IP address is the IP address of the most recent proxy and
+                        // the left-most IP address is the IP address of the originating client.
+                        String[] clients = ip.split(",");
+                        if (clients != null && clients.length > 0)
+                        {
+                            return clients[0];
+                        }
+                    }
+                    return ip;
+                }
+            }
+            return httpRequest.getRemoteAddr();
+        }
+        catch (IllegalStateException ex)
+        {
+            return "";
+        }
+    }
+
+
+    public static String getHostName()
+    {
+        String hostname = System.getenv("HOSTNAME");
+        if (hostname != null)
+        {
+            return hostname;
+        }
+
+        String computerName = System.getenv("COMPUTERNAME");
+        if (computerName != null)
+        {
+            return computerName;
+        }
+
+        return null;
+    }
+
+
+    @Data
+    private static class Argument
+    {
+        private final String name;
+        private final Object value;
+    }
+
+    public static String getSubject(List<String> argNames, Object[] args)
+    {
+        if (args == null || args.length == 0)
+        {
+            return "";
+        }
+        else
+        {
+            StringJoiner joiner = new StringJoiner(", ", "{", "}");
+            for (int i = 0; i < args.length; i++)
+            {
+                Object object = args[i];
+                if (i < argNames.size())
+                {
+                    String s = quoted(argNames.get(i)) + ":" + ObjectLogger.toString(object);
+                    joiner.add(s);
+                }
+                else
+                {
+                    String s = ObjectLogger.toString(object);
+                    joiner.add(s);
+                }
+            }
+            return joiner.toString();
+        }
+    }
+
+    private static String quoted(String s)
+    {
+        return "\"" + s + "\"";
     }
 }

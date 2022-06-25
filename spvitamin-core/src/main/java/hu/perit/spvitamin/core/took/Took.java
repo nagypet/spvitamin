@@ -64,6 +64,13 @@ public class Took implements AutoCloseable
         this.methodName = getCallingMethodName(method, "");
     }
 
+    public Took(Method method, boolean logAtClose)
+    {
+        this.startTimeMillis = System.currentTimeMillis();
+        this.logAtClose = logAtClose;
+        this.methodName = getCallingMethodName(method, "");
+    }
+
     public Took(Method method, String context)
     {
         this.startTimeMillis = System.currentTimeMillis();

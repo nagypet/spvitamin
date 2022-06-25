@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.logging;
 
+import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,6 +35,23 @@ public class LogEvent
     private int eventId;
     private String eventText;
     private String parameters;
+
+    public static LogEvent of(String traceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn)
+    {
+        LogEvent logEvent = new LogEvent();
+        logEvent.setEventTime(LocalDateTime.now());
+        logEvent.setDirectionInput(isDirectionIn);
+        logEvent.setClientIpAddr(ipAddress);
+        logEvent.setTraceId(traceId);
+        logEvent.setUser(username);
+        logEvent.setHostName(hostname);
+        logEvent.setSubsystemName(subsystem);
+        logEvent.setEventId(eventID);
+        logEvent.setEventText(eventText);
+        logEvent.setParameters(subject);
+
+        return logEvent;
+    }
 
     @Override
     public String toString()

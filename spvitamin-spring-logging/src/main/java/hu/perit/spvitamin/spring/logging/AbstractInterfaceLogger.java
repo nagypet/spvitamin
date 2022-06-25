@@ -17,13 +17,12 @@
 package hu.perit.spvitamin.spring.logging;
 
 import hu.perit.spvitamin.core.event.Event;
+import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -33,13 +32,14 @@ import java.util.stream.Collectors;
  * @author Peter Nagy
  */
 
+/**
+ * Use @LoggedRestMethod annotation instead
+ */
 @Slf4j
+@Deprecated
 public abstract class AbstractInterfaceLogger
 {
     public static final Event<LogEvent> LOG_EVENT = new Event<>();
-
-    private static final List<String> IP_HEADERS = Arrays.asList("X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
-            "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
 
     protected HttpServletRequest httpRequest;
 
@@ -109,17 +109,7 @@ public abstract class AbstractInterfaceLogger
 
     protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        LogEvent logEvent = new LogEvent();
-        logEvent.setEventTime(LocalDateTime.now());
-        logEvent.setDirectionInput(isDirectionIn);
-        logEvent.setClientIpAddr(this.getClientIpAddr());
-        logEvent.setTraceId(processID);
-        logEvent.setUser(user);
-        logEvent.setHostName(this.getHostName());
-        logEvent.setSubsystemName(this.getSubsystemName());
-        logEvent.setEventId(eventID);
-        logEvent.setEventText(eventText);
-        logEvent.setParameters(subject);
+        LogEvent logEvent = LogEvent.of(processID, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn);
 
         // Place to forward the event log entry to a log server
         LOG_EVENT.fire(logEvent);
@@ -130,52 +120,13 @@ public abstract class AbstractInterfaceLogger
 
     public String getHostName()
     {
-        String hostname = System.getenv("HOSTNAME");
-        if (hostname != null)
-        {
-            return hostname;
-        }
-
-        String computerName = System.getenv("COMPUTERNAME");
-        if (computerName != null)
-        {
-            return computerName;
-        }
-
-        return null;
+        return LoggingHelper.getHostName();
     }
 
 
     public String getClientIpAddr()
     {
-        try
-        {
-            for (String ipHeader : IP_HEADERS)
-            {
-                String ip = this.httpRequest.getHeader(ipHeader);
-                if (ip != null && !ip.isEmpty() && !ip.equalsIgnoreCase("unknown"))
-                {
-                    if (ipHeader.equalsIgnoreCase("X-Forwarded-For"))
-                    {
-                        // X-Forwarded-For: <client>, <proxy1>, <proxy2>
-                        // If a request goes through multiple proxies, the IP addresses of each successive proxy is listed.
-                        // This means, the right-most IP address is the IP address of the most recent proxy and
-                        // the left-most IP address is the IP address of the originating client.
-                        String[] clients = ip.split(",");
-                        if (clients != null && clients.length > 0)
-                        {
-                            return clients[0];
-                        }
-                    }
-                    return ip;
-                }
-            }
-            return this.httpRequest.getRemoteAddr();
-        }
-        catch (IllegalStateException ex)
-        {
-            return "";
-        }
+        return LoggingHelper.getClientIpAddr(this.httpRequest);
     }
 
 

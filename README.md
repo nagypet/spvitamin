@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.13-RELEASE')
+    set('spvitaminVersion', '1.4.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,11 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.4.0-RELEASE not yet released
+- ObjectLogger
+- @LoggedRestMethod annotation, which triggers an aspect for a good quality logging of the interface methods. 
+
 
 ### 1.3.13-RELEASE 2022-06-12
 - jcenter removed from build.gradle

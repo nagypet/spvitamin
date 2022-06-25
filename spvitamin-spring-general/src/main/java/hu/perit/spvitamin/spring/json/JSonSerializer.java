@@ -85,12 +85,12 @@ public final class JSonSerializer
         return yamlMapper;
     }
 
-	protected enum MapperType
+	public enum MapperType
 	{
 		JSON, YAML
 	}
 
-	protected static ObjectMapper createMapper(MapperType type)
+	public static ObjectMapper createMapper(MapperType type)
 	{
 		ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -100,6 +100,7 @@ public final class JSonSerializer
 		SimpleModule module = new SimpleModule();
 		module.addSerializer(new CustomLocalDateSerializer());
 		module.addSerializer(new CustomLocalDateTimeSerializer());
+		module.addSerializer(new CustomMultipartFileSerializer());
 		module.addDeserializer(Date.class, new CustomDateDeserializer());
 		module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
 		module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
