@@ -45,6 +45,7 @@ dependencyManagement {
 ### 1.4.0-RELEASE not yet released
 - ObjectLogger
 - @LoggedRestMethod annotation, which triggers an aspect for a good quality logging of the interface methods. 
+- AsyncAutoConfiguration, AsyncProperties
 
 
 ### 1.3.13-RELEASE 2022-06-12
@@ -330,6 +331,10 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | ldaps.ad\<i\>.domain                     | string  |                 | perit.hu                            |             |
 | ldaps.ad\<i\>.connect-timeout-ms         | int     | 1000            |                                     |             |
 | ldaps.ad\<i\>.bind-user-pattern          | string  |                 | uid={0},ou=Users,dc=perit,dc=hu     |             |
+| async.core-pool-size                     | int     | 10              |                                     |             |
+| async.max-pool-size                      | int     | 100             |                                     |             |
+| async.queue-capacity                     | int     | 1000            |                                     |             |
+| async.thread-name-prefix                 | string  | async-          |                                     |             |
 
 
 ## Dependency graph
