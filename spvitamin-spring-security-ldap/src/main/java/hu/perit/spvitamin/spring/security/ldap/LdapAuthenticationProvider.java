@@ -18,15 +18,21 @@ package hu.perit.spvitamin.spring.security.ldap;
 
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
+import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
+import org.springframework.core.log.LogMessage;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.authentication.AbstractLdapAuthenticationProvider;
@@ -137,6 +143,39 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         this.domain = StringUtils.hasText(domain) ? domain.toLowerCase() : null;
         this.url = url;
         rootDn = this.domain == null ? null : rootDnFromDomain(this.domain);
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws org.springframework.security.core.AuthenticationException {
+        Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
+                () -> this.messages.getMessage("LdapAuthenticationProvider.onlySupports",
+                        "Only UsernamePasswordAuthenticationToken is supported"));
+        UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
+        String username = userToken.getName();
+        String password = (String) authentication.getCredentials();
+        this.logger.debug(LogMessage.format("Processing authentication request for user: %s", username));
+        if (!StringUtils.hasLength(username)) {
+            throw new BadCredentialsException(
+                    this.messages.getMessage("LdapAuthenticationProvider.emptyUsername", "Empty Username"));
+        }
+        if (!StringUtils.hasLength(password)) {
+            throw new BadCredentialsException(
+                    this.messages.getMessage("AbstractLdapAuthenticationProvider.emptyPassword", "Empty Password"));
+        }
+        Assert.notNull(password, "Null password was supplied in authentication token");
+        DirContextOperations userData = doAuthentication(userToken);
+        UserDetails user = this.userDetailsContextMapper.mapUserFromContext(userData, authentication.getName(),
+                loadUserAuthorities(userData, authentication.getName(), (String) authentication.getCredentials()));
+        return createSuccessfulAuthentication(userToken, user);
+    }
+
+    protected Authentication createSuccessfulAuthentication(UsernamePasswordAuthenticationToken authentication,
+                                                            UserDetails user) {
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+        LdapAuthenticationToken result = new LdapAuthenticationToken(user, authentication.getCredentials(),
+                authoritiesMapper.mapAuthorities(user.getAuthorities()), url);
+        result.setDetails(authentication.getDetails());
+        return result;
     }
 
     @Override
