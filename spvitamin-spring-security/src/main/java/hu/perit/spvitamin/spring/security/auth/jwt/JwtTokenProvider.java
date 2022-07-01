@@ -27,6 +27,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -61,7 +62,7 @@ public class JwtTokenProvider {
                     .addClaims(additionalClaims)
                     .signWith(SignatureAlgorithm.RS512, privateKey);
 
-            if(!ldapUrl.isEmpty()){
+            if(!StringUtils.isEmpty(ldapUrl)){
                 jwtBuilder.claim("ldapUrl", ldapUrl);
             }
 
