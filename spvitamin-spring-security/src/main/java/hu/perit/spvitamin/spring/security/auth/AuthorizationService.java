@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth;
 import java.security.Principal;
 import java.util.Collections;
 
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -109,12 +110,8 @@ public class AuthorizationService
     }
 
     private String calculateUrl(Authentication authentication){
-        if(authentication.getName().equals("admin") || authentication.getName().equals("viewer") || authentication.getName().equals("editor")) {
-            return "Nem AD user";
-        }
-
-        if(!(authentication instanceof LdapAuthenticationToken)){
-            return "";
+        if(! (authentication instanceof LdapAuthenticationToken)) {
+            return "Not an AD user";
         }
 
         return ((LdapAuthenticationToken)authentication).getUrl();

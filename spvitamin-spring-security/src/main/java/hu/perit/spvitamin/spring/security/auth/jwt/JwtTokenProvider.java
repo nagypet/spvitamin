@@ -20,6 +20,7 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,15 +54,18 @@ public class JwtTokenProvider {
             Date iat = Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant());
             Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
-            String jwt = Jwts.builder()
+            JwtBuilder jwtBuilder = Jwts.builder()
                     .setSubject(subject)
                     .setIssuedAt(iat)
                     .setExpiration(exp)
                     .addClaims(additionalClaims)
-                    .signWith(SignatureAlgorithm.RS512, privateKey)
-                    .claim("ldapUrl", ldapUrl)
-                    .compact();
+                    .signWith(SignatureAlgorithm.RS512, privateKey);
 
+            if(!ldapUrl.isEmpty()){
+                jwtBuilder.claim("ldapUrl", ldapUrl);
+            }
+
+            String jwt = jwtBuilder.compact();
             return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
         }
         catch (Exception e) {
