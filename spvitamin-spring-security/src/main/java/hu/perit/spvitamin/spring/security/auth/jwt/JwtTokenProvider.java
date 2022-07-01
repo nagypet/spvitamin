@@ -20,7 +20,6 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,7 +44,7 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    public AuthorizationToken generateToken(String subject, Claims additionalClaims, String ldapUrl) {
+    public AuthorizationToken generateToken(String subject, Claims additionalClaims) {
         try {
             LocalDateTime issuedAt = LocalDateTime.now();
             LocalDateTime expiryDate = issuedAt.plusMinutes(jwtProperties.getExpirationInMinutes());
@@ -54,18 +53,14 @@ public class JwtTokenProvider {
             Date iat = Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant());
             Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
-            JwtBuilder jwtBuilder = Jwts.builder()
+            String jwt = Jwts.builder()
                     .setSubject(subject)
                     .setIssuedAt(iat)
                     .setExpiration(exp)
                     .addClaims(additionalClaims)
-                    .signWith(SignatureAlgorithm.RS512, privateKey);
+                    .signWith(SignatureAlgorithm.RS512, privateKey)
+                    .compact();
 
-            if(!ldapUrl.isEmpty()){
-                jwtBuilder.claim("ldapUrl", ldapUrl);
-            }
-
-            String jwt = jwtBuilder.compact();
             return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
         }
         catch (Exception e) {

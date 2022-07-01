@@ -72,7 +72,7 @@ class JwtTokenProviderTest
         log.debug("testValidToken()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN")), "ldapUrl"));
 
         TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 
@@ -88,7 +88,7 @@ class JwtTokenProviderTest
         log.debug("testInvalidToken()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN")), "ldapUrl"));
         Assertions.assertThrows(JwtException.class, () -> this.jwtTokenProvider.getClaims(token.getJwt().substring(2)));
     }
 
@@ -97,16 +97,18 @@ class JwtTokenProviderTest
 
         private static final String ROLES = "rls";
         private static final String USERID = "uid";
+        private static final String LDAP = "ldap";
 
         public SpecialTokenClaims(Claims claims)
         {
             super(claims);
         }
 
-        public SpecialTokenClaims(long userId, Collection<? extends GrantedAuthority> authorities)
+        public SpecialTokenClaims(long userId, Collection<? extends GrantedAuthority> authorities, String ldapUrl)
         {
             this.setUserId(userId);
             this.setAuthorities(authorities);
+            this.setLdapUrl(ldapUrl);
         }
 
         public long getUserId()
@@ -137,6 +139,10 @@ class JwtTokenProviderTest
             this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
         }
 
+        public void setLdapUrl(String ldapUrl)
+        {
+            this.put(LDAP, ldapUrl);
+        }
     }
 
     @Test
@@ -146,7 +152,7 @@ class JwtTokenProviderTest
         log.debug("testSpecializedTokenClaim()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+            new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN")), "ldapUrl"));
 
         SpecialTokenClaims claims = new SpecialTokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 
