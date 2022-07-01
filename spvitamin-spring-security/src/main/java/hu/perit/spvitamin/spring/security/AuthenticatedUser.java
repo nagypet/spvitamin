@@ -40,6 +40,7 @@ public class AuthenticatedUser implements UserDetails
     private Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
     private boolean anonymous = true;
+    private String ldapUrl;
 
     @Override
     public String getPassword()

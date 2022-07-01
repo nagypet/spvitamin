@@ -44,9 +44,9 @@ public class AuthorizationService
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
 
-        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken( //
+        LdapAuthenticationToken newAuthentication = new LdapAuthenticationToken( //
             authenticatedUser, // 
-            null, authenticatedUser.getAuthorities());
+            null, authenticatedUser.getAuthorities(), authenticatedUser.getLdapUrl());
         newAuthentication.setDetails(authentication.getDetails());
         SecurityContextHolder.getContext().setAuthentication(newAuthentication);
     }
@@ -70,7 +70,9 @@ public class AuthorizationService
 
         if (principal instanceof AuthenticatedUser)
         {
-            return (AuthenticatedUser) principal;
+            AuthenticatedUser user = (AuthenticatedUser) principal;
+            user.setLdapUrl(calculateUrl(authentication));
+            return user;
         }
         else if (principal instanceof UserDetails)
         {
@@ -79,6 +81,7 @@ public class AuthorizationService
                 .authorities(((UserDetails) principal).getAuthorities()) //
                 .userId(-1) //
                 .anonymous(false) //
+                .ldapUrl(calculateUrl(authentication))
                 .build();
         }
         else if (principal instanceof String)
@@ -103,5 +106,17 @@ public class AuthorizationService
 
         throw new AuthorizationException(
             String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
+    }
+
+    private String calculateUrl(Authentication authentication){
+        if(authentication.getName().equals("admin") || authentication.getName().equals("viewer") || authentication.getName().equals("editor")) {
+            return "Nem AD user";
+        }
+
+        if(!(authentication instanceof LdapAuthenticationToken)){
+            return "";
+        }
+
+        return ((LdapAuthenticationToken)authentication).getUrl();
     }
 }
