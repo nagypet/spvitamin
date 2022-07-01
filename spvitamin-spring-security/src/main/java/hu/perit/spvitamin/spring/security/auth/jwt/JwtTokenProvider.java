@@ -44,7 +44,7 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    public AuthorizationToken generateToken(String subject, Claims additionalClaims) {
+    public AuthorizationToken generateToken(String subject, Claims additionalClaims, String ldapUrl) {
         try {
             LocalDateTime issuedAt = LocalDateTime.now();
             LocalDateTime expiryDate = issuedAt.plusMinutes(jwtProperties.getExpirationInMinutes());
@@ -59,6 +59,7 @@ public class JwtTokenProvider {
                     .setExpiration(exp)
                     .addClaims(additionalClaims)
                     .signWith(SignatureAlgorithm.RS512, privateKey)
+                    .claim("ldapUrl", ldapUrl)
                     .compact();
 
             return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
