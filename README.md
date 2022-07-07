@@ -47,6 +47,8 @@ dependencyManagement {
 - @LoggedRestMethod annotation, which triggers an aspect for a good quality logging of the interface methods. 
 - AsyncAutoConfiguration, AsyncProperties
 - LDAP URL is set to the AuthenticatedUser object, from where the authentication succeeded
+- CancelableJobExecutor improved
+- ServerException instanceOf() fixed
 
 
 ### 1.3.13-RELEASE 2022-06-12

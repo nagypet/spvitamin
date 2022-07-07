@@ -19,6 +19,7 @@ package hu.perit.spvitamin.core.exception;
 import java.lang.annotation.Annotation;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -217,5 +218,14 @@ class ExceptionWrapperTest {
         }
 
         Assertions.assertTrue(annotations2.length > 0);
+    }
+
+    @Test
+    void testExecutionException()
+    {
+        ExecutionException ex = new ExecutionException(new ServerException(new NullPointerException()));
+        ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
+        Assertions.assertTrue(exceptionWrapper.causedBy("java.lang.NullPointerException"));
+        Assertions.assertFalse(exceptionWrapper.causedBy("something"));
     }
 }

@@ -46,7 +46,6 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
     @Override
     protected synchronized void beforeExecute(Thread t, Runnable r)
     {
-        log.debug("beforeExecute({}, {})", t, r);
         super.beforeExecute(t, r);
         if (r instanceof Future<?>)
         {
@@ -54,12 +53,16 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             T id = this.futureMap.get(future);
             if (id != null)
             {
-                log.debug("beforeExecute(): Job {} has started!", id.toString());
+                log.debug("beforeExecute({}, {}): Job {} has started! Running jobs: {}", t, r, id.toString(), this.futureMap.size());
             }
             else
             {
-                log.error("beforeExecute(): Future is not in the futureMap!");
+                log.error("beforeExecute({}, {}): Future is not in the futureMap!", t, r);
             }
+        }
+        else
+        {
+            log.error("beforeExecute - non Future({}, {})", t, r);
         }
     }
 
@@ -94,12 +97,11 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                 T id = this.futureMap.get(future);
                 if (id != null)
                 {
-                    log.debug("afterExecute(): Job {} has terminated!", id.toString());
-
                     if (this.futureMap.contains(id))
                     {
                         this.futureMap.remove(id);
                     }
+                    log.debug("afterExecute(): Job {} has terminated! Running jobs: {}", id.toString(), this.futureMap.size());
                 }
             }
         }
@@ -123,6 +125,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                 this.purge();
             }
             this.futureMap.remove(id);
+            log.debug("Running jobs: {}", this.futureMap.size());
             return true;
         }
 

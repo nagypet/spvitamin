@@ -16,41 +16,45 @@
 
 package hu.perit.spvitamin.core.exception;
 
+import lombok.Getter;
+
 import java.lang.annotation.Annotation;
 import java.util.List;
-
-import lombok.Getter;
+import java.util.Objects;
 
 /**
  * #know-how:custom-rest-error-response
- *
+ * <p>
  * ServerException has two roles:
  * 1.) A checked exception can be wrapped in it. You can still use the method instanceOf() to check if the wrapped
- *     exception is of a given type.
+ * exception is of a given type.
  * 2.) When using a Feign client the exception from the server will be decoded and if possible regenerated on the
- *     client side. See: hu.perit.wstemplate.feignclient.RestExceptionResponseDecoder. However if the type of the server exception
- *     is not known on the client side, e.g. because some dependencies are not available, the original server-side
- *     exception will be converted to an instance of ServerException. This is typically the case with some low-level
- *     database exceptions which do not exist on the client side, but may be included in the cause-chain of a server exception.
+ * client side. See: hu.perit.wstemplate.feignclient.RestExceptionResponseDecoder. However if the type of the server exception
+ * is not known on the client side, e.g. because some dependencies are not available, the original server-side
+ * exception will be converted to an instance of ServerException. This is typically the case with some low-level
+ * database exceptions which do not exist on the client side, but may be included in the cause-chain of a server exception.
  *
  * @author Peter Nagy
  */
 
 
 @Getter
-public class ServerException extends RuntimeException implements ServerExceptionInterface {
+public class ServerException extends RuntimeException implements ServerExceptionInterface
+{
 
-	private static final long serialVersionUID = 2272746029581472203L;
-	
-	private final String className;
+    private static final long serialVersionUID = 2272746029581472203L;
+
+    private final String className;
     private final List<String> superClassNames;
 
-    public static <T> T throwFrom(Throwable ex) {
+    public static <T> T throwFrom(Throwable ex)
+    {
         throw new ServerException(ex);
     }
 
     // This is for converting a checked exception into a ServerException
-    ServerException(Throwable ex) {
+    ServerException(Throwable ex)
+    {
         super(ex.getMessage(), ex.getCause());
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
         this.className = exceptionWrapper.getClassName();
@@ -58,14 +62,16 @@ public class ServerException extends RuntimeException implements ServerException
         this.safeSetStackTrace(ex.getStackTrace());
     }
 
-    ServerException(ServerExceptionProperties exceptionProperties) {
+    ServerException(ServerExceptionProperties exceptionProperties)
+    {
         super(exceptionProperties.getMessage(), convertCauses(exceptionProperties.getCause()));
         this.className = exceptionProperties.getExceptionClass();
         this.superClassNames = exceptionProperties.getSuperClasses();
         this.safeSetStackTrace(exceptionProperties.getStackTrace());
     }
 
-    private ServerException(ServerExceptionProperties exceptionProperties, ServerException cause) {
+    private ServerException(ServerExceptionProperties exceptionProperties, ServerException cause)
+    {
         super(exceptionProperties.getMessage(), cause);
         this.className = exceptionProperties.getExceptionClass();
         this.superClassNames = exceptionProperties.getSuperClasses();
@@ -74,41 +80,68 @@ public class ServerException extends RuntimeException implements ServerException
 
 
     @Override
-    public boolean instanceOf(Class<? extends Throwable> anExceptionClass) {
-        return this.superClassNames.contains(anExceptionClass.getName());
+    public boolean instanceOf(Class<? extends Throwable> anExceptionClass)
+    {
+        Objects.requireNonNull(anExceptionClass);
+        if (anExceptionClass.getName().equalsIgnoreCase(this.className))
+        {
+            return true;
+        }
+        if (this.superClassNames != null)
+        {
+            return this.superClassNames.contains(anExceptionClass.getName());
+        }
+        return false;
     }
 
 
     @Override
-    public boolean instanceOf(String anExceptionClassName) {
-        return this.superClassNames.contains(anExceptionClassName);
+    public boolean instanceOf(String anExceptionClassName)
+    {
+        Objects.requireNonNull(anExceptionClassName);
+        if (anExceptionClassName.equalsIgnoreCase(this.className))
+        {
+            return true;
+        }
+        if (this.superClassNames != null)
+        {
+            return this.superClassNames.contains(anExceptionClassName);
+        }
+        return false;
     }
 
 
     @Override
-    public Annotation[] getAnnotations() {
-        try {
+    public Annotation[] getAnnotations()
+    {
+        try
+        {
             return Class.forName(this.className).getAnnotations(); // NOSONAR
         }
-        catch (ClassNotFoundException e) {
+        catch (ClassNotFoundException e)
+        {
             return new Annotation[0];
         }
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         String s = this.className;
         String message = getLocalizedMessage();
         return (message != null) ? (s + ": " + message) : s;
     }
 
 
-    private static ServerException convertCauses(ServerExceptionProperties cause) {
-        if (cause == null) {
+    private static ServerException convertCauses(ServerExceptionProperties cause)
+    {
+        if (cause == null)
+        {
             return null;
         }
-        else {
+        else
+        {
             ServerException serverException = new ServerException(cause, convertCauses(cause.getCause()));
             serverException.safeSetStackTrace(cause.getStackTrace());
             return serverException;
@@ -116,7 +149,8 @@ public class ServerException extends RuntimeException implements ServerException
     }
 
 
-    private void safeSetStackTrace(StackTraceElement[] stackTrace) {
+    private void safeSetStackTrace(StackTraceElement[] stackTrace)
+    {
         this.setStackTrace(stackTrace != null ? stackTrace : new StackTraceElement[0]);
     }
 }

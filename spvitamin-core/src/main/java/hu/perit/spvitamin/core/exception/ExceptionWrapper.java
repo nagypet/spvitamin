@@ -19,7 +19,11 @@ package hu.perit.spvitamin.core.exception;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -29,49 +33,58 @@ import java.util.stream.Collectors;
  */
 
 
-public class ExceptionWrapper implements ServerExceptionInterface {
+public class ExceptionWrapper implements ServerExceptionInterface
+{
 
     private final Throwable exception;
 
-    public static ExceptionWrapper of(Throwable exception) {
+    public static ExceptionWrapper of(Throwable exception)
+    {
         return new ExceptionWrapper(exception);
     }
 
 
-    private ExceptionWrapper(Throwable exception) {
+    private ExceptionWrapper(Throwable exception)
+    {
         Objects.requireNonNull(exception, "Constructor parameter cannot be null!");
         this.exception = exception;
     }
 
 
-    public Throwable getRootCause() {
+    public Throwable getRootCause()
+    {
         return getRootCause(this.exception);
     }
 
 
-    public boolean causedBy(Class<? extends Throwable> anExceptionClass) {
+    public boolean causedBy(Class<? extends Throwable> anExceptionClass)
+    {
         return causedBy(this.exception, anExceptionClass, null);
     }
 
 
-    public boolean causedBy(String anExceptionClassName) {
+    public boolean causedBy(String anExceptionClassName)
+    {
         return causedBy(this.exception, anExceptionClassName, null);
     }
 
 
-    public boolean causedBy(Class<? extends Throwable> anExceptionClass, String messageStart) {
+    public boolean causedBy(Class<? extends Throwable> anExceptionClass, String messageStart)
+    {
         return causedBy(this.exception, anExceptionClass, messageStart);
     }
 
 
-    public String toStringWithCauses() {
+    public String toStringWithCauses()
+    {
         StringBuilder sb = new StringBuilder();
         sb.append(removeLineSeparators(this.exception.toString()));
 
         List<Throwable> causes = getAllCauses(this.exception);
         Collections.reverse(causes);
 
-        for (int i = 0; i < causes.size(); i++) {
+        for (int i = 0; i < causes.size(); i++)
+        {
             sb.append(System.lineSeparator());
             sb.append(String.join("", Collections.nCopies(i + 1, "  ")));
             sb.append("caused by " + removeLineSeparators(causes.get(i).toString()));
@@ -79,38 +92,46 @@ public class ExceptionWrapper implements ServerExceptionInterface {
         return sb.toString();
     }
 
-    static String removeLineSeparators(String text) {
+    static String removeLineSeparators(String text)
+    {
         return text
                 .replaceAll("\r\n", "|")
                 .replaceAll("\n", "|");
     }
 
 
-    public List<Throwable> getAllCauses() {
+    public List<Throwable> getAllCauses()
+    {
         return getAllCauses(this.exception);
     }
 
 
-    public Optional<Throwable> getFromCauseChain(Class<? extends Throwable> anExceptionClass) {
+    public Optional<Throwable> getFromCauseChain(Class<? extends Throwable> anExceptionClass)
+    {
         List<Throwable> allCauses = this.getAllCauses();
         allCauses.add(this.exception);
         List<Throwable> throwables = allCauses.stream()
                 .filter(i -> getClassName(i).equals(anExceptionClass.getName()))
                 .collect(Collectors.toList());
-        if (!throwables.isEmpty()) {
+        if (!throwables.isEmpty())
+        {
             return Optional.of(throwables.get(0));
         }
-        else {
+        else
+        {
             return Optional.empty();
         }
     }
 
 
-    private static List<Throwable> getAllCauses(Throwable root) {
-        if (root.getCause() == null) {
+    private static List<Throwable> getAllCauses(Throwable root)
+    {
+        if (root.getCause() == null)
+        {
             return new ArrayList<>();
         }
-        else {
+        else
+        {
             List<Throwable> causes = getAllCauses(root.getCause());
             causes.add(root.getCause());
             return causes;
@@ -118,107 +139,133 @@ public class ExceptionWrapper implements ServerExceptionInterface {
     }
 
 
-    private static Throwable getRootCause(Throwable root) {
-        if (root.getCause() == null) {
+    private static Throwable getRootCause(Throwable root)
+    {
+        if (root.getCause() == null)
+        {
             return root;
         }
-        else {
+        else
+        {
             return getRootCause(root.getCause());
         }
     }
 
 
-    private static boolean causedBy(Throwable root, Class<? extends Throwable> anExceptionClass, String messageStart) {
+    private static boolean causedBy(Throwable root, Class<? extends Throwable> anExceptionClass, String messageStart)
+    {
         return causedBy(root, anExceptionClass.getName(), messageStart);
     }
 
 
-    private static boolean causedBy(Throwable root, String anExceptionClassName, String messageStart) {
-        if (StringUtils.isNotBlank(messageStart)) {
+    private static boolean causedBy(Throwable root, String anExceptionClassName, String messageStart)
+    {
+        if (StringUtils.isNotBlank(messageStart))
+        {
             if (getClassName(root).equalsIgnoreCase(anExceptionClassName)
-                    && StringUtils.startsWith(root.getMessage(), messageStart)) {
+                    && StringUtils.startsWith(root.getMessage(), messageStart))
+            {
                 return true;
             }
             // e.g. root: InsufficientAuthenticationException
             // anExceptionClass: AuthenticationException should return true
             if (isInstanceOf(root, anExceptionClassName)
-                    && StringUtils.startsWith(root.getMessage(), messageStart)) {
+                    && StringUtils.startsWith(root.getMessage(), messageStart))
+            {
                 return true;
             }
         }
-        else {
-            if (getClassName(root).equalsIgnoreCase(anExceptionClassName)) {
+        else
+        {
+            if (getClassName(root).equalsIgnoreCase(anExceptionClassName))
+            {
                 return true;
             }
             // e.g. root: InsufficientAuthenticationException
             // anExceptionClass: AuthenticationException should return true
-            if (isInstanceOf(root, anExceptionClassName)) {
+            if (isInstanceOf(root, anExceptionClassName))
+            {
                 return true;
             }
         }
 
-        if (root.getCause() == null) {
+        if (root.getCause() == null)
+        {
             return false;
         }
-        else {
+        else
+        {
             return causedBy(root.getCause(), anExceptionClassName, messageStart);
         }
     }
 
 
     @Override
-    public String getClassName() {
+    public String getClassName()
+    {
         return getClassName(this.exception);
     }
 
 
-    public static String getClassName(Throwable throwable) {
-        if (throwable instanceof ServerException) {
+    public static String getClassName(Throwable throwable)
+    {
+        if (throwable instanceof ServerException)
+        {
             return ((ServerException) throwable).getClassName();
         }
-        else {
+        else
+        {
             return throwable.getClass().getName();
         }
     }
 
 
     @Override
-    public boolean instanceOf(Class<? extends Throwable> anExceptionClass) {
+    public boolean instanceOf(Class<? extends Throwable> anExceptionClass)
+    {
         return isInstanceOf(this.exception, anExceptionClass);
     }
 
 
     @Override
-    public boolean instanceOf(String anExceptionClassName) {
+    public boolean instanceOf(String anExceptionClassName)
+    {
         return isInstanceOf(this.exception, anExceptionClassName);
     }
 
 
     /**
-     *
-     * @param throwable It may be an instance of ServerException as well
+     * @param throwable        It may be an instance of ServerException as well
      * @param anExceptionClass
      * @return
      */
-    public static boolean isInstanceOf(Throwable throwable, Class<? extends Throwable> anExceptionClass) {
-        if (throwable instanceof ServerException) {
+    public static boolean isInstanceOf(Throwable throwable, Class<? extends Throwable> anExceptionClass)
+    {
+        if (throwable instanceof ServerException)
+        {
             return ((ServerException) throwable).instanceOf(anExceptionClass);
         }
-        else {
+        else
+        {
             return anExceptionClass.isInstance(throwable);
         }
     }
 
 
-    public static boolean isInstanceOf(Throwable throwable, String anExceptionClassName) {
-        if (throwable instanceof ServerException) {
+    public static boolean isInstanceOf(Throwable throwable, String anExceptionClassName)
+    {
+        if (throwable instanceof ServerException)
+        {
             return ((ServerException) throwable).instanceOf(anExceptionClassName);
         }
-        else {
-            try {
+        else
+        {
+            try
+            {
                 return Class.forName(anExceptionClassName).isInstance(throwable); // NOSONAR
             }
-            catch (ClassNotFoundException e) {
+            catch (ClassNotFoundException e)
+            {
                 return false;
             }
         }
@@ -226,36 +273,45 @@ public class ExceptionWrapper implements ServerExceptionInterface {
 
 
     @Override
-    public List<String> getSuperClassNames() {
+    public List<String> getSuperClassNames()
+    {
         return getSuperClassNames(this.exception);
     }
 
     @Override
-    public Annotation[] getAnnotations() {
-        if (this.exception instanceof ServerException) {
+    public Annotation[] getAnnotations()
+    {
+        if (this.exception instanceof ServerException)
+        {
             return ((ServerException) this.exception).getAnnotations();
         }
-        else {
+        else
+        {
             return this.exception.getClass().getAnnotations();
         }
     }
 
 
-    public static List<String> getSuperClassNames(Throwable throwable) {
-        if (throwable instanceof ServerException) {
+    public static List<String> getSuperClassNames(Throwable throwable)
+    {
+        if (throwable instanceof ServerException)
+        {
             return ((ServerException) throwable).getSuperClassNames();
         }
-        else {
+        else
+        {
             return extractSuperClassNames(throwable);
         }
     }
 
 
-    private static List<String> extractSuperClassNames(Throwable exception) {
+    private static List<String> extractSuperClassNames(Throwable exception)
+    {
 
         List<String> superClasses = new ArrayList<>();
         Class<?> aClass = exception.getClass();
-        while (aClass != null) {
+        while (aClass != null)
+        {
             superClasses.add(aClass.getName());
             aClass = aClass.getSuperclass();
         }
