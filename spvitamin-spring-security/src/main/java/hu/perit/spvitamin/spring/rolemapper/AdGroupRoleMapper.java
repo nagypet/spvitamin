@@ -55,6 +55,7 @@ public class AdGroupRoleMapper
 				.authorities(roles) //
 				.userId(authenticatedUser.getUserId()) //
 				.anonymous(authenticatedUser.isAnonymous())
+				.ldapUrl(authenticatedUser.getLdapUrl())
 				.build();
 	}
 

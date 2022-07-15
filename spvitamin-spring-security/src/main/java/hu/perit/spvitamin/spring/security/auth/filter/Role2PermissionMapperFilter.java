@@ -78,6 +78,7 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
                         .authorities(privileges) //
                         .anonymous(authenticatedUserWithRoles.isAnonymous())
                         .userId(authenticatedUserWithRoles.getUserId())
+                        .ldapUrl(authenticatedUserWithRoles.getLdapUrl())
                         .build();
                 log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
