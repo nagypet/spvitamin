@@ -16,14 +16,12 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
+import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -33,11 +31,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
-import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
-import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collection;
 
 @Slf4j
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
@@ -74,7 +73,15 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, privileges);
+                    UsernamePasswordAuthenticationToken authentication;
+                    if (StringUtils.hasText(authenticatedUser.getLdapUrl()))
+                    {
+                        authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getLdapUrl());
+                    }
+                    else
+                    {
+                        authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, privileges);
+                    }
                     authentication.setDetails(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }

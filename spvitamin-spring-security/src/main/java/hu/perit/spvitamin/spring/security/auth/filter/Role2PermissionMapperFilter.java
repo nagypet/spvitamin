@@ -76,7 +76,10 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
                 AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
                         .username(authenticatedUserWithRoles.getUsername()) //
                         .authorities(privileges) //
-                        .anonymous(authenticatedUserWithRoles.isAnonymous()).build();
+                        .anonymous(authenticatedUserWithRoles.isAnonymous())
+                        .userId(authenticatedUserWithRoles.getUserId())
+                        .ldapUrl(authenticatedUserWithRoles.getLdapUrl())
+                        .build();
                 log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
                 authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);
