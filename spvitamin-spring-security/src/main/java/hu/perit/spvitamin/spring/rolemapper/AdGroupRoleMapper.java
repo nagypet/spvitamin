@@ -56,6 +56,7 @@ public class AdGroupRoleMapper
 				.userId(authenticatedUser.getUserId()) //
 				.anonymous(authenticatedUser.isAnonymous())
 				.ldapUrl(authenticatedUser.getLdapUrl())
+				.domain(authenticatedUser.getDomain())
 				.build();
 	}
 
@@ -77,15 +78,15 @@ public class AdGroupRoleMapper
 
 		return roles.stream().map(role -> new SimpleGrantedAuthority(prefixWithRole(role.toUpperCase()))).collect(Collectors.toSet());
 	}
-	
-	
+
+
 	private String prefixWithRole(String roleName)
 	{
 		if (roleName == null)
 		{
 			return "";
 		}
-		
+
 		return roleName.startsWith("ROLE_") ? roleName : "ROLE_" + roleName;
 	}
 }

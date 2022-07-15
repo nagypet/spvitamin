@@ -72,7 +72,7 @@ class JwtTokenProviderTest
         log.debug("testValidToken()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+                new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN")), "ldapUrl", "domain"));
 
         TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 
@@ -88,7 +88,7 @@ class JwtTokenProviderTest
         log.debug("testInvalidToken()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+                new TokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN")), "ldapUrl", "domain"));
         Assertions.assertThrows(JwtException.class, () -> this.jwtTokenProvider.getClaims(token.getJwt().substring(2)));
     }
 
@@ -146,7 +146,7 @@ class JwtTokenProviderTest
         log.debug("testSpecializedTokenClaim()");
 
         final AuthorizationToken token = this.jwtTokenProvider.generateToken("nagy_peter",
-            new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))), "ldapUrl");
+                new SpecialTokenClaims(12, List.of(new SimpleGrantedAuthority("ADMIN"))));
 
         SpecialTokenClaims claims = new SpecialTokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 

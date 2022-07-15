@@ -46,8 +46,8 @@ public class AuthorizationService
         Authentication authentication = securityContext.getAuthentication();
 
         LdapAuthenticationToken newAuthentication = new LdapAuthenticationToken( //
-            authenticatedUser, // 
-            null, authenticatedUser.getAuthorities(), authenticatedUser.getLdapUrl());
+                authenticatedUser, //
+                null, authenticatedUser.getAuthorities(), authenticatedUser.getLdapUrl());
         newAuthentication.setDetails(authentication.getDetails());
         SecurityContextHolder.getContext().setAuthentication(newAuthentication);
     }
@@ -60,11 +60,11 @@ public class AuthorizationService
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken)
         {
             return AuthenticatedUser.builder() //
-                .username("anonymousUser") //
-                .authorities(Collections.emptyList()) //
-                .userId(-1) //
-                .anonymous(true) //
-                .build();
+                    .username("anonymousUser") //
+                    .authorities(Collections.emptyList()) //
+                    .userId(-1) //
+                    .anonymous(true) //
+                    .build();
         }
 
         Object principal = authentication.getPrincipal();
@@ -73,40 +73,42 @@ public class AuthorizationService
         {
             AuthenticatedUser user = (AuthenticatedUser) principal;
             user.setLdapUrl(calculateUrl(authentication));
+            user.setDomain(((AuthenticatedUser) principal).getDomain());
             return user;
         }
         else if (principal instanceof UserDetails)
         {
             return AuthenticatedUser.builder() //
-                .username(((UserDetails) principal).getUsername()) //
-                .authorities(((UserDetails) principal).getAuthorities()) //
-                .userId(-1) //
-                .anonymous(false) //
-                .ldapUrl(calculateUrl(authentication))
-                .build();
+                    .username(((UserDetails) principal).getUsername()) //
+                    .authorities(((UserDetails) principal).getAuthorities()) //
+                    .userId(-1) //
+                    .anonymous(false) //
+                    .ldapUrl(calculateUrl(authentication))
+                    .domain(calculateDomain(authentication))
+                    .build();
         }
         else if (principal instanceof String)
         {
             String username = (String) principal;
             return AuthenticatedUser.builder() //
-                .username(username) //
-                .authorities(Collections.emptyList()) //
-                .userId(-1) //
-                .anonymous(false) //
-                .build();
+                    .username(username) //
+                    .authorities(Collections.emptyList()) //
+                    .userId(-1) //
+                    .anonymous(false) //
+                    .build();
         }
-        // So that we do not need the keycloak dependency 
+        // So that we do not need the keycloak dependency
         else if ("org.keycloak.KeycloakPrincipal".equals(principal.getClass().getName()))
         {
             return AuthenticatedUser.builder() //
-                .username(((Principal) principal).getName()) //
-                .authorities(authentication.getAuthorities()) //
-                .userId(-1) //
-                .anonymous(false).build();
+                    .username(((Principal) principal).getName()) //
+                    .authorities(authentication.getAuthorities()) //
+                    .userId(-1) //
+                    .anonymous(false).build();
         }
 
         throw new AuthorizationException(
-            String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
+                String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
     }
 
     private String calculateUrl(Authentication authentication){
@@ -115,5 +117,13 @@ public class AuthorizationService
         }
 
         return ((LdapAuthenticationToken)authentication).getUrl();
+    }
+
+    private String calculateDomain(Authentication authentication){
+        if(! (authentication instanceof LdapAuthenticationToken)) {
+            return "No domain information";
+        }
+
+        return ((LdapAuthenticationToken)authentication).getDomain();
     }
 }

@@ -69,6 +69,8 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                                     .authorities(privileges)
                                     .userId(claims.getUserId())
                                     .anonymous(false)
+                                    .ldapUrl(claims.getLdapUrl())
+                                    .domain(claims.getDomain())
                                     .build();
 
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
@@ -76,7 +78,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     UsernamePasswordAuthenticationToken authentication;
                     if (StringUtils.hasText(authenticatedUser.getLdapUrl()))
                     {
-                        authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getLdapUrl());
+                        authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getLdapUrl(), authenticatedUser.getDomain());
                     }
                     else
                     {

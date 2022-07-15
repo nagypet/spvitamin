@@ -35,6 +35,8 @@ public class TokenClaims extends DefaultClaims {
 
     private static final String ROLES = "rls";
     private static final String USERID = "uid";
+    private static final String LDAP = "ldap";
+    private static final String DOMAIN = "domain";
 
 
     public TokenClaims(Claims claims) {
@@ -42,9 +44,11 @@ public class TokenClaims extends DefaultClaims {
     }
 
 
-    public TokenClaims(long userId, Collection<? extends GrantedAuthority> authorities) {
+    public TokenClaims(long userId, Collection<? extends GrantedAuthority> authorities, String ldapUrl, String domain) {
         this.setUserId(userId);
         this.setAuthorities(authorities);
+        this.setLdapUrl(ldapUrl);
+        this.setDomain(domain);
     }
 
 
@@ -71,5 +75,21 @@ public class TokenClaims extends DefaultClaims {
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
         this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
+    }
+
+    public void setLdapUrl(String ldapUrl){
+        this.put(LDAP, ldapUrl);
+    }
+
+    public String getLdapUrl(){
+        return this.get(LDAP, String.class);
+    }
+
+    public void setDomain(String domain){
+        this.put(DOMAIN, domain);
+    }
+
+    public String getDomain(){
+        return this.get(DOMAIN, String.class);
     }
 }

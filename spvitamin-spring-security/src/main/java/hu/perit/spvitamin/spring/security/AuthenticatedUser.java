@@ -41,6 +41,7 @@ public class AuthenticatedUser implements UserDetails
     @Builder.Default
     private boolean anonymous = true;
     private String ldapUrl;
+    private String domain;
 
     @Override
     public String getPassword()
@@ -70,5 +71,9 @@ public class AuthenticatedUser implements UserDetails
     public boolean isEnabled()
     {
         return true;
+    }
+
+    public String getUsernameAndDomain(){
+        return String.format("%s\\%s", username, domain);
     }
 }

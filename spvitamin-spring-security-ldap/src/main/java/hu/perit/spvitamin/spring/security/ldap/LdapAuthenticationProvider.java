@@ -166,7 +166,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         DirContextOperations userData = doAuthentication(userToken);
         UserDetails user = this.userDetailsContextMapper.mapUserFromContext(userData, authentication.getName(),
                 loadUserAuthorities(userData, authentication.getName(), (String) authentication.getCredentials()));
-        return createSuccessfulAuthentication(userToken, user);
+        return createSuccessfulAuthentication(userToken, user, userData.getDn().get(3));
     }
 
     protected Authentication createSuccessfulAuthentication(UsernamePasswordAuthenticationToken authentication,
@@ -174,6 +174,15 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
         LdapAuthenticationToken result = new LdapAuthenticationToken(user, authentication.getCredentials(),
                 authoritiesMapper.mapAuthorities(user.getAuthorities()), url);
+        result.setDetails(authentication.getDetails());
+        return result;
+    }
+
+    protected Authentication createSuccessfulAuthentication(UsernamePasswordAuthenticationToken authentication,
+                                                            UserDetails user, String domain) {
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+        LdapAuthenticationToken result = new LdapAuthenticationToken(user, authentication.getCredentials(),
+                authoritiesMapper.mapAuthorities(user.getAuthorities()), url, domain);
         result.setDetails(authentication.getDetails());
         return result;
     }
