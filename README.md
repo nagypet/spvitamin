@@ -42,7 +42,7 @@ dependencyManagement {
 
 ## Releases
 
-### 1.4.0-RELEASE not yet released
+### 1.4.0-RELEASE 2022-07-31
 - ObjectLogger
 - @LoggedRestMethod annotation, which triggers an aspect for a good quality logging of the interface methods. 
 - AsyncAutoConfiguration, AsyncProperties
