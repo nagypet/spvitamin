@@ -73,7 +73,7 @@ public class AuthenticatedUser implements UserDetails
         return true;
     }
 
-    public String getUsernameAndDomain(){
-        return String.format("%s\\%s", username, domain);
+    public String getDomainAndUsername(){
+        return String.format("%s\\%s", domain, username);
     }
 }
