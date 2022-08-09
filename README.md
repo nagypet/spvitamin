@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.4.0-RELEASE')
+    set('spvitaminVersion', '1.4.1-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.4.1-RELEASE 2022-08-08
+- RestExceptionResponseFactory fixed: ApplicationException is logged with the right level
+
 
 ### 1.4.0-RELEASE 2022-07-31
 - ObjectLogger

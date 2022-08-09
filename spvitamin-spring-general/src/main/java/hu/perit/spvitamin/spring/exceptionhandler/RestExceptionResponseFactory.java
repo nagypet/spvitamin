@@ -74,20 +74,20 @@ public class RestExceptionResponseFactory
             return Optional.of(new RestExceptionResponse(HttpStatus.SERVICE_UNAVAILABLE, ex, path));
         }
 
-        // ========== INTERNAL_SERVER_ERROR (hu.perit.spvitamin.spring.exception) ======================================
-        else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
-        {
-            HttpStatus httpStatus = getHttpStatusFromAnnotation(ex);
-            logByHttpStatus(httpStatus, ex);
-            return Optional.of(new RestExceptionResponse(httpStatus, ex, path));
-        }
-
         // ========== APPLICATION_SPECIFIC_EXCEPTION ===================================================================
         else if (exception.instanceOf(ApplicationRuntimeException.class) || exception.instanceOf(ApplicationException.class))
         {
             ApplicationSpecificException ase = (ApplicationSpecificException) ex;
             logByLogLevel(ex, ase.getType().getLevel());
             return Optional.of(new RestExceptionResponse(HttpStatus.valueOf(ase.getType().getHttpStatusCode()), ex, path));
+        }
+
+        // ========== INTERNAL_SERVER_ERROR (hu.perit.spvitamin.spring.exception) ======================================
+        else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
+        {
+            HttpStatus httpStatus = getHttpStatusFromAnnotation(ex);
+            logByHttpStatus(httpStatus, ex);
+            return Optional.of(new RestExceptionResponse(httpStatus, ex, path));
         }
 
         log.error(StackTracer.toString(ex));
