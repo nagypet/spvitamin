@@ -43,12 +43,21 @@ public class TookWithMetric extends Took
         super.methodName = super.getCallingMethodName(context);
     }
 
-    public TookWithMetric(DualMetric myMetric, String context, boolean logAtClose) {
+    public TookWithMetric(DualMetric myMetric, String context, boolean logAtClose)
+    {
         super(logAtClose);
         this.myMetric = myMetric;
         this.myMetric.increment();
         execTimer = new MeasurementItem();
         super.methodName = super.getCallingMethodName(context);
+    }
+
+    public void batchSize(Long amount)
+    {
+        if (amount != null && amount > 1)
+        {
+            this.myMetric.increment(amount - 1);
+        }
     }
 
     @Override

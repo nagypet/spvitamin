@@ -38,13 +38,13 @@ public class DualMetric
                 .description(String.format("The performance of last %d %s operations", SingleMetricExecutionPerformance.getQueueSize(), functionName))
                 .baseUnit("ms")
                 .register(registry);
-				
+
         Gauge
                 .builder(this.getExecTimeGaugeName(componentName, functionName), this.executionPerformance, SingleMetricExecutionPerformance::getAverage)
                 .description(String.format("The average execution time of last %d %s operations", SingleMetricExecutionPerformance.getQueueSize(), functionName))
                 .baseUnit("ms")
                 .register(registry);
-				
+
     }
 
     private String getCounterName(String componentName, String functionName)
@@ -65,6 +65,19 @@ public class DualMetric
     public void increment()
     {
         this.counter.increment();
+    }
+
+    /**
+     * This is used for batch processing, where more then one item has been processed within a given amount of time.
+     *
+     * @param amount
+     */
+    public void increment(Long amount)
+    {
+        if (amount != null)
+        {
+            this.counter.increment(amount);
+        }
     }
 
     public void pushPerformance(MeasurementItem execTime)

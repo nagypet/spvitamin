@@ -16,16 +16,14 @@
 
 package hu.perit.spvitamin.spring.data.nativequery;
 
-import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import hu.perit.spvitamin.core.exception.CodingException;
 import hu.perit.spvitamin.core.took.Took;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class NativeQueryRepoImpl
@@ -63,40 +61,43 @@ public class NativeQueryRepoImpl
         }
     }
 
-	public List<?> getResultList(String sql, List<Object> params, boolean logSql)
-	{
-		return getResultList(sql, params, logSql, null);
-	}
+    public List<?> getResultList(String sql, List<Object> params, boolean logSql)
+    {
+        return getResultList(sql, params, logSql, null);
+    }
 
-	public List<?> getResultList(String sql, List<Object> params, boolean logSql, Integer limit)
-	{
-		if(params == null) {
-			throw new CodingException("\"params\" cannot be null!");
-		}
+    public List<?> getResultList(String sql, List<Object> params, boolean logSql, Integer limit)
+    {
+        if (params == null)
+        {
+            throw new CodingException("\"params\" cannot be null!");
+        }
 
-		try (Took took = new Took(false))
-		{
-			if (logSql)
-			{
-				log.debug(sql);
-				log.debug("params: " + params.stream().map(Object::toString).collect(Collectors.joining("\n")));
-			}
-			Query query = this.em.createNativeQuery(sql);
-			if(limit != null) {
-				query.setMaxResults(limit);
-			}
-			int i = 0;
-			for (Object p : params) {
-				query.setParameter(++i, p);
-			}
-			List<?> resultList = query.setHint(TIMEOUT_HINT, timeout).getResultList();
-			if (logSql)
-			{
-				log.debug(String.format("getResultList() returned %d result(s) in %d ms", resultList.size(), took.getDuration()));
-			}
-			return resultList;
-		}
-	}
+        try (Took took = new Took(false))
+        {
+            if (logSql)
+            {
+                log.debug(sql);
+                log.debug("params: " + params.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            }
+            Query query = this.em.createNativeQuery(sql);
+            if (limit != null)
+            {
+                query.setMaxResults(limit);
+            }
+            int i = 0;
+            for (Object p : params)
+            {
+                query.setParameter(++i, p);
+            }
+            List<?> resultList = query.setHint(TIMEOUT_HINT, timeout).getResultList();
+            if (logSql)
+            {
+                log.debug(String.format("getResultList() returned %d result(s) in %d ms", resultList.size(), took.getDuration()));
+            }
+            return resultList;
+        }
+    }
 
 
     public Object getSingleResult(String sql)
@@ -107,7 +108,7 @@ public class NativeQueryRepoImpl
 
     public Object getSingleResult(String sql, boolean logSql)
     {
-        try (Took took = new Took())
+        try (Took took = new Took(logSql))
         {
             if (logSql)
             {
