@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.4.1-RELEASE')
+    set('spvitaminVersion', '1.4.2-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.4.2-RELEASE 2022-08-29
+- DualMetric improved for batch processing
+
 
 ### 1.4.1-RELEASE 2022-08-08
 - RestExceptionResponseFactory fixed: ApplicationException is logged with the right level
