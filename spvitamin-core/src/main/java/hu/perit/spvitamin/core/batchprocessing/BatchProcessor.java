@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BatchProcessor
 {
 
-    private int threadPoolSize;
+    protected int threadPoolSize;
 
     public BatchProcessor(int threadPoolSize)
     {
@@ -79,7 +79,7 @@ public abstract class BatchProcessor
             return true;
         }
 
-        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        ExecutorService executorService = createExecutorService();
 
         // Invoke the rest
         boolean shutdownImmediately = false;
@@ -183,5 +183,10 @@ public abstract class BatchProcessor
 
             log.debug("Processing done.");
         }
+    }
+
+    protected ExecutorService createExecutorService()
+    {
+        return Executors.newFixedThreadPool(threadPoolSize);
     }
 }
