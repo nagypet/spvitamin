@@ -17,7 +17,13 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.*;
+import hu.perit.spvitamin.core.exception.ApplicationException;
+import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
+import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.exception.InputException;
+import hu.perit.spvitamin.core.exception.LogLevel;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -36,33 +42,34 @@ public class RestExceptionResponseFactory
     public static Optional<RestExceptionResponse> of(Throwable ex, String path)
     {
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
+        DefaultRestExceptionLogger exceptionLogger = getLogger();
 
         // ========== UNAUTHORIZED (401) ===============================================================================
         if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
                 || exception.instanceOf("io.jsonwebtoken.JwtException"))
         {
-            log.warn(StackTracer.toString(ex));
+            exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(new RestExceptionResponse(HttpStatus.UNAUTHORIZED, ex, path));
         }
 
         // ========== FORBIDDEN (403) ==================================================================================
         else if (exception.instanceOf("org.springframework.security.access.AccessDeniedException"))
         {
-            log.warn(StackTracer.toString(ex));
+            exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(new RestExceptionResponse(HttpStatus.FORBIDDEN, ex, path));
         }
 
         // ========== BAD_REQUEST (400) ================================================================================
         else if (exception.instanceOf(ValidationException.class) || exception.instanceOf(InputException.class))
         {
-            log.warn(StackTracer.toString(ex));
+            exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(new RestExceptionResponse(HttpStatus.BAD_REQUEST, ex, path));
         }
 
         // ========== NOT_IMPLEMENTED (501) ============================================================================
         else if (exception.instanceOf(UnsupportedOperationException.class))
         {
-            log.error(StackTracer.toString(ex));
+            exceptionLogger.log(path, ex, LogLevel.ERROR);
             return Optional.of(new RestExceptionResponse(HttpStatus.NOT_IMPLEMENTED, ex, path));
         }
 
@@ -70,7 +77,7 @@ public class RestExceptionResponseFactory
         else if (exception.instanceOf("org.springframework.cloud.gateway.support.NotFoundException"))
         {
             // kiloggoljuk WARNING-gal
-            log.warn(StackTracer.toString(ex));
+            exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(new RestExceptionResponse(HttpStatus.SERVICE_UNAVAILABLE, ex, path));
         }
 
@@ -78,7 +85,7 @@ public class RestExceptionResponseFactory
         else if (exception.instanceOf(ApplicationRuntimeException.class) || exception.instanceOf(ApplicationException.class))
         {
             ApplicationSpecificException ase = (ApplicationSpecificException) ex;
-            logByLogLevel(ex, ase.getType().getLevel());
+            exceptionLogger.log(path, ex, ase.getType().getLevel());
             return Optional.of(new RestExceptionResponse(HttpStatus.valueOf(ase.getType().getHttpStatusCode()), ex, path));
         }
 
@@ -86,12 +93,30 @@ public class RestExceptionResponseFactory
         else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
         {
             HttpStatus httpStatus = getHttpStatusFromAnnotation(ex);
-            logByHttpStatus(httpStatus, ex);
+            LogLevel logLevel = logLevelByHttpStatus(path, httpStatus, ex);
+            if (logLevel != null)
+            {
+                exceptionLogger.log(path, ex, logLevel);
+            }
             return Optional.of(new RestExceptionResponse(httpStatus, ex, path));
         }
 
-        log.error(StackTracer.toString(ex));
+        exceptionLogger.log(path, ex, LogLevel.ERROR);
         return Optional.empty();
+    }
+
+
+    private static DefaultRestExceptionLogger getLogger()
+    {
+        try
+        {
+            return SpringContext.getBean(DefaultRestExceptionLogger.class);
+        }
+        catch (Exception e)
+        {
+            log.error(StackTracer.toString(e));
+            throw e;
+        }
     }
 
 
@@ -109,44 +134,17 @@ public class RestExceptionResponseFactory
     }
 
 
-    private static void logByHttpStatus(HttpStatus httpStatus, Throwable ex)
+    private static LogLevel logLevelByHttpStatus(String path, HttpStatus httpStatus, Throwable ex)
     {
         switch (classifyHttpStatus(httpStatus))
         {
-            case NONE:
-                return;
             case WARNING:
-                log.warn(StackTracer.toString(ex));
-                break;
+                return LogLevel.WARN;
             case ERROR:
-                log.error(StackTracer.toString(ex));
-                break;
-        }
-    }
-
-
-    private static void logByLogLevel(Throwable ex, LogLevel level)
-    {
-        switch (level)
-        {
-            case DEBUG:
-                log.debug(StackTracer.toString(ex));
-                break;
-            case ERROR:
-                log.error(StackTracer.toString(ex));
-                break;
-            case INFO:
-                log.info(StackTracer.toString(ex));
-                break;
-            case TRACE:
-                log.trace(StackTracer.toString(ex));
-                break;
-            case WARN:
-                log.warn(StackTracer.toString(ex));
-                break;
+                return LogLevel.ERROR;
+            case NONE:
             default:
-                log.error(StackTracer.toString(ex));
-                break;
+                return null;
         }
     }
 

@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.5.0-RELEASE')
+    set('spvitaminVersion', '1.6.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.6.0-RELEASE 2022-09-17
+- RestExceptionResponseFactory logging is moved into DefaultRestExceptionLogger which can be overridden in the application, in order to achieve custom exception logging
+
 
 ### 1.5.0-RELEASE 2022-09-04
 - New versions of CancelableJobExecutor and BatchProcessor to delegate the seurity context to child threads
