@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,6 +43,7 @@ public class AuthenticatedUser implements UserDetails
     private boolean anonymous = true;
     private String ldapUrl;
     private String domain;
+    private Set<String> roles;
 
     @Override
     public String getPassword()

@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -33,10 +34,11 @@ import io.jsonwebtoken.impl.DefaultClaims;
 
 public class TokenClaims extends DefaultClaims {
 
-    private static final String ROLES = "rls";
+    private static final String AUTHORITIES = "rls";
     private static final String USERID = "uid";
     private static final String LDAP = "ldap";
     private static final String DOMAIN = "domain";
+    private static final String ROLES = "roles";
 
 
     public TokenClaims(Claims claims) {
@@ -51,6 +53,14 @@ public class TokenClaims extends DefaultClaims {
         this.setDomain(domain);
     }
 
+    public TokenClaims(long userId, Collection<? extends GrantedAuthority> authorities, String ldapUrl, String domain, Set<String> roles) {
+        this.setUserId(userId);
+        this.setAuthorities(authorities);
+        this.setLdapUrl(ldapUrl);
+        this.setDomain(domain);
+        this.setRoles(roles);
+    }
+
 
     public long getUserId() {
         return this.get(USERID, Long.class);
@@ -63,7 +73,7 @@ public class TokenClaims extends DefaultClaims {
 
 
     public Collection<GrantedAuthority> getAuthorities() {
-        List authorities = this.get(ROLES, List.class);
+        List authorities = this.get(AUTHORITIES, List.class);
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (Object authority : authorities) {
@@ -74,7 +84,7 @@ public class TokenClaims extends DefaultClaims {
     }
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
+        this.put(AUTHORITIES, AuthorityUtils.authorityListToSet(authorities));
     }
 
     public void setLdapUrl(String ldapUrl){
@@ -91,5 +101,13 @@ public class TokenClaims extends DefaultClaims {
 
     public String getDomain(){
         return this.get(DOMAIN, String.class);
+    }
+
+    public void setRoles(Set<String> roles){
+        this.put(ROLES, roles);
+    }
+
+    public List<String> getRoles(){
+        return this.get(ROLES, List.class);
     }
 }

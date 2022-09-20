@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
@@ -62,6 +64,8 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
                     Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
+                    Set<String> roles = new HashSet<>();
+                    claims.getRoles().forEach(roles::add);
 
                     AuthenticatedUser authenticatedUser =
                             AuthenticatedUser.builder()
@@ -71,6 +75,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                                     .anonymous(false)
                                     .ldapUrl(claims.getLdapUrl())
                                     .domain(claims.getDomain())
+                                    .roles(roles)
                                     .build();
 
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
@@ -78,7 +83,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     UsernamePasswordAuthenticationToken authentication;
                     if (StringUtils.hasText(authenticatedUser.getLdapUrl()))
                     {
-                        authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getLdapUrl(), authenticatedUser.getDomain());
+                        authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getLdapUrl(), authenticatedUser.getDomain(), authenticatedUser.getRoles());
                     }
                     else
                     {

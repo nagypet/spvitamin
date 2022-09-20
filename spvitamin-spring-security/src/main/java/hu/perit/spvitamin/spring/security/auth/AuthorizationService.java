@@ -16,20 +16,18 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import java.security.Principal;
-import java.util.Collections;
-
-import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.exception.AuthorizationException;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import hu.perit.spvitamin.spring.exception.AuthorizationException;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -74,6 +72,7 @@ public class AuthorizationService
             AuthenticatedUser user = (AuthenticatedUser) principal;
             user.setLdapUrl(calculateUrl(authentication));
             user.setDomain(((AuthenticatedUser) principal).getDomain());
+            user.setRoles(((AuthenticatedUser) principal).getRoles());
             return user;
         }
         else if (principal instanceof UserDetails)
@@ -85,6 +84,7 @@ public class AuthorizationService
                     .anonymous(false) //
                     .ldapUrl(calculateUrl(authentication))
                     .domain(calculateDomain(authentication))
+                    .roles(getRoles(authentication))
                     .build();
         }
         else if (principal instanceof String)
@@ -111,8 +111,16 @@ public class AuthorizationService
                 String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
     }
 
-    private String calculateUrl(Authentication authentication){
-        if(! (authentication instanceof LdapAuthenticationToken)) {
+    private Set<String> getRoles(Authentication authentication) {
+        if (!(authentication instanceof LdapAuthenticationToken)) {
+            return null;
+        }
+
+        return ((LdapAuthenticationToken) authentication).getRoles();
+    }
+
+    private String calculateUrl(Authentication authentication) {
+        if (!(authentication instanceof LdapAuthenticationToken)) {
             return "Not an AD user";
         }
 
