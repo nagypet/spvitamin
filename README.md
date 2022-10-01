@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.6.0-RELEASE')
+    set('spvitaminVersion', '1.7.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.7.0-RELEASE 2022-10-01
+- Further improvement of CancelableJobExecutor: the class is able to keep track of futures beeing within the shotdown process. There is a new function: cancelAll() to interrupt all running jobs.
+
 
 ### 1.6.0-RELEASE 2022-09-17
 - RestExceptionResponseFactory logging is moved into DefaultRestExceptionLogger which can be overridden in the application, in order to achieve custom exception logging

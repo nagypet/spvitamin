@@ -50,6 +50,7 @@ public class ShutdownManager extends Thread
             Thread.currentThread().interrupt();
             log.error(StackTracer.toString(e));
         }
+        log.warn("Shutdown process initiated!");
         this.initiateShutdown(0);
     }
 

@@ -18,6 +18,8 @@ package hu.perit.spvitamin.core.jobexecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -33,9 +35,11 @@ import java.util.concurrent.TimeUnit;
 public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 {
 
-    // A sorbanálló job-ok
-    protected FutureMap<T> futureMap = new FutureMap<>();
+    // Running jobs
+    protected final FutureMap<T> futureMap = new FutureMap<>();
 
+    // Stopping jobs
+    protected final FutureMap<T> stoppingFutures = new FutureMap<>();
 
     public CancelableJobExecutor(int poolSize)
     {
@@ -53,7 +57,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             T id = this.futureMap.get(future);
             if (id != null)
             {
-                log.debug("beforeExecute({}, {}): Job {} has started! Running jobs: {}", t, r, id.toString(), this.futureMap.size());
+                log.debug("beforeExecute({}, {}): {}", t, r, statusTextWithAction(id, "has started"));
             }
             else
             {
@@ -94,23 +98,54 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             }
             finally
             {
-                T id = this.futureMap.get(future);
+                String action = (t instanceof CancellationException) ? "has been cancelled" : "has finished";
+                T id = removeFrom(this.futureMap, future);
                 if (id != null)
                 {
-                    if (this.futureMap.contains(id))
+                    log.debug("afterExecute(): {}", statusTextWithAction(id, action));
+                }
+                else
+                {
+                    id = removeFrom(this.stoppingFutures, future);
+                    if (id != null)
                     {
-                        this.futureMap.remove(id);
+                        log.debug("afterExecute(): {}", statusTextWithAction(id, action));
                     }
-                    log.debug("afterExecute(): Job {} has terminated! Running jobs: {}", id.toString(), this.futureMap.size());
                 }
             }
         }
-        if (t != null)
+        if (t != null && !(t instanceof CancellationException))
         {
             log.error(t.toString());
         }
     }
 
+
+    private String statusTextWithAction(T id, String action)
+    {
+        return String.format("Job %s %s! %s", id != null ? id.toString() : "null", action, statusText());
+    }
+
+    private String statusText()
+    {
+        return String.format("[Running jobs: %d, stopping jobs: %d]", this.futureMap.size(), this.stoppingFutures.size());
+    }
+
+
+    private T removeFrom(FutureMap<T> map, Future<?> future)
+    {
+        T id = map.get(future);
+        if (id != null)
+        {
+            if (map.contains(id))
+            {
+                map.remove(id);
+                return id;
+            }
+        }
+
+        return null;
+    }
 
     public synchronized boolean cancelJob(T id)
     {
@@ -125,11 +160,49 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                 this.purge();
             }
             this.futureMap.remove(id);
-            log.debug("Running jobs: {}", this.futureMap.size());
+            this.stoppingFutures.put(id, future);
+            log.debug(statusText());
             return true;
         }
 
         log.info("cancelJob({}): Job not found!", id.toString());
         return false;
+    }
+
+    public synchronized int countRunning()
+    {
+        return this.futureMap.size();
+    }
+
+    public synchronized int countStopping()
+    {
+        return this.stoppingFutures.size();
+    }
+
+    // intentionally not synchronized
+    public void cancelAll()
+    {
+        synchronized (this.futureMap)
+        {
+            log.info("Cancel all...");
+            Set<T> keySet = new HashSet<>(this.futureMap.keySet());
+            for (T id : keySet)
+            {
+                cancelJob(id);
+            }
+        }
+
+        while (!Thread.currentThread().isInterrupted() && (countRunning() > 0 || countStopping() > 0))
+        {
+            try
+            {
+                TimeUnit.MILLISECONDS.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
+        log.info("All jobs cancelled.");
     }
 }

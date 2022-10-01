@@ -27,45 +27,59 @@ import java.util.concurrent.Future;
  */
 
 @NoArgsConstructor
-public class FutureMap<T> {
+public class FutureMap<T>
+{
 
-    private Map<T, Future<?>> queueItemsMap = new HashMap<>();
-    private Map<Future<?>, T> queueItemsMapBackwards = new HashMap<>();
+    private Map<T, Future<?>> itemsMapById = new HashMap<>();
+    private Map<Future<?>, T> itemsMapByFuture = new HashMap<>();
 
-    public synchronized void put(T id, Future<?> future) {
-        this.queueItemsMap.put(id, future);
-        this.queueItemsMapBackwards.put(future, id);
+    public synchronized void put(T id, Future<?> future)
+    {
+        this.itemsMapById.put(id, future);
+        this.itemsMapByFuture.put(future, id);
     }
 
 
-    public synchronized void remove(T id) {
-        if (this.queueItemsMap.containsKey(id)) {
-            Future<?> futureToRemove = this.queueItemsMap.get(id);
-            this.queueItemsMap.remove(id);
-            this.queueItemsMapBackwards.remove(futureToRemove);
+    public synchronized void remove(T id)
+    {
+        if (this.itemsMapById.containsKey(id))
+        {
+            Future<?> futureToRemove = this.itemsMapById.get(id);
+            this.itemsMapById.remove(id);
+            this.itemsMapByFuture.remove(futureToRemove);
         }
     }
 
 
-    public synchronized boolean contains(T id) {
-        return this.queueItemsMap.containsKey(id);
+    public synchronized boolean contains(T id)
+    {
+        return this.itemsMapById.containsKey(id);
     }
 
 
-    public synchronized Future<?> get(T id) {
-        return this.queueItemsMap.get(id);
+    public synchronized Future<?> get(T id)
+    {
+        return this.itemsMapById.get(id);
     }
 
-    public synchronized T get(Future<?> future) {
-        return this.queueItemsMapBackwards.get(future);
+    public synchronized T get(Future<?> future)
+    {
+        return this.itemsMapByFuture.get(future);
     }
 
 
-    public synchronized int size() {
-        return this.queueItemsMap.size();
+    public synchronized int size()
+    {
+        return this.itemsMapById.size();
     }
 
-    public synchronized Set<T> getRunningJobs() {
-        return this.queueItemsMap.keySet();
+    public synchronized Set<T> getRunningJobs()
+    {
+        return this.itemsMapById.keySet();
+    }
+
+    public Set<T> keySet()
+    {
+        return itemsMapById.keySet();
     }
 }
