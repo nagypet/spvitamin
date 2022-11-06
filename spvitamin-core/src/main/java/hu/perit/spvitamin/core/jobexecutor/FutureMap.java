@@ -17,9 +17,13 @@
 
 package hu.perit.spvitamin.core.jobexecutor;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
@@ -29,22 +33,27 @@ import java.util.concurrent.Future;
 @NoArgsConstructor
 public class FutureMap<T>
 {
+    public enum Status
+    {
+        QUEUED,
+        RUNNING,
+        STOPPING
+    }
 
-    private Map<T, Future<?>> itemsMapById = new HashMap<>();
+    private Map<T, FutureHolder> itemsMapById = new HashMap<>();
     private Map<Future<?>, T> itemsMapByFuture = new HashMap<>();
 
     public synchronized void put(T id, Future<?> future)
     {
-        this.itemsMapById.put(id, future);
+        this.itemsMapById.put(id, new FutureHolder(future, Status.QUEUED));
         this.itemsMapByFuture.put(future, id);
     }
-
 
     public synchronized void remove(T id)
     {
         if (this.itemsMapById.containsKey(id))
         {
-            Future<?> futureToRemove = this.itemsMapById.get(id);
+            Future<?> futureToRemove = this.itemsMapById.get(id).getFuture();
             this.itemsMapById.remove(id);
             this.itemsMapByFuture.remove(futureToRemove);
         }
@@ -59,7 +68,12 @@ public class FutureMap<T>
 
     public synchronized Future<?> get(T id)
     {
-        return this.itemsMapById.get(id);
+        if (this.itemsMapById.containsKey(id))
+        {
+            return this.itemsMapById.get(id).getFuture();
+        }
+
+        return null;
     }
 
     public synchronized T get(Future<?> future)
@@ -73,13 +87,52 @@ public class FutureMap<T>
         return this.itemsMapById.size();
     }
 
+    @Deprecated
     public synchronized Set<T> getRunningJobs()
     {
         return this.itemsMapById.keySet();
     }
 
-    public Set<T> keySet()
+    public synchronized Set<T> keySet()
     {
         return itemsMapById.keySet();
+    }
+
+    public synchronized Status getStatus(T id)
+    {
+        if (this.itemsMapById.containsKey(id))
+        {
+            return this.itemsMapById.get(id).getStatus();
+        }
+
+        return null;
+    }
+
+
+    public synchronized void setStatus(T id, Status status)
+    {
+        if (this.itemsMapById.containsKey(id))
+        {
+            this.itemsMapById.get(id).setStatus(status);
+        }
+    }
+
+    public synchronized long getCountByStatus(Status status)
+    {
+        return this.itemsMapById.values().stream().filter(i -> i.getStatus() == status).count();
+    }
+
+    @Getter
+    @Setter
+    public static class FutureHolder
+    {
+        private final Future<?> future;
+        private Status status;
+
+        public FutureHolder(Future<?> future, Status status)
+        {
+            this.future = future;
+            this.status = status;
+        }
     }
 }

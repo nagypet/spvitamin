@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.7.0-RELEASE')
+    set('spvitaminVersion', '1.7.1-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.7.1-RELEASE 2022-11-06
+- Further improvement of CancelableJobExecutor: handling of QUEUED job state. afterExecute() is only called for started jobs, therefor only RUNNING jobs are put into STOPPING state when cancelling a job.
+
 
 ### 1.7.0-RELEASE 2022-10-01
 - Further improvement of CancelableJobExecutor: the class is able to keep track of futures beeing within the shotdown process. There is a new function: cancelAll() to interrupt all running jobs.

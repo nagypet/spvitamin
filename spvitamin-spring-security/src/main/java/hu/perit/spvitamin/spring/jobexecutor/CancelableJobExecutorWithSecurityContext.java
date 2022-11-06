@@ -31,17 +31,17 @@ import java.util.concurrent.Future;
 public class CancelableJobExecutorWithSecurityContext<T> extends CancelableJobExecutor<T>
 {
 
-    public CancelableJobExecutorWithSecurityContext(int poolSize)
+    public CancelableJobExecutorWithSecurityContext(int poolSize, String context)
     {
-        super(poolSize);
+        super(poolSize, context);
     }
 
-    public Future<Boolean> submit(CancelableJobWithSecurityContext job)
+    public Future<Boolean> submitJob(T id, CancelableJobWithSecurityContext job)
     {
         // Setting the AuthenticatedUser
         AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
         job.setAuthenticatedUser(authorizationService.getAuthenticatedUser());
 
-        return super.submit(job);
+        return super.submitJob(id, job);
     }
 }

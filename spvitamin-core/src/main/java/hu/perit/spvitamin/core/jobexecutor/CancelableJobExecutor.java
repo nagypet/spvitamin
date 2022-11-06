@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -35,17 +36,29 @@ import java.util.concurrent.TimeUnit;
 public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 {
 
-    // Running jobs
-    protected final FutureMap<T> futureMap = new FutureMap<>();
+    private final String context;
 
-    // Stopping jobs
-    protected final FutureMap<T> stoppingFutures = new FutureMap<>();
+    // Running and queued jobs
+    private final FutureMap<T> futureMap = new FutureMap<>();
 
-    public CancelableJobExecutor(int poolSize)
+    public CancelableJobExecutor(int poolSize, String context)
     {
         super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        this.context = context;
     }
 
+    public Future<Boolean> submitJob(T id, Callable<Boolean> job)
+    {
+        if (this.futureMap.contains(id))
+        {
+            throw new JobAlreadyProcessingException(String.format("[%s] Job '%s' is already being processed, request is ignored.", this.context, id.toString()));
+        }
+
+        Future<Boolean> future = super.submit(job);
+        this.futureMap.put(id, future);
+        log.debug("[{}] submitJob({}), {}", this.context, id, statusText());
+        return future;
+    }
 
     @Override
     protected synchronized void beforeExecute(Thread t, Runnable r)
@@ -57,16 +70,17 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             T id = this.futureMap.get(future);
             if (id != null)
             {
-                log.debug("beforeExecute({}, {}): {}", t, r, statusTextWithAction(id, "has started"));
+                this.futureMap.setStatus(id, FutureMap.Status.RUNNING);
+                log.debug("[{}] beforeExecute({}, {}): {}", this.context, t, r, statusTextWithAction(id, "has started"));
             }
             else
             {
-                log.error("beforeExecute({}, {}): Future is not in the futureMap!", t, r);
+                log.error("[{}] beforeExecute({}, {}): Future is not in the futureMap!", this.context, t, r);
             }
         }
         else
         {
-            log.error("beforeExecute - non Future({}, {})", t, r);
+            log.error("[{}] beforeExecute - non Future({}, {})", this.context, t, r);
         }
     }
 
@@ -74,7 +88,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
     @Override
     protected synchronized void afterExecute(Runnable r, Throwable t)
     {
-        log.debug("afterExecute({}, {})", r, t);
+        log.debug("[{}] afterExecute({}, {})", this.context, r, t);
         super.afterExecute(r, t);
 
         if (t == null && r instanceof Future<?>)
@@ -102,15 +116,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                 T id = removeFrom(this.futureMap, future);
                 if (id != null)
                 {
-                    log.debug("afterExecute(): {}", statusTextWithAction(id, action));
-                }
-                else
-                {
-                    id = removeFrom(this.stoppingFutures, future);
-                    if (id != null)
-                    {
-                        log.debug("afterExecute(): {}", statusTextWithAction(id, action));
-                    }
+                    log.debug("[{}] afterExecute(): {}", this.context, statusTextWithAction(id, action));
                 }
             }
         }
@@ -128,7 +134,11 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 
     private String statusText()
     {
-        return String.format("[Running jobs: %d, stopping jobs: %d]", this.futureMap.size(), this.stoppingFutures.size());
+        return String.format("[Queued jobs: %d, Running jobs: %d, stopping jobs: %d]",
+                this.futureMap.getCountByStatus(FutureMap.Status.QUEUED),
+                this.futureMap.getCountByStatus(FutureMap.Status.RUNNING),
+                this.futureMap.getCountByStatus(FutureMap.Status.STOPPING)
+        );
     }
 
 
@@ -149,34 +159,44 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 
     public synchronized boolean cancelJob(T id)
     {
-        log.debug("cancelJob({})", id.toString());
+        log.debug("[{}] cancelJob({})", this.context, id.toString());
         if (this.futureMap.contains(id))
         {
+            FutureMap.Status status = this.futureMap.getStatus(id);
             Future<?> future = this.futureMap.get(id);
-            if (!future.isDone())
+
+            if (!future.isDone() && status != FutureMap.Status.STOPPING)
             {
-                log.debug("Job {} will be cancelled!", id.toString());
+                log.debug("[{}] Job {} is in {} state, will be cancelled!", this.context, id, status);
                 future.cancel(true);
                 this.purge();
             }
-            this.futureMap.remove(id);
-            this.stoppingFutures.put(id, future);
-            log.debug(statusText());
+
+            if (status == FutureMap.Status.QUEUED)
+            {
+                this.futureMap.remove(id);
+                log.debug("[{}] {}", this.context, statusText());
+            }
+            else if (status == FutureMap.Status.RUNNING)
+            {
+                this.futureMap.setStatus(id, FutureMap.Status.STOPPING);
+                log.debug("[{}] {}", this.context, statusText());
+            }
+            else
+            {
+                log.debug("[{}] Job {} is in {} state, no action required.", this.context, id, status);
+            }
+
             return true;
         }
 
-        log.info("cancelJob({}): Job not found!", id.toString());
+        log.info("[{}] cancelJob({}): Job not found!", this.context, id);
         return false;
     }
 
-    public synchronized int countRunning()
+    public synchronized long countRunning()
     {
-        return this.futureMap.size();
-    }
-
-    public synchronized int countStopping()
-    {
-        return this.stoppingFutures.size();
+        return this.futureMap.getCountByStatus(FutureMap.Status.RUNNING) + this.futureMap.getCountByStatus(FutureMap.Status.STOPPING);
     }
 
     // intentionally not synchronized
@@ -184,7 +204,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
     {
         synchronized (this.futureMap)
         {
-            log.info("Cancel all...");
+            log.info("[{}] Cancel all...", this.context);
             Set<T> keySet = new HashSet<>(this.futureMap.keySet());
             for (T id : keySet)
             {
@@ -192,8 +212,20 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             }
         }
 
-        while (!Thread.currentThread().isInterrupted() && (countRunning() > 0 || countStopping() > 0))
+        int countRetries = 0;
+        while (!Thread.currentThread().isInterrupted() && (countRunning() > 0))
         {
+            if (++countRetries > 300)
+            {
+                log.error("[{}] Some jobs could not be cancelled!", this.context);
+                return;
+            }
+
+            if (countRunning() > 0)
+            {
+                this.futureMap.keySet().forEach(i -> log.debug("[{}] Waiting for stop job {}", this.context, i));
+            }
+
             try
             {
                 TimeUnit.MILLISECONDS.sleep(100);
@@ -203,6 +235,6 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                 Thread.currentThread().interrupt();
             }
         }
-        log.info("All jobs cancelled.");
+        log.info("[{}] All jobs cancelled.", this.context);
     }
 }
