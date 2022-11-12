@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.7.1-RELEASE')
+    set('spvitaminVersion', '1.7.2-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.7.2-RELEASE 2022-11-12
+- StackTracer improved: 1.) each StackTraceElement will be printed only once. 2.) there is a toStringCompact() method, which prints even more compacted stack trace
+
 
 ### 1.7.1-RELEASE 2022-11-06
 - Further improvement of CancelableJobExecutor: handling of QUEUED job state. afterExecute() is only called for started jobs, therefor only RUNNING jobs are put into STOPPING state when cancelling a job.
