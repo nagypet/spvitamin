@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.7.2-RELEASE')
+    set('spvitaminVersion', '1.8.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.8.0-RELEASE 2022-12-30
+- Support for K8s/OpenShift deployment. New property: server.external-url. Can be something like that: "https://${APP_NAME}.${K8S_NAMESPACE}". It controls the links to Swagger, actuator, etc in the admin-gui.
+
 
 ### 1.7.2-RELEASE 2022-11-12
 - StackTracer improved: 1.) each StackTraceElement will be printed only once. 2.) there is a toStringCompact() method, which prints even more compacted stack trace
@@ -343,6 +347,7 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | security.admin-endpoints-access          | string  | *               |                                     |             |
 | server.fqdn                              | string  | localhost       |                                     |             |
 | server.port                              | int     | 8080            |                                     |             |
+| server.external-url                      | string  | -               | http://${APP_NAME}.${K8S_DOMAIN}    |             |
 | server.ssl.enabled                       | boolean | FALSE           |                                     |             |
 | server.ssl.key-store                     | string  | -               | classpath:jks/server-keystore.jks   |             |
 | server.ssl.key-store-password            | string  | -               | changeit                            |             |

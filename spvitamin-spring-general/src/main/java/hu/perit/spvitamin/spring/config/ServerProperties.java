@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.config;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -32,10 +33,14 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("server")
-public class ServerProperties {
+public class ServerProperties
+{
 
     private String fqdn = "localhost";
     private int port = 8080;
+    // externalUrl can be used in K8s or OpenShift deployment, where services often have external routes.
+    // Can be something like that: "https://${APP_NAME}.${K8S_NAMESPACE}"
+    private String externalUrl;
 
     @NestedConfigurationProperty
     private Ssl ssl;
@@ -43,18 +48,31 @@ public class ServerProperties {
     @NestedConfigurationProperty
     private final ErrorProperties error = new ErrorProperties();
 
-    public String getProtocollAsString() {
-        if (this.ssl == null) return "http";
+    public String getProtocollAsString()
+    {
+        if (this.ssl == null)
+        {
+            return "http";
+        }
         return this.ssl.enabled ? "https" : "http";
     }
 
-    public String getServiceUrl() {
-        return String.format("%s://%s:%d", this.getProtocollAsString(), this.fqdn, this.port);
+    public String getServiceUrl()
+    {
+        if (StringUtils.isBlank(this.externalUrl))
+        {
+            // Service URL for standalone deployment
+            return String.format("%s://%s:%d", this.getProtocollAsString(), this.fqdn, this.port);
+        }
+
+        // Service URL for K8s deployment
+        return this.externalUrl;
     }
 
     @Getter
     @Setter
-    public static class Ssl {
+    public static class Ssl
+    {
         private boolean enabled = false;
         private boolean ignoreCertificateValidation = false;
         private String keyStore;
