@@ -16,8 +16,14 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import java.util.List;
-
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SwaggerProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.security.Constants;
+import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
+import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -28,13 +34,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import hu.perit.spvitamin.spring.config.AdminProperties;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.security.Constants;
-import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
-import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
+import java.util.List;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -80,7 +80,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-        AccessDeniedHandler accessDeniedHandler) throws Exception
+                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
     {
         http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler);
         return this;
@@ -124,11 +124,11 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .and() //
-            .authorizeRequests() //
-            .anyRequest().authenticated().and() //
-            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .and() //
+                .authorizeRequests() //
+                .anyRequest().authenticated().and() //
+                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
     }
 
 
@@ -138,11 +138,11 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .ignorePersistedSecurity().and() //
-            .authorizeRequests() //
-            .anyRequest().authenticated().and() //
-            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .ignorePersistedSecurity().and() //
+                .authorizeRequests() //
+                .anyRequest().authenticated().and() //
+                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
     }
 
 
@@ -152,11 +152,11 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .ignorePersistedSecurity().and() //
-            .authorizeRequests() //
-            .anyRequest().hasRole(role).and() //
-            .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .ignorePersistedSecurity().and() //
+                .authorizeRequests() //
+                .anyRequest().hasRole(role).and() //
+                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
     }
 
 
@@ -166,9 +166,9 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .ignorePersistedSecurity().and() //
-            .authorizeRequests().anyRequest().authenticated();
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .ignorePersistedSecurity().and() //
+                .authorizeRequests().anyRequest().authenticated();
 
         // applying JWT Filter
         this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
@@ -180,9 +180,9 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .ignorePersistedSecurity().and() //
-            .authorizeRequests().anyRequest().permitAll();
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .ignorePersistedSecurity().and() //
+                .authorizeRequests().anyRequest().permitAll();
     }
 
 
@@ -192,9 +192,9 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         return this.defaults() //
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-            .ignorePersistedSecurity().and() //
-            .authorizeRequests();
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
+                .ignorePersistedSecurity().and() //
+                .authorizeRequests();
     }
 
 
@@ -209,15 +209,15 @@ public class SimpleHttpSecurityBuilder
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry = http.authorizeRequests().antMatchers(
-            // Admin REST API
-            String.format("%s/version", Constants.BASE_URL_ADMIN),
-            String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
+                // Admin REST API
+                String.format("%s/version", Constants.BASE_URL_ADMIN),
+                String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry //
-            .antMatchers( //
-                Constants.BASE_URL_ADMIN + "/**", //
-                Constants.BASE_URL_KEYSTORE + "/**", //
-                Constants.BASE_URL_TRUSTSTORE + "/**");
+                .antMatchers( //
+                        Constants.BASE_URL_ADMIN + "/**", //
+                        Constants.BASE_URL_KEYSTORE + "/**", //
+                        Constants.BASE_URL_TRUSTSTORE + "/**");
 
         if ("*".equals(securityProperties.getAdminEndpointsAccess()))
         {
@@ -235,20 +235,24 @@ public class SimpleHttpSecurityBuilder
     public SimpleHttpSecurityBuilder authorizeSwagger() throws Exception
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-
+        SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
+        String baseUrlSwaggerUi = swaggerProperties.getSwaggerUi().getBaseUrl();
+        String urlV2Docs = swaggerProperties.getSwagger().getV2().getPath();
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests() //
-            .antMatchers( //
-                // Swagger 2 UI related endpoints and resources
-                "/swagger-ui.html", //
-                "/swagger-ui.html/**", //
-                "/swagger-resources/**", //
-                "/api-docs/**", //
-                "/v2/api-docs/**", //
-                "/webjars/springfox-swagger-ui/**",
-                
-                // Swagger 3
-                "/swagger-ui/**"    
-            );
+                .antMatchers(
+                        // Swagger 2 UI related endpoints and resources
+                        baseUrlSwaggerUi + "/swagger-ui.html",
+                        baseUrlSwaggerUi + "/swagger-ui.html/**",
+                        baseUrlSwaggerUi + "/swagger-resources/**",
+                        baseUrlSwaggerUi + "/webjars/springfox-swagger-ui/**",
+
+                        // Swagger 3
+                        baseUrlSwaggerUi + "/swagger-ui/**",
+
+                        // api-docs
+                        urlV2Docs + "/**",
+                        "/v3/api-docs/**"
+                );
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
         {
@@ -267,14 +271,14 @@ public class SimpleHttpSecurityBuilder
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
         http.authorizeRequests() //
-            .antMatchers(
-                // Health and Prometheus endpoint
-                "/actuator/health", //
-                "/actuator/prometheus") //
-            .permitAll();
+                .antMatchers(
+                        // Health and Prometheus endpoint
+                        "/actuator/health", //
+                        "/actuator/prometheus") //
+                .permitAll();
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests() //
-            .antMatchers("/actuator/**");
+                .antMatchers("/actuator/**");
 
         if ("*".equals(securityProperties.getManagementEndpointsAccess()))
         {
@@ -298,17 +302,17 @@ public class SimpleHttpSecurityBuilder
         if (adminProperties.getAdminGuiUrl().isBlank())
         {
             adminGuiUrls = http.authorizeRequests() //
-                .antMatchers(
-                    // Admin GUI controller
-                    "/", "/*.*", "/css/**", "/assets/**");
+                    .antMatchers(
+                            // Admin GUI controller
+                            "/", "/*.*", "/css/**", "/assets/**");
         }
         else
         {
             adminGuiUrls = http.authorizeRequests() //
-                .antMatchers(
-                    // Admin GUI controller
-                    "/",
-                    String.format("%s/**", adminProperties.getAdminGuiUrl()));
+                    .antMatchers(
+                            // Admin GUI controller
+                            "/",
+                            String.format("%s/**", adminProperties.getAdminGuiUrl()));
         }
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))

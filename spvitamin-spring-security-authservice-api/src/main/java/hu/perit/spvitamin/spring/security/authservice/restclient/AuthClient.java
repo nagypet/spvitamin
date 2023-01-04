@@ -27,7 +27,7 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 
 public interface AuthClient {
 
-    String BASE_URL_AUTHENTICATE = "/authenticate";
+    String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";
 	
     /*
      * ============== authenticate =====================================================================================

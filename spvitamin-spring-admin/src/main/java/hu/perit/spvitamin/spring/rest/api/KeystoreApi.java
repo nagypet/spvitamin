@@ -38,8 +38,8 @@ import java.util.List;
 @Api(value = "keystore-api-controller", description = "Keystore REST API", tags = "keystore-api-controller")
 public interface KeystoreApi
 {
-    String BASE_URL_KEYSTORE = "/keystore";
-    String BASE_URL_TRUSTSTORE = "/truststore";
+    String BASE_URL_KEYSTORE = "/api/spvitamin/keystore";
+    String BASE_URL_TRUSTSTORE = "/api/spvitamin/truststore";
 
     @GetMapping(BASE_URL_KEYSTORE)
     @ApiOperation(value = "Retrieve keystore content",

@@ -16,12 +16,6 @@
 
 package hu.perit.spvitamin.spring.admin;
 
-import java.util.Map;
-
-import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import hu.perit.spvitamin.spring.config.CryptoProperties;
@@ -31,8 +25,15 @@ import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceProperties;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
+import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SystemProperties;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import springfox.boot.starter.autoconfigure.SpringfoxConfigurationProperties;
+
+import java.util.Map;
 
 /**
  * @author Peter Nagy
@@ -52,11 +53,14 @@ class StandardServerParameters
     private final ServerProperties serverProperties;
     private final JacksonProperties jacksonProperties;
     private final MicroserviceCollectionProperties microserviceCollectionProperties;
+    private final SwaggerProperties swaggerProperties;
+    private final SpringfoxConfigurationProperties springfoxConfigurationProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
     {
         ServerParameterList params = new ServerParameterList();
+
         params.add(new ServerParameter("(1) Swagger UI", this.getSwaggerUrl(), true));
         params.add(new ServerParameter("(2) Swagger API Docs", this.getApiDocsUrl(), true));
         params.add(new ServerParameter("(3) Actuator", this.getActuatorUrl(), true));
@@ -69,7 +73,8 @@ class StandardServerParameters
         params.add(ServerParameterList.of(this.serverProperties));
         params.add(ServerParameterList.of(this.jacksonProperties));
 
-        for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet()) {
+        for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet())
+        {
             params.add(ServerParameterList.of(entry.getValue(), "microservices." + entry.getKey()));
         }
 
@@ -88,15 +93,19 @@ class StandardServerParameters
         return params;
     }
 
-    private String getActuatorUrl() {
+    private String getActuatorUrl()
+    {
         return this.serverProperties.getServiceUrl() + "/actuator";
     }
 
-    private String getApiDocsUrl() {
-        return this.serverProperties.getServiceUrl() + "/v2/api-docs";
+    private String getApiDocsUrl()
+    {
+        return this.serverProperties.getServiceUrl() + this.swaggerProperties.getSwagger().getV2().getPath();
     }
 
-    private String getSwaggerUrl() {
-        return this.serverProperties.getServiceUrl() + "/swagger-ui/index.html";
+    private String getSwaggerUrl()
+    {
+        String baseUrl = swaggerProperties.getSwaggerUi().getBaseUrl();
+        return this.serverProperties.getServiceUrl() + baseUrl + "/swagger-ui/index.html";
     }
 }

@@ -33,7 +33,7 @@ import java.util.Properties;
 @Api(value = "admin-api-controller", description = "Admin REST API", tags = "admin-api-controller")
 public interface AdminApi
 {
-    String BASE_URL_ADMIN = "/admin";
+    String BASE_URL_ADMIN = "/api/spvitamin/admin";
 
     @GetMapping(BASE_URL_ADMIN + "/settings")
     @ApiOperation(value = "Retrieve server settings",

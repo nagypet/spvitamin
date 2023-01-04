@@ -16,28 +16,21 @@
 
 package hu.perit.spvitamin.spring.rest.api;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.google.common.reflect.AbstractInvocationHandler;
-
-import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
+import hu.perit.spvitamin.spring.config.AdminProperties;
 import hu.perit.spvitamin.spring.config.Constants;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
-import hu.perit.spvitamin.spring.rest.session.AdminSession;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.config.SystemProperties;
+import hu.perit.spvitamin.spring.manifest.ManifestReader;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Peter Nagy
@@ -45,102 +38,61 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class AdminController implements AdminApi
 {
-    private final AdminApi proxy;
-
-    // Injecting dependencies
-    public AdminController(ShutdownManager sm, ServerParameterProvider serverParameterProvider, AuthorizationService authorizationService, HttpServletRequest httpRequest)
-    {
-        this.proxy = (AdminApi) Proxy.newProxyInstance(
-                AdminApi.class.getClassLoader(),
-                new Class[]{AdminApi.class},
-                new ProxyImpl(sm, serverParameterProvider, authorizationService, httpRequest));
-    }
+    private final ShutdownManager sm;
+    private final ServerParameterProvider serverParameterProvider;
+    private final AdminProperties adminProperties;
 
 
     @Override
+    @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
     public List<ServerParameter> retrieveServerSettingsUsingGET()
     {
-        return this.proxy.retrieveServerSettingsUsingGET();
+        return this.serverParameterProvider.getServerParameters();
     }
 
 
     @Override
     public Properties retrieveVersionInfoUsingGET()
     {
-        return this.proxy.retrieveVersionInfoUsingGET();
+        Properties manifest = ManifestReader.getManifestAttributes();
+        String name = manifest.getProperty("Implementation-Title", "Application Title");
+        String version = manifest.getProperty("Implementation-Version", "");
+        //String svnVersion = manifest.getProperty("SVN-REVISION", "");
+        String buildTime = manifest.getProperty("Build-Time", "");
+        String build;
+        if (StringUtils.isNoneBlank(buildTime))
+        {
+            build = String.format("%s", buildTime);
+        }
+        else
+        {
+            build = "Started from IDE, no build info is available!";
+        }
+
+        Properties props = new Properties();
+        props.setProperty("Title", name);
+        props.setProperty("Version", version);
+        props.setProperty("Build", build);
+        props.setProperty("Copyright", this.adminProperties.getCopyright());
+        props.setProperty("KeystoreAdminEnabled", this.adminProperties.getKeystoreAdminEnabled());
+
+        return props;
     }
 
 
     @Override
     public void shutdown()
     {
-        this.proxy.shutdown();
+        this.sm.start();
     }
 
 
     @Override
     public void cspViolationsUsingPOST(String request)
     {
-        this.proxy.cspViolationsUsingPOST(request);
-    }
-
-
-    /*
-     * ============== PROXY Implementation =============================================================================
-     */
-
-    @Slf4j
-    private static class ProxyImpl extends AbstractInvocationHandler {
-        private final ShutdownManager sm;
-        private final ServerParameterProvider serverParameterProvider;
-        private final AuthorizationService authorizationService;
-        private final ProxyImpl.Logger logger;
-
-        public ProxyImpl(ShutdownManager sm, ServerParameterProvider serverParameterProvider, AuthorizationService authorizationService, HttpServletRequest httpRequest) {
-            this.logger = new ProxyImpl.Logger(httpRequest);
-            this.sm = sm;
-            this.serverParameterProvider = serverParameterProvider;
-            this.authorizationService = authorizationService;
-        }
-
-
-        @Override
-        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
-            return this.invokeWithExtras(method, args);
-        }
-
-
-        private Object invokeWithExtras(Method method, Object[] args) throws Throwable {
-            UserDetails user = this.authorizationService.getAuthenticatedUser();
-            try (Took took = new Took(method)) {
-                this.logger.traceIn(null, user.getUsername(), method, args);
-                AdminSession session = new AdminSession(this.sm, this.serverParameterProvider);
-                Object retval = method.invoke(session, args);
-                return retval;
-            }
-            catch (IllegalAccessException ex) {
-                this.logger.traceOut(null, user.getUsername(), method, ex);
-                throw ex;
-            }
-            catch (InvocationTargetException ex) {
-                this.logger.traceOut(null, user.getUsername(), method, ex.getTargetException());
-                throw ex.getTargetException();
-            }
-        }
-
-        @Slf4j
-        private static class Logger extends AbstractInterfaceLogger {
-
-            Logger(HttpServletRequest httpRequest) {
-                super(httpRequest);
-            }
-
-            @Override
-            protected String getSubsystemName() {
-                return Constants.SUBSYSTEM_NAME;
-            }
-        }
+        // do nothing
     }
 }

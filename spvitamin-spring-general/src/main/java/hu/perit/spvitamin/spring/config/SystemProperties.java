@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "system")
-public class SystemProperties {
+public class SystemProperties
+{
 
     private String timeZone = "Europe/Budapest"; // NOSONAR
 }

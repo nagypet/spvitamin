@@ -48,7 +48,7 @@ public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServi
         // create request
         HttpEntity request = new HttpEntity(headers);
 
-        ResponseEntity<AuthorizationToken> authorizationToken = this.restTemplate.exchange(getServiceUrl() + "/authenticate",
+        ResponseEntity<AuthorizationToken> authorizationToken = this.restTemplate.exchange(getServiceUrl() + "/api/spvitamin/authenticate",
                 HttpMethod.GET,
                 request,
                 AuthorizationToken.class);

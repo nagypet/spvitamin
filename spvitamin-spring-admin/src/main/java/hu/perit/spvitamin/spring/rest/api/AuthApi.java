@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
 @Api(value = "auth-api-controller", description = "Authentication and authorization", tags = "auth-api-controller")
 public interface AuthApi {
 
-    String BASE_URL_AUTHENTICATE = "/authenticate";
+    String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";
 
     /*
      * ============== authenticate ===================================================================================

@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.8.0-RELEASE')
+    set('spvitaminVersion', '1.9.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,12 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.9.0-RELEASE 2023-01-04
+- Breaking change: backend URLs changed: /admin => /api/spvitamin/admin; /authenticate => /api/spvitamin/authenticate; keystore => /api/spvitamin/keystore; truststore => /api/spvitamin/truststore. Only the 5.0 version of AdminGUI is compatible with that version. Please upgrade also the AdminGUI when using this version.
+- New properties: admin.keystore-admin-enabled, admin.copyright
+- AdminGUI Swagger and api-docs links are shown correctly when swagger and api-docs URLs are customized with keys `springfox.documentation.swagger-ui.base-url` and `springfox.documentation.swagger.v2.path`.
+
 
 ### 1.8.0-RELEASE 2022-12-30
 - Support for K8s/OpenShift deployment. New property: server.external-url. Can be something like that: "https://${APP_NAME}.${K8S_NAMESPACE}". It controls the links to Swagger, actuator, etc in the admin-gui.
@@ -315,6 +321,12 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 |------------------------------------------|---------|-----------------|-------------------------------------|-------------|
 | system.time-zone                         | string  | Europe/Budapest |                                     |             |
 | crypto.secret                            | string  | secret          |                                     |             |
+| admin.default-site-url                   | string  |                 |                                     | If the webservice serves a frontend other than the AdminGUI|
+| admin.admin-gui-root-file-name           | string  |                 | index.html                          |             |
+| admin.admin-gui-url                      | string  |                 |                                     | The path where the AdminGUI is served|
+| admin.admin-gui-root-file-name           | string  | index.html      |                                     |             |
+| admin.copyright                          | string  | Peter Nagy ...  |                                     | This text will be shown on the footer of the Admin GUI|
+| admin.keystore-admin-enabled             | boolean | TRUE            |                                     | If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of a Kubernetes or Openshift deployment, where certificates are not managed by the app.|
 | datasource.xyz.db-type                   | string  |                 | oracle, sqlserver, mysql, etc...    |             |
 | datasource.xyz.host                      | string  |                 |                                     |             |
 | datasource.xyz.port                      | string  | db dependent    | e.g. at oracle: 1521, etc.          |             |
