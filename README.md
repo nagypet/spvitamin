@@ -42,7 +42,7 @@ dependencyManagement {
 
 ## Releases
 
-### 1.9.0-RELEASE 2023-01-04
+### 1.9.0-RELEASE 2023-01-05
 - Breaking change: backend URLs changed: /admin => /api/spvitamin/admin; /authenticate => /api/spvitamin/authenticate; keystore => /api/spvitamin/keystore; truststore => /api/spvitamin/truststore. Only the 5.0 version of AdminGUI is compatible with that version. Please upgrade also the AdminGUI when using this version.
 - New properties: admin.keystore-admin-enabled, admin.copyright
 - AdminGUI Swagger and api-docs links are shown correctly when swagger and api-docs URLs are customized with keys `springfox.documentation.swagger-ui.base-url` and `springfox.documentation.swagger.v2.path`.
