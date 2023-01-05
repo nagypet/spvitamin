@@ -39,12 +39,12 @@ public class AdminProperties {
 	@Autowired
 	private ServerProperties serverProperties;
 
-	private String defaultSiteUrl = "";
+	private String defaultSiteUrl = "/admin-gui";
 	private String defaultSiteRootFileName = "";
 	private String defaultSiteStaticContentsPath;
 
 	// e.g. admin.admin-gui-url=/alma
-	private String adminGuiUrl = "";
+	private String adminGuiUrl = "/admin-gui";
 	private String adminGuiRootFileName = "index.html";
 
 	// This string will be displayen in the footer of the AdminGUI

@@ -46,6 +46,7 @@ dependencyManagement {
 - Breaking change: backend URLs changed: /admin => /api/spvitamin/admin; /authenticate => /api/spvitamin/authenticate; keystore => /api/spvitamin/keystore; truststore => /api/spvitamin/truststore. Only the 5.0 version of AdminGUI is compatible with that version. Please upgrade also the AdminGUI when using this version.
 - New properties: admin.keystore-admin-enabled, admin.copyright
 - AdminGUI Swagger and api-docs links are shown correctly when swagger and api-docs URLs are customized with keys `springfox.documentation.swagger-ui.base-url` and `springfox.documentation.swagger.v2.path`.
+- AdminGUI project moved into spvitamin. The compiled frontend must be copied into spvitamin-spring-admin\src\main\resources\public\admin-gui. Please remove any local copies of the AdminGUI and use this setup:
 
 
 ### 1.8.0-RELEASE 2022-12-30
@@ -321,9 +322,9 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 |------------------------------------------|---------|-----------------|-------------------------------------|-------------|
 | system.time-zone                         | string  | Europe/Budapest |                                     |             |
 | crypto.secret                            | string  | secret          |                                     |             |
-| admin.default-site-url                   | string  |                 |                                     | If the webservice serves a frontend other than the AdminGUI|
-| admin.admin-gui-root-file-name           | string  |                 | index.html                          |             |
-| admin.admin-gui-url                      | string  |                 |                                     | The path where the AdminGUI is served|
+| admin.default-site-url                   | string  | /admin-gui      |                                     | If the webservice serves a frontend other than the AdminGUI|
+| admin.admin-gui-root-file-name           | string  |                 |                                     |             |
+| admin.admin-gui-url                      | string  | /admin-gui      |                                     | The path where the AdminGUI is served|
 | admin.admin-gui-root-file-name           | string  | index.html      |                                     |             |
 | admin.copyright                          | string  | Peter Nagy ...  |                                     | This text will be shown on the footer of the Admin GUI|
 | admin.keystore-admin-enabled             | boolean | TRUE            |                                     | If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of a Kubernetes or Openshift deployment, where certificates are not managed by the app.|

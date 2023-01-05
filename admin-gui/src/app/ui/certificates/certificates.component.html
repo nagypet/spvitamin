@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright 2020-2022 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div>
+  <div class="row" *ngIf="authService.isAuthenticated() === true">
+
+    <div class="col-sm-6">
+      <h2>Server {{keystoreType}}</h2>
+      <app-keystore [Keystore]="keystoreEntries" (OnDelete)="onDelete($event)"></app-keystore>
+      <hr>
+    </div>
+
+    <div class="col-sm-6">
+      <h2>{{certFileName}}</h2>
+
+      <form *ngIf="isCertFileOpen() !== true" autocomplete="off" spellcheck="false">
+
+        <div class="form-group">
+          <div class="custom-file">
+            <input type="file" #fileInput (change)="onFileSelected($event)" class="custom-file-input" id="inputGroupFile01">
+            <label class="custom-file-label" for="inputGroupFile01">{{certFileName}}</label>
+          </div>
+        </div> <!-- form-group// -->
+
+        <div class="form-group">
+          <label>Optional (public keys do not have password)</label>
+          <input class="form-control" type="password" placeholder="Password" #passwordInput>
+        </div> <!-- form-group// -->
+
+        <hr>
+
+        <button type="button" class="btn btn-outline-primary" (click)="onOpen()">Open</button>
+
+      </form>
+
+      <div *ngIf="isCertFileOpen() === true">
+        <app-keystore [Keystore]="certFileEntries" [DeleteAllowed]="false" (Selected)="onCertSelected($event)"></app-keystore>
+        <hr>
+        <button *ngIf="selectedCertFileEntry !== null" type="button" class="btn btn-outline-primary" (click)="onImport()">Import</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="onClose()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="authService.isAuthenticated() !== true">
+    <div class="col-sm-12">
+      <div style="padding: 15px 0 0 0">
+        <p>Please log in!</p>
+      </div>
+    </div>
+  </div>
+
+  </div>
