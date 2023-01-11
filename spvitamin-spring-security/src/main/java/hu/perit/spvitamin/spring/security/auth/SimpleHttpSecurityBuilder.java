@@ -273,7 +273,7 @@ public class SimpleHttpSecurityBuilder
         http.authorizeRequests() //
                 .antMatchers(
                         // Health and Prometheus endpoint
-                        "/actuator/health", //
+                        "/actuator/health/**", //
                         "/actuator/prometheus") //
                 .permitAll();
 

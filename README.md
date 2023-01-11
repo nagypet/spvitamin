@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.0-RELEASE')
+    set('spvitaminVersion', '1.9.1-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 1.9.1-RELEASE 2023-01-11
+- All path under /actuator/health is also allowed. For cluster-based deployment /actuator/health/readiness, /actuator/liveness must be allowed.
+
 
 ### 1.9.0-RELEASE 2023-01-05
 - Breaking change: backend URLs changed: /admin => /api/spvitamin/admin; /authenticate => /api/spvitamin/authenticate; keystore => /api/spvitamin/keystore; truststore => /api/spvitamin/truststore. Only the 5.0 version of AdminGUI is compatible with that version. Please upgrade also the AdminGUI when using this version.
