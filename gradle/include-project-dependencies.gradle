@@ -72,7 +72,7 @@ class ProjectConfigurer {
 		File buildGradleFile = new File(root, "build.gradle")
 		if (buildGradleFile.exists()) {
 			buildGradleFile.eachLine {line ->
-				if (!(line =~ /^\s*\/\//) && (line =~ /compile\s*project/) || line =~ /api\s*project/ || line =~ /runtime\s*project/) {
+				if (!(line =~ /^\s*\/\//) && (line =~ /^\s*compile\s*project/) || line =~ /^\s*api\s*project/ || line =~ /^\s*runtime\s*project/ || line =~ /^\s*runtimeOnly\s*project/ || line =~ /^\s*implementation\s*project/) {
 					def matcher = line =~ /:[a-z-A-Z0-9]*/
 					if (matcher.size() == 1) {
 						def projName = matcher[0].substring(1)

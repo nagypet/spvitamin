@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.1-RELEASE')
+    set('spvitaminVersion', '2.0.0-RELEASE')
 }
 
 dependencies {
@@ -41,6 +41,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 2.0.0-RELEASE 2023-01-13
+- Upgrade to Gradle 7.0
+
 
 ### 1.9.1-RELEASE 2023-01-11
 - All path under /actuator/health is also allowed. For cluster-based deployment /actuator/health/readiness, /actuator/liveness must be allowed.

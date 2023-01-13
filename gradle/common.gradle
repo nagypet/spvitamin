@@ -75,7 +75,9 @@ task dist {
  *******************************************************************************************************/
 if (project.hasProperty('bootJar')) {
 	bootJar {
-		layered()
+		layered {
+                        enabled = true
+                }
 	}
 }
 
@@ -209,8 +211,8 @@ if (project.hasProperty('bootJar')) {
 if (project.hasProperty('archivesBaseName')) {
 	task finalizeInstallBootDist(type: Copy) {
 		group 'fmake'
-		from "src/main/dist/bin"
-		into "${buildDir}/install/${archivesBaseName}-boot/bin"
+		from "src/main/dist"
+		into "${buildDir}/install/${archivesBaseName}-boot"
 	}
 }
 
@@ -226,7 +228,7 @@ if (project.hasProperty('installBootDist')) {
 if (project.hasProperty('application')) {
 	application {
 		if (applicationDefaultJvmArgs.isEmpty()) {
-			applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Dlog4j.configuration=file:log4j.properties', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
+			applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
 		}
 	}
 }
@@ -263,6 +265,12 @@ task prepareRunInIDEA(type: Copy) {
     group 'fmake'
     from "src/main/dist/bin"
     into "${projectDir}/out/production/resources"
+}
+
+task prepareRunInIDEA2021(type: Copy) {
+	group 'fmake'
+	from "src/main/dist/bin"
+	into "${projectDir}/build/resources/main"
 }
 
 
@@ -350,79 +358,36 @@ pluginManager.withPlugin('maven-publish') {
 				}
 			}
 			publications {
-				maven(MavenPublication) {
+				mavenJava(MavenPublication) {
 					groupId = "${project.group}"
 					artifactId = "${project.name}"
 					version = "${version}"
-
 					from components.java
-				}
-			}
-		}
-	}
-}
-
-
-pluginManager.withPlugin('maven') {
-	if (project.hasProperty('ossrhUsername')) {
-		uploadArchives {
-			repositories {
-				mavenDeployer {
-					beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-					repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-						authentication(userName: ossrhUsername, password: ossrhPassword)
-					}
-
-					snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-						authentication(userName: ossrhUsername, password: ossrhPassword)
-					}
-
-					pom.project {
-						name "${project.group}:${project.name}"
-						packaging 'jar'
-						description 'A general purpose library to use in a spring based microservice environment.'
-						url 'https://github.com/nagypet/spvitamin'
-
-						scm {
-							connection 'scm:git:git://github.com/nagypet/spvitamin.git'
-							developerConnection 'scm:git:ssh://github.com:nagypet/spvitamin.git'
-							url 'https://github.com/nagypet/spvitamin.git'
-						}
-
+					pom {
+						name = "${project.group}:${project.name}"
+						description = 'A general purpose library to use in a spring based microservice environment.'
+						url = 'https://github.com/nagypet/spvitamin'
 						licenses {
 							license {
-								name 'The Apache License, Version 2.0'
-								url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+								name = 'The Apache License, Version 2.0'
+								url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 							}
 						}
-
 						developers {
 							developer {
-								id 'nagypet'
-								name 'Peter Nagy'
-								email 'peter.nagy@perit.hu'
+								id = 'nagypet'
+								name = 'Peter Nagy'
+								email = 'peter.nagy@perit.hu'
 							}
+						}
+						scm {
+							connection = 'scm:git:git://github.com/nagypet/spvitamin.git'
+							developerConnection = 'scm:git:ssh://github.com:nagypet/spvitamin.git'
+							url = 'https://github.com/nagypet/spvitamin.git'
 						}
 					}
 				}
 			}
-		}
-	
-		/*
-		task javadocJar(type: Jar) {
-			classifier = 'javadoc'
-			from javadoc
-		}
-
-		task sourcesJar(type: Jar) {
-			classifier = 'sources'
-			from sourceSets.main.allSource
-		}
-		*/
-		
-		artifacts {
-			archives javadocJar, sourcesJar
 		}
 	}
 }
@@ -430,7 +395,7 @@ pluginManager.withPlugin('maven') {
 
 pluginManager.withPlugin('signing') {
 	signing {
-		sign configurations.archives
+		sign publishing.publications.mavenJava
 	}
 }
 

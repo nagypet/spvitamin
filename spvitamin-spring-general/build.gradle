@@ -32,7 +32,6 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
-apply plugin: 'maven'
 apply plugin: 'signing'
 
 sourceCompatibility = 1.8
@@ -54,7 +53,7 @@ bootJar {
 
 
 dependencies {
-	compile project(':spvitamin-core')
+	implementation project(':spvitamin-core')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -97,7 +96,7 @@ dependencies {
 
 
 configurations {
-    compile.exclude module: 'spring-boot-starter-logging'
+    implementation.exclude module: 'spring-boot-starter-logging'
 }
 
 

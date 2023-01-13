@@ -37,7 +37,7 @@ application {
 
   
 dependencies {	
-	compile project(':spvitamin-core')
+	implementation project(':spvitamin-core')
 	
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
@@ -47,5 +47,5 @@ dependencies {
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
-    compile('log4j:log4j:1.2.17')
+    implementation('log4j:log4j:1.2.17')
 }
