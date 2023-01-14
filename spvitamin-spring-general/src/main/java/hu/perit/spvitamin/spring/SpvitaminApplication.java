@@ -20,6 +20,9 @@ import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.AbstractEnvironment;
+
+import java.util.StringJoiner;
 
 public class SpvitaminApplication extends SpringApplication
 {
@@ -55,7 +58,12 @@ public class SpvitaminApplication extends SpringApplication
     public SpvitaminApplication(Class<?>... primarySources)
     {
         super(primarySources);
-        this.setAdditionalProfiles("spvitamin-defaults");
+        // setAdditionalProfiles is not working with SpringBoot 2.4.5
+        //this.setAdditionalProfiles("spvitamin-defaults");
+        String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
+        StringJoiner sj = new StringJoiner(",");
+        sj.add(activeProfiles).add("spvitamin-defaults");
+        System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
         this.addListeners(new EnvironmentPostProcessor());
     }
 }
