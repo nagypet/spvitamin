@@ -389,16 +389,13 @@ pluginManager.withPlugin('maven-publish') {
 				}
 			}
 		}
+		
+		
+		pluginManager.withPlugin('signing') {
+			signing {
+				sign publishing.publications.mavenJava
+			}
+		}		
 	}
 }
-
-
-pluginManager.withPlugin('signing') {
-	if (publishing.publications.mavenJava != null) {
-		signing {
-			sign publishing.publications.mavenJava
-		}
-	}
-}
-
 
