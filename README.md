@@ -19,7 +19,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '2.0.1-RELEASE')
+    set('spvitaminVersion', '2.0.2-RELEASE')
 }
 
 dependencies {
@@ -47,6 +47,10 @@ dependencyManagement {
 ```
 
 ## Releases
+
+### 2.0.2-RELEASE 2023-01-14
+- Small fix so that spvitamin-defaults can be loaded with spring-boot 2.4.5 as well
+
 
 ### 2.0.1-RELEASE 2023-01-14
 - Small fix so that spvitamin-defaults can be loaded with spring-boot 2.4.5 as well

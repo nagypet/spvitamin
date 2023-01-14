@@ -394,8 +394,10 @@ pluginManager.withPlugin('maven-publish') {
 
 
 pluginManager.withPlugin('signing') {
-	signing {
-		sign publishing.publications.mavenJava
+	if (project.hasProperty('mavenJava')) {
+		signing {
+			sign publishing.publications.mavenJava
+		}
 	}
 }
 

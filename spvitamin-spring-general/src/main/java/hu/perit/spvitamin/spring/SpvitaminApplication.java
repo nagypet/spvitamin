@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring;
 
 import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -61,6 +62,10 @@ public class SpvitaminApplication extends SpringApplication
         // setAdditionalProfiles is not working with SpringBoot 2.4.5
         //this.setAdditionalProfiles("spvitamin-defaults");
         String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
+        if (StringUtils.isBlank(activeProfiles))
+        {
+            activeProfiles = "default";
+        }
         StringJoiner sj = new StringJoiner(",");
         sj.add(activeProfiles).add("spvitamin-defaults");
         System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
