@@ -16,7 +16,7 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.4.5'
+        springBootVersion = '2.7.7'
     }
     repositories {
         mavenCentral()
@@ -48,11 +48,11 @@ repositories {
 
 // it will be a library, no fat jar
 bootJar {
-   enabled = false
+    enabled = false
 }
 
 dependencies {
-	implementation project(':spvitamin-core')
+    implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
 
@@ -65,7 +65,7 @@ dependencies {
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
-	
+
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-core'
@@ -75,8 +75,8 @@ dependencies {
     implementation 'org.aspectj:aspectjweaver:1.9.9.1'
 
     // Slf4J
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.10.0'

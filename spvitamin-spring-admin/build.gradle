@@ -16,7 +16,7 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.4.5'
+        springBootVersion = '2.7.7'
     }
     repositories {
         mavenCentral()
@@ -48,14 +48,14 @@ repositories {
 
 // it will be a library, no fat jar
 bootJar {
-   enabled = false
+    enabled = false
 }
 
 
 dependencies {
-	implementation project(':spvitamin-core')
-	implementation project(':spvitamin-spring-general')
-	implementation project(':spvitamin-spring-security')
+    implementation project(':spvitamin-core')
+    implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-security')
     implementation project(':spvitamin-spring-logging')
 
     // Lombok
@@ -67,21 +67,22 @@ dependencies {
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
-	implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-	
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Validation
     implementation 'javax.validation:validation-api:2.0.1.Final'
 
-	// Guava
-	implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
+    // Guava
+    implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
 
     // Swagger
     implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger-ui:3.0.0"	
+    implementation "io.springfox:springfox-swagger-ui:3.0.0"
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

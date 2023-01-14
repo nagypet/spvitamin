@@ -1,10 +1,16 @@
 # spvitamin
 
-Vitamin for Spring. A general purpose library to use in a spring based microservice environment.
+Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
+
+The library has been tested with the following versions:
+- SpringBoot 2.4.5
+- SpringBoot 2.7.7
+- SpingCloud 2020.0.5
+- SpingCloud 2021.0.5
 
 ## Dependencies
 
-The spvitamin components are now available in the maven central repository.
+The spvitamin components are available in the maven central repository.
 
 build.gradle
 ```
@@ -42,8 +48,19 @@ dependencyManagement {
 
 ## Releases
 
-### 2.0.0-RELEASE 2023-01-13
+### 2.0.0-RELEASE 2023-01-14
 - Upgrade to Gradle 7.0
+- Using SpringBoot 2.7.7, SpringCloud 2021.0.5
+- Swagger 3.0 is not compatible with SpringBoot 2.7.x. In spvitamin there is a helper bean supporting the use of Swagger 3.0. Please use the `@EnableSwagger3WithSpringBoot2_7` annotation on the Swagger configuration class:
+```java
+@Configuration
+@EnableSwagger3WithSpringBoot2_7 <==
+public class SwaggerConfig
+{
+  ...
+}
+```
+- Using new SpringBoot defaults. Please see below.
 
 
 ### 1.9.1-RELEASE 2023-01-11
@@ -392,6 +409,63 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 | async.max-pool-size                      | int     | 100             |                                     |             |
 | async.queue-capacity                     | int     | 1000            |                                     |             |
 | async.thread-name-prefix                 | string  | async-          |                                     |             |
+
+## SpringBoot defaults:
+```yaml
+#-----------------------------------------------------------------------------------------------------------------------
+# Spring settings
+#-----------------------------------------------------------------------------------------------------------------------
+spring:
+  jackson:
+    serialization.write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: ${system.time-zone}
+  mvc.pathmatch.matching-strategy: ant_path_matcher
+  jpa.open-in-view: false
+  # To enable spring.profiles.include
+  config.use-legacy-processing: true
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Server settings
+#-----------------------------------------------------------------------------------------------------------------------
+server.tomcat.mbeanregistry.enabled: true
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Swagger settings
+#-----------------------------------------------------------------------------------------------------------------------
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: "/docs"
+    swagger:
+      v2:
+        path: "/docs"
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Management endpoints
+#-----------------------------------------------------------------------------------------------------------------------
+management:
+  endpoint:
+    refresh.enabled: true
+    health:
+      show-details: always
+      group:
+        startup:
+          include: "ping, healthIndicatorDatabase, diskSpace"
+        readiness:
+          include: "ping"
+        liveness:
+          include: "ping"
+  endpoints:
+    web.exposure.include: health,env,info,metrics,prometheus
+  health:
+    db.enabled: false
+    ldap.enabled: false
+    refresh.enabled: false
+```
 
 
 ## Dependency graph

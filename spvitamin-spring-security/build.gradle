@@ -16,7 +16,7 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.4.5'
+        springBootVersion = '2.7.7'
     }
     repositories {
         mavenCentral()
@@ -48,7 +48,7 @@ repositories {
 
 // it will be a library, no fat jar
 bootJar {
-   enabled = false
+    enabled = false
 }
 
 dependencies {

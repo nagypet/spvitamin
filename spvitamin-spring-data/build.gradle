@@ -16,7 +16,7 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.4.5'
+        springBootVersion = '2.7.7'
     }
     repositories {
         mavenCentral()
@@ -48,12 +48,12 @@ repositories {
 
 // it will be a library, no fat jar
 bootJar {
-   enabled = false
+    enabled = false
 }
 
 
 dependencies {
-	implementation project(':spvitamin-core')
+    implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
 
     // Lombok
@@ -75,14 +75,14 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
     // Slf4J
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
 
     // ModelMapper
     implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
-	
-	    // Test framework
+
+    // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

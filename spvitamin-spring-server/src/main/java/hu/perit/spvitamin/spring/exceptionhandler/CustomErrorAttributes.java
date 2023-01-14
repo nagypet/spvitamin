@@ -20,6 +20,7 @@ package hu.perit.spvitamin.spring.exceptionhandler;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -45,14 +46,14 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
 
 
     @Override
-    public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
-        Map<String, Object> attributes = super.getErrorAttributes(webRequest, includeStackTrace);
+    public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+        Map<String, Object> attributes = super.getErrorAttributes(webRequest, options);
 
         logAttributes(attributes);
         
         Object status = webRequest.getAttribute("javax.servlet.error.status_code", RequestAttributes.SCOPE_REQUEST);
 
-        if ((status instanceof Integer) && (((Integer) status).intValue() == 404)) {
+        if ((status instanceof Integer) && ((Integer) status == 404)) {
             Object message = webRequest.getAttribute("javax.servlet.error.message", RequestAttributes.SCOPE_REQUEST);
             if (message == null || message.toString().equals("")) {
                 Object path = webRequest.getAttribute("javax.servlet.error.request_uri", RequestAttributes.SCOPE_REQUEST);
