@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-buildscript {
-    ext {
-        lombokVersion = '1.18.8'
-    }
-    repositories {
-        mavenCentral()
-    }
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
 }
-
-// Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
-apply plugin: 'java-library'
-apply plugin: 'jacoco'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-
-sourceCompatibility = 1.8
-
 apply from: '../gradle/common.gradle'
-
 
 repositories {
     mavenCentral()

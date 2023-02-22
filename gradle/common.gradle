@@ -39,7 +39,9 @@ if (project.hasProperty('compileJava')) {
  * JDK > 1.8
  *******************************************************************************************************/
 if (project.hasProperty('java') && project.hasProperty('compileJava')) {
-	if (java.sourceCompatibility != JavaVersion.VERSION_1_8) {
+	sourceCompatibility = jvmVersion
+	println "sourceCompatibility: " + sourceCompatibility
+	if (jvmVersion != '1.8') {
 		compileJava {
 			options.compilerArgs << '--add-exports'
 			options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'

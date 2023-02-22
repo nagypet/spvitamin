@@ -16,12 +16,13 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import com.sun.tools.javac.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Data
 class Job
