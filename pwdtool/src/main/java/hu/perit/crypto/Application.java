@@ -21,10 +21,10 @@ package hu.perit.crypto;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.crypto.CryptoException;
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 
-@Log4j
+@Slf4j
 public class Application
 {
     /**
