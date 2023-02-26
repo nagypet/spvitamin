@@ -34,8 +34,8 @@ application {
 dependencies {
     implementation project(':spvitamin-core')
 
-    compileOnly 'org.projectlombok:lombok:1.18.8'
-    annotationProcessor 'org.projectlombok:lombok:1.18.8'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
 

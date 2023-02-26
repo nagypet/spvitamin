@@ -16,13 +16,13 @@
 
 package hu.perit.spvitamin.spring.httplogging;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Iterator;
 
 @RequiredArgsConstructor
-class HttpResponseWrapper implements HttpWrapper
+final class HttpResponseWrapper implements HttpWrapper
 {
     private final HttpServletResponse httpResponse;
 

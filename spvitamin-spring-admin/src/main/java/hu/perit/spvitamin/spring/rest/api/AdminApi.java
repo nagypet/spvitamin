@@ -17,8 +17,15 @@
 package hu.perit.spvitamin.spring.rest.api;
 
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.logging.EventLogId;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,57 +37,58 @@ import java.util.Properties;
  * @author Peter Nagy
  */
 
-@Api(value = "admin-api-controller", description = "Admin REST API", tags = "admin-api-controller")
+@Tag(name = "admin-api-controller", description = "Admin REST API")
 public interface AdminApi
 {
     String BASE_URL_ADMIN = "/api/spvitamin/admin";
 
     @GetMapping(BASE_URL_ADMIN + "/settings")
-    @ApiOperation(value = "Retrieve server settings",
-            authorizations = {@Authorization(value = "Bearer")}
+    @Operation(summary = "Retrieve server settings",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Authenticated user is not allowed to perform the operation!", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
     )
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 401, message = "Unauthorized request!"),
-            @ApiResponse(code = 403, message = "Authenticated user is not allowed to perform the operation!"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
     @EventLogId(eventId = 1)
     List<ServerParameter> retrieveServerSettingsUsingGET();
 
     @GetMapping(BASE_URL_ADMIN + "/version")
-    @ApiOperation(value = "Retrieve version info")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
+    @Operation(summary = "Retrieve version info",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @EventLogId(eventId = 2)
     Properties retrieveVersionInfoUsingGET();
 
 
     @PostMapping(BASE_URL_ADMIN + "/shutdown")
-    @ApiOperation(value = "Shuts down the server.",
-            authorizations = {@Authorization(value = "Bearer")}
+    @Operation(summary = "Shuts down the server.",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Authenticated user is not allowed to perform the operation!", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
     )
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Shutdown operation has been started."),
-            @ApiResponse(code = 401, message = "Unauthorized request!"),
-            @ApiResponse(code = 403, message = "Authenticated user is not allowed to perform the operation!"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
     @EventLogId(eventId = 3)
     void shutdown();
 
 
     @PostMapping(BASE_URL_ADMIN + "/csp_violations")
-    @ApiOperation(value = "Logs CSP violations")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
+    @Operation(summary = "Logs CSP violations",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @EventLogId(eventId = 4)
     void cspViolationsUsingPOST(
-            @ApiParam(value = "Violations", required=true ) @RequestBody String request
+            @Parameter(name = "Violations", required = true) @RequestBody String request
     );
-
 }

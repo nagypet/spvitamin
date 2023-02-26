@@ -66,8 +66,8 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
 
     // Swagger
-    implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger-ui:3.0.0"
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

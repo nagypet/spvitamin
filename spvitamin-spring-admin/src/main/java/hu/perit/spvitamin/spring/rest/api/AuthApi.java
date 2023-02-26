@@ -16,43 +16,43 @@
 
 package hu.perit.spvitamin.spring.rest.api;
 
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-
 /**
  * @author Peter Nagy
  */
 
-@Api(value = "auth-api-controller", description = "Authentication and authorization", tags = "auth-api-controller")
-public interface AuthApi {
-
+@Tag(name = "auth-api-controller", description = "Authentication and authorization")
+public interface AuthApi
+{
     String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";
 
     /*
      * ============== authenticate ===================================================================================
      */
     @GetMapping(BASE_URL_AUTHENTICATE)
-    @ApiOperation(value = "authenticate() - User authenticate",
-            authorizations = {@Authorization(value = "basicAuth")}
+    @Operation(summary = "authenticate() - User authenticate",
+            security = {
+                    @SecurityRequirement(name = "basic"),
+                    @SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = AuthorizationToken.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
     )
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 401, message = "Invalid credentials"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
     @ResponseStatus(value = HttpStatus.OK)
-    AuthorizationToken authenticateUsingGET(
-            @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID
-    );
+    AuthorizationToken authenticateUsingGET(@RequestHeader(value = "processID", required = false) String processID);
 }

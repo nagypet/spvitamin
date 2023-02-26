@@ -38,15 +38,15 @@ server.tomcat.mbeanregistry.enabled: true
 
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Swagger settings
+# Springdoc settings
 #-----------------------------------------------------------------------------------------------------------------------
-springfox:
-  documentation:
-    swagger-ui:
-      base-url: "/docs"
-    swagger:
-      v2:
-        path: "/docs"
+springdoc:
+  swagger-ui:
+    # the path must end with /swagger-ui
+    path: /docs/swagger-ui
+    filter: true
+  api-docs:
+    path: /docs
 
 
 #-----------------------------------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@ import hu.perit.spvitamin.core.StackTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -60,16 +61,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 
     @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status,
-                                                             WebRequest request)
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request)
     {
-        if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status))
+        if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR)
         {
             request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
         }
         String path = request != null ? request.getDescription(false) : "";
         log.error(StackTracer.toString(ex));
-        RestExceptionResponse exceptionResponse = new RestExceptionResponse(status, ex, path);
-        return new ResponseEntity<>(exceptionResponse, headers, status);
+        RestExceptionResponse exceptionResponse = new RestExceptionResponse(statusCode, ex, path);
+        return new ResponseEntity<>(exceptionResponse, headers, statusCode);
     }
 }

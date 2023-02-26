@@ -16,13 +16,11 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter.jwt;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.StringUtils;
-
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.StringUtils;
 
 /**
  * This class is intentionally no container. It should be invoked only for Jwt endpoints.
@@ -30,15 +28,16 @@ import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
  * @author Peter Nagy
  */
 
-public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter {
-
+public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
+{
     @Override
-    protected JwtString getJwtFromRequest(HttpServletRequest request) {
+    protected JwtString getJwtFromRequest(HttpServletRequest request)
+    {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
+        {
             return new JwtString(bearerToken.substring(7));
         }
         return null;
     }
 }
-

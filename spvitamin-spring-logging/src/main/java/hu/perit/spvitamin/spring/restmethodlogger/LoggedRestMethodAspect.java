@@ -21,6 +21,7 @@ import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import hu.perit.spvitamin.spring.logging.LogEvent;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,7 +32,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -68,8 +68,7 @@ public class LoggedRestMethodAspect
         try (Took took = new Took(method, !annotation.muted()))
         {
             callIn(null, annotation.subsystem(), user.getUsername(), method.getName(), annotation.eventId(), argNames, proceedingJoinPoint.getArgs(), annotation.muted());
-            Object retval = proceedingJoinPoint.proceed();
-            return retval;
+            return proceedingJoinPoint.proceed();
         }
         catch (Throwable ex)
         {

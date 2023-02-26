@@ -23,9 +23,12 @@ import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
+import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertySource;
 
 /**
  * A utility class for post processing some properties. This must be done just
@@ -46,6 +49,15 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
         {
             this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
         }
+        else if (event instanceof ContextRefreshedEvent)
+        {
+            this.onContextRefreshedEvent((ContextRefreshedEvent) event);
+        }
+    }
+
+    private void onContextRefreshedEvent(ContextRefreshedEvent event)
+    {
+        log.info("ContextRefreshedEvent occured");
     }
 
 
@@ -64,12 +76,23 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
                 ServerExceptionProperties.setStackTraceEnabled(ErrorProperties.IncludeStacktrace.ALWAYS.name().equals(env.getProperty("server.error.includeStacktrace", "ALWAYS")));
                 RestExceptionResponse.setExceptionEnabled(Boolean.parseBoolean(env.getProperty("server.error.includeException", "true")));
                 RestExceptionResponse.setMessageEnabled(ErrorProperties.IncludeAttribute.ALWAYS.name().equals(env.getProperty("server.error.includeMessage", "ALWAYS")));
+
+                env.getPropertySources().forEach(i -> dumpPropertySource(i));
             }
             catch (RuntimeException ex)
             {
                 log.error(StackTracer.toString(ex));
                 throw ex;
             }
+        }
+    }
+
+    private void dumpPropertySource(PropertySource<?> ps)
+    {
+        if (ps instanceof OriginTrackedMapPropertySource)
+        {
+            OriginTrackedMapPropertySource propertySource = (OriginTrackedMapPropertySource) ps;
+            log.info(propertySource.getName());
         }
     }
 }

@@ -16,8 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.keycloak;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.keycloak.adapters.AdapterTokenStore;
 import org.keycloak.adapters.BasicAuthRequestAuthenticator;
 import org.keycloak.adapters.KeycloakDeployment;
@@ -28,7 +27,7 @@ public class CustomSpringSecurityRequestAuthenticator extends SpringSecurityRequ
 {
 
     public CustomSpringSecurityRequestAuthenticator(HttpFacade facade, HttpServletRequest request, KeycloakDeployment deployment,
-        AdapterTokenStore tokenStore, int sslRedirectPort)
+                                                    AdapterTokenStore tokenStore, int sslRedirectPort)
     {
         super(facade, request, deployment, tokenStore, sslRedirectPort);
     }

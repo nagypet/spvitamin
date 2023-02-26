@@ -16,17 +16,15 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
 
 /**
  * Session handling could be denied in WebSecurityConfig, thogh we do not want to completely deny session handling. We
@@ -36,12 +34,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class SecurityContextRemoverFilter extends OncePerRequestFilter {
+public class SecurityContextRemoverFilter extends OncePerRequestFilter
+{
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
+    {
+        log.info("{} called", this.getClass().getName());
 
-        log.info("Persisted security context removed by SecurityContextRemoverFilter");
         // Clearing persisted security context => ignoring session handling on the basis of JSESSIONID
         SecurityContextHolder.clearContext();
         filterChain.doFilter(request, response);

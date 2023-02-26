@@ -55,6 +55,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-core'
 
+    // javax.validation
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
     // Aspectj
     runtimeOnly 'org.aspectj:aspectjrt:1.9.9.1'
     implementation 'org.aspectj:aspectjweaver:1.9.9.1'

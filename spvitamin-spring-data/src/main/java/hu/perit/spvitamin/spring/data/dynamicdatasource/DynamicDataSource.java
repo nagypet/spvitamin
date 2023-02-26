@@ -23,8 +23,6 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
-
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
@@ -33,6 +31,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.sql.DataSource;
 
 /**
  * This implementation can actually be closed. When you call close(), it creates a new DataSource object 

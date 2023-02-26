@@ -17,19 +17,30 @@
 package hu.perit.spvitamin.spring.httplogging;
 
 import hu.perit.spvitamin.core.StackTracer;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -47,7 +58,7 @@ public class HttpLoggingFilter implements Filter
             {
                 String contentType = request.getContentType();
                 HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-                HttpLoggingFilter.BufferedResponseWrapper bufferedResponse = new HttpLoggingFilter.BufferedResponseWrapper((HttpServletResponse) response);
+                BufferedResponseWrapper bufferedResponse = new BufferedResponseWrapper((HttpServletResponse) response);
                 if (contentType == null || contentType.startsWith("application/json"))
                 {
                     httpServletRequest = new HttpLoggingFilter.BufferedRequestWrapper((HttpServletRequest) request);
@@ -129,7 +140,7 @@ public class HttpLoggingFilter implements Filter
     }
 
 
-    private void prepareLogMessageResponse(StringBuilder logMessage, HttpServletRequest bufferedRequest, BufferedResponseWrapper bufferedResponse) throws IOException
+    private void prepareLogMessageResponse(StringBuilder logMessage, HttpServletRequest bufferedRequest, BufferedResponseWrapper bufferedResponse)
     {
         String contenttype = bufferedResponse.getContentType();
         String body = contenttype != null && !contenttype.startsWith("application/json") ? "Non JSON Data" : bufferedResponse.getContent();
@@ -162,13 +173,13 @@ public class HttpLoggingFilter implements Filter
 
     private String getParameterAsString(HttpServletRequest request)
     {
-        Set<String> parameterAsString = new HashSet();
-        Enumeration parameterNames = request.getParameterNames();
+        Set<String> parameterAsString = new HashSet<>();
+        Enumeration<String> parameterNames = request.getParameterNames();
 
         while (parameterNames != null && parameterNames.hasMoreElements())
         {
             StringBuilder sb = new StringBuilder();
-            String parameterName = (String) parameterNames.nextElement();
+            String parameterName = parameterNames.nextElement();
             sb.append(parameterName).append("=").append(request.getParameter(parameterName));
             parameterAsString.add(sb.toString());
         }
@@ -176,7 +187,7 @@ public class HttpLoggingFilter implements Filter
         return Strings.join(parameterAsString, ',');
     }
 
-    public void init(FilterConfig filterConfig) throws ServletException
+    public void init(FilterConfig filterConfig)
     {
     }
 
@@ -184,298 +195,13 @@ public class HttpLoggingFilter implements Filter
     {
     }
 
-    public class BufferedResponseWrapper implements HttpServletResponse
-    {
-
-        HttpServletResponse original;
-        HttpLoggingFilter.TeeServletOutputStream tee;
-        ByteArrayOutputStream bos;
-
-        public BufferedResponseWrapper(HttpServletResponse response)
-        {
-            this.original = response;
-        }
-
-        public String getContent()
-        {
-            return this.bos != null ? this.bos.toString() : "";
-        }
-
-        public PrintWriter getWriter() throws IOException
-        {
-            return this.original.getWriter();
-        }
-
-        public ServletOutputStream getOutputStream() throws IOException
-        {
-            if (this.tee == null)
-            {
-                this.bos = new ByteArrayOutputStream();
-                this.tee = HttpLoggingFilter.this.new TeeServletOutputStream(this.original.getOutputStream(), this.bos);
-            }
-
-            return this.tee;
-        }
-
-        public String getCharacterEncoding()
-        {
-            return this.original.getCharacterEncoding();
-        }
-
-        public String getContentType()
-        {
-            return this.original.getContentType();
-        }
-
-        public void setCharacterEncoding(String charset)
-        {
-            this.original.setCharacterEncoding(charset);
-        }
-
-        public void setContentLength(int len)
-        {
-            this.original.setContentLength(len);
-        }
-
-        public void setContentLengthLong(long l)
-        {
-            this.original.setContentLengthLong(l);
-        }
-
-        public void setContentType(String type)
-        {
-            this.original.setContentType(type);
-        }
-
-        public void setBufferSize(int size)
-        {
-            this.original.setBufferSize(size);
-        }
-
-        public int getBufferSize()
-        {
-            return this.original.getBufferSize();
-        }
-
-        public void flushBuffer() throws IOException
-        {
-            this.tee.flush();
-        }
-
-        public void resetBuffer()
-        {
-            this.original.resetBuffer();
-        }
-
-        public boolean isCommitted()
-        {
-            return this.original.isCommitted();
-        }
-
-        public void reset()
-        {
-            this.original.reset();
-        }
-
-        public void setLocale(Locale loc)
-        {
-            this.original.setLocale(loc);
-        }
-
-        public Locale getLocale()
-        {
-            return this.original.getLocale();
-        }
-
-        public void addCookie(Cookie cookie)
-        {
-            this.original.addCookie(cookie);
-        }
-
-        public boolean containsHeader(String name)
-        {
-            return this.original.containsHeader(name);
-        }
-
-        public String encodeURL(String url)
-        {
-            return this.original.encodeURL(url);
-        }
-
-        public String encodeRedirectURL(String url)
-        {
-            return this.original.encodeRedirectURL(url);
-        }
-
-        public String encodeUrl(String url)
-        {
-            return this.original.encodeUrl(url);
-        }
-
-        public String encodeRedirectUrl(String url)
-        {
-            return this.original.encodeRedirectUrl(url);
-        }
-
-        public void sendError(int sc, String msg) throws IOException
-        {
-            this.original.sendError(sc, msg);
-        }
-
-        public void sendError(int sc) throws IOException
-        {
-            this.original.sendError(sc);
-        }
-
-        public void sendRedirect(String location) throws IOException
-        {
-            this.original.sendRedirect(location);
-        }
-
-        public void setDateHeader(String name, long date)
-        {
-            this.original.setDateHeader(name, date);
-        }
-
-        public void addDateHeader(String name, long date)
-        {
-            this.original.addDateHeader(name, date);
-        }
-
-        public void setHeader(String name, String value)
-        {
-            this.original.setHeader(name, value);
-        }
-
-        public void addHeader(String name, String value)
-        {
-            this.original.addHeader(name, value);
-        }
-
-        public void setIntHeader(String name, int value)
-        {
-            this.original.setIntHeader(name, value);
-        }
-
-        public void addIntHeader(String name, int value)
-        {
-            this.original.addIntHeader(name, value);
-        }
-
-        public void setStatus(int sc)
-        {
-            this.original.setStatus(sc);
-        }
-
-        public void setStatus(int sc, String sm)
-        {
-            this.original.setStatus(sc, sm);
-        }
-
-        public String getHeader(String arg0)
-        {
-            return this.original.getHeader(arg0);
-        }
-
-        public Collection<String> getHeaderNames()
-        {
-            return this.original.getHeaderNames();
-        }
-
-        public Collection<String> getHeaders(String arg0)
-        {
-            return this.original.getHeaders(arg0);
-        }
-
-        public int getStatus()
-        {
-            return this.original.getStatus();
-        }
-    }
-
-    public class TeeServletOutputStream extends ServletOutputStream
-    {
-
-        private final TeeOutputStream targetStream;
-
-        public TeeServletOutputStream(OutputStream one, OutputStream two)
-        {
-            this.targetStream = new TeeOutputStream(one, two);
-        }
-
-        public void write(int arg0) throws IOException
-        {
-            this.targetStream.write(arg0);
-        }
-
-        public void flush() throws IOException
-        {
-            super.flush();
-            this.targetStream.flush();
-        }
-
-        public void close() throws IOException
-        {
-            super.close();
-            this.targetStream.close();
-        }
-
-        public boolean isReady()
-        {
-            return false;
-        }
-
-        public void setWriteListener(WriteListener writeListener)
-        {
-        }
-    }
-
-    private static final class BufferedServletInputStream extends ServletInputStream
-    {
-
-        private ByteArrayInputStream bais;
-
-        public BufferedServletInputStream(ByteArrayInputStream bais)
-        {
-            this.bais = bais;
-        }
-
-        public int available()
-        {
-            return this.bais.available();
-        }
-
-        public int read()
-        {
-            return this.bais.read();
-        }
-
-        public int read(byte[] buf, int off, int len)
-        {
-            return this.bais.read(buf, off, len);
-        }
-
-        public boolean isFinished()
-        {
-            return false;
-        }
-
-        public boolean isReady()
-        {
-            return true;
-        }
-
-        public void setReadListener(ReadListener readListener)
-        {
-        }
-    }
 
     private static final class BufferedRequestWrapper extends HttpServletRequestWrapper
     {
 
         private ByteArrayInputStream bais = null;
         private ByteArrayOutputStream baos = null;
-        private HttpLoggingFilter.BufferedServletInputStream bsis = null;
+        private BufferedServletInputStream bsis = null;
         private byte[] buffer = null;
 
         public BufferedRequestWrapper(HttpServletRequest req) throws IOException
@@ -497,7 +223,7 @@ public class HttpLoggingFilter implements Filter
         public ServletInputStream getInputStream()
         {
             this.bais = new ByteArrayInputStream(this.buffer);
-            this.bsis = new HttpLoggingFilter.BufferedServletInputStream(this.bais);
+            this.bsis = new BufferedServletInputStream(this.bais);
             return this.bsis;
         }
 

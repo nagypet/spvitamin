@@ -18,10 +18,10 @@ package hu.perit.spvitamin.spring.data.nativequery;
 
 import hu.perit.spvitamin.core.exception.CodingException;
 import hu.perit.spvitamin.core.took.Took;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.List;
 import java.util.stream.Collectors;
 

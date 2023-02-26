@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -102,10 +103,10 @@ public class RestExceptionResponse implements JsonSerializable
         myMessageEnabled = messageEnabled;
     }
 
-    public RestExceptionResponse(HttpStatus status, Throwable ex, String path)
+    public RestExceptionResponse(HttpStatusCode statusCode, Throwable ex, String path)
     {
         this.timestamp = new Date();
-        this.status = status.value();
+        this.status = statusCode.value();
         this.path = path;
         if (myExceptionEnabled)
         {
@@ -146,7 +147,7 @@ public class RestExceptionResponse implements JsonSerializable
         }
         else
         {
-            this.error = status.getReasonPhrase();
+            this.error = HttpStatus.valueOf(statusCode.value()).getReasonPhrase();
         }
     }
 

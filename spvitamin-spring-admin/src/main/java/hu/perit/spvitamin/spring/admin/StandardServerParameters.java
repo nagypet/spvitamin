@@ -31,7 +31,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import springfox.boot.starter.autoconfigure.SpringfoxConfigurationProperties;
 
 import java.util.Map;
 
@@ -54,7 +53,6 @@ class StandardServerParameters
     private final JacksonProperties jacksonProperties;
     private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final SwaggerProperties swaggerProperties;
-    private final SpringfoxConfigurationProperties springfoxConfigurationProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -100,12 +98,12 @@ class StandardServerParameters
 
     private String getApiDocsUrl()
     {
-        return this.serverProperties.getServiceUrl() + this.swaggerProperties.getSwagger().getV2().getPath();
+        return this.serverProperties.getServiceUrl() + this.swaggerProperties.getApiDocs().getPath();
     }
 
     private String getSwaggerUrl()
     {
-        String baseUrl = swaggerProperties.getSwaggerUi().getBaseUrl();
-        return this.serverProperties.getServiceUrl() + baseUrl + "/swagger-ui/index.html";
+        String path = swaggerProperties.getSwaggerUi().getPath();
+        return this.serverProperties.getServiceUrl() + path + "/index.html";
     }
 }

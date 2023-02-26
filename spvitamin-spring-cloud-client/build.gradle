@@ -49,6 +49,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // javax.validation
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 

@@ -16,24 +16,27 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.security.Constants;
+import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -42,6 +45,7 @@ import java.util.List;
  * @author Peter Nagy
  */
 
+@Slf4j
 public class SimpleHttpSecurityBuilder
 {
 
@@ -50,12 +54,6 @@ public class SimpleHttpSecurityBuilder
     public static SimpleHttpSecurityBuilder newInstance(HttpSecurity http)
     {
         return new SimpleHttpSecurityBuilder(http);
-    }
-
-
-    public static AfterAuthorizationBuilder afterAuthorization(HttpSecurity http)
-    {
-        return new AfterAuthorizationBuilder(http);
     }
 
 
@@ -89,13 +87,21 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder defaults() throws Exception
     {
-        return this.defaultCors().defaultCsrf().allowAdditionalSecurityHeaders();
+        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+
+        return this
+                .defaultCors()
+                .defaultCsrf()
+                .allowAdditionalSecurityHeaders()
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
     }
 
 
-    public SimpleHttpSecurityBuilder scope(String... antPatterns)
+    public SimpleHttpSecurityBuilder scope(String... antPatterns) throws Exception
     {
-        http.requestMatchers().antMatchers(antPatterns);
+        defaults();
+        this.http.securityMatcher(antPatterns);
         return this;
     }
 
@@ -118,212 +124,48 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public void basicAuthWithSession() throws Exception
+    public SimpleHttpSecurityBuilder basicAuth() throws Exception
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
-        this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .and() //
-                .authorizeRequests() //
-                .anyRequest().authenticated().and() //
-                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+        this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+
+        if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
+        {
+            this.http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+        }
+
+        return this;
     }
 
 
-    public void basicAuth() throws Exception
+    public SimpleHttpSecurityBuilder jwtAuth() throws Exception
     {
-        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-        this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .ignorePersistedSecurity().and() //
-                .authorizeRequests() //
-                .anyRequest().authenticated().and() //
-                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
-    }
-
-
-    public void basicAuth(String role) throws Exception
-    {
-        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-        this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .ignorePersistedSecurity().and() //
-                .authorizeRequests() //
-                .anyRequest().hasRole(role).and() //
-                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
-    }
-
-
-    public void jwtAuth() throws Exception
-    {
-        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-        this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .ignorePersistedSecurity().and() //
-                .authorizeRequests().anyRequest().authenticated();
-
         // applying JWT Filter
-        this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+        if (!isFilterAlreadyExists(JwtAuthenticationFilter.class))
+        {
+            this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+        }
+        if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
+        {
+            this.http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+        }
+
+        return this;
     }
 
-    public void permitAll() throws Exception
+
+    public SimpleHttpSecurityBuilder authorizeRequests(Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
     {
-        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
+        this.http.authorizeHttpRequests(authorizeHttpRequestsCustomizer);
 
-        this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .ignorePersistedSecurity().and() //
-                .authorizeRequests().anyRequest().permitAll();
-    }
-
-
-    public ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry authorizeRequests() throws Exception
-    {
-        CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-        CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
-
-        return this.defaults() //
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler) //
-                .ignorePersistedSecurity().and() //
-                .authorizeRequests();
+        return this;
     }
 
 
     public HttpSecurity and()
     {
         return this.http;
-    }
-
-
-    public SimpleHttpSecurityBuilder authorizeAdminRestEndpoints() throws Exception
-    {
-        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry = http.authorizeRequests().antMatchers(
-                // Admin REST API
-                String.format("%s/version", Constants.BASE_URL_ADMIN),
-                String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
-
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = urlRegistry //
-                .antMatchers( //
-                        Constants.BASE_URL_ADMIN + "/**", //
-                        Constants.BASE_URL_KEYSTORE + "/**", //
-                        Constants.BASE_URL_TRUSTSTORE + "/**");
-
-        if ("*".equals(securityProperties.getAdminEndpointsAccess()))
-        {
-            adminUrls.permitAll();
-        }
-        else
-        {
-            adminUrls.hasRole(securityProperties.getAdminEndpointsAccess());
-        }
-
-        return this;
-    }
-
-
-    public SimpleHttpSecurityBuilder authorizeSwagger() throws Exception
-    {
-        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-        SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
-        String baseUrlSwaggerUi = swaggerProperties.getSwaggerUi().getBaseUrl();
-        String urlV2Docs = swaggerProperties.getSwagger().getV2().getPath();
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = http.authorizeRequests() //
-                .antMatchers(
-                        // Swagger 2 UI related endpoints and resources
-                        baseUrlSwaggerUi + "/swagger-ui.html",
-                        baseUrlSwaggerUi + "/swagger-ui.html/**",
-                        baseUrlSwaggerUi + "/swagger-resources/**",
-                        baseUrlSwaggerUi + "/webjars/springfox-swagger-ui/**",
-
-                        // Swagger 3
-                        baseUrlSwaggerUi + "/swagger-ui/**",
-
-                        // api-docs
-                        urlV2Docs + "/**",
-                        "/v3/api-docs/**"
-                );
-
-        if ("*".equals(securityProperties.getSwaggerAccess()))
-        {
-            swaggerUrls.permitAll();
-        }
-        else
-        {
-            swaggerUrls.hasRole(securityProperties.getSwaggerAccess());
-        }
-        return this;
-    }
-
-
-    public SimpleHttpSecurityBuilder authorizeActuator() throws Exception
-    {
-        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-
-        http.authorizeRequests() //
-                .antMatchers(
-                        // Health and Prometheus endpoint
-                        "/actuator/health/**", //
-                        "/actuator/prometheus") //
-                .permitAll();
-
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = http.authorizeRequests() //
-                .antMatchers("/actuator/**");
-
-        if ("*".equals(securityProperties.getManagementEndpointsAccess()))
-        {
-            actuatorUrls.permitAll();
-        }
-        else
-        {
-            actuatorUrls.hasRole(securityProperties.getManagementEndpointsAccess());
-        }
-        return this;
-    }
-
-
-    public SimpleHttpSecurityBuilder authorizeAdminGui() throws Exception
-    {
-        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-
-        AdminProperties adminProperties = SysConfig.getAdminProperties();
-
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls;
-        if (adminProperties.getAdminGuiUrl().isBlank())
-        {
-            adminGuiUrls = http.authorizeRequests() //
-                    .antMatchers(
-                            // Admin GUI controller
-                            "/", "/*.*", "/css/**", "/assets/**");
-        }
-        else
-        {
-            adminGuiUrls = http.authorizeRequests() //
-                    .antMatchers(
-                            // Admin GUI controller
-                            "/",
-                            String.format("%s/**", adminProperties.getAdminGuiUrl()));
-        }
-
-        if ("*".equals(securityProperties.getAdminGuiAccess()))
-        {
-            adminGuiUrls.permitAll();
-        }
-        else
-        {
-            adminGuiUrls.hasRole(securityProperties.getAdminGuiAccess());
-        }
-        return this;
     }
 
 
@@ -343,8 +185,35 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder ignorePersistedSecurity()
     {
-        this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextPersistenceFilter.class);
+        if (!isFilterAlreadyExists(SecurityContextRemoverFilter.class))
+        {
+            this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextPersistenceFilter.class);
+        }
+        else
+        {
+            log.warn("{} has already been applied!", SecurityContextRemoverFilter.class.getName());
+        }
         return this;
+    }
+
+    private boolean isFilterAlreadyExists(Class<?> filterClass)
+    {
+        List<Field> fields = ReflectionUtils.propertiesOf(HttpSecurity.class, true);
+        Field filters = fields.stream().filter(i -> i.getName().equalsIgnoreCase("filters")).findAny().orElse(null);
+        if (filters != null)
+        {
+            filters.setAccessible(true);
+            try
+            {
+                List f = (List) filters.get(this.http);
+                return f.stream().anyMatch(i -> i.toString().contains(filterClass.getName()));
+            }
+            catch (IllegalAccessException e)
+            {
+                // Just do nothing
+            }
+        }
+        return false;
     }
 
 
@@ -372,31 +241,5 @@ public class SimpleHttpSecurityBuilder
         {
             return List.of(input);
         }
-    }
-
-
-    public static class AfterAuthorizationBuilder
-    {
-        private final HttpSecurity http;
-
-        private AfterAuthorizationBuilder(HttpSecurity http)
-        {
-            this.http = http;
-        }
-
-        public void basicAuth() throws Exception
-        {
-            CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
-
-            this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
-        }
-
-
-        public void jwtAuth()
-        {
-            // applying JWT Filter
-            this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
-        }
-
     }
 }

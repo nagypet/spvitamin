@@ -19,7 +19,7 @@ package hu.perit.spvitamin.spring.resttemplate;
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -28,23 +28,35 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class RestTemplateErrorHandler extends DefaultResponseErrorHandler {
+public class RestTemplateErrorHandler extends DefaultResponseErrorHandler
+{
 
     @Override
-    protected void handleError(ClientHttpResponse response, HttpStatus statusCode) throws IOException {
+    public void handleError(ClientHttpResponse response) throws IOException
+    {
         Exception ex = this.getException(response);
-        if (ex instanceof RuntimeException) {
-            throw (RuntimeException)ex;
+        if (ex instanceof RuntimeException)
+        {
+            throw (RuntimeException) ex;
         }
-        else {
+        else
+        {
             ServerException.throwFrom(ex);
         }
     }
 
+    @Override
+    protected void handleError(ClientHttpResponse response, HttpStatusCode statusCode) throws IOException
+    {
+        handleError(response);
+    }
 
-    private Exception getException(ClientHttpResponse response) throws IOException {
+
+    private Exception getException(ClientHttpResponse response) throws IOException
+    {
         Charset charset = getCharset(response);
-        if (charset == null) {
+        if (charset == null)
+        {
             charset = StandardCharsets.UTF_8;
         }
         response.getBody();
@@ -54,8 +66,10 @@ public class RestTemplateErrorHandler extends DefaultResponseErrorHandler {
     }
 
 
-    private Exception getException(RestExceptionResponse exceptionResponse) {
-        if (exceptionResponse != null && exceptionResponse.getException() != null) {
+    private Exception getException(RestExceptionResponse exceptionResponse)
+    {
+        if (exceptionResponse != null && exceptionResponse.getException() != null)
+        {
             return exceptionResponse.getException().toException();
         }
         return null;

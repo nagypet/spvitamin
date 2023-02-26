@@ -18,9 +18,9 @@ package hu.perit.spvitamin.spring.logging;
 
 import hu.perit.spvitamin.core.event.Event;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;

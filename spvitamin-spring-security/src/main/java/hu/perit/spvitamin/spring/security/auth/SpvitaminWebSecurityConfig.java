@@ -16,101 +16,189 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SwaggerProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.security.Constants;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.security.Constants;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * @author Peter Nagy
  */
 
 @EnableWebSecurity
+@Configuration
 public class SpvitaminWebSecurityConfig
 {
     /*
      * ============== Config for the endpoints with persisted security =================================================
      */
-    @Configuration
-    @Order(98)
-    public static class WebSecurityConfigurationAdapterForJwt extends WebSecurityConfigurerAdapter
+    @Bean
+    @Order(998)
+    public SecurityFilterChain configureAdminRestEndpoints(HttpSecurity http) throws Exception
     {
-
-        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-        private final CustomAccessDeniedHandler accessDeniedHandler;
-
-        public WebSecurityConfigurationAdapterForJwt(SecurityProperties securityProperties,
-            CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler)
-        {
-            this.authenticationEntryPoint = authenticationEntryPoint;
-            this.accessDeniedHandler = accessDeniedHandler;
-        }
-
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http) //
-                .scope( //
-                    Constants.BASE_URL_ADMIN + "/**", //
-                    Constants.BASE_URL_KEYSTORE + "/**", //
-                    Constants.BASE_URL_TRUSTSTORE + "/**") //
-                .defaults() //
-                .exceptionHandler(this.authenticationEntryPoint, this.accessDeniedHandler) //
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(
+                        Constants.BASE_URL_ADMIN + "/**",
+                        Constants.BASE_URL_KEYSTORE + "/**",
+                        Constants.BASE_URL_TRUSTSTORE + "/**")
                 // /admin/** endpoints
-                .authorizeAdminRestEndpoints().and()
+                .authorizeRequests(this::authAdminRestEndpoints)
                 // any other requests
-                .authorizeRequests().anyRequest().authenticated();
+                .authorizeRequests(i -> i.anyRequest().authenticated());
+
+        return http.build();
+    }
+
+    private void authAdminRestEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        registry.requestMatchers(
+                // Admin REST API
+                String.format("%s/version", Constants.BASE_URL_ADMIN),
+                String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
+
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = registry.requestMatchers(
+                Constants.BASE_URL_ADMIN + "/**",
+                Constants.BASE_URL_KEYSTORE + "/**",
+                Constants.BASE_URL_TRUSTSTORE + "/**");
+
+        if ("*".equals(securityProperties.getAdminEndpointsAccess()))
+        {
+            adminUrls.permitAll();
+        }
+        else
+        {
+            adminUrls.hasRole(securityProperties.getAdminEndpointsAccess());
         }
     }
+
 
     /*
      * ============== Config for the rest (also persisted security) ====================================================
      */
-    @Configuration(proxyBeanMethods = false)
-    @Order(99)
-    public class DefaultWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter
+    @Bean
+    @Order(999)
+    public SecurityFilterChain configureAllOthers(HttpSecurity http) throws Exception
     {
-
-        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-        private final CustomAccessDeniedHandler accessDeniedHandler;
-
-        public DefaultWebSecurityConfigurationAdapter(CustomAuthenticationEntryPoint authenticationEntryPoint,
-            CustomAccessDeniedHandler accessDeniedHandler)
-        {
-            this.authenticationEntryPoint = authenticationEntryPoint;
-            this.accessDeniedHandler = accessDeniedHandler;
-        }
-
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http) //
-                .defaults() //
-                .exceptionHandler(this.authenticationEntryPoint, this.accessDeniedHandler) //
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .defaults()
                 .logout()
                 // h2 console uses frames
-                .allowFrames() //
-                .authorizeSwagger() //
-                .authorizeActuator() //
-                .authorizeAdminGui().and() //
-                .authorizeRequests() //
-                .antMatchers(
-                    // H2
-                    "/h2/**",
-
-                    // error
-                    "/error",
-
-                    // Logout endpoint
-                    "/logout").permitAll()
+                .allowFrames()
+                .authorizeRequests(this::authorizeSwagger)
+                .authorizeRequests(this::authorizeActuator)
+                .authorizeRequests(this::authorizeAdminGui)
+                .authorizeRequests(this::permitEndpoints)
                 // any other requests
-                .anyRequest().authenticated();
+                .authorizeRequests(i -> i.anyRequest().authenticated());
+
+        return http.build();
+    }
+
+    private void permitEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    {
+        registry.requestMatchers(
+                // H2
+                "/h2/**",
+
+                // error
+                "/error",
+
+                // Logout endpoint
+                "/logout").permitAll();
+    }
+
+    private void authorizeAdminGui(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        AdminProperties adminProperties = SysConfig.getAdminProperties();
+
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls;
+        if (adminProperties.getAdminGuiUrl().isBlank())
+        {
+            adminGuiUrls = registry
+                    .requestMatchers(
+                            // Admin GUI controller
+                            "/", "/*.*", "/css/**", "/assets/**");
         }
+        else
+        {
+            adminGuiUrls = registry
+                    .requestMatchers(
+                            // Admin GUI controller
+                            "/",
+                            String.format("%s/**", adminProperties.getAdminGuiUrl()));
+        }
+
+        if ("*".equals(securityProperties.getAdminGuiAccess()))
+        {
+            adminGuiUrls.permitAll();
+        }
+        else
+        {
+            adminGuiUrls.hasRole(securityProperties.getAdminGuiAccess());
+        }
+    }
+
+    private void authorizeActuator(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+
+        registry.requestMatchers(
+                        // Health and Prometheus endpoint
+                        "/actuator/health/**",
+                        "/actuator/prometheus")
+                .permitAll();
+
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = registry
+                .requestMatchers("/actuator/**");
+
+        if ("*".equals(securityProperties.getManagementEndpointsAccess()))
+        {
+            actuatorUrls.permitAll();
+        }
+        else
+        {
+            actuatorUrls.hasRole(securityProperties.getManagementEndpointsAccess());
+        }
+    }
+
+
+    private void authorizeSwagger(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    {
+        SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+        SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
+        String swaggerUiPath = swaggerProperties.getSwaggerUi().getPath();
+        String apiDocsPath = swaggerProperties.getApiDocs().getPath();
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = registry
+                .requestMatchers(
+                        // Swagger 3
+                        swaggerUiPath + "/**",
+
+                        // api-docs
+                        apiDocsPath + "/**"
+                );
+
+        if ("*".equals(securityProperties.getSwaggerAccess()))
+        {
+            swaggerUrls.permitAll();
+        }
+        else
+        {
+            swaggerUrls.hasRole(securityProperties.getSwaggerAccess());
+        }
+
     }
 }

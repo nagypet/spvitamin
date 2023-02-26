@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "springfox.documentation")
+@ConfigurationProperties(prefix = "springdoc")
 @Slf4j
 public class SwaggerProperties
 {
@@ -34,42 +34,31 @@ public class SwaggerProperties
     private SwaggerUiConfigurationProperties swaggerUi = new SwaggerUiConfigurationProperties();
 
     @NestedConfigurationProperty
-    private SwaggerConfigurationProperties swagger = new SwaggerConfigurationProperties();
+    private ApiDocsProperties apiDocs = new ApiDocsProperties();
 
     @Setter
     public static class SwaggerUiConfigurationProperties
     {
-        private String baseUrl;
+        private String path;
 
-        public String getBaseUrl()
+        public String getPath()
         {
-            String baseUrl = this.baseUrl;
-            if (baseUrl == null)
+            String path = this.path;
+            if (StringUtils.isBlank(path) || !path.endsWith("/swagger-ui"))
             {
-                baseUrl = "";
+                path = "/swagger-ui";
             }
-            if (!baseUrl.isEmpty() && !baseUrl.startsWith("/"))
+            if (!path.isEmpty() && !path.startsWith("/"))
             {
-                baseUrl = "/" + baseUrl;
+                path = "/" + path;
             }
-            return baseUrl;
+            return path;
         }
     }
 
-    @Setter
-    public static class SwaggerConfigurationProperties
-    {
-        @NestedConfigurationProperty
-        private Swagger2Configuration v2 = new Swagger2Configuration();
-
-        public Swagger2Configuration getV2()
-        {
-            return v2;
-        }
-    }
 
     @Setter
-    public static class Swagger2Configuration
+    public static class ApiDocsProperties
     {
         private String path;
 
@@ -78,7 +67,7 @@ public class SwaggerProperties
             String path = this.path;
             if (StringUtils.isBlank(path))
             {
-                path = "/v2/api-docs";
+                path = "/v3/api-docs";
             }
             if (!path.isEmpty() && !path.startsWith("/"))
             {
