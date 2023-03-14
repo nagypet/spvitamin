@@ -44,7 +44,8 @@ class StackTracerTest
         {
             String message = StackTracer.toString(ex);
             log.error(message);
-            Assertions.assertTrue(message.startsWith("java.lang.NullPointerException\n    => 1: hu.perit.spvitamin.core.StackTracerTest.testNullPointerException(StackTracerTest.java:"));
+            Assertions.assertTrue(message.startsWith("java.lang.NullPointerException: Cannot invoke \"Object.toString()\" because \"alma\" is null\n" +
+                    "    => 1: hu.perit.spvitamin.core.StackTracerTest.testNullPointerException(StackTracerTest.java:"));
         }
         log.debug("next line");
     }
