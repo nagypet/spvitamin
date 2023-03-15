@@ -1,3 +1,4 @@
+/* tslint:disable:one-line */
 /*
  * Copyright 2020-2023 the original author or authors.
  *
@@ -15,16 +16,18 @@
  */
 
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../../services/auth/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
+import {ErrorService} from '../../services/error.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit
+{
   @ViewChild('usernameInput', {static: true}) usernameInput: ElementRef;
   @ViewChild('passwordInput', {static: true}) passwordInput: ElementRef;
 
@@ -33,38 +36,47 @@ export class LoginComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
-  ) {
+    private authService: AuthService,
+    private errorService: ErrorService
+  )
+  {
   }
 
-  ngOnInit() {
+  ngOnInit()
+  {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  onLogin() {
-    let userName = this.usernameInput.nativeElement.value;
-    let password = this.passwordInput.nativeElement.value;
+  onLogin()
+  {
+    const userName = this.usernameInput.nativeElement.value;
+    const password = this.passwordInput.nativeElement.value;
 
-    this.authService.authenticateWithUserNamePassword(userName, password).subscribe(data => {
-      this.authService.tryGetSettings().subscribe().add(() => {
-        this.router.navigateByUrl(this.returnUrl);
-      });
+    this.authService.login(userName, password).subscribe(data =>
+    {
+      this.router.navigateByUrl(this.returnUrl);
+    }, error =>
+    {
+      this.errorService.errorToast('', 'Invalid username or password!');
     });
 
   }
 
-  onCancel() {
-    this.authService.logout().subscribe().add(() => {
-      this.router.navigateByUrl('/');
-    });
+  onCancel()
+  {
+    this.authService.logout();
+    this.router.navigateByUrl('/');
   }
 
 
-  onKeyPress(event: KeyboardEvent) {
+  onKeyPress(event: KeyboardEvent)
+  {
     //console.log("onKeyPress " + event.key);
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter')
+    {
       this.onLogin();
-    } else if (event.key === 'Escape') {
+    } else if (event.key === 'Escape')
+    {
       this.onCancel();
     }
   }

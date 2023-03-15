@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
@@ -119,6 +120,14 @@ public class SimpleHttpSecurityBuilder
                 http.headers().addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1]));
             }
         }
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder createSession() throws Exception
+    {
+        this.http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
 
         return this;
     }

@@ -1,3 +1,4 @@
+/* tslint:disable:one-line */
 /*
  * Copyright 2020-2023 the original author or authors.
  *
@@ -15,18 +16,20 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {AdminService} from '../admin.service';
-import {AuthService} from '../auth/auth.service';
+import {AdminService} from '../../services/admin.service';
+import {AuthService} from '../../services/auth/auth.service';
 
-export class ServerParameter {
+export class ServerParameter
+{
   name: string;
   value: string;
   link: boolean;
 
-  constructor(name, value, link) {
+  constructor(name, value, link)
+  {
     this.name = name;
     this.value = value;
-    this.link = this.link;
+    this.link = link;
   }
 }
 
@@ -35,26 +38,43 @@ export class ServerParameter {
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit {
-  public settings: Array<ServerParameter> = new Array<ServerParameter>();
-  public shutdownIsInProgress: boolean = false;
+export class SettingsComponent implements OnInit
+{
+  public settings: Array<ServerParameter> | null = new Array<ServerParameter>();
+  public shutdownIsInProgress = false;
 
   constructor(
     public adminService: AdminService,
     public authService: AuthService
-  ) {
+  )
+  {
 
   }
 
-  ngOnInit() {
-    this.adminService.getSettings().subscribe(data => {
+  ngOnInit()
+  {
+    this.adminService.getSettings().subscribe(data =>
+    {
       this.settings = data;
+    }, error =>
+    {
+      this.settings = null;
+    });
+
+    this.authService.isLoggedIn.subscribe(value =>
+    {
+      if (!value)
+      {
+        this.settings = null;
+      }
     });
   }
 
 
-  onShutdown() {
-    this.adminService.postShutdown().subscribe(data => {
+  onShutdown()
+  {
+    this.adminService.postShutdown().subscribe(data =>
+    {
       this.shutdownIsInProgress = true;
     });
   }

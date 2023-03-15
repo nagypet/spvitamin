@@ -16,7 +16,7 @@
 
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CertInfo, KeystoreEntry} from '../../../modell/keystore';
-import {AuthService} from '../../auth/auth.service';
+import {AuthService} from '../../../services/auth/auth.service';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

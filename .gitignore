@@ -13,6 +13,8 @@ target/
 .springBeans
 .sts4-cache
 
+*.class 
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -26,6 +28,7 @@ AdminGUI/dist
 #Others
 .gradle
 build
+bin
 out
 polc
 distributions

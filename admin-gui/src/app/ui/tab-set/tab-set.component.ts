@@ -15,7 +15,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {AdminService} from '../admin.service';
+import {AdminService} from '../../services/admin.service';
 
 @Component({
   selector: 'app-tab-set',

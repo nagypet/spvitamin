@@ -1,3 +1,4 @@
+/* tslint:disable:one-line */
 /*
  * Copyright 2020-2023 the original author or authors.
  *
@@ -24,69 +25,83 @@ import {environment} from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class AdminService {
+export class AdminService
+{
   private httpSilent: HttpClient;
 
   constructor(
     private http: HttpClient,
     private handler: HttpBackend
-  ) {
+  )
+  {
     this.httpSilent = new HttpClient(handler);
   }
 
 
-  private removeWhitespacesFromString(input: string): string {
+  private removeWhitespacesFromString(input: string): string
+  {
     const codec = new HttpUrlEncodingCodec();
     return codec.encodeValue(input);
     // input.replace(' ', '%20');
   }
 
 
-  public getVersionInfo(): Observable<any> {
+  public getVersionInfo(): Observable<any>
+  {
 
     return this.http.get(`${environment.baseURL}/api/spvitamin/admin/version`);
   }
 
-  public getSettings(): Observable<any> {
+  public getSettings(): Observable<any>
+  {
     return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`);
   }
 
-  public postShutdown(): Observable<any> {
+  public postShutdown(): Observable<any>
+  {
     return this.http.post(`${environment.baseURL}/api/spvitamin/admin/shutdown`, '');
   }
 
-  public getKeystore(): Observable<any> {
+  public getKeystore(): Observable<any>
+  {
     return this.http.get(`${environment.baseURL}/api/spvitamin/keystore`);
   }
 
 
-  public saveKeystore(): Observable<any> {
+  public saveKeystore(): Observable<any>
+  {
     return this.http.post(`${environment.baseURL}/api/spvitamin/keystore`, null);
   }
 
 
-  public getEntriesFromCert(certFile: CertificateFile): Observable<any> {
+  public getEntriesFromCert(certFile: CertificateFile): Observable<any>
+  {
     return this.http.post(`${environment.baseURL}/api/spvitamin/keystore/certificates`, certFile);
   }
 
-  public importCertificateIntoKeystore(certFile: CertificateFile, alias: string): Observable<any> {
+  public importCertificateIntoKeystore(certFile: CertificateFile, alias: string): Observable<any>
+  {
     return this.http.post(`${environment.baseURL}/api/spvitamin/keystore/privatekey`, {certificateFile: certFile, alias: alias});
   }
 
-  public removeCertificateFromKeystore(alias: string): Observable<any> {
+  public removeCertificateFromKeystore(alias: string): Observable<any>
+  {
     // we have to remove white spaces from the alias name
     return this.http.delete(`${environment.baseURL}/api/spvitamin/keystore/privatekey/${this.removeWhitespacesFromString(alias)}`);
   }
 
-  public getTruststore(): Observable<any> {
+  public getTruststore(): Observable<any>
+  {
     return this.http.get(`${environment.baseURL}/api/spvitamin/truststore`);
   }
 
-  public importCertificateIntoTruststore(certFile: CertificateFile, alias: string): Observable<any> {
+  public importCertificateIntoTruststore(certFile: CertificateFile, alias: string): Observable<any>
+  {
     return this.http.post(`${environment.baseURL}/api/spvitamin/truststore/certificate`, {certificateFile: certFile, alias: alias});
   }
 
-  public removeCertificateFromTruststore(alias: string): Observable<any> {
+  public removeCertificateFromTruststore(alias: string): Observable<any>
+  {
     // we have to remove white spaces from the alias name
     return this.http.delete(`${environment.baseURL}/api/spvitamin/truststore/certificate/${this.removeWhitespacesFromString(alias)}`);
   }

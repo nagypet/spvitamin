@@ -15,8 +15,8 @@
  */
 
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {AdminService} from '../admin.service';
-import {AuthService} from '../auth/auth.service';
+import {AdminService} from '../../services/admin.service';
+import {AuthService} from '../../services/auth/auth.service';
 import {CertificateFile, KeystoreEntry} from '../../modell/keystore';
 import {Router} from '@angular/router';
 
@@ -52,7 +52,7 @@ export class CertificatesComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.authService.isAuthenticated()) {
+    if (this.authService.isLoggedIn.getValue()) {
       if (this.keystoreType === 'keystore' || this.router.url === '/admin-gui/keystore') {
         this.keystoreType = 'keystore';
         this.loadKeystoreEntries();

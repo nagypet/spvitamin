@@ -47,13 +47,14 @@ public class SpvitaminWebSecurityConfig
     {
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope(
-                        Constants.BASE_URL_ADMIN + "/**",
+                        Constants.BASE_URL_ADMIN + "/shutdown",
                         Constants.BASE_URL_KEYSTORE + "/**",
                         Constants.BASE_URL_TRUSTSTORE + "/**")
                 // /admin/** endpoints
                 .authorizeRequests(this::authAdminRestEndpoints)
                 // any other requests
                 .authorizeRequests(i -> i.anyRequest().authenticated())
+                .ignorePersistedSecurity()
                 .jwtAuth();
 
         return http.build();

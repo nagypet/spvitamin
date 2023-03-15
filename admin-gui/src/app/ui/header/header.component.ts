@@ -1,3 +1,4 @@
+/* tslint:disable:one-line */
 /*
  * Copyright 2020-2023 the original author or authors.
  *
@@ -15,8 +16,8 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {AdminService} from '../admin.service';
-import {AuthService} from '../auth/auth.service';
+import {AdminService} from '../../services/admin.service';
+import {AuthService} from '../../services/auth/auth.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -24,7 +25,8 @@ import {Router} from '@angular/router';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit
+{
   public title = '';
   public version = '';
 
@@ -33,23 +35,26 @@ export class HeaderComponent implements OnInit {
     private adminService: AdminService,
     public authService: AuthService,
     private router: Router,
-  ) {
+  )
+  {
 
   }
 
-  ngOnInit() {
-    this.adminService.getVersionInfo().subscribe(data => {
+  ngOnInit()
+  {
+    this.adminService.getVersionInfo().subscribe(data =>
+    {
       console.log(data);
       this.title = data.Title;
       this.version = data.Version;
     });
+
+    this.authService.getProfile().subscribe();
   }
 
-  onLogout() {
-    this.authService.logout().subscribe().add(() => {
-      this.authService.tryGetSettings().subscribe().add(() => {
-        this.router.navigateByUrl('/');
-      });
-    });
+  onLogout()
+  {
+    this.authService.logout();
+    this.router.navigateByUrl('/');
   }
 }

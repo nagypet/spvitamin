@@ -15,7 +15,7 @@
   -->
 
 <div>
-  <div *ngIf="authService.areSettingsAvailable() === true">
+  <div *ngIf="settings !== null">
 
     <h2>Server settings</h2>
     <table class="table table-sm table-striped">
@@ -35,14 +35,14 @@
     </table>
     <hr>
 
-    <button *ngIf="authService.isAuthenticated() === true" type="button" class="btn btn-outline-primary" (click)="onShutdown()" ngbTooltip="Shuts down the service" placement="right">Shutdown</button>
-    <button *ngIf="authService.isAuthenticated() !== true" disabled type="button" class="btn btn-outline-primary" (click)="onShutdown()">Shutdown</button>
+    <button *ngIf="authService.isLoggedIn.value === true" type="button" class="btn btn-outline-primary" (click)="onShutdown()" ngbTooltip="Shuts down the service" placement="right">Shutdown</button>
+    <button *ngIf="authService.isLoggedIn.value !== true" disabled type="button" class="btn btn-outline-primary" (click)="onShutdown()">Shutdown</button>
 
     <ngb-alert *ngIf="shutdownIsInProgress === true" style="margin: 10px 0 0 0" [dismissible]="false">Shutting down the service...</ngb-alert>
 
   </div>
 
-  <div class="row" *ngIf="authService.areSettingsAvailable() !== true">
+  <div class="row" *ngIf="settings === null">
     <div class="col-sm-12">
       <div style="padding: 15px 0 0 0">
         <p>Please log in!</p>

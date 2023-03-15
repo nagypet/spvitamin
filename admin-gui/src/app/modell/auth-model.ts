@@ -1,3 +1,6 @@
+/* tslint:disable */
+/* eslint-disable */
+
 /*
  * Copyright 2020-2023 the original author or authors.
  *
@@ -14,9 +17,40 @@
  * limitations under the License.
  */
 
-export interface AuthToken {
+export interface AuthToken
+{
   sub: string;
   jwt: string;
   iat: Date;
   exp: Date;
+}
+
+
+export interface ServerExceptionProperties
+{
+  message: string;
+  exceptionClass: string;
+  superClasses: string[];
+  stackTrace: StackTraceElement[];
+  cause: ServerExceptionProperties;
+}
+
+export interface JsonSerializable
+{
+}
+
+export interface StackTraceElement extends Serializable
+{
+  classLoaderName: string;
+  moduleName: string;
+  moduleVersion: string;
+  methodName: string;
+  fileName: string;
+  lineNumber: number;
+  className: string;
+  nativeMethod: boolean;
+}
+
+export interface Serializable
+{
 }
