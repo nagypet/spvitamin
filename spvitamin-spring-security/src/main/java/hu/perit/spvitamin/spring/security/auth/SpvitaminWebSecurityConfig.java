@@ -28,7 +28,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -54,7 +53,8 @@ public class SpvitaminWebSecurityConfig
                 // /admin/** endpoints
                 .authorizeRequests(this::authAdminRestEndpoints)
                 // any other requests
-                .authorizeRequests(i -> i.anyRequest().authenticated());
+                .authorizeRequests(i -> i.anyRequest().authenticated())
+                .jwtAuth();
 
         return http.build();
     }
