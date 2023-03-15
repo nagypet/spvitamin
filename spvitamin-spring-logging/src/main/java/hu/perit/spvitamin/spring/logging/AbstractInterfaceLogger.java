@@ -50,34 +50,34 @@ public abstract class AbstractInterfaceLogger
 
     protected abstract String getSubsystemName();
 
-    public void traceIn(String processId, String user, Method method, Object... args)
+    public void traceIn(String traceId, String user, Method method, Object... args)
     {
-        log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), getSubject(args), true));
+        log.debug(iptrace(traceId, user, getEventLogId(method), method.getName(), getSubject(args), true));
     }
 
-    public void traceIn(String processId, String user, String methodName, int eventId, Object... args)
+    public void traceIn(String traceId, String user, String methodName, int eventId, Object... args)
     {
-        log.debug(iptrace(processId, user, eventId, methodName, getSubject(args), true));
+        log.debug(iptrace(traceId, user, eventId, methodName, getSubject(args), true));
     }
 
-    public void traceOut(String processId, String user, Method method, Throwable ex)
+    public void traceOut(String traceId, String user, Method method, Throwable ex)
     {
-        log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), ex.toString(), false));
+        log.debug(iptrace(traceId, user, getEventLogId(method), method.getName(), ex.toString(), false));
     }
 
-    public void traceOut(String processId, String user, Method method)
+    public void traceOut(String traceId, String user, Method method)
     {
-        log.debug(iptrace(processId, user, getEventLogId(method), method.getName(), "SUCCESS", false));
+        log.debug(iptrace(traceId, user, getEventLogId(method), method.getName(), "SUCCESS", false));
     }
 
-    public void traceOut(String processId, String user, String methodName, int eventId, Throwable ex)
+    public void traceOut(String traceId, String user, String methodName, int eventId, Throwable ex)
     {
-        log.debug(iptrace(processId, user, eventId, methodName, ex.toString(), false));
+        log.debug(iptrace(traceId, user, eventId, methodName, ex.toString(), false));
     }
 
-    public void traceOut(String processId, String user, String methodName, int eventId)
+    public void traceOut(String traceId, String user, String methodName, int eventId)
     {
-        log.debug(iptrace(processId, user, eventId, methodName, "SUCCESS", false));
+        log.debug(iptrace(traceId, user, eventId, methodName, "SUCCESS", false));
     }
 
     private int getEventLogId(Method method)
@@ -107,9 +107,9 @@ public abstract class AbstractInterfaceLogger
     }
 
 
-    protected String iptrace(String processID, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
+    protected String iptrace(String traceId, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        LogEvent logEvent = LogEvent.of(processID, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn);
+        LogEvent logEvent = LogEvent.of(traceId, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn);
 
         // Place to forward the event log entry to a log server
         LOG_EVENT.fire(logEvent);

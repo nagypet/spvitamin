@@ -42,7 +42,7 @@ class InvokerTest
             return message;
         }
 
-        public List<String> internalQueryDocumentEx(String processID, List<String> documentTypeNames, String documentTypeGroupName, String orderBy, String sqlWhere, int limit)
+        public List<String> internalQueryDocumentEx(String traceId, List<String> documentTypeNames, String documentTypeGroupName, String orderBy, String sqlWhere, int limit)
         {
             log.debug("internalQueryDocumentEx() called!");
             return Collections.emptyList();

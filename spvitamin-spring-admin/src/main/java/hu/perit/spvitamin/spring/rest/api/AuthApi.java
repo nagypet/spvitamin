@@ -54,5 +54,5 @@ public interface AuthApi
             }
     )
     @ResponseStatus(value = HttpStatus.OK)
-    AuthorizationToken authenticateUsingGET(@RequestHeader(value = "processID", required = false) String processID);
+    AuthorizationToken authenticateUsingGET(@RequestHeader(value = "traceID", required = false) String traceId);
 }

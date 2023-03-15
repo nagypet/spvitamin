@@ -35,9 +35,9 @@ public interface AuthClient {
     @RequestLine("GET " + BASE_URL_AUTHENTICATE)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     AuthorizationToken authenticate(
-            @Param("processID") String processID
+            @Param("traceId") String traceId
     );
 }
