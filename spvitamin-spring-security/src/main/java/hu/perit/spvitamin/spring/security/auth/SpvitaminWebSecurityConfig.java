@@ -25,11 +25,13 @@ import hu.perit.spvitamin.spring.security.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * @author Peter Nagy
@@ -45,13 +47,15 @@ public class SpvitaminWebSecurityConfig
      */
     @Bean
     @Order(997)
+    @DependsOn(value = "serverProperties")
     public SecurityFilterChain configureLogoutRestEndpoint(HttpSecurity http) throws Exception
     {
+        String serviceUrl = SysConfig.getServerProperties().getServiceUrl();
         final String logoutUrl = "/api/spvitamin/logout";
-        log.info("logout URL: {}", logoutUrl);
+        log.info("logout URL: POST {}{}", serviceUrl, logoutUrl);
 
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(logoutUrl)
+                .scope(new AntPathRequestMatcher(logoutUrl, "POST"))
                 .authorizeRequests(i -> i.anyRequest().permitAll()).and()
                 .logout(logout -> logout
                         .logoutUrl(logoutUrl)

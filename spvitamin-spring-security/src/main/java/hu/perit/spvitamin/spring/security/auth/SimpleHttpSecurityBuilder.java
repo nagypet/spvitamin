@@ -33,6 +33,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -106,6 +107,12 @@ public class SimpleHttpSecurityBuilder
         return this;
     }
 
+    public SimpleHttpSecurityBuilder scope(RequestMatcher requestMatcher) throws Exception
+    {
+        defaults();
+        this.http.securityMatcher(requestMatcher);
+        return this;
+    }
 
     public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders() throws Exception
     {
