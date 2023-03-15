@@ -180,7 +180,10 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder logout() throws Exception
     {
-        this.http.logout().invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true).logoutSuccessUrl("/");
+        this.http.logout()
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true);
         return this;
     }
 

@@ -26,12 +26,14 @@ export class ErrorInterceptor implements HttpInterceptor
           if (error.status === 401)
           {
             this.authService.handleAuthError(error);
+          } else
+          {
+            if (error.status !== 200)
+            {
+              this.errorService.handleError(error);
+            }
           }
 
-          if (error.status !== 401)
-          {
-            this.errorService.handleError(error);
-          }
           return throwError(error);
         })
       );

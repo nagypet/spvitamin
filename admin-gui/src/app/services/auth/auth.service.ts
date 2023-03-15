@@ -79,8 +79,7 @@ export class AuthService
       {
         this.errorService.warningToast('Munkamenete lejárt!', 'Kérjük jelentkezzen be újra!');
       }
-      // TODO implement logout endpoint
-      // this.httpClient.post(`${environment.baseURL}/logout`, {}).subscribe(res => console.log(res));
+      this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).subscribe(res => console.log(res));
       this.cleanUpSessionStorage();
       this.isLoggedIn.next(false);
     }

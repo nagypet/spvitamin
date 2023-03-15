@@ -22,6 +22,7 @@ import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -36,10 +37,35 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
+@Slf4j
 public class SpvitaminWebSecurityConfig
 {
     /*
-     * ============== Config for the endpoints with persisted security =================================================
+     * ============== Config for the admin endpoints ===================================================================
+     */
+    @Bean
+    @Order(997)
+    public SecurityFilterChain configureLogoutRestEndpoint(HttpSecurity http) throws Exception
+    {
+        final String logoutUrl = "/api/spvitamin/logout";
+        log.info("logout URL: {}", logoutUrl);
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(logoutUrl)
+                .authorizeRequests(i -> i.anyRequest().permitAll()).and()
+                .logout(logout -> logout
+                        .logoutUrl(logoutUrl)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
+                );
+
+        return http.build();
+    }
+
+
+    /*
+     * ============== Config for the admin endpoints ===================================================================
      */
     @Bean
     @Order(998)
@@ -70,7 +96,7 @@ public class SpvitaminWebSecurityConfig
                 String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = registry.requestMatchers(
-                Constants.BASE_URL_ADMIN + "/**",
+                Constants.BASE_URL_ADMIN + "/shutdown",
                 Constants.BASE_URL_KEYSTORE + "/**",
                 Constants.BASE_URL_TRUSTSTORE + "/**");
 
@@ -86,7 +112,7 @@ public class SpvitaminWebSecurityConfig
 
 
     /*
-     * ============== Config for the rest (also persisted security) ====================================================
+     * ============== Config for the rest with persisted security ======================================================
      */
     @Bean
     @Order(999)
