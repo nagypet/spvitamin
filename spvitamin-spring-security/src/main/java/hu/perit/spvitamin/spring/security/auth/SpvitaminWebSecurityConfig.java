@@ -43,7 +43,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SpvitaminWebSecurityConfig
 {
     /*
-     * ============== Config for the admin endpoints ===================================================================
+     * ============== Config for the logout endpoint ===================================================================
      */
     @Bean
     @Order(997)
@@ -77,7 +77,7 @@ public class SpvitaminWebSecurityConfig
     {
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope(
-                        Constants.BASE_URL_ADMIN + "/shutdown",
+                        Constants.BASE_URL_ADMIN + "/**",
                         Constants.BASE_URL_KEYSTORE + "/**",
                         Constants.BASE_URL_TRUSTSTORE + "/**")
                 // /admin/** endpoints
@@ -96,10 +96,12 @@ public class SpvitaminWebSecurityConfig
 
         registry.requestMatchers(
                 // Admin REST API
-                String.format("%s/version", Constants.BASE_URL_ADMIN),
-                String.format("%s/csp_violations", Constants.BASE_URL_ADMIN)).permitAll();
+                String.format(Constants.BASE_URL_ADMIN + "/version"),
+                String.format(Constants.BASE_URL_ADMIN + "/csp_violations")
+        ).permitAll();
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = registry.requestMatchers(
+                Constants.BASE_URL_ADMIN + "/settings",
                 Constants.BASE_URL_ADMIN + "/shutdown",
                 Constants.BASE_URL_KEYSTORE + "/**",
                 Constants.BASE_URL_TRUSTSTORE + "/**");
