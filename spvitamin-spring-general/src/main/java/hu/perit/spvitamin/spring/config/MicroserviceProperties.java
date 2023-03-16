@@ -21,7 +21,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MicroserviceProperties {
+public class MicroserviceProperties
+{
 
     private String url;
 }

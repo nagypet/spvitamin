@@ -31,7 +31,6 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "metrics")
 public class MetricsProperties
 {
-
     private int performanceItemcount = 50;
     private long timeoutMillis = 2_000;
     private long metricsGatheringHysteresisMillis = 30_000;

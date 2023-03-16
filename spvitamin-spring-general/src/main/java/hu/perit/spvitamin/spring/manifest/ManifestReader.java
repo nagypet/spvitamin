@@ -45,7 +45,7 @@ public class ManifestReader {
                     String type = prop.getProperty("Implementation-Type");
                     if (type != null && type.equalsIgnoreCase("Application")) {
                         ResourceUrlDecoder resourceUrl = new ResourceUrlDecoder(url);
-                        log.debug(String.format("Manifest loaded from '%s'", resourceUrl.getLocation().get(0)));
+                        log.info(String.format("Manifest loaded from '%s'", resourceUrl.getLocation().get(0)));
                         return prop;
                     }
                 }

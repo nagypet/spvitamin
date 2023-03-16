@@ -26,11 +26,12 @@ import java.util.Map;
 @Data
 @Component
 @ConfigurationProperties
-public class MicroserviceCollectionProperties {
-
+public class MicroserviceCollectionProperties
+{
     private Map<String, MicroserviceProperties> microservices = new HashMap<>();
 
-    public MicroserviceProperties get(String name) {
+    public MicroserviceProperties get(String name)
+    {
         return this.microservices.get(name);
     }
 }

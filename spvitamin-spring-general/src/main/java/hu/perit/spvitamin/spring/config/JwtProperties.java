@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {
-
+public class JwtProperties
+{
     private String privateKeyAlias;
     @ConfigProperty(hidden = true)
     private String privateKeyEncryptedPassword;

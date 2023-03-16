@@ -18,7 +18,6 @@ package hu.perit.spvitamin.spring.config;
 
 import lombok.Data;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "springdoc")
-@Slf4j
 public class SwaggerProperties
 {
     @NestedConfigurationProperty
