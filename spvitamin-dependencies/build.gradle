@@ -92,13 +92,6 @@ if (project.hasProperty('ossrhUsername')) {
 }
 
 
-
-
-task uploadArchives() {
-	dependsOn 'publishAllPublicationsToStagingRepository'
-}
-
-
 def customizePom(pom) {
 	pom.withXml {
 		def root = asNode()
