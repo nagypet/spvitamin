@@ -2,13 +2,16 @@
 
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
-The library has been tested with the following versions:
+## Current releases:
+### 3.0.4-1-RELEASE
+- SpringBoot 3.0.4
+- SpingCloud 2022.0.1
+
+### 2.0.2-RELEASE
 - SpringBoot 2.4.5
 - SpringBoot 2.7.7
-- SpringBoot 3.0.4
 - SpingCloud 2020.0.5
 - SpingCloud 2021.0.5
-- SpingCloud 2022.0.1
 
 ## Dependencies
 
@@ -48,10 +51,11 @@ dependencyManagement {
 }
 ```
 
-## Releases
+## Release history
 
-### 3.0.4-1-RELEASE 2023-03-14
+### 3.0.4-1-RELEASE 2023-03-19
 - Compiled with spring-boot 3.0.4
+- Security keycloak is commented out, must be updated as well
 
 ### 2.0.2-RELEASE 2023-01-14
 - Small fix so that spvitamin-defaults can be loaded with spring-boot 2.4.5 as well
