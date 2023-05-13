@@ -53,7 +53,7 @@ dependencyManagement {
 
 ## Release history
 
-### 3.0.4-2-RELEASE 2023-03-19
+### 3.0.4-2-RELEASE 2023-05-13
 - jar classifier was '-plain' which caused problems when spvitamin was used with maven.
 
 ### 3.0.4-1-RELEASE 2023-03-19
