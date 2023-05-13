@@ -401,3 +401,6 @@ pluginManager.withPlugin('maven-publish') {
 	}
 }
 
+tasks.named("jar") {
+	archiveClassifier = ''
+}
