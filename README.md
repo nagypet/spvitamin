@@ -3,7 +3,7 @@
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
-### 3.0.4-2-RELEASE
+### 3.0.4-3-RELEASE
 - SpringBoot 3.0.4
 - SpingCloud 2022.0.1
 
@@ -24,7 +24,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.0.4-2-RELEASE')
+    set('spvitaminVersion', '3.0.4-3-RELEASE')
 }
 
 dependencies {
@@ -52,6 +52,13 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 3.0.4-3-RELEASE 2023-10-07
+- DEFAULT_JACKSON_TIMESTAMPFORMAT changed to "yyyy-MM-dd'T'HH:mm:ss.SSS" and custom deserializers fixed
+- RestExceptionResponse improved: 
+  - traceId, 
+  - also jakarta.validation.ConstraintViolationException is handled
+  - Violated contrains listed in the `error` property even if the exception is instance of an ApplicationException or ApplicationRuntimeException but has been caused by a ConstraintViolationException
 
 ### 3.0.4-2-RELEASE 2023-05-13
 - jar classifier was '-plain' which caused problems when spvitamin was used with maven.
