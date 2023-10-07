@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.ValidationException;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
@@ -63,7 +62,9 @@ public class RestExceptionResponseFactory
         }
 
         // ========== BAD_REQUEST (400) ================================================================================
-        else if (exception.instanceOf(ValidationException.class) || exception.instanceOf(InputException.class))
+        else if (exception.instanceOf(javax.validation.ValidationException.class)
+            || exception.instanceOf(jakarta.validation.ValidationException.class)
+            || exception.instanceOf(InputException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(new RestExceptionResponse(HttpStatus.BAD_REQUEST, ex, path, traceId));

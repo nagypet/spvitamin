@@ -18,7 +18,9 @@ package hu.perit.spvitamin.spring.exceptionhandler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
+import hu.perit.spvitamin.core.exception.ApplicationException;
+import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import lombok.EqualsAndHashCode;
@@ -31,8 +33,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,16 +129,34 @@ public class RestExceptionResponse implements JsonSerializable
             this.message = ex.getMessage();
         }
 
-        if (ex instanceof ConstraintViolationException cve)
+        ExceptionWrapper exception = ExceptionWrapper.of(ex);
+        if (exception.causedBy("javax.validation.ConstraintViolationException"))
         {
             //Get all errors
-            Set<ConstraintViolation<?>> violations = cve.getConstraintViolations();
-            List<String> errors = new ArrayList<>();
-            for (ConstraintViolation<?> violation : violations)
-            {
-                errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
-            }
-            this.error = errors;
+            exception.getFromCauseChain(javax.validation.ConstraintViolationException.class).ifPresent(throwable -> {
+                javax.validation.ConstraintViolationException cve = (javax.validation.ConstraintViolationException) throwable;
+                Set<javax.validation.ConstraintViolation<?>> violations = cve.getConstraintViolations();
+                List<String> errors = new ArrayList<>();
+                for (javax.validation.ConstraintViolation<?> violation : violations)
+                {
+                    errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
+                }
+                this.error = errors;
+            });
+        }
+        else if (exception.causedBy("jakarta.validation.ConstraintViolationException"))
+        {
+            //Get all errors
+            exception.getFromCauseChain(jakarta.validation.ConstraintViolationException.class).ifPresent(throwable -> {
+                jakarta.validation.ConstraintViolationException cve = (jakarta.validation.ConstraintViolationException) throwable;
+                Set<jakarta.validation.ConstraintViolation<?>> violations = cve.getConstraintViolations();
+                List<String> errors = new ArrayList<>();
+                for (jakarta.validation.ConstraintViolation<?> violation : violations)
+                {
+                    errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
+                }
+                this.error = errors;
+            });
         }
         else if (ex instanceof MethodArgumentNotValidException manve)
         {
@@ -152,13 +170,18 @@ public class RestExceptionResponse implements JsonSerializable
             }
             this.error = errors;
         }
-        else if (ex instanceof ApplicationSpecificException ase)
-        {
-            this.type = ase.getType().name();
-        }
         else
         {
             this.error = HttpStatus.valueOf(statusCode.value()).getReasonPhrase();
+        }
+
+        if (ex instanceof ApplicationException ae)
+        {
+            this.type = ae.getType().name();
+        }
+        else if (ex instanceof ApplicationRuntimeException are)
+        {
+            this.type = are.getType().name();
         }
     }
 
