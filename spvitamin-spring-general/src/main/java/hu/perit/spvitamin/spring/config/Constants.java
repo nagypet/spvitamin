@@ -26,7 +26,7 @@ public class Constants {
         // Utility class
     }
 
-    public static final String DEFAULT_JACKSON_TIMESTAMPFORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String DEFAULT_JACKSON_TIMESTAMPFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     public static final String DEFAULT_JACKSON_DATEFORMAT = "yyyy-MM-dd";
 
     public static final String SUBSYSTEM_NAME = "admin-gui";

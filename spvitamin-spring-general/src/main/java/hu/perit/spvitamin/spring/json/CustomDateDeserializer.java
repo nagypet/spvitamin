@@ -31,34 +31,32 @@ import java.util.Date;
  * @author Peter Nagy
  */
 
-public class CustomDateDeserializer extends JsonDeserializer<Date> {
+public class CustomDateDeserializer extends JsonDeserializer<Date>
+{
 
     @Override
-    public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    {
 
         if (StringUtils.isBlank(jp.getText()))
         {
             return null;
         }
 
-        try {
-            return DateUtils.parseDate(jp.getText(),
-                    "yyyy-MM-dd HH:mm:ss.SSS",
-                    "yyyy-MM-dd HH:mm:ss",
-                    "yyyy-MM-dd HH:mm",
-                    "yyyy-MM-dd",
-                    // 2020-05-12T09:59:09.276+0000
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
-                    // 2021-04-14T17:30:25.740+02:00
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        try
+        {
+            return DateUtils.parseDate(jp.getText(), AcceptedDateFormats.getAcceptedDateFormats().toArray(new String[0]));
         }
-        catch (ParseException e) {
+        catch (ParseException e)
+        {
             throw new InvalidFormatException(jp, e.getMessage(), jp.getText(), Date.class);
         }
     }
 
+
     @Override
-    public Class<Date> handledType() {
+    public Class<Date> handledType()
+    {
         return Date.class;
     }
 }

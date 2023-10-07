@@ -27,36 +27,31 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Peter Nagy
  */
 
-public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate> {
+public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
+{
 
     @Override
-    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    {
         if (StringUtils.isBlank(jp.getText()))
         {
             return null;
         }
 
-        List<String> formats = new ArrayList<>();
-        formats.add("yyyy-MM-dd HH:mm:ss.SSS");
-        formats.add("yyyy-MM-dd HH:mm:ss");
-        formats.add("yyyy-MM-dd HH:mm");
-        formats.add("yyyy-MM-dd");
-        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
         DateTimeParseException exception = null;
-        for (String format : formats) {
-            try {
+        for (String format : AcceptedDateFormats.getAcceptedDateFormats())
+        {
+            try
+            {
                 return this.tryParseWithFormat(jp.getText(), format);
             }
-            catch (DateTimeParseException ex) {
+            catch (DateTimeParseException ex)
+            {
                 // nem sikerült parse-olni, próbáljuk a következő formátummal
                 exception = ex;
             }
@@ -65,13 +60,15 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate> {
     }
 
 
-    private LocalDate tryParseWithFormat(String value, String format) {
+    private LocalDate tryParseWithFormat(String value, String format)
+    {
         return LocalDate.parse(value, DateTimeFormatter.ofPattern(format));
     }
 
 
     @Override
-    public Class<LocalDate> handledType() {
+    public Class<LocalDate> handledType()
+    {
         return LocalDate.class;
     }
 }

@@ -36,27 +36,27 @@ import java.util.Optional;
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler
 {
 
-    protected final ResponseEntity<Object> exceptionHandler(Exception ex, WebRequest request)
+    // Use the variant with traceId
+    @Deprecated
+    protected final ResponseEntity<RestExceptionResponse> exceptionHandler(Exception ex, WebRequest request)
+    {
+        return exceptionHandler(ex, request, null);
+    }
+
+
+    protected final ResponseEntity<RestExceptionResponse> exceptionHandler(Exception ex, WebRequest request, String traceId)
     {
         String path = request != null ? request.getDescription(false) : "";
 
-        Optional<RestExceptionResponse> restExceptionResponse = RestExceptionResponseFactory.of(ex, path);
+        Optional<RestExceptionResponse> restExceptionResponse = RestExceptionResponseFactory.of(ex, path, traceId);
         if (restExceptionResponse.isPresent())
         {
             return new ResponseEntity<>(restExceptionResponse.get(), HttpStatus.valueOf(restExceptionResponse.get().getStatus()));
         }
 
-        try
-        {
-            // TODO create the same response structure as in the RestExceptionResponse
-            return super.handleException(ex, request);
-        }
-        catch (Exception e)
-        {
-            log.error(StackTracer.toString(e));
-            RestExceptionResponse exceptionResponse = new RestExceptionResponse(RestExceptionResponseFactory.getHttpStatusFromAnnotation(ex), ex, path);
-            return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
-        }
+        log.error(StackTracer.toString(ex));
+        RestExceptionResponse exceptionResponse = new RestExceptionResponse(RestExceptionResponseFactory.getHttpStatusFromAnnotation(ex), ex, path, traceId);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
     }
 
 

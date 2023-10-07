@@ -16,49 +16,42 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-
-import hu.perit.spvitamin.spring.config.Constants;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author Peter Nagy
  */
 
-public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
+public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime>
+{
 
     @Override
-    public LocalDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public LocalDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    {
 
         if (StringUtils.isBlank(jp.getText()))
         {
             return null;
         }
 
-        List<String> formats = new ArrayList<>();
-        formats.add("yyyy-MM-dd HH:mm:ss.SSS");
-        formats.add("yyyy-MM-dd HH:mm:ss");
-        formats.add("yyyy-MM-dd HH:mm");
-        formats.add("yyyy-MM-dd");
-        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
         DateTimeParseException exception = null;
-        for (String format : formats) {
-            try {
+        for (String format : AcceptedDateFormats.getAcceptedDateFormats())
+        {
+            try
+            {
                 return this.tryParseWithFormat(jp.getText(), format);
             }
-            catch (DateTimeParseException ex) {
+            catch (DateTimeParseException ex)
+            {
                 // nem sikerült parse-olni, próbáljuk a következő formátummal
                 exception = ex;
             }
@@ -66,12 +59,16 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
         throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid LocalDateTime format!", jp.getText(), LocalDateTime.class);
     }
 
-    private LocalDateTime tryParseWithFormat(String value, String format) {
+
+    private LocalDateTime tryParseWithFormat(String value, String format)
+    {
         return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 
+
     @Override
-    public Class<LocalDateTime> handledType() {
+    public Class<LocalDateTime> handledType()
+    {
         return LocalDateTime.class;
     }
 }

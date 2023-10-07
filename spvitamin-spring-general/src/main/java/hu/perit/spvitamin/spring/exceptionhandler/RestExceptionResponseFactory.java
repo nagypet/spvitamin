@@ -17,12 +17,7 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ApplicationException;
-import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
-import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
-import hu.perit.spvitamin.core.exception.InputException;
-import hu.perit.spvitamin.core.exception.LogLevel;
+import hu.perit.spvitamin.core.exception.*;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,38 +34,46 @@ import java.util.Optional;
 @Slf4j
 public class RestExceptionResponseFactory
 {
+    // Use the variant with traceId
+    @Deprecated
     public static Optional<RestExceptionResponse> of(Throwable ex, String path)
+    {
+        return of(ex, path, null);
+    }
+
+
+    public static Optional<RestExceptionResponse> of(Throwable ex, String path, String traceId)
     {
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
         DefaultRestExceptionLogger exceptionLogger = getLogger();
 
         // ========== UNAUTHORIZED (401) ===============================================================================
         if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
-                || exception.instanceOf("io.jsonwebtoken.JwtException"))
+            || exception.instanceOf("io.jsonwebtoken.JwtException"))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
-            return Optional.of(new RestExceptionResponse(HttpStatus.UNAUTHORIZED, ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.UNAUTHORIZED, ex, path, traceId));
         }
 
         // ========== FORBIDDEN (403) ==================================================================================
         else if (exception.instanceOf("org.springframework.security.access.AccessDeniedException"))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
-            return Optional.of(new RestExceptionResponse(HttpStatus.FORBIDDEN, ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.FORBIDDEN, ex, path, traceId));
         }
 
         // ========== BAD_REQUEST (400) ================================================================================
         else if (exception.instanceOf(ValidationException.class) || exception.instanceOf(InputException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
-            return Optional.of(new RestExceptionResponse(HttpStatus.BAD_REQUEST, ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.BAD_REQUEST, ex, path, traceId));
         }
 
         // ========== NOT_IMPLEMENTED (501) ============================================================================
         else if (exception.instanceOf(UnsupportedOperationException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.ERROR);
-            return Optional.of(new RestExceptionResponse(HttpStatus.NOT_IMPLEMENTED, ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.NOT_IMPLEMENTED, ex, path, traceId));
         }
 
         // ========== SERVICE_UNAVAILABLE (503) ========================================================================
@@ -78,7 +81,7 @@ public class RestExceptionResponseFactory
         {
             // kiloggoljuk WARNING-gal
             exceptionLogger.log(path, ex, LogLevel.WARN);
-            return Optional.of(new RestExceptionResponse(HttpStatus.SERVICE_UNAVAILABLE, ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.SERVICE_UNAVAILABLE, ex, path, traceId));
         }
 
         // ========== APPLICATION_SPECIFIC_EXCEPTION ===================================================================
@@ -86,19 +89,19 @@ public class RestExceptionResponseFactory
         {
             ApplicationSpecificException ase = (ApplicationSpecificException) ex;
             exceptionLogger.log(path, ex, ase.getType().getLevel());
-            return Optional.of(new RestExceptionResponse(HttpStatus.valueOf(ase.getType().getHttpStatusCode()), ex, path));
+            return Optional.of(new RestExceptionResponse(HttpStatus.valueOf(ase.getType().getHttpStatusCode()), ex, path, traceId));
         }
 
         // ========== INTERNAL_SERVER_ERROR (hu.perit.spvitamin.spring.exception) ======================================
         else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
         {
             HttpStatus httpStatus = getHttpStatusFromAnnotation(ex);
-            LogLevel logLevel = logLevelByHttpStatus(path, httpStatus, ex);
+            LogLevel logLevel = logLevelByHttpStatus(httpStatus);
             if (logLevel != null)
             {
                 exceptionLogger.log(path, ex, logLevel);
             }
-            return Optional.of(new RestExceptionResponse(httpStatus, ex, path));
+            return Optional.of(new RestExceptionResponse(httpStatus, ex, path, traceId));
         }
 
         exceptionLogger.log(path, ex, LogLevel.ERROR);
@@ -125,27 +128,23 @@ public class RestExceptionResponseFactory
         Annotation[] annotations = ExceptionWrapper.of(ex).getAnnotations();
         for (Annotation annotation : annotations)
         {
-            if (annotation instanceof ResponseStatus)
+            if (annotation instanceof ResponseStatus responseStatus)
             {
-                return ((ResponseStatus) annotation).value();
+                return responseStatus.value();
             }
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
 
-    private static LogLevel logLevelByHttpStatus(String path, HttpStatus httpStatus, Throwable ex)
+    private static LogLevel logLevelByHttpStatus(HttpStatus httpStatus)
     {
-        switch (classifyHttpStatus(httpStatus))
+        return switch (classifyHttpStatus(httpStatus))
         {
-            case WARNING:
-                return LogLevel.WARN;
-            case ERROR:
-                return LogLevel.ERROR;
-            case NONE:
-            default:
-                return null;
-        }
+            case WARNING -> LogLevel.WARN;
+            case ERROR -> LogLevel.ERROR;
+            default -> null;
+        };
     }
 
 
@@ -153,6 +152,7 @@ public class RestExceptionResponseFactory
     {
         NONE, WARNING, ERROR
     }
+
 
     private static LogStatus classifyHttpStatus(HttpStatus httpStatus)
     {

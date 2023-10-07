@@ -33,8 +33,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -84,10 +84,11 @@ public class RestExceptionResponse implements JsonSerializable
     private static boolean myExceptionEnabled = true;
     private static boolean myMessageEnabled = true;
 
-    private Date timestamp;
-    private int status;
+    private LocalDateTime timestamp;
+    private Integer status;
     private Object error;
     private String path;
+    private String traceId;
     private ServerExceptionProperties exception;
     private String type;
     private String message;
@@ -98,16 +99,27 @@ public class RestExceptionResponse implements JsonSerializable
         myExceptionEnabled = exceptionEnabled;
     }
 
+
     public static void setMessageEnabled(boolean messageEnabled)
     {
         myMessageEnabled = messageEnabled;
     }
 
+
+    // Use the variant with traceId
+    @Deprecated
     public RestExceptionResponse(HttpStatusCode statusCode, Throwable ex, String path)
     {
-        this.timestamp = new Date();
+        this(statusCode, ex, path, null);
+    }
+
+
+    public RestExceptionResponse(HttpStatusCode statusCode, Throwable ex, String path, String traceId)
+    {
+        this.timestamp = LocalDateTime.now();
         this.status = statusCode.value();
         this.path = path;
+        this.traceId = traceId;
         if (myExceptionEnabled)
         {
             this.exception = new ServerExceptionProperties(ex);
@@ -117,10 +129,10 @@ public class RestExceptionResponse implements JsonSerializable
             this.message = ex.getMessage();
         }
 
-        if (ex instanceof ConstraintViolationException)
+        if (ex instanceof ConstraintViolationException cve)
         {
             //Get all errors
-            Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ex).getConstraintViolations();
+            Set<ConstraintViolation<?>> violations = cve.getConstraintViolations();
             List<String> errors = new ArrayList<>();
             for (ConstraintViolation<?> violation : violations)
             {
@@ -128,21 +140,20 @@ public class RestExceptionResponse implements JsonSerializable
             }
             this.error = errors;
         }
-        else if (ex instanceof MethodArgumentNotValidException)
+        else if (ex instanceof MethodArgumentNotValidException manve)
         {
-            BindingResult bindingResult = ((MethodArgumentNotValidException) ex).getBindingResult();
+            BindingResult bindingResult = manve.getBindingResult();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
             List<String> errors = new ArrayList<>();
             for (FieldError fieldError : fieldErrors)
             {
                 errors.add(String.format("%s %s! Rejected value: '%s'", fieldError.getField(), fieldError.getDefaultMessage(),
-                        getRejectedValueAsText(fieldError.getRejectedValue())));
+                    getRejectedValueAsText(fieldError.getRejectedValue())));
             }
             this.error = errors;
         }
-        else if (ex instanceof ApplicationSpecificException)
+        else if (ex instanceof ApplicationSpecificException ase)
         {
-            ApplicationSpecificException ase = (ApplicationSpecificException) ex;
             this.type = ase.getType().name();
         }
         else
