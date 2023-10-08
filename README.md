@@ -24,7 +24,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.0.4-3-RELEASE')
+    set('spvitaminVersion', '3.0.4-4-RELEASE')
 }
 
 dependencies {
@@ -52,6 +52,9 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 3.0.4-4-RELEASE not-yet-released
+- DefaultRestExceptionResponseHandler slightly refactored
 
 ### 3.0.4-3-RELEASE 2023-10-07
 - DEFAULT_JACKSON_TIMESTAMPFORMAT changed to "yyyy-MM-dd'T'HH:mm:ss.SSS" and custom deserializers fixed

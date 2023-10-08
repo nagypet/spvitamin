@@ -85,7 +85,7 @@ public class RestExceptionResponse implements JsonSerializable
     private static boolean myMessageEnabled = true;
 
     private LocalDateTime timestamp;
-    private Integer status;
+    private int status;
     private Object error;
     private String path;
     private String traceId;
