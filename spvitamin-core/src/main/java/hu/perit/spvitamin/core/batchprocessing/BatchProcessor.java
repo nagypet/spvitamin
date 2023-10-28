@@ -44,7 +44,7 @@ public abstract class BatchProcessor
 
 
     @SuppressWarnings({"squid:S3776", "squid:S1141", "squid:S1193"})
-    public boolean process(List<BatchJob> batchJobs) throws ExecutionException, InterruptedException
+    public boolean process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
     {
         if (batchJobs == null || batchJobs.isEmpty())
         {
