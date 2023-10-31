@@ -16,20 +16,20 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import hu.perit.spvitamin.spring.config.Constants;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * @author Peter Nagy
@@ -37,8 +37,9 @@ import hu.perit.spvitamin.spring.config.Constants;
 
 public final class JSonSerializer
 {
-    private static ObjectMapper jsonMapper;
-    private static ObjectMapper yamlMapper;
+	private static ObjectMapper jsonMapper;
+	private static ObjectMapper yamlMapper;
+
 
 	public String toJson(Object object) throws JsonProcessingException
 	{
@@ -64,31 +65,33 @@ public final class JSonSerializer
 	}
 
 
-    private static synchronized ObjectMapper getJsonMapper()
-    {
-        if (jsonMapper == null)
-        {
-            jsonMapper = createMapper(MapperType.JSON);
-        }
+	private static synchronized ObjectMapper getJsonMapper()
+	{
+		if (jsonMapper == null)
+		{
+			jsonMapper = createMapper(MapperType.JSON);
+		}
 
-        return jsonMapper;
-    }
+		return jsonMapper;
+	}
 
 
-    private static synchronized ObjectMapper getYamlMapper()
-    {
-        if (yamlMapper == null)
-        {
-            yamlMapper = createMapper(MapperType.YAML);
-        }
+	private static synchronized ObjectMapper getYamlMapper()
+	{
+		if (yamlMapper == null)
+		{
+			yamlMapper = createMapper(MapperType.YAML);
+		}
 
-        return yamlMapper;
-    }
+		return yamlMapper;
+	}
+
 
 	public enum MapperType
 	{
 		JSON, YAML
 	}
+
 
 	public static ObjectMapper createMapper(MapperType type)
 	{
@@ -97,13 +100,16 @@ public final class JSonSerializer
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		// We encode timestamps with millisecond precision
 		mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
+
 		SimpleModule module = new SimpleModule();
 		module.addSerializer(new CustomLocalDateSerializer());
 		module.addSerializer(new CustomLocalDateTimeSerializer());
+		module.addSerializer(new CustomZonedDateTimeSerializer());
 		module.addSerializer(new CustomMultipartFileSerializer());
 		module.addDeserializer(Date.class, new CustomDateDeserializer());
 		module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
 		module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+		module.addDeserializer(ZonedDateTime.class, new CustomZonedDateTimeDeserializer());
 		mapper.registerModule(module);
 
 		return mapper;

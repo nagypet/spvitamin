@@ -44,7 +44,7 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
         }
 
         DateTimeParseException exception = null;
-        for (String format : AcceptedDateFormats.getAcceptedDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
         {
             try
             {
@@ -52,11 +52,12 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
             }
             catch (DateTimeParseException ex)
             {
-                // nem sikerült parse-olni, próbáljuk a következő formátummal
+                // not succeeded to parse with this format => trying the next
                 exception = ex;
             }
         }
-        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid LocalDateTime format!", jp.getText(), LocalDateTime.class);
+        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid LocalDateTime format!", jp.getText(),
+            LocalDateTime.class);
     }
 
 

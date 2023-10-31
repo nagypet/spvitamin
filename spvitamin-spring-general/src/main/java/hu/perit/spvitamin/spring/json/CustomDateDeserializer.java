@@ -25,6 +25,9 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /**
@@ -43,6 +46,20 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
             return null;
         }
 
+        // Try to parse as ZonedDateTime
+        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        {
+            try
+            {
+                ZonedDateTime zonedDateTime = this.tryParseWithFormat(jp.getText(), format);
+                return Date.from(zonedDateTime.toInstant());
+            }
+            catch (DateTimeParseException ex)
+            {
+                // not succeeded to parse with this format => trying the next
+            }
+        }
+
         try
         {
             return DateUtils.parseDate(jp.getText(), AcceptedDateFormats.getAcceptedDateFormats().toArray(new String[0]));
@@ -51,6 +68,12 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
         {
             throw new InvalidFormatException(jp, e.getMessage(), jp.getText(), Date.class);
         }
+    }
+
+
+    private ZonedDateTime tryParseWithFormat(String value, String format)
+    {
+        return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 
 
