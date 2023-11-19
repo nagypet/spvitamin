@@ -53,6 +53,9 @@ dependencyManagement {
 
 ## Release history
 
+### 3.0.4-5-RELEASE not yet released
+- Support for OffsetDateTime in hu/perit/spvitamin/spring/json package
+
 ### 3.0.4-4-RELEASE 2023-11-01
 - DefaultRestExceptionResponseHandler slightly refactored
 - Time deserialization improved with formats containing nanoseconds

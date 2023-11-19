@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -37,81 +38,83 @@ import java.util.Date;
 
 public final class JSonSerializer
 {
-	private static ObjectMapper jsonMapper;
-	private static ObjectMapper yamlMapper;
+    private static ObjectMapper jsonMapper;
+    private static ObjectMapper yamlMapper;
 
 
-	public String toJson(Object object) throws JsonProcessingException
-	{
-		return getJsonMapper().writeValueAsString(object);
-	}
+    public String toJson(Object object) throws JsonProcessingException
+    {
+        return getJsonMapper().writeValueAsString(object);
+    }
 
 
-	public String toYaml(Object object) throws JsonProcessingException
-	{
-		return getYamlMapper().writeValueAsString(object);
-	}
+    public String toYaml(Object object) throws JsonProcessingException
+    {
+        return getYamlMapper().writeValueAsString(object);
+    }
 
 
-	public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
-	{
-		return getJsonMapper().readValue(jsonString, getJsonMapper().getTypeFactory().constructType(target));
-	}
+    public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
+    {
+        return getJsonMapper().readValue(jsonString, getJsonMapper().getTypeFactory().constructType(target));
+    }
 
 
-	public static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
-	{
-		return getYamlMapper().readValue(jsonString, getYamlMapper().getTypeFactory().constructType(target));
-	}
+    public static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
+    {
+        return getYamlMapper().readValue(jsonString, getYamlMapper().getTypeFactory().constructType(target));
+    }
 
 
-	private static synchronized ObjectMapper getJsonMapper()
-	{
-		if (jsonMapper == null)
-		{
-			jsonMapper = createMapper(MapperType.JSON);
-		}
+    private static synchronized ObjectMapper getJsonMapper()
+    {
+        if (jsonMapper == null)
+        {
+            jsonMapper = createMapper(MapperType.JSON);
+        }
 
-		return jsonMapper;
-	}
-
-
-	private static synchronized ObjectMapper getYamlMapper()
-	{
-		if (yamlMapper == null)
-		{
-			yamlMapper = createMapper(MapperType.YAML);
-		}
-
-		return yamlMapper;
-	}
+        return jsonMapper;
+    }
 
 
-	public enum MapperType
-	{
-		JSON, YAML
-	}
+    private static synchronized ObjectMapper getYamlMapper()
+    {
+        if (yamlMapper == null)
+        {
+            yamlMapper = createMapper(MapperType.YAML);
+        }
+
+        return yamlMapper;
+    }
 
 
-	public static ObjectMapper createMapper(MapperType type)
-	{
-		ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
-		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		// We encode timestamps with millisecond precision
-		mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
+    public enum MapperType
+    {
+        JSON, YAML
+    }
 
-		SimpleModule module = new SimpleModule();
-		module.addSerializer(new CustomLocalDateSerializer());
-		module.addSerializer(new CustomLocalDateTimeSerializer());
-		module.addSerializer(new CustomZonedDateTimeSerializer());
-		module.addSerializer(new CustomMultipartFileSerializer());
-		module.addDeserializer(Date.class, new CustomDateDeserializer());
-		module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
-		module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
-		module.addDeserializer(ZonedDateTime.class, new CustomZonedDateTimeDeserializer());
-		mapper.registerModule(module);
 
-		return mapper;
-	}
+    public static ObjectMapper createMapper(MapperType type)
+    {
+        ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // We encode timestamps with millisecond precision
+        mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
+
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(new CustomLocalDateSerializer());
+        module.addSerializer(new CustomLocalDateTimeSerializer());
+        module.addSerializer(new CustomZonedDateTimeSerializer());
+        module.addSerializer(new CustomOffsetDateTimeSerializer());
+        module.addSerializer(new CustomMultipartFileSerializer());
+        module.addDeserializer(Date.class, new CustomDateDeserializer());
+        module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+        module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        module.addDeserializer(ZonedDateTime.class, new CustomZonedDateTimeDeserializer());
+        module.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
+        mapper.registerModule(module);
+
+        return mapper;
+    }
 }

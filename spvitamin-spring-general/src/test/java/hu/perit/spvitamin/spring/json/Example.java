@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -24,15 +25,17 @@ class Example implements JsonSerializable
     private final LocalDate localDate;
     private final LocalDateTime localDateTime;
     private final ZonedDateTime zonedDateTime;
+    private final OffsetDateTime offsetDateTime;
 
     public Example()
     {
         this.name = null;
-        age = 0;
-        date = null;
-        localDate = null;
-        localDateTime = null;
-        zonedDateTime = null;
+        this.age = 0;
+        this.date = null;
+        this.localDate = null;
+        this.localDateTime = null;
+        this.zonedDateTime = null;
+        this.offsetDateTime = null;
     }
 
     @Override

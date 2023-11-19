@@ -22,7 +22,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 
@@ -46,7 +48,9 @@ class JsonSerializableTest
             cal.getTime(),
             LocalDate.of(2020, 5, 11),
             LocalDateTime.of(2020, 5, 11, 10, 10, 10),
-            ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.of("+0200")));
+            ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.of("+0200")),
+            OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00"))
+        );
 
         String originalObjectJson = originalObject.toJson();
         log.debug(originalObjectJson);
