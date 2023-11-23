@@ -23,6 +23,7 @@ import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -31,7 +32,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
  * @author Peter Nagy
@@ -55,14 +58,14 @@ public class SpvitaminWebSecurityConfig
         log.info("logout URL: POST {}{}", serviceUrl, logoutUrl);
 
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(new AntPathRequestMatcher(logoutUrl, "POST"))
-                .authorizeRequests(i -> i.anyRequest().permitAll()).and()
-                .logout(logout -> logout
-                        .logoutUrl(logoutUrl)
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
-                );
+            .scope(new AntPathRequestMatcher(logoutUrl, "POST"))
+            .authorizeRequests(i -> i.anyRequest().permitAll()).and()
+            .logout(logout -> logout
+                .logoutUrl(logoutUrl)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
+            );
 
         return http.build();
     }
@@ -72,39 +75,50 @@ public class SpvitaminWebSecurityConfig
      * ============== Config for the admin endpoints ===================================================================
      */
     @Bean
+    MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector)
+    {
+        return new MvcRequestMatcher.Builder(introspector);
+    }
+
+
+    @Bean
     @Order(998)
-    public SecurityFilterChain configureAdminRestEndpoints(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureAdminRestEndpoints(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(
-                        Constants.BASE_URL_ADMIN + "/**",
-                        Constants.BASE_URL_KEYSTORE + "/**",
-                        Constants.BASE_URL_TRUSTSTORE + "/**")
-                // /admin/** endpoints
-                .authorizeRequests(this::authAdminRestEndpoints)
-                // any other requests
-                .authorizeRequests(i -> i.anyRequest().authenticated())
-                .ignorePersistedSecurity()
-                .jwtAuth();
+            .scope(
+                Constants.BASE_URL_ADMIN + "/**",
+                Constants.BASE_URL_KEYSTORE + "/**",
+                Constants.BASE_URL_TRUSTSTORE + "/**")
+            // /admin/** endpoints
+            .authorizeRequests(i -> authAdminRestEndpoints(i, mvc))
+            // any other requests
+            .authorizeRequests(i -> i.anyRequest().authenticated())
+            .ignorePersistedSecurity()
+            .jwtAuth();
 
         return http.build();
     }
 
-    private void authAdminRestEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+
+    private void authAdminRestEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry,
+        MvcRequestMatcher.Builder mvc)
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        registry.requestMatchers(
-                // Admin REST API
-                String.format(Constants.BASE_URL_ADMIN + "/version"),
-                String.format(Constants.BASE_URL_ADMIN + "/csp_violations")
-        ).permitAll();
+        // Admin REST API
+        registry
+            .requestMatchers(
+                mvc.pattern(Constants.BASE_URL_ADMIN + "/version"),
+                mvc.pattern(Constants.BASE_URL_ADMIN + "/csp_violations")
+            ).permitAll();
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminUrls = registry.requestMatchers(
-                Constants.BASE_URL_ADMIN + "/settings",
-                Constants.BASE_URL_ADMIN + "/shutdown",
-                Constants.BASE_URL_KEYSTORE + "/**",
-                Constants.BASE_URL_TRUSTSTORE + "/**");
+            mvc.pattern(Constants.BASE_URL_ADMIN + "/settings"),
+            mvc.pattern(Constants.BASE_URL_ADMIN + "/shutdown"),
+            mvc.pattern(Constants.BASE_URL_KEYSTORE + "/**"),
+            mvc.pattern(Constants.BASE_URL_TRUSTSTORE + "/**")
+        );
 
         if ("*".equals(securityProperties.getAdminEndpointsAccess()))
         {
@@ -122,37 +136,43 @@ public class SpvitaminWebSecurityConfig
      */
     @Bean
     @Order(999)
-    public SecurityFilterChain configureAllOthers(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureAllOthers(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
-                .defaults()
-                .logout()
-                // h2 console uses frames
-                .allowFrames()
-                .authorizeRequests(this::authorizeSwagger)
-                .authorizeRequests(this::authorizeActuator)
-                .authorizeRequests(this::authorizeAdminGui)
-                .authorizeRequests(this::permitEndpoints)
-                // any other requests
-                .authorizeRequests(i -> i.anyRequest().authenticated());
+            .defaults()
+            .logout()
+            // h2 console uses frames
+            .allowFrames()
+            .authorizeRequests(i -> authorizeSwagger(i, mvc))
+            .authorizeRequests(i -> authorizeActuator(i, mvc))
+            .authorizeRequests(i -> authorizeAdminGui(i, mvc))
+            .authorizeRequests(i -> permitEndpoints(i, mvc))
+            // any other requests
+            .authorizeRequests(i -> i.anyRequest().authenticated());
 
         return http.build();
     }
 
-    private void permitEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
-    {
-        registry.requestMatchers(
-                // H2
-                "/h2/**",
 
+    private void permitEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry,
+        MvcRequestMatcher.Builder mvc)
+    {
+        registry
+            .requestMatchers(
                 // error
-                "/error",
+                mvc.pattern("/error"),
 
                 // Logout endpoint
-                "/logout").permitAll();
+                mvc.pattern("/logout")
+            ).permitAll()
+            // H2
+            .requestMatchers(PathRequest.toH2Console()).permitAll()
+        ;
     }
 
-    private void authorizeAdminGui(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+
+    private void authorizeAdminGui(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry,
+        MvcRequestMatcher.Builder mvc)
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
@@ -162,17 +182,22 @@ public class SpvitaminWebSecurityConfig
         if (adminProperties.getAdminGuiUrl().isBlank())
         {
             adminGuiUrls = registry
-                    .requestMatchers(
-                            // Admin GUI controller
-                            "/", "/*.*", "/css/**", "/assets/**");
+                .requestMatchers(
+                    // Admin GUI controller
+                    mvc.pattern("/"),
+                    mvc.pattern("/*.*"),
+                    mvc.pattern("/css/**"),
+                    mvc.pattern("/assets/**")
+                );
         }
         else
         {
             adminGuiUrls = registry
-                    .requestMatchers(
-                            // Admin GUI controller
-                            "/",
-                            String.format("%s/**", adminProperties.getAdminGuiUrl()));
+                .requestMatchers(
+                    // Admin GUI controller
+                    mvc.pattern("/"),
+                    mvc.pattern(String.format("%s/**", adminProperties.getAdminGuiUrl()))
+                );
         }
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))
@@ -185,18 +210,20 @@ public class SpvitaminWebSecurityConfig
         }
     }
 
-    private void authorizeActuator(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+
+    private void authorizeActuator(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry,
+        MvcRequestMatcher.Builder mvc)
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
         registry.requestMatchers(
-                        // Health and Prometheus endpoint
-                        "/actuator/health/**",
-                        "/actuator/prometheus")
-                .permitAll();
+                // Health and Prometheus endpoint
+                mvc.pattern("/actuator/health/**"),
+                mvc.pattern("/actuator/prometheus"))
+            .permitAll();
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = registry
-                .requestMatchers("/actuator/**");
+            .requestMatchers(mvc.pattern("/actuator/**"));
 
         if ("*".equals(securityProperties.getManagementEndpointsAccess()))
         {
@@ -209,20 +236,21 @@ public class SpvitaminWebSecurityConfig
     }
 
 
-    private void authorizeSwagger(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    private void authorizeSwagger(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry,
+        MvcRequestMatcher.Builder mvc)
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
         SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
         String swaggerUiPath = swaggerProperties.getSwaggerUi().getPath();
         String apiDocsPath = swaggerProperties.getApiDocs().getPath();
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = registry
-                .requestMatchers(
-                        // Swagger 3
-                        swaggerUiPath + "/**",
+            .requestMatchers(
+                // Swagger 3
+                mvc.pattern(swaggerUiPath + "/**"),
 
-                        // api-docs
-                        apiDocsPath + "/**"
-                );
+                // api-docs
+                mvc.pattern(apiDocsPath + "/**")
+            );
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
         {

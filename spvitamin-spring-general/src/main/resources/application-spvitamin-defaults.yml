@@ -56,14 +56,16 @@ management:
   endpoint:
     refresh.enabled: true
     health:
+      probes:
+        enabled: true
       show-details: always
       group:
         startup:
-          include: "ping, healthIndicatorDatabase, diskSpace"
+          include: "ping, diskSpace"
         readiness:
-          include: "ping"
+          include: "ping, readinessState"
         liveness:
-          include: "ping"
+          include: "ping, livenessState"
   endpoints:
     web.exposure.include: health,env,info,metrics,prometheus
   health:

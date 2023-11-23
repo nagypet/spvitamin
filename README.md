@@ -3,6 +3,10 @@
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
+### 3.1.5-1-RELEASE
+- SpringBoot 3.1.5
+- SpingCloud 2022.0.1
+
 ### 3.0.4-5-RELEASE
 - SpringBoot 3.0.4
 - SpingCloud 2022.0.1
@@ -24,7 +28,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.0.4-5-RELEASE')
+    set('spvitaminVersion', '3.1.5-1-RELEASE')
 }
 
 dependencies {
@@ -52,6 +56,9 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 3.1.5-1-RELEASE not yet released
+- SpvitaminWebSecurityConfig updated using MvcRequestMatcher.Builder
 
 ### 3.0.4-5-RELEASE 2023-11-19
 - Added support for OffsetDateTime in hu/perit/spvitamin/spring/json package
