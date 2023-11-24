@@ -19,7 +19,6 @@ package hu.perit.spvitamin.spring.httplogging;
 import hu.perit.spvitamin.core.StackTracer;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
@@ -30,7 +29,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -42,7 +40,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
 @Slf4j
 public class HttpLoggingFilter implements Filter
 {
@@ -116,9 +113,9 @@ public class HttpLoggingFilter implements Filter
     private void prepareLogMessageRequest(StringBuilder logMessage, HttpServletRequest bufferedRequest) throws IOException
     {
         String body;
-        if (bufferedRequest instanceof HttpLoggingFilter.BufferedRequestWrapper)
+        if (bufferedRequest instanceof HttpLoggingFilter.BufferedRequestWrapper requestWrapper)
         {
-            body = ((HttpLoggingFilter.BufferedRequestWrapper) bufferedRequest).getRequestBody();
+            body = requestWrapper.getRequestBody();
         }
         else
         {
@@ -126,12 +123,12 @@ public class HttpLoggingFilter implements Filter
         }
 
         logMessage
-                .append("==> HTTP REQUEST - ")
-                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-                .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
-                .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
+            .append("==> HTTP REQUEST - ")
+            .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+            .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+            .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+            .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
+            .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
 
         if (log.isDebugEnabled())
         {
@@ -147,12 +144,12 @@ public class HttpLoggingFilter implements Filter
         int httpStatus = bufferedResponse.getStatus();
 
         logMessage
-                .append("<== HTTP RESPONSE - ")
-                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-                .append("[RESPONSE STATUS: ").append(httpStatus).append("] ")
-                .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ");
+            .append("<== HTTP RESPONSE - ")
+            .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+            .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+            .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+            .append("[RESPONSE STATUS: ").append(httpStatus).append("] ")
+            .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ");
 
         if (log.isDebugEnabled())
         {
@@ -166,10 +163,12 @@ public class HttpLoggingFilter implements Filter
         return LoggingHelper.getHeadersAsString(new HttpRequestWrapper(request));
     }
 
+
     private String getResponseHeaderAsString(HttpServletResponse response)
     {
         return LoggingHelper.getHeadersAsString(new HttpResponseWrapper(response));
     }
+
 
     private String getParameterAsString(HttpServletRequest request)
     {
@@ -187,14 +186,6 @@ public class HttpLoggingFilter implements Filter
         return Strings.join(parameterAsString, ',');
     }
 
-    public void init(FilterConfig filterConfig)
-    {
-    }
-
-    public void destroy()
-    {
-    }
-
 
     private static final class BufferedRequestWrapper extends HttpServletRequestWrapper
     {
@@ -203,6 +194,7 @@ public class HttpLoggingFilter implements Filter
         private ByteArrayOutputStream baos = null;
         private BufferedServletInputStream bsis = null;
         private byte[] buffer = null;
+
 
         public BufferedRequestWrapper(HttpServletRequest req) throws IOException
         {
@@ -220,12 +212,15 @@ public class HttpLoggingFilter implements Filter
             this.buffer = this.baos.toByteArray();
         }
 
+
+        @Override
         public ServletInputStream getInputStream()
         {
             this.bais = new ByteArrayInputStream(this.buffer);
             this.bsis = new BufferedServletInputStream(this.bais);
             return this.bsis;
         }
+
 
         String getRequestBody() throws IOException
         {
