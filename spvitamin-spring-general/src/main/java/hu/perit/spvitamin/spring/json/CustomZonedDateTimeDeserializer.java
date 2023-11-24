@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -37,7 +36,7 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
             }
         }
         throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid ZonedDateTime format!", jp.getText(),
-            LocalDateTime.class);
+            ZonedDateTime.class);
     }
 
 

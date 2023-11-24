@@ -7,14 +7,15 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDateTime>
+public class CustomInstantDeserializer extends JsonDeserializer<Instant>
 {
     @Override
-    public OffsetDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public Instant deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
 
         if (StringUtils.isBlank(jp.getText()))
@@ -35,20 +36,20 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
                 exception = ex;
             }
         }
-        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid OffsetDateTime format!", jp.getText(),
-            OffsetDateTime.class);
+        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid Instant format!", jp.getText(),
+            Instant.class);
     }
 
 
-    private OffsetDateTime tryParseWithFormat(String value, String format)
+    private Instant tryParseWithFormat(String value, String format)
     {
-        return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+        return Instant.from(ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format)));
     }
 
 
     @Override
-    public Class<OffsetDateTime> handledType()
+    public Class<Instant> handledType()
     {
-        return OffsetDateTime.class;
+        return Instant.class;
     }
 }

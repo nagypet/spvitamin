@@ -60,6 +60,7 @@ dependencyManagement {
 ### 3.1.5-1-RELEASE not yet released
 - SpvitaminWebSecurityConfig updated using MvcRequestMatcher.Builder
 - HttpLoggingFilter bug fixed: @Component annotation removed
+- Json package: added support for Instant
 
 ### 3.0.4-5-RELEASE 2023-11-19
 - Added support for OffsetDateTime in hu/perit/spvitamin/spring/json package

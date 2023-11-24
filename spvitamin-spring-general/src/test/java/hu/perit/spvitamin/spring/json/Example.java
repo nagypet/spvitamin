@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -26,6 +27,7 @@ class Example implements JsonSerializable
     private final LocalDateTime localDateTime;
     private final ZonedDateTime zonedDateTime;
     private final OffsetDateTime offsetDateTime;
+    private final Instant instant;
 
     public Example()
     {
@@ -36,6 +38,7 @@ class Example implements JsonSerializable
         this.localDateTime = null;
         this.zonedDateTime = null;
         this.offsetDateTime = null;
+        this.instant = null;
     }
 
     @Override

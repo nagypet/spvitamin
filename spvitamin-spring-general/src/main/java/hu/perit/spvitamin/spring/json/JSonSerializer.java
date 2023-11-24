@@ -26,6 +26,7 @@ import hu.perit.spvitamin.spring.config.Constants;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -107,12 +108,14 @@ public final class JSonSerializer
         module.addSerializer(new CustomLocalDateTimeSerializer());
         module.addSerializer(new CustomZonedDateTimeSerializer());
         module.addSerializer(new CustomOffsetDateTimeSerializer());
+        module.addSerializer(new CustomInstantSerializer());
         module.addSerializer(new CustomMultipartFileSerializer());
         module.addDeserializer(Date.class, new CustomDateDeserializer());
         module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
         module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
         module.addDeserializer(ZonedDateTime.class, new CustomZonedDateTimeDeserializer());
         module.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
+        module.addDeserializer(Instant.class, new CustomInstantDeserializer());
         mapper.registerModule(module);
 
         return mapper;

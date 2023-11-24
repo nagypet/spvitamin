@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -49,7 +50,8 @@ class JsonSerializableTest
             LocalDate.of(2020, 5, 11),
             LocalDateTime.of(2020, 5, 11, 10, 10, 10),
             ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.of("+0200")),
-            OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00"))
+            OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")),
+            Instant.from(OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")))
         );
 
         String originalObjectJson = originalObject.toJson();
