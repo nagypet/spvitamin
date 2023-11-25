@@ -23,7 +23,7 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
         }
 
         DateTimeParseException exception = null;
-        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
             {
@@ -42,6 +42,11 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
 
     private OffsetDateTime tryParseWithFormat(String value, String format)
     {
+        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
+        {
+            return OffsetDateTime.parse(value);
+        }
+
         return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

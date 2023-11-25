@@ -17,11 +17,11 @@
 package hu.perit.spvitamin.spring.json;
 
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,48 +78,85 @@ import java.util.List;
 @Getter
 public final class AcceptedDateFormats
 {
-    private static final List<String> DATE_FORMATS;
-    private static final List<String> LOCAL_DATE_FORMATS;
+    public enum Standard
+    {
+        JSR_310,
+        ISO_8601
+    }
+
+    public enum Type
+    {
+        DATE,
+        DATE_TIME,
+        OTHER
+    }
+
+    @Data
+    public static class TimestampFormat
+    {
+        private final Standard standard;
+        private final Type type;
+        private final String formatString;
+
+
+        public static TimestampFormat of(Standard standard, Type type, String formatString)
+        {
+            return new TimestampFormat(standard, type, formatString);
+        }
+    }
+
+    private static final List<TimestampFormat> TIMESTAMP_FORMATS;
+
+    public static final String JAVA_STANDARD = "JAVA_STANDARD";
 
     static
     {
-        List<String> formats = new ArrayList<>();
+        List<TimestampFormat> formats = new ArrayList<>();
+
+        // Type.JSR_310
+
         // Without T
-        formats.add("yyyy-MM-dd HH:mm:ss.SSS");
-        formats.add("yyyy-MM-dd HH:mm:ss");
-        formats.add("yyyy-MM-dd HH:mm");
-        formats.add("yyyy-MM-dd");
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSS"));
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss"));
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm"));
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE, "yyyy-MM-dd"));
         // With T
-        formats.add("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        formats.add("yyyy-MM-dd'T'HH:mm:ss");
-        formats.add("yyyy-MM-dd'T'HH:mm");
-        DATE_FORMATS = formats;
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSS"));
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss"));
+        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm"));
+
+        // Type.ISO_8601
+        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.OTHER, JAVA_STANDARD));
+        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.nnnnnnnnn"));
+        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn"));
 
         // With timezone
-        DATE_FORMATS.addAll(formats.stream().filter(i -> i.length() > 10).map(i -> i + "Z").toList());
-        DATE_FORMATS.addAll(formats.stream().filter(i -> i.length() > 10).map(i -> i + "XXX").toList());
-
-        List<String> localDateFormats = new ArrayList<>();
-        localDateFormats.add("yyyy-MM-dd HH:mm:ss.nnnnnnnnn");
-        localDateFormats.add("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn");
-        LOCAL_DATE_FORMATS = new ArrayList<>();
-        LOCAL_DATE_FORMATS.addAll(localDateFormats);
-
-        // With timezone
-        LOCAL_DATE_FORMATS.addAll(localDateFormats.stream().filter(i -> i.length() > 10).map(i -> i + "Z").toList());
-        LOCAL_DATE_FORMATS.addAll(localDateFormats.stream().filter(i -> i.length() > 10).map(i -> i + "XXX").toList());
-
-        LOCAL_DATE_FORMATS.addAll(formats);
-    }
-
-    public static List<String> getAcceptedDateFormats()
-    {
-        return Collections.unmodifiableList(DATE_FORMATS);
+        TIMESTAMP_FORMATS = new ArrayList<>();
+        TIMESTAMP_FORMATS.addAll(formats);
+        TIMESTAMP_FORMATS.addAll(getDateTimeFormatsWithZonePostfix(formats, "Z"));
+        TIMESTAMP_FORMATS.addAll(getDateTimeFormatsWithZonePostfix(formats, "XXX"));
     }
 
 
-    public static List<String> getAcceptedLocalDateFormats()
+    private static List<TimestampFormat> getDateTimeFormatsWithZonePostfix(List<TimestampFormat> timestampFormats, String timeZonePostfix)
     {
-        return Collections.unmodifiableList(LOCAL_DATE_FORMATS);
+        return timestampFormats.stream()
+            .filter(i -> i.getType() == Type.DATE_TIME)
+            .map(i -> TimestampFormat.of(i.getStandard(), i.getType(), i.getFormatString() + timeZonePostfix))
+            .toList();
+    }
+
+
+    public static List<String> getAcceptedJsr310Formats()
+    {
+        return TIMESTAMP_FORMATS.stream().filter(i -> i.getStandard() == Standard.JSR_310).map(TimestampFormat::getFormatString).toList();
+    }
+
+
+    public static List<String> getAcceptedIso8601Formats()
+    {
+        return TIMESTAMP_FORMATS.stream().map(TimestampFormat::getFormatString).toList();
     }
 }

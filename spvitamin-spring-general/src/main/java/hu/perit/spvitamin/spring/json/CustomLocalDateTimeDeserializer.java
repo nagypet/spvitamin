@@ -44,7 +44,7 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
         }
 
         DateTimeParseException exception = null;
-        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
             {
@@ -63,6 +63,11 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
 
     private LocalDateTime tryParseWithFormat(String value, String format)
     {
+        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
+        {
+            return LocalDateTime.parse(value);
+        }
+
         return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

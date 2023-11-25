@@ -24,7 +24,7 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
         }
 
         DateTimeParseException exception = null;
-        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
             {
@@ -43,6 +43,11 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
 
     private Instant tryParseWithFormat(String value, String format)
     {
+        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
+        {
+            return Instant.parse(value);
+        }
+
         return Instant.from(ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format)));
     }
 

@@ -47,7 +47,7 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
         }
 
         // Try to parse as ZonedDateTime
-        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
             {
@@ -62,7 +62,7 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
 
         try
         {
-            return DateUtils.parseDate(jp.getText(), AcceptedDateFormats.getAcceptedDateFormats().toArray(new String[0]));
+            return DateUtils.parseDate(jp.getText(), AcceptedDateFormats.getAcceptedJsr310Formats().toArray(new String[0]));
         }
         catch (ParseException e)
         {
@@ -73,6 +73,11 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
 
     private ZonedDateTime tryParseWithFormat(String value, String format)
     {
+        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
+        {
+            return ZonedDateTime.parse(value);
+        }
+
         return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

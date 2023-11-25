@@ -23,7 +23,7 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
         }
 
         DateTimeParseException exception = null;
-        for (String format : AcceptedDateFormats.getAcceptedLocalDateFormats())
+        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
             {
@@ -42,6 +42,11 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
 
     private ZonedDateTime tryParseWithFormat(String value, String format)
     {
+        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
+        {
+            return ZonedDateTime.parse(value);
+        }
+
         return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

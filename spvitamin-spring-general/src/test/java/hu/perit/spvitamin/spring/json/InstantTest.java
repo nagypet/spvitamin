@@ -30,6 +30,9 @@ class InstantTest
         testDeserialization("2020-05-01T10:11:12Z", refTime(2020, 5, 1, 10, 11, 12, 0, "Z"));
         testDeserialization("2020-05-01 10:11:12.123Z", refTime(2020, 5, 1, 10, 11, 12, 123, "Z"));
         testDeserialization("2020-05-01T10:11:12.123Z", refTime(2020, 5, 1, 10, 11, 12, 123, "Z"));
+        // Microseconds
+        testDeserialization("2020-05-01T10:11:12.695499Z", refTimeNano(2020, 5, 1, 10, 11, 12, 695499000, "Z"));
+        testDeserialization("2020-05-01T10:11:12.695499+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 695499000, "+4"));
         // Nanoseconds
         testDeserialization("2020-05-01T10:11:12.695499117Z", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117, "Z"));
         testDeserialization("2020-05-01T10:11:12.695499117+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117, "+4"));

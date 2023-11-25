@@ -34,6 +34,9 @@ class LocalDateTimeTest
         testDeserialization("2020-05-01T10:11:12Z", refTime(2020, 5, 1, 10, 11, 12, 0));
         testDeserialization("2020-05-01 10:11:12.123Z", refTime(2020, 5, 1, 10, 11, 12, 123));
         testDeserialization("2020-05-01T10:11:12.123Z", refTime(2020, 5, 1, 10, 11, 12, 123));
+        // Microseconds
+        testDeserialization("2020-05-01T10:11:12.695499", refTimeNano(2020, 5, 1, 10, 11, 12, 695499000));
+        testDeserialization("2020-05-01T10:11:12.695499Z", refTimeNano(2020, 5, 1, 10, 11, 12, 695499000));
         // Nanoseconds
         testDeserialization("2020-05-01T10:11:12.695499117", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117));
         testDeserialization("2020-05-01T10:11:12.695499117Z", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117));
