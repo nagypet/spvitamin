@@ -17,38 +17,21 @@
 package hu.perit.spvitamin.spring.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Extends JacksonAutoConfiguration with custom serializers and deserializers
  */
 
 @Configuration
-public class JacksonConfiguration
+public class JacksonAutoConfiguration
 {
-
     @Bean
-    public com.fasterxml.jackson.databind.Module createCustomModule()
+    public ObjectMapper objectMapper()
     {
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(new CustomLocalDateSerializer());
-        module.addSerializer(new CustomLocalDateTimeSerializer());
-        module.addDeserializer(Date.class, new CustomDateDeserializer());
-        module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
-        module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
-
-        return module;
-    }
-
-    @Bean
-    public ObjectMapper createMapper()
-    {
-        return JSonSerializer.createMapper(JSonSerializer.MapperType.JSON);
+        return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
     }
 }
