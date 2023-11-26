@@ -19,12 +19,11 @@ package hu.perit.spvitamin.json.time;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -43,7 +42,6 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
             return null;
         }
 
-        DateTimeParseException exception = null;
         for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
@@ -53,20 +51,16 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
             catch (DateTimeParseException ex)
             {
                 // nem sikerült parse-olni, próbáljuk a következő formátummal
-                exception = ex;
             }
         }
-        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid LocalDate format!", jp.getText(), LocalDateTime.class);
+
+        // Failed with custom formats, try default
+        return LocalDateDeserializer.INSTANCE.deserialize(jp, ctxt);
     }
 
 
     private LocalDate tryParseWithFormat(String value, String format)
     {
-        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
-        {
-            return LocalDate.parse(value);
-        }
-
         return LocalDate.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

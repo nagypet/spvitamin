@@ -62,7 +62,8 @@ dependencyManagement {
 - HttpLoggingFilter bug fixed: @Component annotation removed
 - Json package: added support for Instant
 - Json package refactored to allow microsecond precision
-- Json time modul extracted to new spvitamin-module: spvitamin-json-time
+- Json time module extracted to new spvitamin-module: spvitamin-json-time
+- Major refactor of the json time module
 
 ### 3.0.4-5-RELEASE 2023-11-19
 - Added support for OffsetDateTime in hu/perit/spvitamin/spring/json package

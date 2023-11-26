@@ -25,7 +25,7 @@ public final class SpvitaminObjectMapper
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // We encode timestamps with millisecond precision
-        mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
+        //mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT));
         mapper.registerModule(new SpvitaminJsonTimeModul());
 
         return mapper;

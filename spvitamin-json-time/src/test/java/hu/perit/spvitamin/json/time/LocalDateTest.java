@@ -45,9 +45,8 @@ class LocalDateTest
     void testDeserialization(String dateString, LocalDate expectedDate) throws IOException
     {
         String jsonString = String.format("{\"localDate\":\"%s\"}", dateString);
-        log.debug(jsonString);
         ExampleClass decodedObject = JsonSerializable.fromJson(jsonString, ExampleClass.class);
-        log.debug("decoded:  " + decodedObject.toString());
+        log.debug("{} => {}", jsonString, decodedObject.toString());
 
         assertThat(decodedObject.getLocalDate()).isEqualTo(expectedDate);
     }

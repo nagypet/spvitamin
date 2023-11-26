@@ -1,20 +1,21 @@
 package hu.perit.spvitamin.json;
 
+import hu.perit.spvitamin.json.time.Constants;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode
 @Getter
 @Slf4j
@@ -29,6 +30,7 @@ public class ExampleClass implements JsonSerializable
     private final OffsetDateTime offsetDateTime;
     private final Instant instant;
 
+
     public ExampleClass()
     {
         this.name = null;
@@ -41,9 +43,37 @@ public class ExampleClass implements JsonSerializable
         this.instant = null;
     }
 
+
     @Override
     public void finalizeJsonDeserialization()
     {
-        log.debug("finalizeJsonDeserialization() called!");
+        //log.debug("finalizeJsonDeserialization() called!");
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return new StringJoiner(", ", ExampleClass.class.getSimpleName() + "[", "]")
+            .add("name='" + name + "'")
+            .add("age=" + age)
+            .add("date=" + formatDate(date))
+            .add("localDate=" + localDate)
+            .add("localDateTime=" + localDateTime)
+            .add("zonedDateTime=" + zonedDateTime)
+            .add("offsetDateTime=" + offsetDateTime)
+            .add("instant=" + instant)
+            .toString();
+    }
+
+
+    private String formatDate(Date timestamp)
+    {
+        if (timestamp == null)
+        {
+            return null;
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT);
+        return simpleDateFormat.format(date);
     }
 }

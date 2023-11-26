@@ -3,7 +3,7 @@ package hu.perit.spvitamin.json.time;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -22,7 +22,6 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
             return null;
         }
 
-        DateTimeParseException exception = null;
         for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
@@ -32,21 +31,16 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
             catch (DateTimeParseException ex)
             {
                 // not succeeded to parse with this format => trying the next
-                exception = ex;
             }
         }
-        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid OffsetDateTime format!", jp.getText(),
-            OffsetDateTime.class);
+
+        // Failed with custom formats, try default
+        return InstantDeserializer.OFFSET_DATE_TIME.deserialize(jp, ctxt);
     }
 
 
     private OffsetDateTime tryParseWithFormat(String value, String format)
     {
-        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
-        {
-            return OffsetDateTime.parse(value);
-        }
-
         return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 

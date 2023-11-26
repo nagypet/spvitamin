@@ -18,30 +18,73 @@ class DateTest
     @Test
     void testDeserialization() throws IOException
     {
-        testDeserialization("2020-05-01", refTime(2020, 4, 1, 0, 0, 0, 0));
-        testDeserialization("2020-05-01 10:11", refTime(2020, 4, 1, 10, 11, 0, 0));
-        testDeserialization("2020-05-01T10:11", refTime(2020, 4, 1, 10, 11, 0, 0));
-        testDeserialization("2020-05-01 10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0));
-        testDeserialization("2020-05-01T10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0));
-        testDeserialization("2020-05-01 10:11:12.123", refTime(2020, 4, 1, 10, 11, 12, 123));
-        testDeserialization("2020-05-01T10:11:12.123", refTime(2020, 4, 1, 10, 11, 12, 123));
+        // without T, no time zone
+        testDeserialization("2020-05-01 10:11", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
+        testDeserialization("2020-05-01 10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
+        testDeserialization("2020-05-01 10:11:12.1", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
+        testDeserialization("2020-05-01 10:11:12.12", refTime(2020, 4, 1, 10, 11, 12, 120, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.1234", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.12345", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123456", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.1234567", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.12345678", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123456789", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+
+        // with T, no time zone
+        testDeserialization("2020-05-01", refTime(2020, 4, 1, 2, 0, 0, 0));
+        testDeserialization("2020-05-01T10:11", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
+        testDeserialization("2020-05-01T10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
+        testDeserialization("2020-05-01T10:11:12.1", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
+        testDeserialization("2020-05-01T10:11:12.12", refTime(2020, 4, 1, 10, 11, 12, 120, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.1234", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.12345", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123456", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.1234567", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.12345678", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123456789", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+
+        // without T, offset
         testDeserialization("2020-05-01 10:11+0400", refTime(2020, 4, 1, 10, 11, 0, 0, "GMT+4"));
-        testDeserialization("2020-05-01T10:11+0400", refTime(2020, 4, 1, 10, 11, 0, 0, "GMT+4"));
         testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 4, 1, 10, 11, 12, 0, "GMT+4"));
-        testDeserialization("2020-05-01T10:11:12+0400", refTime(2020, 4, 1, 10, 11, 12, 0, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.1+0400", refTime(2020, 4, 1, 10, 11, 12, 100, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.12+0400", refTime(2020, 4, 1, 10, 11, 12, 120, "GMT+4"));
         testDeserialization("2020-05-01 10:11:12.123+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.1234+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.12345+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.123456+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.1234567+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.12345678+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01 10:11:12.123456789+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+
+        // with T, offset
+        testDeserialization("2020-05-01T10:11+0400", refTime(2020, 4, 1, 10, 11, 0, 0, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12+0400", refTime(2020, 4, 1, 10, 11, 12, 0, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.1+0400", refTime(2020, 4, 1, 10, 11, 12, 100, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.12+0400", refTime(2020, 4, 1, 10, 11, 12, 120, "GMT+4"));
         testDeserialization("2020-05-01T10:11:12.123+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
-        testDeserialization("2020-05-01T10:11:12.123499117Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
-        testDeserialization("2020-05-01T10:11:12.123499117+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.1234+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.12345+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.123456+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.1234567+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.12345678+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+        testDeserialization("2020-05-01T10:11:12.123456789+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
+
+        // with T, Zulu
+        testDeserialization("2020-05-01T10:11:12.1Z", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
+        testDeserialization("2020-05-01T10:11:12.12Z", refTime(2020, 4, 1, 10, 11, 12, 120, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123456Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01T10:11:12.123456789Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
     }
 
 
     void testDeserialization(String dateString, Date expectedDate) throws IOException
     {
         String jsonString = String.format("{\"date\":\"%s\"}", dateString);
-        log.debug(jsonString);
         ExampleClass decodedObject = JsonSerializable.fromJson(jsonString, ExampleClass.class);
-        log.debug("decoded:  " + decodedObject.toString());
+        log.debug("{} => {}", jsonString, decodedObject.toString());
 
         assertThat(decodedObject.getDate()).isEqualTo(expectedDate);
     }

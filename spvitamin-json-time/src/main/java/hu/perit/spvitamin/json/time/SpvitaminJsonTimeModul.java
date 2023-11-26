@@ -14,6 +14,7 @@ public class SpvitaminJsonTimeModul extends SimpleModule
 {
     public SpvitaminJsonTimeModul()
     {
+        super.addSerializer(new CustomDateSerializer());
         super.addSerializer(new CustomLocalDateSerializer());
         super.addSerializer(new CustomLocalDateTimeSerializer());
         super.addSerializer(new CustomZonedDateTimeSerializer());

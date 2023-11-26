@@ -19,15 +19,13 @@ package hu.perit.spvitamin.json.time;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -46,39 +44,38 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
             return null;
         }
 
-        // Try to parse as ZonedDateTime
-        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
-        {
-            try
-            {
-                ZonedDateTime zonedDateTime = this.tryParseWithFormat(jp.getText(), format);
-                return Date.from(zonedDateTime.toInstant());
-            }
-            catch (DateTimeParseException ex)
-            {
-                // not succeeded to parse with this format => trying the next
-            }
-        }
-
         try
         {
-            return DateUtils.parseDate(jp.getText(), AcceptedDateFormats.getAcceptedJsr310Formats().toArray(new String[0]));
+            return DateDeserializers.DateDeserializer.instance.deserialize(jp, ctxt);
         }
-        catch (ParseException e)
+        catch (Exception e)
         {
-            throw new InvalidFormatException(jp, e.getMessage(), jp.getText(), Date.class);
+            // The standard deserializer failed, try the next one
         }
+
+        // Trying to deserialize as an Instant
+        try
+        {
+            CustomInstantDeserializer customInstantDeserializer = new CustomInstantDeserializer();
+            Instant instant = customInstantDeserializer.deserialize(jp, ctxt);
+            return Date.from(instant);
+        }
+        catch (Exception e)
+        {
+            // Cannot deserialize as an Instant, try the next one
+        }
+
+        // Trying to deserialize as a LocalDateTime
+        CustomLocalDateTimeDeserializer customLocalDateTimeDeserializer = new CustomLocalDateTimeDeserializer();
+        LocalDateTime localDateTime = customLocalDateTimeDeserializer.deserialize(jp, ctxt);
+        Instant instant = localDateTime.toInstant(ZoneOffset.of("Z"));
+        return Date.from(instant);
     }
 
 
-    private ZonedDateTime tryParseWithFormat(String value, String format)
+    private boolean containsTimeZone(String text)
     {
-        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
-        {
-            return ZonedDateTime.parse(value);
-        }
-
-        return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+        return text.contains("+") || text.endsWith("Z");
     }
 
 

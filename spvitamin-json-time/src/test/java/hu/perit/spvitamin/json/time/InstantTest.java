@@ -38,15 +38,24 @@ class InstantTest
         // Nanoseconds
         testDeserialization("2020-05-01T10:11:12.695499117Z", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117, "Z"));
         testDeserialization("2020-05-01T10:11:12.695499117+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 695499117, "+4"));
+
+        testDeserialization("2020-05-01T10:11:12.1+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 100000000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.12+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 120000000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.123+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123000000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.1234+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123400000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.12345+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123450000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.123456+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123456000, "+4"));
+        testDeserialization("2020-05-01T10:11:12.1234567+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123456700, "+4"));
+        testDeserialization("2020-05-01T10:11:12.12345678+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123456780, "+4"));
+        testDeserialization("2020-05-01T10:11:12.123456789+0400", refTimeNano(2020, 5, 1, 10, 11, 12, 123456789, "+4"));
     }
 
 
     void testDeserialization(String dateString, Instant expectedDate) throws IOException
     {
         String jsonString = String.format("{\"instant\":\"%s\"}", dateString);
-        log.debug(jsonString);
         ExampleClass decodedObject = JsonSerializable.fromJson(jsonString, ExampleClass.class);
-        log.debug("decoded:  " + decodedObject.toString());
+        log.debug("{} => {}", jsonString, decodedObject.toString());
 
         assertThat(decodedObject.getInstant()).isEqualTo(expectedDate);
     }

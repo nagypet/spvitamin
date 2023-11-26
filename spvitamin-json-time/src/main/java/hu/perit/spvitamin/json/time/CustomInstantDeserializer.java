@@ -3,7 +3,7 @@ package hu.perit.spvitamin.json.time;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -23,7 +23,6 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
             return null;
         }
 
-        DateTimeParseException exception = null;
         for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try
@@ -33,21 +32,16 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
             catch (DateTimeParseException ex)
             {
                 // not succeeded to parse with this format => trying the next
-                exception = ex;
             }
         }
-        throw new InvalidFormatException(jp, exception != null ? exception.getMessage() : "Invalid Instant format!", jp.getText(),
-            Instant.class);
+
+        // Failed with custom formats, try default
+        return InstantDeserializer.INSTANT.deserialize(jp, ctxt);
     }
 
 
     private Instant tryParseWithFormat(String value, String format)
     {
-        if (AcceptedDateFormats.JAVA_STANDARD.equals(format))
-        {
-            return Instant.parse(value);
-        }
-
         return Instant.from(ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format)));
     }
 

@@ -78,12 +78,6 @@ import java.util.List;
 @Getter
 public final class AcceptedDateFormats
 {
-    public enum Standard
-    {
-        JSR_310,
-        ISO_8601
-    }
-
     public enum Type
     {
         DATE,
@@ -94,43 +88,49 @@ public final class AcceptedDateFormats
     @Data
     public static class TimestampFormat
     {
-        private final Standard standard;
         private final Type type;
         private final String formatString;
 
 
-        public static TimestampFormat of(Standard standard, Type type, String formatString)
+        public static TimestampFormat of(Type type, String formatString)
         {
-            return new TimestampFormat(standard, type, formatString);
+            return new TimestampFormat(type, formatString);
         }
     }
 
     private static final List<TimestampFormat> TIMESTAMP_FORMATS;
 
-    public static final String JAVA_STANDARD = "JAVA_STANDARD";
-
     static
     {
         List<TimestampFormat> formats = new ArrayList<>();
 
-        // Type.JSR_310
-
-        // Without T
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSS"));
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss"));
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd HH:mm"));
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE, "yyyy-MM-dd"));
-        // With T
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSS"));
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss"));
-        formats.add(TimestampFormat.of(Standard.JSR_310, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm"));
-
         // Type.ISO_8601
-        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.OTHER, JAVA_STANDARD));
-        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
-        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
-        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.nnnnnnnnn"));
-        formats.add(TimestampFormat.of(Standard.ISO_8601, Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn"));
+        // Without T
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.SS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss.S"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm:ss"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm"));
+        formats.add(TimestampFormat.of(Type.DATE, "yyyy-MM-dd"));
+
+        // With T
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SS"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.S"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss"));
+        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm"));
 
         // With timezone
         TIMESTAMP_FORMATS = new ArrayList<>();
@@ -144,19 +144,15 @@ public final class AcceptedDateFormats
     {
         return timestampFormats.stream()
             .filter(i -> i.getType() == Type.DATE_TIME)
-            .map(i -> TimestampFormat.of(i.getStandard(), i.getType(), i.getFormatString() + timeZonePostfix))
+            .map(i -> TimestampFormat.of(i.getType(), i.getFormatString() + timeZonePostfix))
             .toList();
-    }
-
-
-    public static List<String> getAcceptedJsr310Formats()
-    {
-        return TIMESTAMP_FORMATS.stream().filter(i -> i.getStandard() == Standard.JSR_310).map(TimestampFormat::getFormatString).toList();
     }
 
 
     public static List<String> getAcceptedIso8601Formats()
     {
-        return TIMESTAMP_FORMATS.stream().map(TimestampFormat::getFormatString).toList();
+        return TIMESTAMP_FORMATS.stream()
+            .map(TimestampFormat::getFormatString)
+            .toList();
     }
 }
