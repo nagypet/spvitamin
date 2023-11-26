@@ -39,6 +39,7 @@ bootJar {
 
 dependencies {
     implementation project(':spvitamin-core')
+    implementation project(':spvitamin-json-time')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -67,7 +68,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // YAML formatting
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    //implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

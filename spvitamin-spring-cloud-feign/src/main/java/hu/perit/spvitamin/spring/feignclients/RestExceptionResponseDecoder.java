@@ -16,8 +16,6 @@
 
 package hu.perit.spvitamin.spring.feignclients;
 
-import java.io.IOException;
-
 import feign.FeignException;
 import feign.Response;
 import feign.Util;
@@ -27,24 +25,31 @@ import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+
 /**
  * @author Peter Nagy
  */
 
 @Slf4j
-public class RestExceptionResponseDecoder implements ErrorDecoder {
+public class RestExceptionResponseDecoder implements ErrorDecoder
+{
 
     @Override
-    public Exception decode(String methodKey, Response response) {
-        try {
-            if (response.body() != null) {
+    public Exception decode(String methodKey, Response response)
+    {
+        try
+        {
+            if (response.body() != null)
+            {
                 String body = Util.toString(response.body().asReader());
                 RestExceptionResponse exceptionResponse = JsonSerializable.fromJson(body, RestExceptionResponse.class);
                 Exception ex = this.getException(exceptionResponse);
                 return ex != null ? ex : FeignException.errorStatus(methodKey, response);
             }
         }
-        catch (IOException ex) {
+        catch (IOException ex)
+        {
             log.error(StackTracer.toString(ex));
         }
 
@@ -52,8 +57,10 @@ public class RestExceptionResponseDecoder implements ErrorDecoder {
     }
 
 
-    private Exception getException(RestExceptionResponse exceptionResponse) {
-        if (exceptionResponse != null && exceptionResponse.getException() != null) {
+    private Exception getException(RestExceptionResponse exceptionResponse)
+    {
+        if (exceptionResponse != null && exceptionResponse.getException() != null)
+        {
             return exceptionResponse.getException().toException();
         }
         return null;

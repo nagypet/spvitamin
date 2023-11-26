@@ -16,9 +16,9 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.io.IOException;
 
 /**
  * @author Peter Nagy
@@ -29,13 +29,13 @@ public interface JsonSerializable
 
 	default String toJson() throws JsonProcessingException
 	{
-		return new JSonSerializer().toJson(this);
+		return JSonSerializer.toJson(this);
 	}
 
 
 	default String toYaml() throws JsonProcessingException
 	{
-		return new JSonSerializer().toYaml(this);
+		return JSonSerializer.toYaml(this);
 	}
 
 
@@ -43,9 +43,9 @@ public interface JsonSerializable
 	{
 		T obj = JSonSerializer.fromJson(jsonString, target);
 
-		if (obj instanceof JsonSerializable)
+		if (obj instanceof JsonSerializable jsonSerializable)
 		{
-			((JsonSerializable) obj).finalizeJsonDeserialization();
+			jsonSerializable.finalizeJsonDeserialization();
 		}
 		return obj;
 	}
@@ -55,9 +55,9 @@ public interface JsonSerializable
 	{
 		T obj = JSonSerializer.fromYaml(jsonString, target);
 
-		if (obj instanceof JsonSerializable)
+		if (obj instanceof JsonSerializable jsonSerializable)
 		{
-			((JsonSerializable) obj).finalizeJsonDeserialization();
+			jsonSerializable.finalizeJsonDeserialization();
 		}
 		return obj;
 	}

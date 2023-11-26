@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.json;
+package hu.perit.spvitamin.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -33,26 +32,26 @@ public final class JSonSerializer
 {
     public static String toJson(Object object) throws JsonProcessingException
     {
-        return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON).writeValueAsString(object);
+        return SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON).writeValueAsString(object);
     }
 
 
     public static String toYaml(Object object) throws JsonProcessingException
     {
-        return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML).writeValueAsString(object);
+        return SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML).writeValueAsString(object);
     }
 
 
     public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
     {
-        ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
     }
 
 
     public static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
     {
-        ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML);
+        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
     }
 }

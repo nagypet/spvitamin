@@ -45,6 +45,7 @@ public class RestTemplateErrorHandler extends DefaultResponseErrorHandler
         }
     }
 
+
     @Override
     protected void handleError(ClientHttpResponse response, HttpStatusCode statusCode) throws IOException
     {

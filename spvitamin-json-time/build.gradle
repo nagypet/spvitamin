@@ -25,13 +25,7 @@ plugins {
 apply from: '../gradle/common.gradle'
 
 repositories {
-    jcenter()
     mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
-    flatDir {
-        dirs '../gradle/localrepo'
-    }
 }
 
 
@@ -43,34 +37,40 @@ bootJar {
 
 dependencies {
     implementation project(':spvitamin-core')
-    implementation project(':spvitamin-json-time')
-    implementation project(':spvitamin-spring-general')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
-
-    // JJWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    // apache.commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
     // FasterXML
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // YAML formatting
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
 
-    // OpenFeign
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // Test framework
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
+
+configurations {
+    implementation.exclude module: 'spring-boot-starter-logging'
+}
+
+
+test {
+    useJUnitPlatform()
 }

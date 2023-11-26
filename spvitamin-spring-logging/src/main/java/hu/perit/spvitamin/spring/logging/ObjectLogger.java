@@ -17,7 +17,6 @@
 package hu.perit.spvitamin.spring.logging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.perit.spvitamin.spring.json.JSonSerializer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -34,8 +33,7 @@ public class ObjectLogger
     {
         try
         {
-            ObjectMapper mapper = JSonSerializer.createMapper(JSonSerializer.MapperType.JSON);
-            return mapper.writeValueAsString(object);
+            return JSonSerializer.toJson(object);
         }
         catch (JsonProcessingException e)
         {
@@ -57,6 +55,7 @@ public class ObjectLogger
     public static class RecursiveJSonToStringStyle extends RecursiveToStringStyle
     {
         private static final String FIELD_NAME_QUOTE = "\"";
+
 
         RecursiveJSonToStringStyle()
         {
@@ -83,11 +82,13 @@ public class ObjectLogger
             this.setSizeEndText(">\"");
         }
 
+
         @Override
         protected void appendDetail(final StringBuffer buffer, final String fieldName, final char value)
         {
             appendValueAsString(buffer, String.valueOf(value));
         }
+
 
         @Override
         public void appendDetail(final StringBuffer buffer, final String fieldName, final Object value)
@@ -114,6 +115,7 @@ public class ObjectLogger
             super.appendDetail(buffer, fieldName, value);
         }
 
+
         /**
          * Appends the given String enclosed in double-quotes to the given StringBuffer.
          *
@@ -124,6 +126,7 @@ public class ObjectLogger
         {
             buffer.append('"').append(StringEscapeUtils.escapeJson(value)).append('"');
         }
+
 
         @Override
         protected void appendFieldStart(final StringBuffer buffer, final String fieldName)
@@ -136,6 +139,7 @@ public class ObjectLogger
 
             super.appendFieldStart(buffer, FIELD_NAME_QUOTE + StringEscapeUtils.escapeJson(fieldName) + FIELD_NAME_QUOTE);
         }
+
 
         /**
          * <p>

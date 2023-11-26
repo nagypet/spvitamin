@@ -38,6 +38,7 @@ bootJar {
 
 dependencies {
     implementation project(':spvitamin-core')
+    implementation project(':spvitamin-json-time')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
 
