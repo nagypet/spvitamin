@@ -19,7 +19,7 @@ class ZonedDateTimeTest
     {
         // With timezone
         testDeserialization("2020-05-01 10:11+0400", refTime(2020, 5, 1, 10, 11, 0, 0, "+4"));
-        testDeserialization("2020-05-01T10:11+0400", refTime(2020, 5, 1, 10, 11, 0, 0, "+4"));
+        testDeserialization("2020-11-01T10:11+0400", refTime(2020, 11, 1, 10, 11, 0, 0, "+4"));
         testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 5, 1, 10, 11, 12, 0, "+4"));
         testDeserialization("2020-05-01T10:11:12+0400", refTime(2020, 5, 1, 10, 11, 12, 0, "+4"));
         testDeserialization("2020-05-01 10:11:12.123+0400", refTime(2020, 5, 1, 10, 11, 12, 123, "+4"));

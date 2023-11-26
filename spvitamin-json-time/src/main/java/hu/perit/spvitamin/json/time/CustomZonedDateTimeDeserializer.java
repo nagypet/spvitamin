@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -16,12 +17,19 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
     @Override
     public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
-
         if (StringUtils.isBlank(jp.getText()))
         {
             return null;
         }
 
+        ZonedDateTime zonedDateTime = deserializeInternal(jp, ctxt);
+
+        // Change the offset to the local offset
+        return zonedDateTime.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault());
+    }
+
+    private ZonedDateTime deserializeInternal(JsonParser jp, DeserializationContext ctxt) throws IOException
+    {
         for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
         {
             try

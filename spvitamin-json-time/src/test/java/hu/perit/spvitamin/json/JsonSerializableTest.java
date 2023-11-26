@@ -49,7 +49,7 @@ class JsonSerializableTest
             cal.getTime(),
             LocalDate.of(2020, 5, 11),
             LocalDateTime.of(2020, 5, 11, 10, 10, 10),
-            ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.of("+0200")),
+            ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.systemDefault()),
             OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")),
             Instant.from(OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")))
         );

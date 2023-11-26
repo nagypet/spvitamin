@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -62,6 +64,16 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
 
     private LocalDateTime tryParseWithFormat(String value, String format)
     {
+        try
+        {
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+            return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        catch (DateTimeParseException ex)
+        {
+            // Cannot deserialize as OffsetDateTime, let's try as LocalDateTime
+        }
+
         return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(format));
     }
 
