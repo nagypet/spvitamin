@@ -1,8 +1,10 @@
 package hu.perit.spvitamin.json.time;
 
 import hu.perit.spvitamin.json.ExampleClass;
+import hu.perit.spvitamin.json.JSonSerializer;
 import hu.perit.spvitamin.json.JsonSerializable;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,10 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class DateTest
 {
+    @BeforeEach
+    void setUp()
+    {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Budapest"));
+    }
+
     @Test
     void testDeserialization() throws IOException
     {
-        // without T, no time zone
+        // without T, no zone offset
+        log.debug("without T, no zone offset --------------------------------------------------------------------------");
+        testDeserialization("2020-05-01", refTime(2020, 4, 1, 2, 0, 0, 0));
         testDeserialization("2020-05-01 10:11", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
         testDeserialization("2020-05-01 10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
         testDeserialization("2020-05-01 10:11:12.1", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
@@ -31,8 +41,8 @@ class DateTest
         testDeserialization("2020-05-01 10:11:12.12345678", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
         testDeserialization("2020-05-01 10:11:12.123456789", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
 
-        // with T, no time zone
-        testDeserialization("2020-05-01", refTime(2020, 4, 1, 2, 0, 0, 0));
+        // with T, no zone offset
+        log.debug("with T, no zone offset -----------------------------------------------------------------------------");
         testDeserialization("2020-05-01T10:11", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
         testDeserialization("2020-05-01T10:11:12", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
         testDeserialization("2020-05-01T10:11:12.1", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
@@ -45,7 +55,8 @@ class DateTest
         testDeserialization("2020-05-01T10:11:12.12345678", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
         testDeserialization("2020-05-01T10:11:12.123456789", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
 
-        // without T, offset
+        // without T, with zone offset
+        log.debug("without T, with zone offset ------------------------------------------------------------------------");
         testDeserialization("2020-05-01 10:11+0400", refTime(2020, 4, 1, 10, 11, 0, 0, "GMT+4"));
         testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 4, 1, 10, 11, 12, 0, "GMT+4"));
         testDeserialization("2020-05-01 10:11:12.1+0400", refTime(2020, 4, 1, 10, 11, 12, 100, "GMT+4"));
@@ -58,7 +69,8 @@ class DateTest
         testDeserialization("2020-05-01 10:11:12.12345678+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
         testDeserialization("2020-05-01 10:11:12.123456789+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
 
-        // with T, offset
+        // with T, with zone offset
+        log.debug("with T, with zone offset ---------------------------------------------------------------------------");
         testDeserialization("2020-05-01T10:11+0400", refTime(2020, 4, 1, 10, 11, 0, 0, "GMT+4"));
         testDeserialization("2020-05-01T10:11:12+0400", refTime(2020, 4, 1, 10, 11, 12, 0, "GMT+4"));
         testDeserialization("2020-05-01T10:11:12.1+0400", refTime(2020, 4, 1, 10, 11, 12, 100, "GMT+4"));
@@ -71,7 +83,20 @@ class DateTest
         testDeserialization("2020-05-01T10:11:12.12345678+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
         testDeserialization("2020-05-01T10:11:12.123456789+0400", refTime(2020, 4, 1, 10, 11, 12, 123, "GMT+4"));
 
-        // with T, Zulu
+        // without T, Zulu time
+        log.debug("without T, Zulu time -------------------------------------------------------------------------------");
+        testDeserialization("2020-05-01 10:11Z", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
+        testDeserialization("2020-05-01 10:11:12Z", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
+        testDeserialization("2020-05-01 10:11:12.1Z", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
+        testDeserialization("2020-05-01 10:11:12.12Z", refTime(2020, 4, 1, 10, 11, 12, 120, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123456Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+        testDeserialization("2020-05-01 10:11:12.123456789Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
+
+        // with T, Zulu time
+        log.debug("with T, Zulu time ----------------------------------------------------------------------------------");
+        testDeserialization("2020-05-01T10:11Z", refTime(2020, 4, 1, 10, 11, 0, 0, "Z"));
+        testDeserialization("2020-05-01T10:11:12Z", refTime(2020, 4, 1, 10, 11, 12, 0, "Z"));
         testDeserialization("2020-05-01T10:11:12.1Z", refTime(2020, 4, 1, 10, 11, 12, 100, "Z"));
         testDeserialization("2020-05-01T10:11:12.12Z", refTime(2020, 4, 1, 10, 11, 12, 120, "Z"));
         testDeserialization("2020-05-01T10:11:12.123Z", refTime(2020, 4, 1, 10, 11, 12, 123, "Z"));
@@ -84,7 +109,7 @@ class DateTest
     {
         String jsonString = String.format("{\"date\":\"%s\"}", dateString);
         ExampleClass decodedObject = JsonSerializable.fromJson(jsonString, ExampleClass.class);
-        log.debug("{} => {}", jsonString, decodedObject.toString());
+        log.debug("{} => {}", dateString, JSonSerializer.toJson(decodedObject.getDate()));
 
         assertThat(decodedObject.getDate()).isEqualTo(expectedDate);
     }

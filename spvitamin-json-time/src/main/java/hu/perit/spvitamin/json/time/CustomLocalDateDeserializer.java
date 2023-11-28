@@ -19,6 +19,7 @@ package hu.perit.spvitamin.json.time;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,7 +28,6 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 /**
  * @author Peter Nagy
@@ -44,16 +44,27 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
             return null;
         }
 
-        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
+        for (String pattern : AdditionalDateFormats.getPatterns())
         {
             try
             {
-                return this.tryParseWithFormat(jp.getText(), format);
+                return this.tryParseWithPattern(jp.getText(), pattern);
             }
-            catch (DateTimeParseException ex)
+            catch (Exception ex)
             {
-                // nem sikerült parse-olni, próbáljuk a következő formátummal
+                // not succeeded to parse with this format => trying the next
             }
+        }
+
+        // Try to read with time zone offset
+        try
+        {
+            OffsetDateTime offsetDateTime = InstantDeserializer.OFFSET_DATE_TIME.deserialize(jp, ctxt);
+            return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDate();
+        }
+        catch (Exception ex)
+        {
+            // not succeeded to parse with this format => trying the next
         }
 
         // Failed with custom formats, try default
@@ -61,19 +72,19 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
     }
 
 
-    private LocalDate tryParseWithFormat(String value, String format)
+    private LocalDate tryParseWithPattern(String value, String pattern)
     {
         try
         {
-            OffsetDateTime offsetDateTime = OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
             return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDate();
         }
-        catch (DateTimeParseException ex)
+        catch (Exception ex)
         {
             // Cannot deserialize as OffsetDateTime, let's try as LocalDateTime
         }
 
-        return LocalDate.parse(value, DateTimeFormatter.ofPattern(format));
+        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
     }
 
 

@@ -11,7 +11,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDateTime>
 {
@@ -34,13 +33,13 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
 
     private OffsetDateTime deserializeInternal(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
-        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
+        for (String pattern : AdditionalDateFormats.getPatterns())
         {
             try
             {
-                return this.tryParseWithFormat(jp.getText(), format);
+                return this.tryParseWithPattern(jp.getText(), pattern);
             }
-            catch (DateTimeParseException ex)
+            catch (Exception ex)
             {
                 // not succeeded to parse with this format => trying the next
             }
@@ -51,9 +50,9 @@ public class CustomOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDat
     }
 
 
-    private OffsetDateTime tryParseWithFormat(String value, String format)
+    private OffsetDateTime tryParseWithPattern(String value, String pattern)
     {
-        return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+        return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
     }
 
 

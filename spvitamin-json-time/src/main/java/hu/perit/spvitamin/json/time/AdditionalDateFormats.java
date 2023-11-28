@@ -76,7 +76,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public final class AcceptedDateFormats
+public final class AdditionalDateFormats
 {
     public enum Type
     {
@@ -119,19 +119,6 @@ public final class AcceptedDateFormats
         formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm"));
         formats.add(TimestampFormat.of(Type.DATE, "yyyy-MM-dd"));
 
-        // With T
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SS"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.S"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss"));
-        formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd'T'HH:mm"));
-
         // With timezone
         TIMESTAMP_FORMATS = new ArrayList<>();
         TIMESTAMP_FORMATS.addAll(formats);
@@ -149,7 +136,7 @@ public final class AcceptedDateFormats
     }
 
 
-    public static List<String> getAcceptedIso8601Formats()
+    public static List<String> getPatterns()
     {
         return TIMESTAMP_FORMATS.stream()
             .map(TimestampFormat::getFormatString)

@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime>
 {
@@ -30,13 +29,13 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
 
     private ZonedDateTime deserializeInternal(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
-        for (String format : AcceptedDateFormats.getAcceptedIso8601Formats())
+        for (String pattern : AdditionalDateFormats.getPatterns())
         {
             try
             {
-                return this.tryParseWithFormat(jp.getText(), format);
+                return this.tryParseWithPattern(jp.getText(), pattern);
             }
-            catch (DateTimeParseException ex)
+            catch (Exception ex)
             {
                 // not succeeded to parse with this format => trying the next
             }
@@ -47,9 +46,9 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
     }
 
 
-    private ZonedDateTime tryParseWithFormat(String value, String format)
+    private ZonedDateTime tryParseWithPattern(String value, String pattern)
     {
-        return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+        return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
     }
 
 
