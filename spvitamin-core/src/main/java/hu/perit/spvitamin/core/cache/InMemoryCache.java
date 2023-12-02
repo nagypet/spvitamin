@@ -109,6 +109,12 @@ public class InMemoryCache<K, V extends CacheableEntity>
     }
 
 
+    public int size()
+    {
+        return this.values.size();
+    }
+
+
     private boolean isEntityValid(V value)
     {
         if (value == null)
