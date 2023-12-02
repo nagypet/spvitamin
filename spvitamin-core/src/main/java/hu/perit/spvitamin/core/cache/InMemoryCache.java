@@ -93,6 +93,22 @@ public class InMemoryCache<K, V extends CacheableEntity>
     }
 
 
+    public void remove(K key)
+    {
+        // Create a new lock for the current entry, to block subsequent get() and update() operations.
+        ReentrantLock lock = this.locks.computeIfAbsent(key, k -> new ReentrantLock());
+
+        try (var l = new ClosableLock(lock))
+        {
+            this.values.remove(key);
+        }
+        finally
+        {
+            this.locks.remove(key);
+        }
+    }
+
+
     private boolean isEntityValid(V value)
     {
         if (value == null)
