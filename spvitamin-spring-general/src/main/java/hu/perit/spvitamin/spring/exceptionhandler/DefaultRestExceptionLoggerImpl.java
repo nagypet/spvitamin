@@ -36,33 +36,24 @@ public class DefaultRestExceptionLoggerImpl implements DefaultRestExceptionLogge
 {
     public static final String FORMAT = "path: '%s', ex: %s";
 
+
     @PostConstruct
     void init()
     {
         log.info(String.format("%s initialized", this.getClass().getName()));
     }
 
+
     @Override
     public void log(String path, Throwable ex, LogLevel level)
     {
         switch (level)
         {
-            case DEBUG:
-                log.debug(String.format(FORMAT, path, StackTracer.toString(ex)));
-                break;
-            case INFO:
-                log.info(String.format(FORMAT, path, StackTracer.toString(ex)));
-                break;
-            case TRACE:
-                log.trace(String.format(FORMAT, path, StackTracer.toString(ex)));
-                break;
-            case WARN:
-                log.warn(String.format(FORMAT, path, StackTracer.toString(ex)));
-                break;
-            case ERROR:
-            default:
-                log.error(String.format(FORMAT, path, StackTracer.toString(ex)));
-                break;
+            case DEBUG -> log.debug(String.format(FORMAT, path, StackTracer.toString(ex)));
+            case INFO -> log.info(String.format(FORMAT, path, StackTracer.toString(ex)));
+            case TRACE -> log.trace(String.format(FORMAT, path, StackTracer.toString(ex)));
+            case WARN -> log.warn(String.format(FORMAT, path, StackTracer.toString(ex)));
+            default -> log.error(String.format(FORMAT, path, StackTracer.toString(ex)));
         }
     }
 }

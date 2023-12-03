@@ -16,7 +16,6 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import hu.perit.spvitamin.core.StackTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,12 +51,7 @@ public class DefaultRestExceptionResponseHandler
         String path = request != null ? request.getDescription(false) : "";
 
         Optional<RestExceptionResponse> restExceptionResponse = RestExceptionResponseFactory.of(ex, path, traceId);
-        if (restExceptionResponse.isPresent())
-        {
-            return restExceptionResponse.get();
-        }
-
-        log.error(StackTracer.toString(ex));
-        return new RestExceptionResponse(RestExceptionResponseFactory.getHttpStatusFromAnnotation(ex), ex, path, traceId);
+        return restExceptionResponse.orElseGet(
+            () -> new RestExceptionResponse(RestExceptionResponseFactory.getHttpStatusFromAnnotation(ex), ex, path, traceId));
     }
 }
