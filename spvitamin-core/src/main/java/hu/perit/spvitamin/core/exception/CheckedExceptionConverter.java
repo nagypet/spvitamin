@@ -16,16 +16,21 @@
 
 package hu.perit.spvitamin.core.exception;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class CheckedExceptionConverter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CheckedExceptionConverter
 {
     public static <T> T invoke(Callable<T> callable)
     {
         return invoke(callable, ServerException::throwFrom);
     }
+
 
     public static <T> T invoke(Callable<T> callable, Function<Exception, T> exceptionHandler)
     {
@@ -39,10 +44,12 @@ public class CheckedExceptionConverter
         }
     }
 
+
     public static void invokeVoid(ThrowingRunnable runnable)
     {
         invokeVoid(runnable, ServerException::throwFrom);
     }
+
 
     public static void invokeVoid(ThrowingRunnable runnable, Consumer<Exception> exceptionHandler)
     {
