@@ -16,12 +16,12 @@
 
 package hu.perit.spvitamin.core.connectablecontext;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -32,13 +32,15 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public abstract class ConnectableContext
 {
-    private AtomicBoolean connected = new AtomicBoolean(false);
-    private AtomicReference<ContextKey> contextKey = new AtomicReference<>(null);
+    private final AtomicBoolean connected = new AtomicBoolean(false);
+    private final AtomicReference<ContextKey> contextKey = new AtomicReference<>(null);
 
-    private AtomicLong lastActionTime = new AtomicLong(0);
-    private AtomicBoolean activityOngoing = new AtomicBoolean(false);
+    private final AtomicLong lastActionTime = new AtomicLong(0);
+    private final AtomicBoolean activityOngoing = new AtomicBoolean(false);
+
 
     protected abstract long getIdleTimeout();
+
 
     public void connect(ContextKey key)
     {
@@ -63,6 +65,7 @@ public abstract class ConnectableContext
             log.debug(String.format("%s.disconnect(%s)", this.getClass().getSimpleName(), this.getContextName()));
         }
     }
+
 
     public boolean isIdle()
     {
@@ -109,14 +112,15 @@ public abstract class ConnectableContext
         return contextKeyRef != null ? contextKeyRef.toString() : "null";
     }
 
+
     @Override
     public String toString()
     {
         return "ConnectableContext{" +
-                "connected=" + connected +
-                ", isIdle=" + this.isIdle() +
-                ", contextKey=" + contextKey +
-                ", lastActionTime=" + lastActionTime +
-                '}';
+            "connected=" + connected +
+            ", isIdle=" + this.isIdle() +
+            ", contextKey=" + contextKey +
+            ", lastActionTime=" + lastActionTime +
+            '}';
     }
 }

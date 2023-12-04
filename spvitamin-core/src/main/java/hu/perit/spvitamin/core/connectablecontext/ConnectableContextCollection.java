@@ -16,15 +16,17 @@
 
 package hu.perit.spvitamin.core.connectablecontext;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Supplier;
-
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -35,13 +37,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConnectableContextCollection<T extends ConnectableContext> extends HashMap<ContextKey, T>
 {
+    @Getter
     private String contextTypeName = "ConnectableContext";
+
     private final Supplier<T> contextSupplier; // NOSONAR: this class is not serializable
+
 
     public ConnectableContextCollection(Supplier<T> supplier)
     {
         this.contextSupplier = supplier;
     }
+
 
     public T get(ContextKey key)
     {
@@ -57,11 +63,6 @@ public class ConnectableContextCollection<T extends ConnectableContext> extends 
         {
             return value;
         }
-    }
-
-    public String getContextTypeName()
-    {
-        return this.contextTypeName;
     }
 
 
@@ -81,19 +82,24 @@ public class ConnectableContextCollection<T extends ConnectableContext> extends 
         return Objects.equals(contextSupplier, that.contextSupplier);
     }
 
+
     @Override
     public int hashCode()
     {
         return Objects.hash(super.hashCode(), contextSupplier);
     }
 
+
     // prevent from serialization
+    @Serial
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         throw new NotSerializableException();
     }
 
+
     // prevent from serialization
+    @Serial
     private void readObject(ObjectInputStream in) throws IOException
     {
         throw new NotSerializableException();
