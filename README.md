@@ -57,7 +57,7 @@ dependencyManagement {
 
 ## Release history
 
-### 3.1.5-1-RELEASE not yet released
+### 3.1.5-1-RELEASE 2023-12-13
 - SpvitaminWebSecurityConfig updated using MvcRequestMatcher.Builder
 - HttpLoggingFilter bug fixed: @Component annotation removed
 - Json package: added support for Instant
