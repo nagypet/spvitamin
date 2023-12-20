@@ -35,6 +35,7 @@ public class DatasourceProperties
 
     protected String dbType = "sqlserver";
     protected String host = "localhost";
+    protected String instance;
     protected String port;
     protected String host2;
     protected String port2;

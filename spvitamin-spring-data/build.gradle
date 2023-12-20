@@ -64,8 +64,9 @@ dependencies {
     testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
 
-    // ModelMapper
-    implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
+    // Mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

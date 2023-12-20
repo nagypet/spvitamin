@@ -16,16 +16,17 @@
 
 package hu.perit.spvitamin.spring.data.dynamicdatasource;
 
-import org.modelmapper.ModelMapper;
-
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
+import hu.perit.spvitamin.spring.data.mapper.ConnectionParamMapper;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.factory.Mappers;
 
 /**
  * A convenience class, which creates a JDBC connection string using the raw datasource properties for the popular database systems.
@@ -37,7 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @ToString
 @Slf4j
-public class ConnectionParam extends DatasourceProperties {
+public class ConnectionParam extends DatasourceProperties
+{
 
     public static final String DBTYPE_SQLSERVER = "sqlserver";
     public static final String DBTYPE_ORACLE = "oracle";
@@ -49,33 +51,39 @@ public class ConnectionParam extends DatasourceProperties {
 
     private final String portDelimiter;
 
-    public ConnectionParam(DatasourceProperties properties) {
-    	if (properties == null) {
-    		throw new IllegalArgumentException("DatasourceProperties is 'null'! Most probably the application cannot access the database configuration. Please make sure, the application.properties is available.");
-    	}
-    	
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.map(properties, this);
+    public ConnectionParam(DatasourceProperties properties)
+    {
+        if (properties == null)
+        {
+            throw new IllegalArgumentException("DatasourceProperties is 'null'! Most probably the application cannot access the database configuration. Please make sure, the application.properties is available.");
+        }
 
-        if (dialect == null) {
+        ConnectionParamMapper mapper = Mappers.getMapper(ConnectionParamMapper.class);
+        mapper.copy(properties, this);
+
+        if (dialect == null)
+        {
             dialect = getDefaultDialect();
         }
 
-        if (port == null) {
+        if (port == null)
+        {
             port = getDefaultPortString();
         }
-        
+
         portDelimiter = port.isBlank() ? "" : ":";
     }
 
 
-    public String getPassword() {
+    public String getPassword()
+    {
         CryptoUtil crypto = new CryptoUtil();
 
         return crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), this.getEncryptedPassword());
     }
 
-    public String getJdbcUrl() {
+    public String getJdbcUrl()
+    {
         //jdbc:sqlserver://localhost;databaseName=FLC_DB;socketTimeout=10000
         //jdbc:mysql://192.168.1.7:3306/lms
         //jdbc:oracle:thin:@192.168.7.25:1521/XE
@@ -85,16 +93,18 @@ public class ConnectionParam extends DatasourceProperties {
           (ADDRESS = (PROTOCOL = TCP)(HOST = host1)(PORT = port1 ))
           (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
           (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
-        */        
-    	//jdbc:h2:mem:testdb
+        */
+        //jdbc:h2:mem:testdb
         //jdbc:postgresql://localhost:5432/postgres_demo
         String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptions();
         log.info(url);
         return url;
     }
 
-    private String getOptions() {
-        switch (this.dbType) {
+    private String getOptions()
+    {
+        switch (this.dbType)
+        {
             case DBTYPE_SQLSERVER:
                 return String.format(";socketTimeout=%d", this.getSocketTimeout());
 
@@ -112,8 +122,10 @@ public class ConnectionParam extends DatasourceProperties {
     }
 
 
-    public String getDriverClassName() {
-        switch (this.dbType) {
+    public String getDriverClassName()
+    {
+        switch (this.dbType)
+        {
             case DBTYPE_SQLSERVER:
                 return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
@@ -135,8 +147,10 @@ public class ConnectionParam extends DatasourceProperties {
     }
 
 
-    public String getDefaultDialect() {
-        switch (this.dbType) {
+    public String getDefaultDialect()
+    {
+        switch (this.dbType)
+        {
             case DBTYPE_SQLSERVER:
                 return "org.hibernate.dialect.SQLServer2012Dialect";
 
@@ -158,8 +172,10 @@ public class ConnectionParam extends DatasourceProperties {
     }
 
 
-    private String getDefaultPortString() {
-        switch (dbType) {
+    private String getDefaultPortString()
+    {
+        switch (dbType)
+        {
             case DBTYPE_SQLSERVER:
                 return "1433";
 
@@ -181,12 +197,15 @@ public class ConnectionParam extends DatasourceProperties {
     }
 
 
-    private String getDbTypeString() {
-        if (dbType == null || dbType.isEmpty()) {
+    private String getDbTypeString()
+    {
+        if (dbType == null || dbType.isEmpty())
+        {
             return "";
         }
-        
-        switch (dbType) {
+
+        switch (dbType)
+        {
             case DBTYPE_SQLSERVER:
             case DBTYPE_MYSQL:
             case DBTYPE_H2:
@@ -201,29 +220,46 @@ public class ConnectionParam extends DatasourceProperties {
         }
     }
 
-    private String getHostString() {
-        if (host == null || host.isEmpty()) {
+    private String getHostString()
+    {
+        if (host == null || host.isEmpty())
+        {
             return "";
         }
-        
-        if (DBTYPE_ORACLE.equalsIgnoreCase(dbType)) {
+
+        if (DBTYPE_ORACLE.equalsIgnoreCase(dbType))
+        {
             return getHostStringOracle();
         }
-        else if (DBTYPE_H2.equalsIgnoreCase(dbType)) {
+        else if (DBTYPE_H2.equalsIgnoreCase(dbType))
+        {
             return ":" + host;
         }
-        else {
+        else if (DBTYPE_SQLSERVER.equalsIgnoreCase(dbType))
+        {
+            if (StringUtils.isBlank(this.instance))
+            {
+                return "://" + host + portDelimiter + port;
+            }
+
+            return String.format("://%s;instanceName=%s", host, instance);
+        }
+        else
+        {
             return "://" + host + portDelimiter + port;
         }
     }
-    
-    private String getHostStringOracle()  {
-        if (host == null || host.isEmpty()) {
+
+    private String getHostStringOracle()
+    {
+        if (host == null || host.isEmpty())
+        {
             return "";
         }
-        
-        if(host2 == null || port2 == null) {
-            return ":@" + host + portDelimiter + port; 
+
+        if (host2 == null || port2 == null)
+        {
+            return ":@" + host + portDelimiter + port;
         }
         
         /*
@@ -233,8 +269,8 @@ public class ConnectionParam extends DatasourceProperties {
           (ADDRESS = (PROTOCOL = TCP)(HOST = host2 )(PORT = port2 ))
           (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
         */
-        
-        StringBuilder b = new  StringBuilder();
+
+        StringBuilder b = new StringBuilder();
         b.append(":@(DESCRIPTION = ");
         b.append(String.format("(CONNECT_TIMEOUT = %d)", getConnectionTimeout() / 1000));
         b.append(String.format("(TRANSPORT_CONNECT_TIMEOUT = %d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000));
@@ -244,17 +280,21 @@ public class ConnectionParam extends DatasourceProperties {
         return b.toString();
     }
 
-    private String getDbNameString() {
-        if (this.dbName == null || this.dbName.isEmpty()) {
+    private String getDbNameString()
+    {
+        if (this.dbName == null || this.dbName.isEmpty())
+        {
             return "";
         }
-        
-        switch (this.dbType) {
+
+        switch (this.dbType)
+        {
             case DBTYPE_SQLSERVER:
                 return ";databaseName=" + this.dbName;
 
             case DBTYPE_ORACLE:
-                if(host2 != null && port2 != null) {
+                if (host2 != null && port2 != null)
+                {
                     return "";
                 }
                 return "/" + dbName;

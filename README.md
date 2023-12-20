@@ -57,6 +57,10 @@ dependencyManagement {
 
 ## Release history
 
+### 3.1.5-2-RELEASE not yet released
+- spvitamin-spring-data: SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
+
+
 ### 3.1.5-1-RELEASE 2023-12-13
 - SpvitaminWebSecurityConfig updated using MvcRequestMatcher.Builder
 - HttpLoggingFilter bug fixed: @Component annotation removed
@@ -66,8 +70,10 @@ dependencyManagement {
 - Major refactor of the json time module
 - InMemoryCache added
 
+
 ### 3.0.4-5-RELEASE 2023-11-19
 - Added support for OffsetDateTime in hu/perit/spvitamin/spring/json package
+
 
 ### 3.0.4-4-RELEASE 2023-11-01
 - DefaultRestExceptionResponseHandler slightly refactored
@@ -80,12 +86,15 @@ dependencyManagement {
   - also jakarta.validation.ConstraintViolationException is handled
   - Violated contrains listed in the `error` property even if the exception is instance of an ApplicationException or ApplicationRuntimeException but has been caused by a ConstraintViolationException
 
+
 ### 3.0.4-2-RELEASE 2023-05-13
 - jar classifier was '-plain' which caused problems when spvitamin was used with maven.
+
 
 ### 3.0.4-1-RELEASE 2023-03-19
 - Compiled with spring-boot 3.0.4
 - Security keycloak is commented out, must be updated as well
+
 
 ### 2.0.2-RELEASE 2023-01-14
 - Small fix so that spvitamin-defaults can be loaded with spring-boot 2.4.5 as well
