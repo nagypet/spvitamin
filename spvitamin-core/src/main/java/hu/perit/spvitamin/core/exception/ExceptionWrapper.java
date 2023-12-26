@@ -75,6 +75,12 @@ public class ExceptionWrapper implements ServerExceptionInterface
     }
 
 
+    public boolean causedBy(String anExceptionClassName, String messageStart)
+    {
+        return causedBy(this.exception, anExceptionClassName, messageStart);
+    }
+
+
     public String toStringWithCauses()
     {
         StringBuilder sb = new StringBuilder();
