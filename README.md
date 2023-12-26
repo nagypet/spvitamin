@@ -58,7 +58,14 @@ dependencyManagement {
 ## Release history
 
 ### 3.1.5-2-RELEASE not yet released
-- spvitamin-spring-data: SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
+#### spvitamin-core
+- ExceptionWrapper new version of causedBy
+- ExceptionGuard
+- StateMachine
+
+#### spvitamin-spring-data
+- SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
+- OffsetDateTimeToUTCConverter
 
 
 ### 3.1.5-1-RELEASE 2023-12-13
