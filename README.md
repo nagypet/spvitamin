@@ -5,7 +5,7 @@ Vitamin for Spring. A general purpose library for developing spring based micros
 ## Current releases:
 ### 3.1.5-1-RELEASE
 - SpringBoot 3.1.5
-- SpingCloud 2022.0.1
+- SpingCloud 2022.0.4
 
 ### 3.0.4-5-RELEASE
 - SpringBoot 3.0.4
@@ -58,6 +58,8 @@ dependencyManagement {
 ## Release history
 
 ### 3.1.5-2-RELEASE not yet released
+- springCloudVersion=2022.0.4
+
 #### spvitamin-core
 - ExceptionWrapper new version of causedBy
 - ExceptionGuard
