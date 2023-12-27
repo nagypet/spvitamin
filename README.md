@@ -62,6 +62,10 @@ dependencyManagement {
 - ExceptionWrapper new version of causedBy
 - ExceptionGuard
 - StateMachine
+- LocalDateTimeUtils
+
+#### spvitamin-spring-general
+- ResponseEntityUtils
 
 #### spvitamin-spring-data
 - SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
