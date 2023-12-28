@@ -68,6 +68,7 @@ dependencyManagement {
 
 #### spvitamin-spring-general
 - ResponseEntityUtils
+- InMemoryMultipartFile
 
 #### spvitamin-spring-security
 - RestExceptionResponseDecoder improved
