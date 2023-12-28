@@ -5,8 +5,12 @@
 
 package hu.perit.spvitamin.core.typehelpers;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.TimeZone;
@@ -14,6 +18,7 @@ import java.util.TimeZone;
 /**
  * @author nagy_peter
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LocalDateTimeUtils
 {
 
@@ -26,6 +31,18 @@ public final class LocalDateTimeUtils
 
         return timestamp.format(getDateTimeFormatter());
     }
+
+
+    public static String format(OffsetDateTime timestamp)
+    {
+        if (timestamp == null)
+        {
+            return "";
+        }
+
+        return timestamp.toLocalDateTime().format(getDateTimeFormatter());
+    }
+
 
     /**
      * @return {@link DateTimeFormatter} yyyy-mm-dd hh:mm:ss formátummal,
@@ -41,13 +58,9 @@ public final class LocalDateTimeUtils
                 .toFormatter();
     }
 
+
     public static LocalDateTime getLocalDateTimeFromMillis(long millis)
     {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), TimeZone.getDefault().toZoneId());
-    }
-
-    private LocalDateTimeUtils()
-    {
-        // Utility class
     }
 }
