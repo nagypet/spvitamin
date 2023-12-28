@@ -182,7 +182,7 @@ public class StackTracer
     }
 
 
-    private static boolean isOwnPackage(String className)
+    public static boolean isOwnPackage(String className)
     {
         lock.readLock().lock();
         try

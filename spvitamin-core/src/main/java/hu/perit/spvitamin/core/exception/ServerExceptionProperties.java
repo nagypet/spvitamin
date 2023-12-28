@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.core.exception;
 
+import hu.perit.spvitamin.core.StackTracer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -78,10 +80,14 @@ public class ServerExceptionProperties
     {
         if (isStacktraceEnabled() || stackTrace == null || stackTrace.length == 0)
         {
-            return stackTrace;
+            if (stackTrace == null || stackTrace.length == 0)
+            {
+                return stackTrace;
+            }
+            return Arrays.stream(stackTrace).filter(i -> StackTracer.isOwnPackage(i.getClassName())).toArray(StackTraceElement[]::new);
         }
 
-        return new StackTraceElement[] { stackTrace[0] };
+        return new StackTraceElement[]{stackTrace[0]};
     }
 
 

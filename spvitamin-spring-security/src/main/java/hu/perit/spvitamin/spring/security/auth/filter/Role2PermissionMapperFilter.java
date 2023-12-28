@@ -26,12 +26,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -52,12 +49,11 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException
     {
+        AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
 
         try
         {
             log.debug("{} called", this.getClass().getName());
-
-            AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
 
             AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
 
@@ -85,24 +81,29 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
 
             filterChain.doFilter(request, response);
         }
-        catch (AuthenticationException ex)
+        // 2023-12-28: I cannot remember anymore, why this block is here?
+//        catch (AuthenticationException ex)
+//        {
+//            SecurityContextHolder.clearContext();
+//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+//            if (resolver.resolveException(request, response, null, ex) == null)
+//            {
+//                throw ex;
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            SecurityContextHolder.clearContext();
+//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+//            if (resolver.resolveException(request, response, null,
+//                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
+//            {
+//                throw ex;
+//            }
+//        }
+        finally
         {
-            SecurityContextHolder.clearContext();
-            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, ex) == null)
-            {
-                throw ex;
-            }
-        }
-        catch (Exception ex)
-        {
-            SecurityContextHolder.clearContext();
-            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null,
-                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
-            {
-                throw ex;
-            }
+            authorizationService.setAuthenticatedUser(null);
         }
     }
 

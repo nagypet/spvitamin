@@ -69,6 +69,10 @@ dependencyManagement {
 #### spvitamin-spring-general
 - ResponseEntityUtils
 
+#### spvitamin-spring-security
+- RestExceptionResponseDecoder improved
+- Some security filters improved
+
 #### spvitamin-spring-data
 - SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
 - OffsetDateTimeToUTCConverter

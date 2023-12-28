@@ -69,7 +69,10 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
     
     private void logAttributes(Map<String, Object> attributes)
     {
-        String errorText = attributes.entrySet().stream().map(e -> String.format("%s: %s", e.getKey(), e.getValue())).collect(Collectors.joining("; "));
+        String errorText = attributes.entrySet().stream()
+                .filter(i -> !"trace".equalsIgnoreCase(i.getKey()))
+                .map(e -> String.format("%s: %s", e.getKey(), e.getValue()))
+                .collect(Collectors.joining("; "));
         log.warn(errorText);
     }
 }

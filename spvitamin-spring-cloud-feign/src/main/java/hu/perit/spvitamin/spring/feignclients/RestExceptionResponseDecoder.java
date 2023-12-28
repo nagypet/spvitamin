@@ -16,44 +16,50 @@
 
 package hu.perit.spvitamin.spring.feignclients;
 
-import feign.FeignException;
 import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
-import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Peter Nagy
  */
 
-@Slf4j
 public class RestExceptionResponseDecoder implements ErrorDecoder
 {
+    private final ErrorDecoder defaultErrorDecoder = new Default();
 
     @Override
     public Exception decode(String methodKey, Response response)
     {
-        try
+        HttpStatus httpStatus = HttpStatus.resolve(response.status());
+        if (httpStatus != null && httpStatus.isError())
         {
             if (response.body() != null)
             {
-                String body = Util.toString(response.body().asReader());
-                RestExceptionResponse exceptionResponse = JsonSerializable.fromJson(body, RestExceptionResponse.class);
-                Exception ex = this.getException(exceptionResponse);
-                return ex != null ? ex : FeignException.errorStatus(methodKey, response);
+                try
+                {
+                    String body = Util.toString(response.body().asReader(StandardCharsets.UTF_8));
+                    RestExceptionResponse exceptionResponse = JsonSerializable.fromJson(body, RestExceptionResponse.class);
+                    Exception ex = this.getException(exceptionResponse);
+                    if (ex != null)
+                    {
+                        return ex;
+                    }
+                }
+                catch (IOException ex)
+                {
+                    // Error response could not be converted into a RestExceptionResponse
+                }
             }
         }
-        catch (IOException ex)
-        {
-            log.error(StackTracer.toString(ex));
-        }
 
-        return FeignException.errorStatus(methodKey, response);
+        return this.defaultErrorDecoder.decode(methodKey, response);
     }
 
 
