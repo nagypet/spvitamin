@@ -21,17 +21,17 @@ group = 'hu.perit.spvitamin'
  * BuildTime
  *******************************************************************************************************/
 if (project.hasProperty('compileJava')) {
-	task createBuildTimeTxt() {
-		outputs.file("${buildDir}/buildtime.txt")
-		doLast {
-			new File(buildDir, "buildtime.txt").text = """Buildtime: ${new Date().format('yyyy-MM-dd HH:mm:ss')}"""
-		}
-	}
-	compileJava.finalizedBy createBuildTimeTxt
-	
-	compileJava { 
-		options.encoding = "CP1252" 
-	}
+    task createBuildTimeTxt() {
+        outputs.file("${buildDir}/buildtime.txt")
+        doLast {
+            new File(buildDir, "buildtime.txt").text = """Buildtime: ${new Date().format('yyyy-MM-dd HH:mm:ss')}"""
+        }
+    }
+    compileJava.finalizedBy createBuildTimeTxt
+
+    compileJava {
+        options.encoding = "CP1252"
+    }
 }
 
 
@@ -39,17 +39,17 @@ if (project.hasProperty('compileJava')) {
  * JDK > 1.8
  *******************************************************************************************************/
 if (project.hasProperty('java') && project.hasProperty('compileJava')) {
-	sourceCompatibility = jvmVersion
-	println "sourceCompatibility: " + sourceCompatibility
-	if (jvmVersion != '1.8') {
-		compileJava {
-			options.compilerArgs << '--add-exports'
-			options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
-		}
-	}
+    sourceCompatibility = jvmVersion
+    println "sourceCompatibility: " + sourceCompatibility
+    if (jvmVersion != '1.8') {
+        compileJava {
+            options.compilerArgs << '--add-exports'
+            options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
+        }
+    }
 }
 
-  
+
 /********************************************************************************************************
  * Default task
  *******************************************************************************************************/
@@ -58,17 +58,16 @@ defaultTasks 'dist'
 
 task dist {
     group 'fmake'
-	
-	if (project.hasProperty('test')) {
-		dependsOn 'test'
-	}
-	
-	if (project.hasProperty('installDist')) {
-		dependsOn 'installDist'
-	}
-	else if (project.hasProperty('jar')) {
-		dependsOn 'jar'
-	}
+
+    if (project.hasProperty('test')) {
+        dependsOn 'test'
+    }
+
+    if (project.hasProperty('installDist')) {
+        dependsOn 'installDist'
+    } else if (project.hasProperty('jar')) {
+        dependsOn 'jar'
+    }
 }
 
 
@@ -76,30 +75,24 @@ task dist {
  * Layered bootJar
  *******************************************************************************************************/
 if (project.hasProperty('bootJar')) {
-	bootJar {
-		layered {
-                        enabled = true
-                }
-	}
+    bootJar {
+        layered {
+            enabled = true
+        }
+    }
 }
 
 
 /********************************************************************************************************
  * Version information
  *******************************************************************************************************/
-if (new File("${projectDir}/version.ver").exists())
-{
-	version = rootProject.file("${projectDir}/version.ver").text.trim()
+if (new File("${projectDir}/version.ver").exists()) {
+    version = rootProject.file("${projectDir}/version.ver").text.trim()
+} else if (new File("${projectDir}/../version.ver").exists()) {
+    version = rootProject.file("${projectDir}/../version.ver").text.trim()
+} else {
+    throw new RuntimeException("version.ver not found while processing ${project.name}!")
 }
-else if (new File("${projectDir}/../version.ver").exists())
-{
-	version = rootProject.file("${projectDir}/../version.ver").text.trim()
-}
-else
-{
-	throw new RuntimeException("version.ver not found while processing ${project.name}!")
-}
-
 
 
 /********************************************************************************************************
@@ -113,9 +106,9 @@ task prepareTest(type: Copy) {
 }
 
 if (project.hasProperty('test')) {
-	test{
-		dependsOn 'prepareTest'
-	}
+    test {
+        dependsOn 'prepareTest'
+    }
 }
 
 
@@ -123,22 +116,22 @@ if (project.hasProperty('test')) {
  * Integration test support
  *******************************************************************************************************/
 if (project.hasProperty('sourceSets')) {
-	sourceSets {
-		integtest {
-			java {
-				compileClasspath += main.output + test.output
-				runtimeClasspath += main.output + test.output
-				srcDir file('src/integtest/java')
-			}
-			resources.srcDir file('src/integtest/resources')
-		}
-	}
+    sourceSets {
+        integtest {
+            java {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integtest/java')
+            }
+            resources.srcDir file('src/integtest/resources')
+        }
+    }
 }
 
 configurations {
     integtestCompile.extendsFrom testCompile
     integtestRuntime.extendsFrom testRuntime
-	integtestImplementation.extendsFrom testImplementation
+    integtestImplementation.extendsFrom testImplementation
 }
 
 task prepareIntegTest(type: Copy) {
@@ -149,10 +142,10 @@ task prepareIntegTest(type: Copy) {
 
 task integtest(type: Test) {
     dependsOn 'prepareIntegTest'
-	if (project.hasProperty('sourceSets')) {
-		testClassesDirs = sourceSets.integtest.output.classesDirs
-		classpath = sourceSets.integtest.runtimeClasspath
-	}
+    if (project.hasProperty('sourceSets')) {
+        testClassesDirs = sourceSets.integtest.output.classesDirs
+        classpath = sourceSets.integtest.runtimeClasspath
+    }
 }
 
 integtest {
@@ -164,45 +157,45 @@ integtest {
  * MANIFEST
  *******************************************************************************************************/
 if (project.hasProperty('jar')) {
-	jar {
-		dependsOn 'createBuildTimeTxt'
-		enabled = true
-		doFirst {
-			manifest {
-				attributes(
-						'Implementation-Vendor': 'perit.hu',
-						'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
-						'Implementation-Version': version
-				)
-				if (project.hasProperty('application')) {
-					attributes(
-						'Implementation-Title': applicationName,
-						'Implementation-Type': 'Library'
-					)
-				}
-			}
-		}
-	}
+    jar {
+        dependsOn 'createBuildTimeTxt'
+        enabled = true
+        doFirst {
+            manifest {
+                attributes(
+                        'Implementation-Vendor': 'perit.hu',
+                        'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
+                        'Implementation-Version': version
+                )
+                if (project.hasProperty('application')) {
+                    attributes(
+                            'Implementation-Title': applicationName,
+                            'Implementation-Type': 'Library'
+                    )
+                }
+            }
+        }
+    }
 }
 
 if (project.hasProperty('bootJar')) {
-	bootJar {
-		doFirst {
-			manifest {
-				attributes(
-						'Implementation-Vendor': 'perit.hu',
-						'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
-						'Implementation-Version': version
-				)
-				if (project.hasProperty('application')) {
-					attributes(
-						'Implementation-Title': applicationName,
-						'Implementation-Type': 'Library'
-					)
-				}
-			}
-		}
-	}
+    bootJar {
+        doFirst {
+            manifest {
+                attributes(
+                        'Implementation-Vendor': 'perit.hu',
+                        'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
+                        'Implementation-Version': version
+                )
+                if (project.hasProperty('application')) {
+                    attributes(
+                            'Implementation-Title': applicationName,
+                            'Implementation-Type': 'Library'
+                    )
+                }
+            }
+        }
+    }
 }
 
 
@@ -211,37 +204,36 @@ if (project.hasProperty('bootJar')) {
  *******************************************************************************************************/
 
 if (project.hasProperty('archivesBaseName')) {
-	task finalizeInstallBootDist(type: Copy) {
-		group 'fmake'
-		from "src/main/dist"
-		into "${buildDir}/install/${archivesBaseName}-boot"
-	}
+    task finalizeInstallBootDist(type: Copy) {
+        group 'fmake'
+        from "src/main/dist"
+        into "${buildDir}/install/${archivesBaseName}-boot"
+    }
 }
 
 if (project.hasProperty('installBootDist')) {
-	installBootDist.finalizedBy finalizeInstallBootDist
+    installBootDist.finalizedBy finalizeInstallBootDist
 }
-
 
 
 /********************************************************************************************************
  * Application
  *******************************************************************************************************/
 if (project.hasProperty('application')) {
-	application {
-		if (applicationDefaultJvmArgs.isEmpty()) {
-			applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
-		}
-	}
+    application {
+        if (applicationDefaultJvmArgs.isEmpty()) {
+            applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
+        }
+    }
 }
- 
+
 
 task configurations() {
     group 'fmake'
     description 'Prints the configuration items'
-	doLast {
-		configurations.each { println it.name }
-	}
+    doLast {
+        configurations.each { println it.name }
+    }
 }
 
 
@@ -250,12 +242,12 @@ task configurations() {
  *******************************************************************************************************/
 
 if (project.hasProperty('startScripts')) {
-	startScripts {
-		doLast {
-			windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=%APP_HOME%\\\\lib\\\\*')
-			unixScript.text = unixScript.text.replaceAll('CLASSPATH=.*', 'CLASSPATH=\\$APP_HOME/lib/*')
-		}
-	}
+    startScripts {
+        doLast {
+            windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=%APP_HOME%\\\\lib\\\\*')
+            unixScript.text = unixScript.text.replaceAll('CLASSPATH=.*', 'CLASSPATH=\\$APP_HOME/lib/*')
+        }
+    }
 }
 
 
@@ -270,9 +262,9 @@ task prepareRunInIDEA(type: Copy) {
 }
 
 task prepareRunInIDEA2021(type: Copy) {
-	group 'fmake'
-	from "src/main/dist/bin"
-	into "${projectDir}/build/resources/main"
+    group 'fmake'
+    from "src/main/dist/bin"
+    into "${projectDir}/build/resources/main"
 }
 
 
@@ -298,32 +290,32 @@ task prepareRun(type: Copy) {
 }
 
 if (project.hasProperty('run')) {
-	run {
-		dependsOn prepareRun
-		doFirst {
-			applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
-		}
-		workingDir = "${projectDir}/build/bin"
-	}
+    run {
+        dependsOn prepareRun
+        doFirst {
+            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+        }
+        workingDir = "${projectDir}/build/bin"
+    }
 }
 
 if (project.hasProperty('bootRun')) {
-	bootRun {
-		dependsOn prepareRun
-		doFirst {
-			applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
-		}
-		workingDir = "${projectDir}/build/bin"
-	}
+    bootRun {
+        dependsOn prepareRun
+        doFirst {
+            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+        }
+        workingDir = "${projectDir}/build/bin"
+    }
 }
 
 
 if (project.hasProperty('jacocoTestReport')) {
-	jacocoTestReport {
-		reports {
-			xml.enabled true
-		}
-	}
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
 }
 
 
@@ -331,76 +323,78 @@ if (project.hasProperty('jacocoTestReport')) {
  * Publishing with source and javadoc
  *******************************************************************************************************/
 if (project.hasProperty('java')) {
-	java {
-		withSourcesJar()
-	}
-	java {
-		withJavadocJar()
-	}
-	tasks.withType(Javadoc) {
-		failOnError false
-		options.addStringOption('Xdoclint:none', '-quiet')
-		options.addStringOption('encoding', 'UTF-8')
-		options.addStringOption('charSet', 'UTF-8')
-	}	
+    java {
+        withSourcesJar()
+    }
+    java {
+        withJavadocJar()
+    }
+    tasks.withType(Javadoc) {
+        failOnError false
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
 }
 
 
 pluginManager.withPlugin('maven-publish') {
-	if (project.hasProperty('ossrhUsername')) {
-		publishing {
-			repositories {
-				maven {
-					credentials {
-						username "${ossrhUsername}"
-						password "${ossrhPassword}"
-					}
-					name 'Staging'
-					url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-				}
-			}
-			publications {
-				mavenJava(MavenPublication) {
-					groupId = "${project.group}"
-					artifactId = "${project.name}"
-					version = "${version}"
-					from components.java
-					pom {
-						name = "${project.group}:${project.name}"
-						description = 'A general purpose library to use in a spring based microservice environment.'
-						url = 'https://github.com/nagypet/spvitamin'
-						licenses {
-							license {
-								name = 'The Apache License, Version 2.0'
-								url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-							}
-						}
-						developers {
-							developer {
-								id = 'nagypet'
-								name = 'Peter Nagy'
-								email = 'peter.nagy@perit.hu'
-							}
-						}
-						scm {
-							connection = 'scm:git:git://github.com/nagypet/spvitamin.git'
-							developerConnection = 'scm:git:ssh://github.com:nagypet/spvitamin.git'
-							url = 'https://github.com/nagypet/spvitamin.git'
-						}
-					}
-				}
-			}
-		}
-		
-		
-		pluginManager.withPlugin('signing') {
-			signing {
-				sign publishing.publications.mavenJava
-			}
-		}		
-	}
+    publishing {
+        if (project.hasProperty('ossrhUsername')) {
+            repositories {
+                maven {
+                    credentials {
+                        username "${ossrhUsername}"
+                        password "${ossrhPassword}"
+                    }
+                    name 'Staging'
+                    url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                }
+            }
+        }
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = "${project.group}"
+                artifactId = "${project.name}"
+                version = "${version}"
+                from components.java
+                pom {
+                    name = "${project.group}:${project.name}"
+                    description = 'A general purpose library to use in a spring based microservice environment.'
+                    url = 'https://github.com/nagypet/spvitamin'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'nagypet'
+                            name = 'Peter Nagy'
+                            email = 'peter.nagy@perit.hu'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/nagypet/spvitamin.git'
+                        developerConnection = 'scm:git:ssh://github.com:nagypet/spvitamin.git'
+                        url = 'https://github.com/nagypet/spvitamin.git'
+                    }
+                }
+            }
+        }
+    }
+
+
+    pluginManager.withPlugin('signing') {
+        if (project.hasProperty('ossrhUsername')) {
+            signing {
+                sign publishing.publications.mavenJava
+            }
+        }
+    }
 }
 
 tasks.named("jar") {
-	archiveClassifier = ''
+    archiveClassifier = ''
 }
