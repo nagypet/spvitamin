@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExceptionGuard
 {
-    public static void withTryCatch(Runnable r)
+    public static void withTryCatch(ThrowingRunnable r)
     {
         try
         {
