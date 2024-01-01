@@ -1,6 +1,5 @@
-/* tslint:disable:one-line */
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +14,7 @@
  * limitations under the License.
  */
 
+/* tslint:disable:one-line */
 import {Injectable} from '@angular/core';
 import {HttpBackend, HttpClient, HttpUrlEncodingCodec} from '@angular/common/http';
 import {Observable} from 'rxjs';
