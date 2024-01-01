@@ -71,12 +71,14 @@ dependencyManagement {
 - InMemoryMultipartFile
 
 #### spvitamin-spring-security
-- RestExceptionResponseDecoder improved
 - Some security filters improved
 
 #### spvitamin-spring-data
 - SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
 - OffsetDateTimeToUTCConverter
+
+#### spvitamin-spring-cloud-feign
+- RestExceptionResponseDecoder improved
 
 
 ### 3.1.5-1-RELEASE 2023-12-13
