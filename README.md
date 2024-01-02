@@ -75,6 +75,7 @@ dependencyManagement {
 
 #### spvitamin-spring-data
 - SqlServer JDBC Url can contain an `instance` part: "jdbc:sqlserver://db_host;instanceName=inst1;databaseName=test"
+- New property in DatabaseProperties: `options`. This can be used for Sql-Server and H2 to define additional connection options.
 - OffsetDateTimeToUTCConverter
 
 #### spvitamin-spring-cloud-feign

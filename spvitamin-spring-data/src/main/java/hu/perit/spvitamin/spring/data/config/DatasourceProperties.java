@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Loads datasource properties from the properties file and sets defaults.
@@ -30,6 +31,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@ToString
 public class DatasourceProperties
 {
 
@@ -49,6 +51,7 @@ public class DatasourceProperties
     protected String dialect;
     protected Integer maxPoolSize = 10;
     protected String connectionInitSql;
+    protected String options;
 
     /*
     connectionTimeout controls the maximum number of milliseconds that a client (that's you) will wait for a connection
@@ -83,13 +86,4 @@ public class DatasourceProperties
     */
     private Long socketTimeout = 100_000L;
     private String ddlAuto = "none";
-
-    @Override
-    public String toString()
-    {
-        return "DatasourceProperties{" + "dbType='" + dbType + '\'' + ", host='" + host + '\'' + ", port='" + port + '\'' + ", dbName='"
-            + dbName + '\'' + ", username='" + username + '\'' + ", encryptedPassword='" + encryptedPassword + '\'' + ", dialect='"
-            + dialect + '\'' + ", maxPoolSize=" + maxPoolSize + ", connectionTimeout=" + connectionTimeout + ", leakDetectionThreshold="
-            + leakDetectionThreshold + ", socketTimeout=" + socketTimeout + ", ddlAuto='" + ddlAuto + '\'' + '}';
-    }
 }

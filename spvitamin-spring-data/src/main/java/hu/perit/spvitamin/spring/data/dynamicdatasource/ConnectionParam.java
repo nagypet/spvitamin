@@ -96,104 +96,78 @@ public class ConnectionParam extends DatasourceProperties
         */
         //jdbc:h2:mem:testdb
         //jdbc:postgresql://localhost:5432/postgres_demo
-        String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptions();
+        String url = "jdbc" + this.getDbTypeString() + this.getHostString() + this.getDbNameString() + this.getOptionsString();
         log.info(url);
         return url;
     }
 
-    private String getOptions()
+
+    private String getOptionsString()
     {
-        switch (this.dbType)
+        return switch (this.dbType)
         {
-            case DBTYPE_SQLSERVER:
-                return String.format(";socketTimeout=%d", this.getSocketTimeout());
+            case DBTYPE_SQLSERVER -> getOptionsSeparatedWithSemicolon(true);
+            case DBTYPE_H2 -> getOptionsSeparatedWithSemicolon(false);
+            case DBTYPE_ORACLE, DBTYPE_MYSQL, DBTYPE_POSTGRESQL -> "";
+            default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
+        };
+    }
 
-            case DBTYPE_ORACLE:
-            case DBTYPE_MYSQL:
-            case DBTYPE_H2:
-            case DBTYPE_POSTGRESQL:
-                break;
 
-            default:
-                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
+    private String getOptionsSeparatedWithSemicolon(boolean includeSocketTimeout)
+    {
+        StringBuilder sb = new StringBuilder();
+        if (includeSocketTimeout)
+        {
+            sb.append(";").append(String.format("socketTimeout=%d", this.getSocketTimeout()));
         }
-
-        return "";
+        if (this.options != null)
+        {
+            sb.append(";").append(this.options);
+        }
+        return sb.toString();
     }
 
 
     public String getDriverClassName()
     {
-        switch (this.dbType)
+        return switch (this.dbType)
         {
-            case DBTYPE_SQLSERVER:
-                return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-
-            case DBTYPE_ORACLE:
-                return "oracle.jdbc.driver.OracleDriver";
-
-            case DBTYPE_MYSQL:
-                return "com.mysql.cj.jdbc.Driver";
-
-            case DBTYPE_H2:
-                return "org.h2.Driver";
-
-            case DBTYPE_POSTGRESQL:
-                return "org.postgresql.Driver";
-
-            default:
-                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
-        }
+            case DBTYPE_SQLSERVER -> "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+            case DBTYPE_ORACLE -> "oracle.jdbc.driver.OracleDriver";
+            case DBTYPE_MYSQL -> "com.mysql.cj.jdbc.Driver";
+            case DBTYPE_H2 -> "org.h2.Driver";
+            case DBTYPE_POSTGRESQL -> "org.postgresql.Driver";
+            default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
+        };
     }
 
 
     public String getDefaultDialect()
     {
-        switch (this.dbType)
+        return switch (this.dbType)
         {
-            case DBTYPE_SQLSERVER:
-                return "org.hibernate.dialect.SQLServer2012Dialect";
-
-            case DBTYPE_ORACLE:
-                return "org.hibernate.dialect.Oracle10gDialect";
-
-            case DBTYPE_MYSQL:
-                return "org.hibernate.dialect.MySQL5Dialect";
-
-            case DBTYPE_H2:
-                return "org.hibernate.dialect.H2Dialect";
-
-            case DBTYPE_POSTGRESQL:
-                return "org.hibernate.dialect.PostgreSQLDialect";
-
-            default:
-                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
-        }
+            case DBTYPE_SQLSERVER -> "org.hibernate.dialect.SQLServerDialect";
+            case DBTYPE_ORACLE -> "org.hibernate.dialect.Oracle10gDialect";
+            case DBTYPE_MYSQL -> "org.hibernate.dialect.MySQL5Dialect";
+            case DBTYPE_H2 -> "org.hibernate.dialect.H2Dialect";
+            case DBTYPE_POSTGRESQL -> "org.hibernate.dialect.PostgreSQLDialect";
+            default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
+        };
     }
 
 
     private String getDefaultPortString()
     {
-        switch (dbType)
+        return switch (dbType)
         {
-            case DBTYPE_SQLSERVER:
-                return "1433";
-
-            case DBTYPE_ORACLE:
-                return "1521";
-
-            case DBTYPE_MYSQL:
-                return "3306";
-
-            case DBTYPE_H2:
-                return "";
-
-            case DBTYPE_POSTGRESQL:
-                return "5432";
-
-            default:
-                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
-        }
+            case DBTYPE_SQLSERVER -> "1433";
+            case DBTYPE_ORACLE -> "1521";
+            case DBTYPE_MYSQL -> "3306";
+            case DBTYPE_H2 -> "";
+            case DBTYPE_POSTGRESQL -> "5432";
+            default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
+        };
     }
 
 
@@ -204,20 +178,12 @@ public class ConnectionParam extends DatasourceProperties
             return "";
         }
 
-        switch (dbType)
+        return switch (dbType)
         {
-            case DBTYPE_SQLSERVER:
-            case DBTYPE_MYSQL:
-            case DBTYPE_H2:
-            case DBTYPE_POSTGRESQL:
-                return ":" + dbType;
-
-            case DBTYPE_ORACLE:
-                return ":" + dbType + ":thin";
-
-            default:
-                throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, dbType));
-        }
+            case DBTYPE_SQLSERVER, DBTYPE_MYSQL, DBTYPE_H2, DBTYPE_POSTGRESQL -> ":" + dbType;
+            case DBTYPE_ORACLE -> ":" + dbType + ":thin";
+            default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, dbType));
+        };
     }
 
     private String getHostString()
@@ -270,14 +236,12 @@ public class ConnectionParam extends DatasourceProperties
           (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
         */
 
-        StringBuilder b = new StringBuilder();
-        b.append(":@(DESCRIPTION = ");
-        b.append(String.format("(CONNECT_TIMEOUT = %d)", getConnectionTimeout() / 1000));
-        b.append(String.format("(TRANSPORT_CONNECT_TIMEOUT = %d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000));
-        b.append(String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host, port));
-        b.append(String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host2, port2));
-        b.append(String.format("(CONNECT_DATA = (SERVICE_NAME = %s )))", dbName));
-        return b.toString();
+        return ":@(DESCRIPTION = " +
+                String.format("(CONNECT_TIMEOUT = %d)", getConnectionTimeout() / 1000) +
+                String.format("(TRANSPORT_CONNECT_TIMEOUT = %d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000) +
+                String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host, port) +
+                String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host2, port2) +
+                String.format("(CONNECT_DATA = (SERVICE_NAME = %s )))", dbName);
     }
 
     private String getDbNameString()
