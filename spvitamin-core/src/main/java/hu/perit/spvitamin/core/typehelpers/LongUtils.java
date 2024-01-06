@@ -16,13 +16,17 @@
 
 package hu.perit.spvitamin.core.typehelpers;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.math.BigInteger;
 
 /**
  * LongUtils
  * @author Peter Nagy (xgxtpna)
  */
-public class LongUtils
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class LongUtils
 {
     /**
      * @param l1
@@ -215,9 +219,8 @@ public class LongUtils
     }
 
 
-    private LongUtils()
+    public static long get(Long l)
     {
-        // private constructor for the utility class
+        return l != null ? l : 0;
     }
-       
 }
