@@ -66,6 +66,7 @@ dependencyManagement {
 - StateMachine
 - LocalDateTimeUtils
 - LongUtils new function: `long get(Long l)`
+- ListUtils
 
 #### spvitamin-spring-general
 - ResponseEntityUtils
