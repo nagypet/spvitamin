@@ -17,16 +17,30 @@
 package hu.perit.spvitamin.spring;
 
 import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.resource.Resources;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.AbstractEnvironment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 import java.util.StringJoiner;
 
+@Slf4j
 public class SpvitaminApplication extends SpringApplication
 {
+
+    public static final String SPVITAMIN_DEFAULTS = "spvitamin-defaults";
+
     /**
      * Static helper that can be used to run a {@link SpringApplication} from the
      * specified source using default settings.
@@ -37,7 +51,7 @@ public class SpvitaminApplication extends SpringApplication
      */
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args)
     {
-        return run(new Class<?>[] {primarySource}, args);
+        return run(new Class<?>[]{primarySource}, args);
     }
 
 
@@ -59,16 +73,51 @@ public class SpvitaminApplication extends SpringApplication
     public SpvitaminApplication(Class<?>... primarySources)
     {
         super(primarySources);
-        // setAdditionalProfiles is not working with SpringBoot 2.4.5
-        //this.setAdditionalProfiles("spvitamin-defaults");
+
+        // Setting additional profiles
         String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
         if (StringUtils.isBlank(activeProfiles))
         {
-            activeProfiles = "default";
+            activeProfiles = Objects.requireNonNullElse(getDefaultProviles(), "default");
         }
         StringJoiner sj = new StringJoiner(",");
-        sj.add(activeProfiles).add("spvitamin-defaults");
+        sj.add(activeProfiles).add(SPVITAMIN_DEFAULTS);
+        String hostname = getHostName();
+        if (hostname != null)
+        {
+            sj.add(hostname);
+        }
+
         System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
+
         this.addListeners(new EnvironmentPostProcessor());
+    }
+
+    private static String getDefaultProviles()
+    {
+        try
+        {
+            Path activeProfilesPath = Resources.getResourcePath("config/active-profiles.conf");
+            InputStream inputStream = Files.newInputStream(activeProfilesPath);
+            String activeProfiles = StringUtils.strip(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+            log.info("Active profiles loaded from {}: {}", activeProfilesPath, activeProfiles);
+            return activeProfiles;
+        }
+        catch (IOException | ResourceNotFoundException | RuntimeException e)
+        {
+            return null;
+        }
+    }
+
+
+    private static String getHostName()
+    {
+        String hostname = System.getenv("HOSTNAME");
+        if (hostname != null)
+        {
+            return hostname.toLowerCase();
+        }
+
+        return StringUtils.toRootLowerCase(System.getenv("COMPUTERNAME"));
     }
 }

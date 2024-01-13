@@ -71,6 +71,7 @@ dependencyManagement {
 #### spvitamin-spring-general
 - ResponseEntityUtils
 - InMemoryMultipartFile
+- Loading active profiles from: config/active-profiles.conf
 
 #### spvitamin-spring-security
 - Some security filters improved

@@ -77,7 +77,7 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
                 RestExceptionResponse.setExceptionEnabled(Boolean.parseBoolean(env.getProperty("server.error.includeException", "true")));
                 RestExceptionResponse.setMessageEnabled(ErrorProperties.IncludeAttribute.ALWAYS.name().equals(env.getProperty("server.error.includeMessage", "ALWAYS")));
 
-                env.getPropertySources().forEach(i -> dumpPropertySource(i));
+                env.getPropertySources().forEach(this::dumpPropertySource);
             }
             catch (RuntimeException ex)
             {
@@ -89,9 +89,8 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
 
     private void dumpPropertySource(PropertySource<?> ps)
     {
-        if (ps instanceof OriginTrackedMapPropertySource)
+        if (ps instanceof OriginTrackedMapPropertySource propertySource)
         {
-            OriginTrackedMapPropertySource propertySource = (OriginTrackedMapPropertySource) ps;
             log.info(propertySource.getName());
         }
     }

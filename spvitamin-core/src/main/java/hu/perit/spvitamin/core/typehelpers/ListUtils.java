@@ -28,4 +28,14 @@ public final class ListUtils
     {
         return list == null || list.isEmpty() ? null : list.get(list.size() - 1);
     }
+
+
+    public static int size(List<?> list)
+    {
+        if (list == null)
+        {
+            return 0;
+        }
+        return list.size();
+    }
 }
