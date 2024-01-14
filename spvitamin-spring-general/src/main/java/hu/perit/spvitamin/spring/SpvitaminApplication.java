@@ -32,8 +32,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SpvitaminApplication extends SpringApplication
@@ -78,7 +78,7 @@ public class SpvitaminApplication extends SpringApplication
         String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
         if (StringUtils.isBlank(activeProfiles))
         {
-            activeProfiles = Objects.requireNonNullElse(getDefaultProviles(), "default");
+            activeProfiles = Objects.requireNonNullElse(getHostBasedProfiles(), "default");
         }
         StringJoiner sj = new StringJoiner(",");
         sj.add(activeProfiles).add(SPVITAMIN_DEFAULTS);
@@ -93,19 +93,36 @@ public class SpvitaminApplication extends SpringApplication
         this.addListeners(new EnvironmentPostProcessor());
     }
 
-    private static String getDefaultProviles()
+
+    private static String getHostBasedProfiles()
+    {
+        List<String> profiles = new ArrayList<>();
+        profiles.addAll(getHostBasedProfiles("default.profiles"));
+        profiles.addAll(getHostBasedProfiles("config/default.profiles"));
+        String hostname = getHostName();
+        if (hostname != null)
+        {
+            profiles.addAll(getHostBasedProfiles(hostname + ".profiles"));
+            profiles.addAll(getHostBasedProfiles("config/" + hostname + ".profiles"));
+        }
+        return profiles.stream().distinct().collect(Collectors.joining(","));
+    }
+
+
+    private static List<String> getHostBasedProfiles(String filepath)
     {
         try
         {
-            Path activeProfilesPath = Resources.getResourcePath("config/active-profiles.conf");
+            log.info("Trying to load profiles from {}", filepath);
+            Path activeProfilesPath = Resources.getResourcePath(filepath);
             InputStream inputStream = Files.newInputStream(activeProfilesPath);
             String activeProfiles = StringUtils.strip(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
-            log.info("Active profiles loaded from {}: {}", activeProfilesPath, activeProfiles);
-            return activeProfiles;
+            log.info("Additional profiles loaded from {}: {}", activeProfilesPath, activeProfiles);
+            return List.of(activeProfiles.split(","));
         }
         catch (IOException | ResourceNotFoundException | RuntimeException e)
         {
-            return null;
+            return Collections.emptyList();
         }
     }
 

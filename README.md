@@ -71,7 +71,7 @@ dependencyManagement {
 #### spvitamin-spring-general
 - ResponseEntityUtils
 - InMemoryMultipartFile
-- Loading active profiles from: config/active-profiles.conf
+- Loading active profiles from: default.profiles and <hostname>.profiles
 
 #### spvitamin-spring-security
 - Some security filters improved
@@ -423,72 +423,74 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 
 ## ConfigProperties
 
-| Name                                     | Type    | Default         | Sample                              | Description |
-|------------------------------------------|---------|-----------------|-------------------------------------|-------------|
-| system.time-zone                         | string  | Europe/Budapest |                                     |             |
-| crypto.secret                            | string  | secret          |                                     |             |
-| admin.default-site-url                   | string  | /admin-gui      |                                     | If the webservice serves a frontend other than the AdminGUI|
-| admin.admin-gui-root-file-name           | string  |                 |                                     |             |
-| admin.admin-gui-url                      | string  | /admin-gui      |                                     | The path where the AdminGUI is served|
-| admin.admin-gui-root-file-name           | string  | index.html      |                                     |             |
-| admin.copyright                          | string  | Peter Nagy ...  |                                     | This text will be shown on the footer of the Admin GUI|
-| admin.keystore-admin-enabled             | boolean | TRUE            |                                     | If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of a Kubernetes or Openshift deployment, where certificates are not managed by the app.|
-| datasource.xyz.db-type                   | string  |                 | oracle, sqlserver, mysql, etc...    |             |
-| datasource.xyz.host                      | string  |                 |                                     |             |
-| datasource.xyz.port                      | string  | db dependent    | e.g. at oracle: 1521, etc.          |             |
-| datasource.xyz.host2                     | string  |                 |                                     | optional alternative host |
-| datasource.xyz.port2                     | string  |                 |                                     | optional alternative port |
-| datasource.xyz.db-name                   | string  |                 |                                     |             |
-| datasource.xyz.username                  | string  |                 |                                     |             |
-| datasource.xyz.encrypted-password        | string  |                 |                                     |             |
-| datasource.xyz.dialect                   | string  |                 |                                     |             |
-| datasource.xyz.max-pool-size             | int     | 10              |                                     |             |
-| datasource.xyz.connection-timeout        | long    | 90.000 ms       |                                     |             |
-| datasource.xyz.leak-detection-threashold | long    | 0               |                                     |             |
-| datasource.xyz.socket-timeout            | long    | 100.000 ms      |                                     |             |
-| datasource.xyz.ddl-auto                  | string  | none            | update, validate                    |             |
-| jwt.private-key-alias                    | string  | -               | templatekey                         |             |
-| jwt.private-key-encryptedPassword        | string  | -               | jdP5CKDIu5v2VUafF33pPQ==            |             |
-| jwt.public-key-alias                     | string  | -               | templatekey                         |             |
-| jwt.expiration-in-minutes                | string  | -               | 60                                  |             |
-| metrics.performance-itemcount            | int     | 50              |                                     |             |
-| metrics.timeout-millis                   | long    | 2.000           |                                     |             |
-| metrics.metrics-gathering-hysteresis-millis| long  | 30.000          |                                     |             |
-| security.admin-user-name                 | string  | -               | admin                               |             |
-| security.admin-user-encryptedPassword    | string  | -               | 7MmoozfTexI=                        |             |
-| security.allowed-origins                 | string  | -               |                                     |             |
-| security.allowed-headers                 | string  | -               |                                     |             |
-| security.allowed-methods                 | string  | -               |                                     |             |
-| security.swagger-access                  | string  | *               |                                     |             |
-| security.management-endpoints-access     | string  | *               |                                     |             |
-| security.admin-gui-access                | string  | *               |                                     |             |
-| security.admin-endpoints-access          | string  | *               |                                     |             |
-| server.fqdn                              | string  | localhost       |                                     |             |
-| server.port                              | int     | 8080            |                                     |             |
-| server.external-url                      | string  | -               | http://${APP_NAME}.${K8S_DOMAIN}    |             |
-| server.ssl.enabled                       | boolean | FALSE           |                                     |             |
-| server.ssl.key-store                     | string  | -               | classpath:jks/server-keystore.jks   |             |
-| server.ssl.key-store-password            | string  | -               | changeit                            |             |
-| server.ssl.key-alias                     | string  | -               | templatekey                         |             |
-| server.ssl.key-password                  | string  | -               | changeit                            |             |
-| server.ssl.trust-store                   | string  | -               | classpath:jks/client-truststore.jks |             |
-| server.ssl.trust-store-password          | string  | -               | changeit                            |             |
-| server.ssl.ignore-certificate-validation | boolean | FALSE           |                                     |             |
-| server.error.includeException            | boolean | TRUE            |                                     |             |
-| server.error.includeStacktrace           | string  | ALWAYS          | ALWAYS, NEVER                       |             |
-| server.error.includeMessage              | string  | ALWAYS          | ALWAYS, NEVER                       | The message part is only displayed if exception is not enabled |
-| ldaps.ad\<i\>.enabled                    | boolean | TRUE            |                                     |             |
-| ldaps.ad\<i\>.url                        | string  |                 | ldap://192.168.62.150:10389         |             |
-| ldaps.ad\<i\>.root-dn                    | string  |                 | OU=Users,DC=perit,DC=hu             |             |
-| ldaps.ad\<i\>.filter                     | string  |                 | (&(objectClass=user)(userPrincipalName={0})) |             |
-| ldaps.ad\<i\>.userprincipal-with-domain  | boolean | FALSE           |                                     |             |
-| ldaps.ad\<i\>.domain                     | string  |                 | perit.hu                            |             |
-| ldaps.ad\<i\>.connect-timeout-ms         | int     | 1000            |                                     |             |
-| ldaps.ad\<i\>.bind-user-pattern          | string  |                 | uid={0},ou=Users,dc=perit,dc=hu     |             |
-| async.core-pool-size                     | int     | 10              |                                     |             |
-| async.max-pool-size                      | int     | 100             |                                     |             |
-| async.queue-capacity                     | int     | 1000            |                                     |             |
-| async.thread-name-prefix                 | string  | async-          |                                     |             |
+| Name                                        | Type    | Default         | Sample                              | Description |
+|---------------------------------------------|---------|-----------------|-------------------------------------|-------------|
+| system.time-zone                            | string  | Europe/Budapest |                                     |             |
+| crypto.secret                               | string  | secret          |                                     |             |
+| admin.default-site-url                      | string  | /admin-gui      |                                     | If the webservice serves a frontend other than the AdminGUI|
+| admin.admin-gui-root-file-name              | string  |                 |                                     |             |
+| admin.admin-gui-url                         | string  | /admin-gui      |                                     | The path where the AdminGUI is served|
+| admin.admin-gui-root-file-name              | string  | index.html      |                                     |             |
+| admin.copyright                             | string  | Peter Nagy ...  |                                     | This text will be shown on the footer of the Admin GUI|
+| admin.keystore-admin-enabled                | boolean | TRUE            |                                     | If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of a Kubernetes or Openshift deployment, where certificates are not managed by the app.|
+| datasource.xyz.db-type                      | string  |                 | oracle, sqlserver, mysql, etc...    |             |
+| datasource.xyz.host                         | string  |                 |                                     |             |
+| datasource.xyz.instance                     | string  |                 |                                     |             |
+| datasource.xyz.port                         | string  | db dependent    | e.g. at oracle: 1521, etc.          |             |
+| datasource.xyz.host2                        | string  |                 |                                     | optional alternative host |
+| datasource.xyz.port2                        | string  |                 |                                     | optional alternative port |
+| datasource.xyz.db-name                      | string  |                 |                                     |             |
+| datasource.xyz.username                     | string  |                 |                                     |             |
+| datasource.xyz.encrypted-password           | string  |                 |                                     |             |
+| datasource.xyz.dialect                      | string  |                 |                                     |             |
+| datasource.xyz.max-pool-size                | int     | 10              |                                     |             |
+| datasource.xyz.connection-timeout           | long    | 90.000 ms       |                                     |             |
+| datasource.xyz.leak-detection-threashold    | long    | 0               |                                     |             |
+| datasource.xyz.socket-timeout               | long    | 100.000 ms      |                                     |             |
+| datasource.xyz.ddl-auto                     | string  | none            | update, validate                    |             |
+| datasource.xyz.options                      | string  |                 |                                     |             |
+| jwt.private-key-alias                       | string  | -               | templatekey                         |             |
+| jwt.private-key-encryptedPassword           | string  | -               | jdP5CKDIu5v2VUafF33pPQ==            |             |
+| jwt.public-key-alias                        | string  | -               | templatekey                         |             |
+| jwt.expiration-in-minutes                   | string  | -               | 60                                  |             |
+| metrics.performance-itemcount               | int     | 50              |                                     |             |
+| metrics.timeout-millis                      | long    | 2.000           |                                     |             |
+| metrics.metrics-gathering-hysteresis-millis | long  | 30.000          |                                     |             |
+| security.admin-user-name                    | string  | -               | admin                               |             |
+| security.admin-user-encryptedPassword       | string  | -               | 7MmoozfTexI=                        |             |
+| security.allowed-origins                    | string  | -               |                                     |             |
+| security.allowed-headers                    | string  | -               |                                     |             |
+| security.allowed-methods                    | string  | -               |                                     |             |
+| security.swagger-access                     | string  | *               |                                     |             |
+| security.management-endpoints-access        | string  | *               |                                     |             |
+| security.admin-gui-access                   | string  | *               |                                     |             |
+| security.admin-endpoints-access             | string  | *               |                                     |             |
+| server.fqdn                                 | string  | localhost       |                                     |             |
+| server.port                                 | int     | 8080            |                                     |             |
+| server.external-url                         | string  | -               | http://${APP_NAME}.${K8S_DOMAIN}    |             |
+| server.ssl.enabled                          | boolean | FALSE           |                                     |             |
+| server.ssl.key-store                        | string  | -               | classpath:jks/server-keystore.jks   |             |
+| server.ssl.key-store-password               | string  | -               | changeit                            |             |
+| server.ssl.key-alias                        | string  | -               | templatekey                         |             |
+| server.ssl.key-password                     | string  | -               | changeit                            |             |
+| server.ssl.trust-store                      | string  | -               | classpath:jks/client-truststore.jks |             |
+| server.ssl.trust-store-password             | string  | -               | changeit                            |             |
+| server.ssl.ignore-certificate-validation    | boolean | FALSE           |                                     |             |
+| server.error.includeException               | boolean | TRUE            |                                     |             |
+| server.error.includeStacktrace              | string  | ALWAYS          | ALWAYS, NEVER                       |             |
+| server.error.includeMessage                 | string  | ALWAYS          | ALWAYS, NEVER                       | The message part is only displayed if exception is not enabled |
+| ldaps.ad\<i\>.enabled                       | boolean | TRUE            |                                     |             |
+| ldaps.ad\<i\>.url                           | string  |                 | ldap://192.168.62.150:10389         |             |
+| ldaps.ad\<i\>.root-dn                       | string  |                 | OU=Users,DC=perit,DC=hu             |             |
+| ldaps.ad\<i\>.filter                        | string  |                 | (&(objectClass=user)(userPrincipalName={0})) |             |
+| ldaps.ad\<i\>.userprincipal-with-domain     | boolean | FALSE           |                                     |             |
+| ldaps.ad\<i\>.domain                        | string  |                 | perit.hu                            |             |
+| ldaps.ad\<i\>.connect-timeout-ms            | int     | 1000            |                                     |             |
+| ldaps.ad\<i\>.bind-user-pattern             | string  |                 | uid={0},ou=Users,dc=perit,dc=hu     |             |
+| async.core-pool-size                        | int     | 10              |                                     |             |
+| async.max-pool-size                         | int     | 100             |                                     |             |
+| async.queue-capacity                        | int     | 1000            |                                     |             |
+| async.thread-name-prefix                    | string  | async-          |                                     |             |
 
 ## SpringBoot defaults:
 ```yaml
