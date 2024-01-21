@@ -223,4 +223,22 @@ public final class LongUtils
     {
         return l != null ? l : 0;
     }
+
+
+    public static Long parse(String text)
+    {
+        if (text == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return Long.parseLong(text);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
 }
