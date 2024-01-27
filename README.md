@@ -3,7 +3,7 @@
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
-### 3.1.5-1-RELEASE
+### 3.1.5-2-RELEASE
 - SpringBoot 3.1.5
 - SpingCloud 2022.0.4
 
@@ -28,11 +28,12 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.1.5-1-RELEASE')
+    set('spvitaminVersion', '3.1.5-2-RELEASE')
 }
 
 dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-core'
+    implementation 'hu.perit.spvitamin:spvitamin-json-time'
     implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
@@ -57,7 +58,7 @@ dependencyManagement {
 
 ## Release history
 
-### 3.1.5-2-RELEASE not yet released
+### 3.1.5-2-RELEASE 2024-01-27
 - springCloudVersion=2022.0.4
 
 #### spvitamin-core
