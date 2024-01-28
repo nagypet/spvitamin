@@ -20,12 +20,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import hu.perit.spvitamin.json.time.Constants;
 import hu.perit.spvitamin.json.time.SpvitaminJsonTimeModul;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.text.SimpleDateFormat;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpvitaminObjectMapper
@@ -35,7 +32,21 @@ public final class SpvitaminObjectMapper
         JSON, YAML
     }
 
+    private static final ObjectMapper jsonMapper = internalCreateMapper(MapperType.JSON);
+    private static final ObjectMapper yamlMapper = internalCreateMapper(MapperType.YAML);
+
+
     public static ObjectMapper createMapper(MapperType type)
+    {
+        return switch (type)
+        {
+            case JSON -> jsonMapper;
+            case YAML -> yamlMapper;
+        };
+    }
+
+
+    private static ObjectMapper internalCreateMapper(MapperType type)
     {
         ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

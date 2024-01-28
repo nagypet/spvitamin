@@ -16,35 +16,35 @@
 
 package hu.perit.spvitamin.core.batchprocessing;
 
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import hu.perit.spvitamin.core.StackTracer;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Peter Nagy
  */
 
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 public abstract class BatchProcessor
 {
 
-    protected int threadPoolSize;
+    protected final int threadPoolSize;
 
-    public BatchProcessor(int threadPoolSize)
+
+    public boolean process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
     {
-        this.threadPoolSize = threadPoolSize;
+        return process(batchJobs, true);
     }
 
 
     @SuppressWarnings({"squid:S3776", "squid:S1141", "squid:S1193"})
-    public boolean process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
+    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
     {
         if (batchJobs == null || batchJobs.isEmpty())
         {
@@ -58,19 +58,23 @@ public abstract class BatchProcessor
 
         // Call the first one synchronously to see, if connection can be established
         BatchJob firstJob = copyOfBatchJobs.get(0);
-        copyOfBatchJobs.remove(0);
 
-        try
+        if (runFirstSynchronously)
         {
-            firstJob.call();
-        }
-        catch (Exception ex)
-        {
-            // meg kell nézni, hogy fatalis hiba történt-e, ami az egész batch feldolgozását meg kell, hogy állítsa?
-            if (firstJob.isFatalException(ex))
+            copyOfBatchJobs.remove(0);
+
+            try
             {
-                // Ha fatális hiba
-                throw new ExecutionException(ex);
+                firstJob.call();
+            }
+            catch (Exception ex)
+            {
+                // meg kell nézni, hogy fatalis hiba történt-e, ami az egész batch feldolgozását meg kell, hogy állítsa?
+                if (firstJob.isFatalException(ex))
+                {
+                    // Ha fatális hiba
+                    throw new ExecutionException(ex);
+                }
             }
         }
 

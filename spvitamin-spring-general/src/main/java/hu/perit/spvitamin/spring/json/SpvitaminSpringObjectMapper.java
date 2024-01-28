@@ -24,7 +24,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpvitaminSpringObjectMapper
 {
+    private static final ObjectMapper jsonMapper = internalCreateMapper(SpvitaminObjectMapper.MapperType.JSON);
+    private static final ObjectMapper yamlMapper = internalCreateMapper(SpvitaminObjectMapper.MapperType.YAML);
+
     public static ObjectMapper createMapper(SpvitaminObjectMapper.MapperType type)
+    {
+        return switch (type)
+        {
+            case JSON -> jsonMapper;
+            case YAML -> yamlMapper;
+        };
+    }
+
+    private static ObjectMapper internalCreateMapper(SpvitaminObjectMapper.MapperType type)
     {
         ObjectMapper mapper = SpvitaminObjectMapper.createMapper(type);
         // Register additional modules for use within the Spring framework
