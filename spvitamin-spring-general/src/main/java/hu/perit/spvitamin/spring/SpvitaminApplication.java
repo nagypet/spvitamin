@@ -97,14 +97,20 @@ public class SpvitaminApplication extends SpringApplication
     private static String getHostBasedProfiles()
     {
         List<String> profiles = new ArrayList<>();
-        profiles.addAll(getHostBasedProfiles("default.profiles"));
-        profiles.addAll(getHostBasedProfiles("config/default.profiles"));
         String hostname = getHostName();
         if (hostname != null)
         {
             profiles.addAll(getHostBasedProfiles(hostname + ".profiles"));
             profiles.addAll(getHostBasedProfiles("config/" + hostname + ".profiles"));
         }
+
+        if (profiles.isEmpty())
+        {
+            // If there is no host based profile => load the defaults
+            profiles.addAll(getHostBasedProfiles("default.profiles"));
+            profiles.addAll(getHostBasedProfiles("config/default.profiles"));
+        }
+
         return profiles.stream().distinct().collect(Collectors.joining(","));
     }
 

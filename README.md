@@ -61,6 +61,7 @@ dependencyManagement {
 ### 3.1.5-3-RELEASE not yet released
 - BatchProcessor: new parameter to disable synchronous execution of the first item
 - SpvitaminObjectMapper and SpvitaminSpringObjectMapper: mapper instance stored in a static
+- profile loader improved
 
 
 ### 3.1.5-2-RELEASE 2024-01-27
