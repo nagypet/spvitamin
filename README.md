@@ -62,6 +62,7 @@ dependencyManagement {
 - BatchProcessor: new parameter to disable synchronous execution of the first item
 - SpvitaminObjectMapper and SpvitaminSpringObjectMapper: mapper instance stored in a static
 - profile loader improved
+- LocalDateTimeUtils.format(OffsetDateTime timestamp) output truncated to seconds
 
 
 ### 3.1.5-2-RELEASE 2024-01-27

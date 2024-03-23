@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoUnit;
 import java.util.TimeZone;
 
 /**
@@ -51,7 +52,7 @@ public final class LocalDateTimeUtils
             return "";
         }
 
-        return timestamp.toLocalDateTime().format(getDateTimeFormatter());
+        return timestamp.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS).format(getDateTimeFormatter());
     }
 
 
