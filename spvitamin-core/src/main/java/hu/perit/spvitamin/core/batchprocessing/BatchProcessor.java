@@ -21,8 +21,16 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Nagy
@@ -39,12 +47,19 @@ public abstract class BatchProcessor
 
     public boolean process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
     {
-        return process(batchJobs, true);
+        return process(batchJobs, true, null, null);
+    }
+
+
+    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
+    {
+        return process(batchJobs, runFirstSynchronously, null, null);
     }
 
 
     @SuppressWarnings({"squid:S3776", "squid:S1141", "squid:S1193"})
-    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
+    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously, Integer reportEveryNProcessed, String name)
+        throws ExecutionException, InterruptedException
     {
         if (batchJobs == null || batchJobs.isEmpty())
         {
@@ -87,9 +102,9 @@ public abstract class BatchProcessor
 
         // Invoke the rest
         boolean shutdownImmediately = false;
+        final Map<Future<Boolean>, BatchJob> futures = new HashMap<>();
         try
         {
-            Map<Future<Boolean>, BatchJob> futures = new HashMap<>();
             BatchJobStatus status = new BatchJobStatus(false);
             for (BatchJob job : copyOfBatchJobs)
             {
@@ -107,10 +122,12 @@ public abstract class BatchProcessor
 
             // amelyik elkészült, megvizsgáljuk az exception állapotot
             boolean thereIsUndone = true;
+            int lastReportedCount = 0;
             while (thereIsUndone)
             {
                 thereIsUndone = false;
                 Iterator<Map.Entry<Future<Boolean>, BatchJob>> iter = futures.entrySet().iterator();
+                lastReportedCount = reportProgress(lastReportedCount, futures.size(), reportEveryNProcessed, name);
                 while (iter.hasNext())
                 {
                     Map.Entry<Future<Boolean>, BatchJob> mapEntry = iter.next();
@@ -138,7 +155,7 @@ public abstract class BatchProcessor
                             if (ex instanceof ExecutionException)
                             {
                                 if (ex.getCause() == null
-                                        || mapEntry.getValue().isFatalException(((ExecutionException) ex).getCause()))
+                                    || mapEntry.getValue().isFatalException(((ExecutionException) ex).getCause()))
                                 {
                                     // Ha fatális hiba
                                     shutdownImmediately = true;
@@ -175,19 +192,35 @@ public abstract class BatchProcessor
         {
             if (shutdownImmediately)
             {
-                log.info("Fatal error or interrupted, exiting immediately!");
-                executorService.shutdownNow();
+                List<Runnable> runnables = executorService.shutdownNow();
+                log.info("Fatal error or interrupted, cancelling {} threads immediately!", runnables.size());
             }
 
             // meg kell várni, míg mindegyik elkészül
             while (!executorService.isTerminated())
             {
                 executorService.awaitTermination(1, TimeUnit.SECONDS);
+                log.info("waiting for termination...");
             }
 
             log.debug("Processing done.");
         }
     }
+
+
+    private static int reportProgress(int lastReportedCount, int countRemaining, Integer reportEveryNProcessed, String name)
+    {
+        if (reportEveryNProcessed != null)
+        {
+            if (lastReportedCount == 0 || lastReportedCount > countRemaining + reportEveryNProcessed)
+            {
+                log.info("{} - count of remaining tasks: {}", name, countRemaining);
+                return countRemaining;
+            }
+        }
+        return lastReportedCount;
+    }
+
 
     protected ExecutorService createExecutorService()
     {
