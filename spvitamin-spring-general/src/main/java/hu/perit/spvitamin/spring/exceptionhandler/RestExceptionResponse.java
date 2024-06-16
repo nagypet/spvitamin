@@ -130,21 +130,7 @@ public class RestExceptionResponse implements JsonSerializable
         }
 
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
-        if (exception.causedBy("javax.validation.ConstraintViolationException"))
-        {
-            //Get all errors
-            exception.getFromCauseChain(javax.validation.ConstraintViolationException.class).ifPresent(throwable -> {
-                javax.validation.ConstraintViolationException cve = (javax.validation.ConstraintViolationException) throwable;
-                Set<javax.validation.ConstraintViolation<?>> violations = cve.getConstraintViolations();
-                List<String> errors = new ArrayList<>();
-                for (javax.validation.ConstraintViolation<?> violation : violations)
-                {
-                    errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
-                }
-                this.error = errors;
-            });
-        }
-        else if (exception.causedBy("jakarta.validation.ConstraintViolationException"))
+        if (exception.causedBy("jakarta.validation.ConstraintViolationException"))
         {
             //Get all errors
             exception.getFromCauseChain(jakarta.validation.ConstraintViolationException.class).ifPresent(throwable -> {

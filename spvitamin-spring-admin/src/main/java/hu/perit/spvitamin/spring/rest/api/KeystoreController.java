@@ -16,24 +16,7 @@
 
 package hu.perit.spvitamin.spring.rest.api;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.google.common.reflect.AbstractInvocationHandler;
-
 import hu.perit.spvitamin.core.connectablecontext.StringContextKey;
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.config.Constants;
@@ -44,7 +27,21 @@ import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSession;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSessionHolder;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.util.List;
 
 /**
  * @author Peter Nagy

@@ -48,16 +48,13 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Eureka client
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

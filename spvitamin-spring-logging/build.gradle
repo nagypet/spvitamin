@@ -48,15 +48,12 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-core'
-
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
 
     // Aspectj
     runtimeOnly 'org.aspectj:aspectjrt:1.9.9.1'
@@ -67,7 +64,7 @@ dependencies {
     testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation('log4j:log4j:1.2.17')
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.10.0'
+    implementation "commons-io:commons-io:${commonsIoVersion}"
 
     // Test framework
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

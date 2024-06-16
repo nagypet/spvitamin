@@ -45,13 +45,13 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
 
     // FasterXML
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
 
     // YAML formatting
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'

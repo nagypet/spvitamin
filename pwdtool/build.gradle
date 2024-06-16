@@ -37,7 +37,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

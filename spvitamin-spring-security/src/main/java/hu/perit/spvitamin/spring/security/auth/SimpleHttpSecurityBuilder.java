@@ -53,6 +53,7 @@ public class SimpleHttpSecurityBuilder
 
     private final HttpSecurity http;
 
+
     public static SimpleHttpSecurityBuilder newInstance(HttpSecurity http)
     {
         return new SimpleHttpSecurityBuilder(http);
@@ -67,22 +68,22 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder defaultCors() throws Exception
     {
-        http.cors().configurationSource(corsConfigurationSource());
+        http.cors(i -> i.configurationSource(corsConfigurationSource()));
         return this;
     }
 
 
     public SimpleHttpSecurityBuilder defaultCsrf() throws Exception
     {
-        http.csrf().disable();
+        http.csrf(i -> i.disable());
         return this;
     }
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
+        AccessDeniedHandler accessDeniedHandler) throws Exception
     {
-        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler);
+        http.exceptionHandling(i -> i.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
         return this;
     }
 
@@ -93,10 +94,10 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         return this
-                .defaultCors()
-                .defaultCsrf()
-                .allowAdditionalSecurityHeaders()
-                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
+            .defaultCors()
+            .defaultCsrf()
+            .allowAdditionalSecurityHeaders()
+            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
     }
 
 
@@ -107,12 +108,14 @@ public class SimpleHttpSecurityBuilder
         return this;
     }
 
+
     public SimpleHttpSecurityBuilder scope(RequestMatcher requestMatcher) throws Exception
     {
         defaults();
         this.http.securityMatcher(requestMatcher);
         return this;
     }
+
 
     public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders() throws Exception
     {
@@ -124,7 +127,7 @@ public class SimpleHttpSecurityBuilder
             {
                 // pl: X-Content-Security-Policy=default-src 'self'
                 String[] headerParts = header.split("=");
-                http.headers().addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1]));
+                http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1])));
             }
         }
 
@@ -134,7 +137,7 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder createSession() throws Exception
     {
-        this.http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+        this.http.sessionManagement(i -> i.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
 
         return this;
     }
@@ -144,7 +147,7 @@ public class SimpleHttpSecurityBuilder
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
 
-        this.http.httpBasic().authenticationEntryPoint(authenticationEntryPoint);
+        this.http.httpBasic(i -> i.authenticationEntryPoint(authenticationEntryPoint));
 
         if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
         {
@@ -171,7 +174,8 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder authorizeRequests(Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
+    public SimpleHttpSecurityBuilder authorizeRequests(
+        Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
     {
         this.http.authorizeHttpRequests(authorizeHttpRequestsCustomizer);
 
@@ -187,17 +191,14 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder logout() throws Exception
     {
-        this.http.logout()
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .clearAuthentication(true);
+        this.http.logout(i -> i.invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true));
         return this;
     }
 
 
     public SimpleHttpSecurityBuilder allowFrames() throws Exception
     {
-        this.http.headers().frameOptions().sameOrigin();
+        this.http.headers(i -> i.frameOptions(j -> j.sameOrigin()));
         return this;
     }
 
@@ -214,6 +215,7 @@ public class SimpleHttpSecurityBuilder
         }
         return this;
     }
+
 
     private boolean isFilterAlreadyExists(Class<?> filterClass)
     {

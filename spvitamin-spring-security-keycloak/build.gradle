@@ -53,9 +53,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
 }
 
 dependencyManagement {

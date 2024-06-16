@@ -17,7 +17,12 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.*;
+import hu.perit.spvitamin.core.exception.ApplicationException;
+import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
+import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.exception.InputException;
+import hu.perit.spvitamin.core.exception.LogLevel;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -62,8 +67,7 @@ public class RestExceptionResponseFactory
         }
 
         // ========== BAD_REQUEST (400) ================================================================================
-        else if (exception.instanceOf(javax.validation.ValidationException.class)
-            || exception.instanceOf(jakarta.validation.ValidationException.class)
+        else if (exception.instanceOf(jakarta.validation.ValidationException.class)
             || exception.instanceOf(InputException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);

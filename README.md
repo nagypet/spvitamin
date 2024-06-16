@@ -3,6 +3,10 @@
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
+### 3.3.0-1-RELEASE
+- SpringBoot 3.3.0
+- SpingCloud 2023.0.2
+
 ### 3.1.5-2-RELEASE
 - SpringBoot 3.1.5
 - SpingCloud 2022.0.4

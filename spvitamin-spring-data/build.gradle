@@ -52,12 +52,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.retry:spring-retry:1.3.1'
 
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
+    // jakarta.validation
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

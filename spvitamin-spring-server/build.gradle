@@ -58,15 +58,12 @@ dependencies {
     // JAXB (JDK > 8 miatt)
     implementation "javax.xml.bind:jaxb-api:${jaxbApiVersion}"
 
-    // javax.validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
-
     // Guava
-    implementation 'com.google.guava:guava:32.1.3-jre'
+    implementation "com.google.guava:guava:${guavaVersion}"
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

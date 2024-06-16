@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.data.config;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;

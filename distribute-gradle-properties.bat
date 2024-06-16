@@ -2,6 +2,7 @@
 
 copy gradle.properties pwdtool
 copy gradle.properties spvitamin-core
+copy gradle.properties spvitamin-json-time
 copy gradle.properties spvitamin-spring-admin
 copy gradle.properties spvitamin-spring-cloud-client
 copy gradle.properties spvitamin-spring-cloud-eureka
