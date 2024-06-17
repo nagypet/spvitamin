@@ -152,10 +152,9 @@ public abstract class BatchProcessor
                         {
                             log.error(StackTracer.toString(ex));
                             // meg kell nézni, hogy fatalis hiba történt-e, ami az egész batch feldolgozását meg kell, hogy állítsa?
-                            if (ex instanceof ExecutionException)
+                            if (ex instanceof ExecutionException ee)
                             {
-                                if (ex.getCause() == null
-                                    || mapEntry.getValue().isFatalException(((ExecutionException) ex).getCause()))
+                                if (ex.getCause() == null || mapEntry.getValue().isFatalException(ee.getCause()))
                                 {
                                     // Ha fatális hiba
                                     shutdownImmediately = true;
