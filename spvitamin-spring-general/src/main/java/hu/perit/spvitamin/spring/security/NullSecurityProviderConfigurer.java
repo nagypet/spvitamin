@@ -16,15 +16,13 @@
 
 package hu.perit.spvitamin.spring.security;
 
-import java.security.Provider;
-import java.security.Security;
-
-import javax.annotation.PostConstruct;
-
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import lombok.extern.slf4j.Slf4j;
+import java.security.Provider;
+import java.security.Security;
 
 /**
  * #know-how:disable-ssl-certificate-validation
@@ -34,17 +32,23 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class NullSecurityProviderConfigurer {
+public class NullSecurityProviderConfigurer
+{
 
     private final ServerProperties serverProperties;
 
-    public NullSecurityProviderConfigurer(ServerProperties serverProperties) {
+
+    public NullSecurityProviderConfigurer(ServerProperties serverProperties)
+    {
         this.serverProperties = serverProperties;
     }
 
+
     @PostConstruct
-    void init() {
-        if (this.serverProperties.getSsl() != null && this.serverProperties.getSsl().isIgnoreCertificateValidation()) {
+    void init()
+    {
+        if (this.serverProperties.getSsl() != null && this.serverProperties.getSsl().isIgnoreCertificateValidation())
+        {
             Provider nullSecurityProvider = new NullSecurityProvider("NullSecurityProvider", "1.0", "Skipping SSL certificate validation");
             Security.insertProviderAt(nullSecurityProvider, 1);
 

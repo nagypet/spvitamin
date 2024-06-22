@@ -21,8 +21,7 @@ package hu.perit.spvitamin.spring.connectablecontext;
  */
 
 
-import javax.annotation.PreDestroy;
-
+import jakarta.annotation.PreDestroy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

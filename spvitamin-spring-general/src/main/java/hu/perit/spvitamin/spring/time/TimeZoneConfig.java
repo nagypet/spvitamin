@@ -16,27 +16,30 @@
 
 package hu.perit.spvitamin.spring.time;
 
-import java.util.TimeZone;
-
-import javax.annotation.PostConstruct;
-
+import hu.perit.spvitamin.spring.config.SystemProperties;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import hu.perit.spvitamin.spring.config.SystemProperties;
-import lombok.extern.slf4j.Slf4j;
+import java.util.TimeZone;
 
 @Component
 @Slf4j
-public class TimeZoneConfig {
+public class TimeZoneConfig
+{
 
     private final SystemProperties systemProperties;
 
-    public TimeZoneConfig(SystemProperties systemProperties) {
+
+    public TimeZoneConfig(SystemProperties systemProperties)
+    {
         this.systemProperties = systemProperties;
     }
 
+
     @PostConstruct
-    void started() {
+    void started()
+    {
         log.debug(String.format("Time zone set to: '%s'", this.systemProperties.getTimeZone()));
         TimeZone.setDefault(TimeZone.getTimeZone(this.systemProperties.getTimeZone()));
     }

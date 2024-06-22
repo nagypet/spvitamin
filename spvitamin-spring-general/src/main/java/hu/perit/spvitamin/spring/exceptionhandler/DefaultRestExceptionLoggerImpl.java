@@ -18,11 +18,10 @@ package hu.perit.spvitamin.spring.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.LogLevel;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * This is a default implementation of RestExceptionLogger. It can be overridden on application level to implement

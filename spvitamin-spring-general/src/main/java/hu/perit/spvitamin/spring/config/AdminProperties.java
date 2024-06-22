@@ -16,15 +16,13 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import javax.annotation.PostConstruct;
-
+import jakarta.annotation.PostConstruct;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -35,34 +33,38 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @ConfigurationProperties(prefix = "admin")
 @Slf4j
-public class AdminProperties {
-	@Autowired
-	private ServerProperties serverProperties;
+public class AdminProperties
+{
+    @Autowired
+    private ServerProperties serverProperties;
 
-	private String defaultSiteUrl = "/admin-gui";
-	private String defaultSiteRootFileName = "";
-	private String defaultSiteStaticContentsPath;
+    private String defaultSiteUrl = "/admin-gui";
+    private String defaultSiteRootFileName = "";
+    private String defaultSiteStaticContentsPath;
 
-	// e.g. admin.admin-gui-url=/alma
-	private String adminGuiUrl = "/admin-gui";
-	private String adminGuiRootFileName = "index.html";
+    // e.g. admin.admin-gui-url=/alma
+    private String adminGuiUrl = "/admin-gui";
+    private String adminGuiRootFileName = "index.html";
 
-	// This string will be displayen in the footer of the AdminGUI
-	private String copyright = "Peter Nagy - nagy.peter.home@gmail.com; peter.nagy@perit.hu";
+    // This string will be displayen in the footer of the AdminGUI
+    private String copyright = "Peter Nagy - nagy.peter.home@gmail.com; peter.nagy@perit.hu";
 
-	// If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of
-	// a Kubernetes or Openshift deployment, where certificates are not managed by the app.
-	private Boolean keystoreAdminEnabled = true;
+    // If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of
+    // a Kubernetes or Openshift deployment, where certificates are not managed by the app.
+    private Boolean keystoreAdminEnabled = true;
 
-	@PostConstruct
-	private void postConstruct() {
-		log.info(String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl,
-				this.defaultSiteRootFileName));
-		log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
-	}
 
-	public String getKeystoreAdminEnabled()
-	{
-		return BooleanUtils.isTrue(this.keystoreAdminEnabled) ? "true" : "false";
-	}
+    @PostConstruct
+    private void postConstruct()
+    {
+        log.info(String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl,
+            this.defaultSiteRootFileName));
+        log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
+    }
+
+
+    public String getKeystoreAdminEnabled()
+    {
+        return BooleanUtils.isTrue(this.keystoreAdminEnabled) ? "true" : "false";
+    }
 }
