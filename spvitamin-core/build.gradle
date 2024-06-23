@@ -36,12 +36,14 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     // apache.commons
+    implementation "commons-io:commons-io:${commonsIoVersion}"
     implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
     implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
 
 	// JUnit
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testImplementation "org.assertj:assertj-core:${assertJVersion}"
 
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

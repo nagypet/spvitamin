@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.http;
 
+import hu.perit.spvitamin.core.filename.FileNameUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.*;
@@ -29,7 +30,7 @@ public final class ResponseEntityUtils
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(
                 ContentDisposition.attachment()
-                        .filename(fileName)
+                        .filename(FileNameUtils.sanitizeFileName(fileName))
                         .build()
         );
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);

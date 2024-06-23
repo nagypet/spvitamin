@@ -62,6 +62,11 @@ dependencyManagement {
 
 ## Release history
 
+### 3.3.0-1-RELEASE not yet released
+- Compiled with SpringBoot 3.3.0 and SpingCloud 2023.0.2
+- FileNameUtils added
+
+
 ### 3.1.5-3-RELEASE not yet released
 - BatchProcessor: new parameter to disable synchronous execution of the first item
 - SpvitaminObjectMapper and SpvitaminSpringObjectMapper: mapper instance stored in a static
