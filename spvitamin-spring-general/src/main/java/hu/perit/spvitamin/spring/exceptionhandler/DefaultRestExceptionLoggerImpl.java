@@ -46,6 +46,11 @@ public class DefaultRestExceptionLoggerImpl implements DefaultRestExceptionLogge
     @Override
     public void log(String path, Throwable ex, LogLevel level)
     {
+        if ("uri=/favicon.ico".equalsIgnoreCase(path))
+        {
+            return;
+        }
+
         switch (level)
         {
             case DEBUG -> log.debug(String.format(FORMAT, path, StackTracer.toString(ex)));

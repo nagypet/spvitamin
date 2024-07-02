@@ -65,6 +65,8 @@ dependencyManagement {
 ### 3.3.0-1-RELEASE not yet released
 - Compiled with SpringBoot 3.3.0 and SpingCloud 2023.0.2
 - FileNameUtils added
+- h2-console must be ebaled in the application specific security config
+- /favicon.ico errors and warnings will not be logged by the DefaultRestExceptionLogger
 
 
 ### 3.1.5-3-RELEASE not yet released

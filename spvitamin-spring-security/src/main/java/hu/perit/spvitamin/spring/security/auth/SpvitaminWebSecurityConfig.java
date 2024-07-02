@@ -165,8 +165,8 @@ public class SpvitaminWebSecurityConfig
                 // Logout endpoint
                 mvc.pattern("/logout")
             ).permitAll()
-            // H2
-            .requestMatchers(PathRequest.toH2Console()).permitAll()
+            // H2 console must be enabled within the application
+            //.requestMatchers(PathRequest.toH2Console()).permitAll()
         ;
     }
 
