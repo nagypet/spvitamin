@@ -38,3 +38,4 @@ copyTo spvitamin-spring-security-authservice-api
 copyTo spvitamin-spring-security-keycloak
 copyTo spvitamin-spring-security-ldap
 copyTo spvitamin-spring-server
+copyTo spvitamin-test
