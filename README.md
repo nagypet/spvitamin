@@ -68,6 +68,7 @@ dependencyManagement {
 - h2-console must be ebaled in the application specific security config
 - /favicon.ico errors and warnings will not be logged by the DefaultRestExceptionLogger
 - new modul added: spvitamin-test
+- graceful shutdown configured as default
 
 
 ### 3.1.5-3-RELEASE not yet released
