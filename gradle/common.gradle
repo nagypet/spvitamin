@@ -30,7 +30,7 @@ if (project.hasProperty('compileJava')) {
     compileJava.finalizedBy createBuildTimeTxt
 
     compileJava {
-        options.encoding = "CP1252"
+        options.encoding = "UTF-8"
     }
 }
 
