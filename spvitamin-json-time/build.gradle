@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -36,34 +36,42 @@ bootJar {
 
 
 dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
 
     // apache.commons
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
 
     // FasterXML
-    implementation 'com.fasterxml.jackson.core:jackson-core'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
+    implementation libs.jackson.core
+    implementation libs.jackson.databind
+    implementation libs.jackson.datatype.jsr310
 
     // YAML formatting
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    implementation libs.jackson.dataformat.yaml
 
     // Slf4J
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
-    testImplementation('log4j:log4j:1.2.17')
+    implementation libs.slf4j.api
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    // Slf4J
+    testImplementation libs.slf4j.log4j12
+    testImplementation libs.log4j.log4j
 
     // Test framework
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation libs.assertj
 }
 
 

@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-apply from: 'gradle/include-subprojects.gradle'
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from(files("gradle/version-catalog.toml"))
+        }
+    }
+}
 
+apply from: 'gradle/include-subprojects.gradle'
 
 rootProject.name = 'spvitamin'

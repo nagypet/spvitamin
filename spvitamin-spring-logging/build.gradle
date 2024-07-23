@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -35,39 +35,42 @@ bootJar {
 }
 
 dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
 
     // apache.commons
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+    implementation libs.commons.io
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-core'
 
     // Aspectj
-    runtimeOnly 'org.aspectj:aspectjrt:1.9.9.1'
-    implementation 'org.aspectj:aspectjweaver:1.9.9.1'
+    runtimeOnly libs.aspectj.rt
+    implementation libs.aspectj.weaver
 
     // Slf4J
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
-    testImplementation('log4j:log4j:1.2.17')
+    implementation libs.slf4j.api
 
-    implementation "commons-io:commons-io:${commonsIoVersion}"
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.slf4j.log4j12
+    testImplementation libs.log4j.log4j
 }
 
 

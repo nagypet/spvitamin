@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -36,19 +36,22 @@ bootJar {
 
 
 dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-json-time')
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
 
     // apache.commons
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
-    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+    implementation libs.commons.io
 
     // Spring
     implementation 'org.springframework.boot:spring-boot'
@@ -56,29 +59,25 @@ dependencies {
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'
 
-    implementation 'jakarta.annotation:jakarta.annotation-api'
+    implementation libs.jakarta.annotation.api
 
     // jakarta.validation
-    implementation 'jakarta.validation:jakarta.validation-api'
+    implementation libs.jakarta.validation.api
 
     // FasterXML
-    implementation 'com.fasterxml.jackson.core:jackson-core'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-    // YAML formatting
-    //implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    implementation libs.jackson.core
+    implementation libs.jackson.databind
 
     // Slf4J
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
-    testImplementation('log4j:log4j:1.2.17')
+    implementation libs.slf4j.api
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    testImplementation 'org.assertj:assertj-core:3.24.2'
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.assertj
+    testImplementation libs.slf4j.log4j12
+    testImplementation libs.log4j.log4j
 }
 
 

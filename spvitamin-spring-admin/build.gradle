@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -36,21 +36,24 @@ bootJar {
 
 
 dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
     implementation project(':spvitamin-spring-logging')
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
 
     // apache.commons
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
-    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+    implementation libs.commons.io
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -58,16 +61,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Guava
-    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation libs.guava
 
     // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0'
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 

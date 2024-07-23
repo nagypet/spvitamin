@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -37,39 +37,40 @@ bootJar {
 
 
 dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
 
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // JJWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation libs.jsonwebtoken
 
     // JAXB (JDK > 8 miatt)
-    implementation "javax.xml.bind:jaxb-api:${jaxbApiVersion}"
+    implementation libs.jaxb.api
 
     // Guava
-    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation libs.guava
 
     // apache.commons
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
 
     // Slf4J
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    //testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
-    //testImplementation('log4j:log4j:1.2.17')
+    implementation libs.slf4j.api
 
     // Micrometer Prometheus plugin
-    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 
