@@ -30,11 +30,19 @@ import org.springframework.core.env.Environment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -218,9 +226,8 @@ public class KeystoreUtils
             else
             {
                 KeyStore.Entry entry = ks.getEntry(alias, null);
-                if (entry instanceof KeyStore.TrustedCertificateEntry)
+                if (entry instanceof KeyStore.TrustedCertificateEntry trustedCertificateEntry)
                 {
-                    KeyStore.TrustedCertificateEntry trustedCertificateEntry = (KeyStore.TrustedCertificateEntry) entry;
                     Certificate certificate = trustedCertificateEntry.getTrustedCertificate();
                     CertInfo certInfo = getInfoFromCertificate(certificate);
                     keystoreEntry.getChain().add(certInfo);

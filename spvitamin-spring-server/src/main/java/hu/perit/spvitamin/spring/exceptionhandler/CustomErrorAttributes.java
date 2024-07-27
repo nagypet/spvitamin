@@ -17,17 +17,16 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -36,26 +35,32 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class CustomErrorAttributes extends DefaultErrorAttributes {
+public class CustomErrorAttributes extends DefaultErrorAttributes
+{
 
     private final ServerProperties serverProperties;
 
-    public CustomErrorAttributes(ServerProperties serverProperties) {
+
+    public CustomErrorAttributes(ServerProperties serverProperties)
+    {
         this.serverProperties = serverProperties;
     }
 
 
     @Override
-    public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+    public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options)
+    {
         Map<String, Object> attributes = super.getErrorAttributes(webRequest, options);
 
         logAttributes(attributes);
-        
+
         Object status = webRequest.getAttribute("javax.servlet.error.status_code", RequestAttributes.SCOPE_REQUEST);
 
-        if ((status instanceof Integer) && ((Integer) status == 404)) {
+        if ((status instanceof Integer statusValue) && (statusValue == 404))
+        {
             Object message = webRequest.getAttribute("javax.servlet.error.message", RequestAttributes.SCOPE_REQUEST);
-            if (message == null || message.toString().equals("")) {
+            if (message == null || message.toString().equals(""))
+            {
                 Object path = webRequest.getAttribute("javax.servlet.error.request_uri", RequestAttributes.SCOPE_REQUEST);
                 String link = String.format("%s://%s:%s", "http(s)", this.serverProperties.getFqdn(), this.serverProperties.getPort());
                 message = String.format("There is no handler for '%s%s'! For available services please see: '%s'", link, path, link);
@@ -65,14 +70,14 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
 
         return attributes;
     }
-    
-    
+
+
     private void logAttributes(Map<String, Object> attributes)
     {
         String errorText = attributes.entrySet().stream()
-                .filter(i -> !"trace".equalsIgnoreCase(i.getKey()))
-                .map(e -> String.format("%s: %s", e.getKey(), e.getValue()))
-                .collect(Collectors.joining("; "));
+            .filter(i -> !"trace".equalsIgnoreCase(i.getKey()))
+            .map(e -> String.format("%s: %s", e.getKey(), e.getValue()))
+            .collect(Collectors.joining("; "));
         log.warn(errorText);
     }
 }
