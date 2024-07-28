@@ -54,7 +54,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // JJWT
-    implementation libs.jsonwebtoken
+    implementation libs.bundles.jsonwebtoken
 
     // FasterXML
     implementation libs.jackson.core

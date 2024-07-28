@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -40,12 +41,16 @@ import java.util.Date;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider
+{
 
     private final JwtProperties jwtProperties;
 
-    public AuthorizationToken generateToken(String subject, Claims additionalClaims) {
-        try {
+
+    public AuthorizationToken generateToken(String subject, Claims additionalClaims)
+    {
+        try
+        {
             LocalDateTime issuedAt = LocalDateTime.now();
             LocalDateTime expiryDate = issuedAt.plusMinutes(jwtProperties.getExpirationInMinutes());
             Key privateKey = KeystoreUtils.getPrivateKey();
@@ -54,30 +59,35 @@ public class JwtTokenProvider {
             Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
             String jwt = Jwts.builder()
-                    .setSubject(subject)
-                    .setIssuedAt(iat)
-                    .setExpiration(exp)
-                    .addClaims(additionalClaims)
-                    .signWith(SignatureAlgorithm.RS512, privateKey)
-                    .compact();
+                .subject(subject)
+                .issuedAt(iat)
+                .expiration(exp)
+                .claims(additionalClaims)
+                .signWith(privateKey, SignatureAlgorithm.RS512)
+                .compact();
 
             return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new JwtException("Token creation failed!", e);
         }
     }
 
 
-    public Claims getClaims(String jwt) {
-        try {
-            Key publicKey = KeystoreUtils.getPublicKey();
+    public Claims getClaims(String jwt)
+    {
+        try
+        {
+            PublicKey publicKey = KeystoreUtils.getPublicKey();
             return new DefaultClaims(Jwts.parser()
-                    .setSigningKey(publicKey)
-                    .parseClaimsJws(jwt)
-                    .getBody());
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload());
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new JwtException("JWT token parse failed!", ex);
         }
     }

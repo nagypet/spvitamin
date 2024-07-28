@@ -6,36 +6,43 @@ org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.2' 
 aspectj = '1.9.22.1'
 jackson = '2.17.2'
 junit = '5.10.3'
+logback = '1.5.6'
 mapstruct = '1.5.5.Final'
 springdoc = '2.6.0'
 
 [libraries]
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
-assertj = 'org.assertj:assertj-core:3.25.3'
-commons-collections4 = 'org.apache.commons:commons-collections4:4.4'
-commons-io = 'commons-io:commons-io:2.15.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.14.0'
+assertj = 'org.assertj:assertj-core:3.26.3'
+commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
+commons-io = 'commons-io:commons-io:2.16.1'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.15.0'
 guava = 'com.google.guava:guava:33.2.1-jre'
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
 jakarta-annotation-api = 'jakarta.annotation:jakarta.annotation-api:3.0.0'
-jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.0.2'
+jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.0'
 jaxb-api = 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-jsonwebtoken = 'io.jsonwebtoken:jjwt:0.9.1'
+jsonwebtoken-api = 'io.jsonwebtoken:jjwt-api:0.12.6'
+jsonwebtoken-impl = 'io.jsonwebtoken:jjwt-impl:0.12.6'
+jsonwebtoken-jackson = 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }
 keycloakbom = 'org.keycloak.bom:keycloak-adapter-bom:12.0.4'
 log4j-log4j = 'log4j:log4j:1.2.17'
-logback-classic = 'ch.qos.logback:logback-classic:1.5.6'
-logback-core = 'ch.qos.logback:logback-core:1.5.6'
-lombok = 'org.projectlombok:lombok:1.18.32'
+logback-classic = { module = 'ch.qos.logback:logback-classic', version.ref = 'logback' }
+logback-core = { module = 'ch.qos.logback:logback-core', version.ref = 'logback' }
+lombok = 'org.projectlombok:lombok:1.18.34'
 mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
-slf4j-api = 'org.slf4j:slf4j-api:2.0.7'
+slf4j-api = 'org.slf4j:slf4j-api:2.0.13'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
 spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
+
+
+[bundles]
+jsonwebtoken = ["jsonwebtoken-api", "jsonwebtoken-impl", "jsonwebtoken-jackson"]

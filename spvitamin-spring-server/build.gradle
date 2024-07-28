@@ -54,7 +54,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // JJWT
-    implementation libs.jsonwebtoken
+    implementation libs.bundles.jsonwebtoken
 
     // JAXB (JDK > 8 miatt)
     implementation libs.jaxb.api

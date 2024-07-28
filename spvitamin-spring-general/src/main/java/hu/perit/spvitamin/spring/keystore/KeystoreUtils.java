@@ -34,6 +34,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -57,6 +58,7 @@ public class KeystoreUtils
 
     private static final String SERVER_SSL_KEYSTORE = "server.ssl.key-store";
     private static final String SERVER_SSL_TRUSTSTORE = "server.ssl.trust-store";
+
 
     private KeystoreUtils()
     {
@@ -155,7 +157,8 @@ public class KeystoreUtils
         {
             KeyStore serverKeystore = getServerKeyStore();
             CryptoUtil crypto = new CryptoUtil();
-            key = serverKeystore.getKey(jwtProperties.getPrivateKeyAlias(), crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), jwtProperties.getPrivateKeyEncryptedPassword()).toCharArray());
+            key = serverKeystore.getKey(jwtProperties.getPrivateKeyAlias(),
+                crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), jwtProperties.getPrivateKeyEncryptedPassword()).toCharArray());
         }
         catch (Exception ex)
         {
@@ -164,13 +167,14 @@ public class KeystoreUtils
 
         if (key == null)
         {
-            throw new InvalidInputException(String.format("'%s' not found in keystore '%s'!", jwtProperties.getPrivateKeyAlias(), System.getProperty(SERVER_SSL_KEYSTORE)));
+            throw new InvalidInputException(
+                String.format("'%s' not found in keystore '%s'!", jwtProperties.getPrivateKeyAlias(), System.getProperty(SERVER_SSL_KEYSTORE)));
         }
         return key;
     }
 
 
-    public static Key getPublicKey()
+    public static PublicKey getPublicKey()
     {
 
         JwtProperties jwtProperties = SysConfig.getJwtProperties();
@@ -187,7 +191,8 @@ public class KeystoreUtils
 
         if (certificate == null)
         {
-            throw new InvalidInputException(String.format("'%s' not found in truststore '%s'!", jwtProperties.getPublicKeyAlias(), System.getProperty(SERVER_SSL_TRUSTSTORE)));
+            throw new InvalidInputException(
+                String.format("'%s' not found in truststore '%s'!", jwtProperties.getPublicKeyAlias(), System.getProperty(SERVER_SSL_TRUSTSTORE)));
         }
         return certificate.getPublicKey();
     }
@@ -356,16 +361,16 @@ public class KeystoreUtils
             // file:/C:/Users/nagy_peter/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar
             // file:/C:/Users/nagy_peter/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar
             return Stream.of(optClassPathFromManifest.get().split("file:/"))
-                    .map(String::strip)
-                    .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
-                    .collect(Collectors.toList());
+                .map(String::strip)
+                .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
+                .collect(Collectors.toList());
         }
         else
         {
             return Stream.of(classPath.split(File.pathSeparator))
-                    .map(String::strip)
-                    .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
-                    .collect(Collectors.toList());
+                .map(String::strip)
+                .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
+                .collect(Collectors.toList());
         }
     }
 
