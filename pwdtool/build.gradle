@@ -16,6 +16,7 @@
 
 plugins {
     id 'application'
+    id 'jacoco'
 }
 apply from: '../gradle/common.gradle'
 

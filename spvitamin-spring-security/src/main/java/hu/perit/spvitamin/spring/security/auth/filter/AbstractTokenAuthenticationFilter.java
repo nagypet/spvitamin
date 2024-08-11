@@ -89,25 +89,24 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
             filterChain.doFilter(request, response);
         }
-        // 2023-12-28: I cannot remember anymore, why this block is here?
-//        catch (AuthenticationException ex)
-//        {
-//            SecurityContextHolder.clearContext();
-//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-//            if (resolver.resolveException(request, response, null, ex) == null)
-//            {
-//                throw ex;
-//            }
-//        }
-//        catch (Exception ex)
-//        {
-//            SecurityContextHolder.clearContext();
-//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-//            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
-//            {
-//                throw ex;
-//            }
-//        }
+        catch (AuthenticationException ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null, ex) == null)
+            {
+                throw ex;
+            }
+        }
+        catch (Exception ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            {
+                throw ex;
+            }
+        }
         finally
         {
             SecurityContextHolder.clearContext();

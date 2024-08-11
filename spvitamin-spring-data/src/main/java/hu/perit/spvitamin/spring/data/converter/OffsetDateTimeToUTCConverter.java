@@ -24,7 +24,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@Converter(autoApply = true)
 public class OffsetDateTimeToUTCConverter implements AttributeConverter<OffsetDateTime, LocalDateTime>
 {
     @Override

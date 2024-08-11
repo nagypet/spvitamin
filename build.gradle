@@ -15,7 +15,8 @@
  */
 
 plugins {
-    id "org.sonarqube" version "3.0" apply false
+	alias libs.plugins.sonarqube apply false
+	alias libs.plugins.ben.manes.versions
 }
 
 subprojects {
