@@ -16,6 +16,10 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import jakarta.validation.*;
+
+import java.util.Set;
+
 /**
  * @author Peter Nagy
  */
@@ -26,7 +30,7 @@ public class SysConfig
 
     public static JwtProperties getJwtProperties()
     {
-        return SpringContext.getBean(JwtProperties.class);
+        return validate(SpringContext.getBean(JwtProperties.class));
     }
 
     public static SecurityProperties getSecurityProperties()
@@ -57,5 +61,20 @@ public class SysConfig
     public static MicroserviceCollectionProperties getSysMicroservices()
     {
         return SpringContext.getBean(MicroserviceCollectionProperties.class);
+    }
+
+
+    private static <T> T validate(T bean)
+    {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory())
+        {
+            Validator validator = factory.getValidator();
+            Set<ConstraintViolation<T>> violations = validator.validate(bean);
+            if (!violations.isEmpty())
+            {
+                throw new ConstraintViolationException(violations);
+            }
+        }
+        return bean;
     }
 }

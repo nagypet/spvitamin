@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -28,11 +30,16 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "jwt")
+@Valid
 public class JwtProperties
 {
+    @NotNull
     private String privateKeyAlias;
+    @NotNull
     @ConfigProperty(hidden = true)
     private String privateKeyEncryptedPassword;
+    @NotNull
     private String publicKeyAlias;
+    @NotNull
     private long expirationInMinutes;
 }

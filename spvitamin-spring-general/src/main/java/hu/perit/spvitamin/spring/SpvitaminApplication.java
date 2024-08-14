@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.AbstractEnvironment;
 
@@ -41,31 +41,11 @@ public class SpvitaminApplication extends SpringApplication
 
     public static final String SPVITAMIN_DEFAULTS = "spvitamin-defaults";
 
-    /**
-     * Static helper that can be used to run a {@link SpringApplication} from the
-     * specified source using default settings.
-     *
-     * @param primarySource the primary source to load
-     * @param args          the application arguments (usually passed from a Java main method)
-     * @return the running {@link ApplicationContext}
-     */
-    public static ConfigurableApplicationContext run(Class<?> primarySource, String... args)
-    {
-        return run(new Class<?>[]{primarySource}, args);
-    }
 
-
-    /**
-     * Static helper that can be used to run a {@link SpringApplication} from the
-     * specified sources using default settings and user supplied arguments.
-     *
-     * @param primarySources the primary sources to load
-     * @param args           the application arguments (usually passed from a Java main method)
-     * @return the running {@link ApplicationContext}
-     */
-    public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args)
+    public static ConfigurableApplicationContext run(Class<?> primarySources, String[] args, ApplicationContextInitializer<?>... initializers)
     {
         SpringApplication springApplication = new SpvitaminApplication(primarySources);
+        springApplication.addInitializers(initializers);
         return springApplication.run(args);
     }
 

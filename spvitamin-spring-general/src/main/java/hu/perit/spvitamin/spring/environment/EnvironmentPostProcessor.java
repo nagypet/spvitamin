@@ -45,13 +45,13 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
     @Override
     public void onApplicationEvent(ApplicationEvent event)
     {
-        if (event instanceof ApplicationPreparedEvent)
+        if (event instanceof ApplicationPreparedEvent applicationPreparedEvent)
         {
-            this.onApplicationPreparedEvent((ApplicationPreparedEvent) event);
+            this.onApplicationPreparedEvent(applicationPreparedEvent);
         }
-        else if (event instanceof ContextRefreshedEvent)
+        else if (event instanceof ContextRefreshedEvent contextRefreshedEvent)
         {
-            this.onContextRefreshedEvent((ContextRefreshedEvent) event);
+            this.onContextRefreshedEvent(contextRefreshedEvent);
         }
     }
 

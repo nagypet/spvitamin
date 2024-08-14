@@ -150,7 +150,6 @@ public class KeystoreUtils
 
     public static Key getPrivateKey()
     {
-
         JwtProperties jwtProperties = SysConfig.getJwtProperties();
         Key key = null;
         try

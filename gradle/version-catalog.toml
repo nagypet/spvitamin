@@ -1,10 +1,13 @@
 [plugins]
+ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.6' }
 org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.2' }
+sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 
 [versions]
 aspectj = '1.9.22.1'
 jackson = '2.17.2'
+jsonwebtoken = '0.12.6'
 junit = '5.10.3'
 logback = '1.5.6'
 mapstruct = '1.5.5.Final'
@@ -16,7 +19,7 @@ aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj'
 assertj = 'org.assertj:assertj-core:3.26.3'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.15.0'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.16.0'
 guava = 'com.google.guava:guava:33.2.1-jre'
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
@@ -25,9 +28,9 @@ jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-dat
 jakarta-annotation-api = 'jakarta.annotation:jakarta.annotation-api:3.0.0'
 jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.0'
 jaxb-api = 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-jsonwebtoken-api = 'io.jsonwebtoken:jjwt-api:0.12.6'
-jsonwebtoken-impl = 'io.jsonwebtoken:jjwt-impl:0.12.6'
-jsonwebtoken-jackson = 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+jsonwebtoken-api = { module = 'io.jsonwebtoken:jjwt-api', version.ref = 'jsonwebtoken' }
+jsonwebtoken-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jsonwebtoken' }
+jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 'jsonwebtoken' }
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }
 keycloakbom = 'org.keycloak.bom:keycloak-adapter-bom:12.0.4'

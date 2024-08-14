@@ -68,6 +68,7 @@ dependencyManagement {
 
 ### 3.3.2-1-RELEASE not yet released
 - Compiled with SpringBoot 3.3.2 and SpingCloud 2023.0.3
+- SpvitaminApplication allows environment initializers
 
 
 ### 3.3.0-1-RELEASE not yet released
