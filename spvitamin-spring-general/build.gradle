@@ -63,6 +63,7 @@ dependencies {
 
     // jakarta.validation
     implementation libs.jakarta.validation.api
+    implementation libs.hibernate.validator
 
     // FasterXML
     implementation libs.jackson.core
