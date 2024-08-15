@@ -42,6 +42,13 @@ public class SpvitaminApplication extends SpringApplication
     public static final String SPVITAMIN_DEFAULTS = "spvitamin-defaults";
 
 
+    public static ConfigurableApplicationContext run(Class<?> primarySources, String[] args)
+    {
+        SpringApplication springApplication = new SpvitaminApplication(primarySources);
+        return springApplication.run(args);
+    }
+
+
     public static ConfigurableApplicationContext run(Class<?> primarySources, String[] args, ApplicationContextInitializer<?>... initializers)
     {
         SpringApplication springApplication = new SpvitaminApplication(primarySources);
