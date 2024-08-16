@@ -16,17 +16,15 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
-/**
- * @author Peter Nagy
- */
+@FunctionalInterface
+public interface RestExceptionResponseSupplier<T> {
 
-@Slf4j
-public class DefaultRestExceptionResponseBuilder extends AbstractRestExceptionResponseBuilder<RestExceptionResponse>
-{
-    public DefaultRestExceptionResponseBuilder(RestExceptionResponseFactory<RestExceptionResponse> factory)
-    {
-        super(factory);
-    }
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    T get(HttpStatus httpStatus, Throwable ex, String path, String traceId);
 }

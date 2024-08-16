@@ -27,6 +27,6 @@ public class DefaultRestExceptionResponseHandler extends RestExceptionResponseHa
 {
     protected RestExceptionResponseBuilder<RestExceptionResponse> getBuilder()
     {
-        return new DefaultRestExceptionResponseBuilder(new DefaultRestExceptionResponseFactory());
+        return new GenericRestExceptionResponseBuilder<>(RestExceptionResponse::new);
     }
 }

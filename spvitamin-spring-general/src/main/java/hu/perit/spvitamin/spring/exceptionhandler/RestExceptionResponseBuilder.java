@@ -18,10 +18,14 @@ package hu.perit.spvitamin.spring.exceptionhandler;
 
 import java.util.Optional;
 
-public interface RestExceptionResponseBuilder<T>
+public interface RestExceptionResponseBuilder<T extends IRestExceptionResponse>
 {
     @Deprecated
-    Optional<T> createResponse(Throwable ex, String path);
+    // Use the variant with traceId
+    default Optional<T> createResponse(Throwable ex, String path)
+    {
+        return createResponse(ex, path, null);
+    }
 
     Optional<T> createResponse(Throwable ex, String path, String traceId);
 
