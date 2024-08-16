@@ -30,30 +30,36 @@ import java.util.Objects;
  * @author Peter Nagy
  */
 
-public interface Invoker {
-
-    default Object invoke(Object target, String name, Object... args) throws InvocationTargetException {
+public interface Invoker
+{
+    default Object invoke(Object target, String name, Object... args) throws InvocationTargetException
+    {
         Objects.requireNonNull(target, "Invocation target is 'null'!");
 
-        try {
+        try
+        {
             Class<?>[] argTypes = ClassUtils.toClass(args);
             Object retVal = FixedMethodUtils.invokeMethod(target, true, name, args);
             Method method = FixedMethodUtils.getMatchingMethod(target.getClass(), name, argTypes);
-            if (method != null) {
+            if (method != null)
+            {
                 Class<?> returnType = method.getReturnType();
-                if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive()) {
+                if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive())
+                {
                     throw new RuntimeException("Null return value does not match primitive return type for: " + method);
                 }
             }
 
             return retVal;
         }
-        catch (NoSuchMethodException | IllegalAccessException e) {
+        catch (NoSuchMethodException | IllegalAccessException e)
+        {
             return ServerException.throwFrom(e);
         }
     }
 
-    static String getMyMethodName() {
+    static String getMyMethodName()
+    {
         StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
         return stackTraceElement.getMethodName();
     }

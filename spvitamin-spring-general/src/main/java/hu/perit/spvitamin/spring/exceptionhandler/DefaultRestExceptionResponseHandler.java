@@ -17,41 +17,16 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.context.request.WebRequest;
-
-import java.util.Optional;
 
 /**
  * @author Peter Nagy
  */
 
 @Slf4j
-public class DefaultRestExceptionResponseHandler
+public class DefaultRestExceptionResponseHandler extends RestExceptionResponseHandler<RestExceptionResponse>
 {
-
-    // Use the variant with traceId
-    @Deprecated
-    protected ResponseEntity<RestExceptionResponse> exceptionHandler(Exception ex, WebRequest request)
+    protected RestExceptionResponseBuilder<RestExceptionResponse> getBuilder()
     {
-        return exceptionHandler(ex, request, null);
-    }
-
-
-    protected ResponseEntity<RestExceptionResponse> exceptionHandler(Exception ex, WebRequest request, String traceId)
-    {
-        RestExceptionResponse exceptionResponse = getExceptionResponse(ex, request, traceId);
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
-    }
-
-
-    protected RestExceptionResponse getExceptionResponse(Exception ex, WebRequest request, String traceId)
-    {
-        String path = request != null ? request.getDescription(false) : "";
-
-        Optional<RestExceptionResponse> restExceptionResponse = RestExceptionResponseFactory.of(ex, path, traceId);
-        return restExceptionResponse.orElseGet(
-            () -> new RestExceptionResponse(RestExceptionResponseFactory.getHttpStatusFromAnnotation(ex), ex, path, traceId));
+        return new DefaultRestExceptionResponseBuilder(new DefaultRestExceptionResponseFactory());
     }
 }

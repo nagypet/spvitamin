@@ -79,6 +79,16 @@ public class ServerException extends RuntimeException implements ServerException
     }
 
 
+    // For Backward compatibility
+    @Deprecated
+    public ServerException(String exceptionClass, String message, Throwable cause)
+    {
+        super(message, cause);
+        this.className = exceptionClass;
+        this.superClassNames = null;
+    }
+
+
     @Override
     public boolean instanceOf(Class<? extends Throwable> anExceptionClass)
     {

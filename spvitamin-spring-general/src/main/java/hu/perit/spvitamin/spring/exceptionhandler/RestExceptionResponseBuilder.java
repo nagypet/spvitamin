@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2020-2024 the original author or authors.
  *
@@ -17,25 +16,14 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import lombok.Getter;
+import java.util.Optional;
 
-import java.util.Date;
-
-/**
- * @author Peter Nagy
- */
-
-
-@Getter
-public class HttpResponse
+public interface RestExceptionResponseBuilder<T>
 {
+    @Deprecated
+    Optional<T> createResponse(Throwable ex, String path);
 
-    private final Date timestamp;
-    private final String text;
+    Optional<T> createResponse(Throwable ex, String path, String traceId);
 
-    public HttpResponse(String text)
-    {
-        this.timestamp = new Date();
-        this.text = text;
-    }
+    T getResponseByExceptionAnnotation(Throwable ex, String path, String traceId);
 }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2020-2024 the original author or authors.
  *
@@ -17,25 +16,7 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import lombok.Getter;
-
-import java.util.Date;
-
-/**
- * @author Peter Nagy
- */
-
-
-@Getter
-public class HttpResponse
+public interface IRestExceptionResponse
 {
-
-    private final Date timestamp;
-    private final String text;
-
-    public HttpResponse(String text)
-    {
-        this.timestamp = new Date();
-        this.text = text;
-    }
+    int getStatus();
 }

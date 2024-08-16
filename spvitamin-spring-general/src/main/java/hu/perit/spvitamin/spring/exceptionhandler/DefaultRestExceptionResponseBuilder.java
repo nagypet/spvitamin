@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2020-2024 the original author or authors.
  *
@@ -17,25 +16,17 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-import lombok.Getter;
-
-import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
-
-@Getter
-public class HttpResponse
+@Slf4j
+public class DefaultRestExceptionResponseBuilder extends AbstractRestExceptionResponseBuilder<RestExceptionResponse>
 {
-
-    private final Date timestamp;
-    private final String text;
-
-    public HttpResponse(String text)
+    public DefaultRestExceptionResponseBuilder(RestExceptionResponseFactory<RestExceptionResponse> factory)
     {
-        this.timestamp = new Date();
-        this.text = text;
+        super(factory);
     }
 }

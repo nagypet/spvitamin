@@ -21,6 +21,7 @@ commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
 commons-lang3 = 'org.apache.commons:commons-lang3:3.16.0'
 guava = 'com.google.guava:guava:33.2.1-jre'
+hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson' }

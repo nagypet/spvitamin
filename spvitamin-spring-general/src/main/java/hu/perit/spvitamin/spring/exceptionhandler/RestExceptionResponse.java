@@ -76,9 +76,9 @@ import java.util.Set;
 @NoArgsConstructor // Json!
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @JsonInclude(Include.NON_NULL)
-public class RestExceptionResponse implements JsonSerializable
+public class RestExceptionResponse implements JsonSerializable, IRestExceptionResponse
 {
 
     private static boolean myExceptionEnabled = true;
