@@ -16,6 +16,9 @@
 
 package hu.perit.spvitamin.spring.exceptionhandler;
 
-public interface RestExceptionLogger extends DefaultRestExceptionLogger
+import hu.perit.spvitamin.core.exception.LogLevel;
+
+public interface RestExceptionLogger
 {
+    void log(String path, Throwable ex, LogLevel level);
 }

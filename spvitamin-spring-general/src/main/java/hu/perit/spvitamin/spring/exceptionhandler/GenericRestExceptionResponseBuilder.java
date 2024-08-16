@@ -35,12 +35,12 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
 {
     protected final RestExceptionResponseSupplier<T> supplier;
 
-    
+
     @Override
     public Optional<T> createResponse(Throwable ex, String path, String traceId)
     {
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
-        DefaultRestExceptionLogger exceptionLogger = getLogger();
+        RestExceptionLogger exceptionLogger = getLogger();
 
         // ========== UNAUTHORIZED (401) ===============================================================================
         if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
@@ -112,11 +112,11 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
     }
 
 
-    private static DefaultRestExceptionLogger getLogger()
+    private static RestExceptionLogger getLogger()
     {
         try
         {
-            return SpringContext.getBean(DefaultRestExceptionLogger.class);
+            return SpringContext.getBean(RestExceptionLogger.class);
         }
         catch (Exception e)
         {

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @ConditionalOnMissingBean(RestExceptionLogger.class)
-public class DefaultRestExceptionLoggerImpl implements DefaultRestExceptionLogger
+public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
 {
     public static final String FORMAT = "path: '%s', ex: %s";
 
