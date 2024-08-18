@@ -23,7 +23,7 @@ import {SettingsComponent} from './settings/settings.component';
 import {CertificatesComponent} from './certificates/certificates.component';
 import {RouterModule, Routes} from '@angular/router';
 import {AdminService} from '../services/admin.service';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoginComponent} from './login/login.component';
@@ -57,8 +57,7 @@ export const routes: Routes = [
   {path: 'admin-gui/about', component: AboutComponent},
 ];
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         LayoutComponent,
         HeaderComponent,
         FooterComponent,
@@ -71,25 +70,20 @@ export const routes: Routes = [
         TabSetComponent,
         FunctionDisabledWarningComponent,
     ],
-    imports: [
-        CommonModule,
+    exports: [LayoutComponent], imports: [CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
         NgbModule,
         RouterModule.forRoot(routes, {}),
-        HttpClientModule,
         ToastrModule.forRoot(),
-        FormsModule,
-    ],
-    providers: [
+        FormsModule], providers: [
         AdminService,
         AuthService,
         AuthGuard,
         { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-        { provide: LocationStrategy, useClass: HashLocationStrategy }
-    ],
-    exports: [LayoutComponent]
-})
+        { provide: LocationStrategy, useClass: HashLocationStrategy },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class UiModule {
 }

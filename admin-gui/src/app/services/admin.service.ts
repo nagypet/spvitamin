@@ -16,7 +16,7 @@
 
 /* tslint:disable:one-line */
 import {Injectable} from '@angular/core';
-import {HttpBackend, HttpClient, HttpUrlEncodingCodec} from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CertificateFile} from '../modell/keystore';
 import {environment} from '../../environments/environment';
