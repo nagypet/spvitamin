@@ -19,7 +19,7 @@ const PROXY_CONFIG = [
     context: [
       "/backend"
     ],
-    target: "http://localhost:8410",
+    target: "https://192.168.128.135:8181",
     secure: false,
     pathRewrite: {"^/backend": ""}
   }
