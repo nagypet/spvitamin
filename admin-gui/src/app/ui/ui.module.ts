@@ -76,7 +76,7 @@ export const routes: Routes = [
         BrowserModule,
         BrowserAnimationsModule,
         NgbModule,
-        RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+        RouterModule.forRoot(routes, {}),
         HttpClientModule,
         ToastrModule.forRoot(),
         FormsModule,
