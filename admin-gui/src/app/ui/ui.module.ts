@@ -58,40 +58,38 @@ export const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    LayoutComponent,
-    HeaderComponent,
-    FooterComponent,
-    SettingsComponent,
-    CertificatesComponent,
-    LoginComponent,
-    KeystoreComponent,
-    NgbdModalContent,
-    AboutComponent,
-    TabSetComponent,
-    FunctionDisabledWarningComponent,
-  ],
-  imports: [
-    CommonModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    NgbModule,
-    RouterModule.forRoot(routes, {relativeLinkResolution: 'legacy'}),
-    HttpClientModule,
-    ToastrModule.forRoot(),
-    FormsModule,
-  ],
-  providers: [
-    AdminService,
-    AuthService,
-    AuthGuard,
-    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
-    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
-  ],
-  exports: [LayoutComponent],
-  entryComponents: [NgbdModalContent]
-  //bootstrap: [LayoutComponent]
+    declarations: [
+        LayoutComponent,
+        HeaderComponent,
+        FooterComponent,
+        SettingsComponent,
+        CertificatesComponent,
+        LoginComponent,
+        KeystoreComponent,
+        NgbdModalContent,
+        AboutComponent,
+        TabSetComponent,
+        FunctionDisabledWarningComponent,
+    ],
+    imports: [
+        CommonModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        NgbModule,
+        RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+        HttpClientModule,
+        ToastrModule.forRoot(),
+        FormsModule,
+    ],
+    providers: [
+        AdminService,
+        AuthService,
+        AuthGuard,
+        { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+        { provide: LocationStrategy, useClass: HashLocationStrategy }
+    ],
+    exports: [LayoutComponent]
 })
 export class UiModule {
 }
