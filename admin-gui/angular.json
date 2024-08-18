@@ -66,19 +66,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "admingui:build",
-            "proxyConfig": "proxy.conf.js"
+            "proxyConfig": "proxy.conf.js",
+            "buildTarget": "admingui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "admingui:build:production"
+              "buildTarget": "admingui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "admingui:build"
+            "buildTarget": "admingui:build"
           }
         },
         "test": {
