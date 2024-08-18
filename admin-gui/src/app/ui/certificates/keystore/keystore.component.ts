@@ -18,6 +18,7 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {CertInfo, KeystoreEntry} from '../../../modell/keystore';
 import {AuthService} from '../../../services/auth/auth.service';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'ngbd-modal-content',
@@ -47,7 +48,12 @@ export class NgbdModalContent {
 @Component({
   selector: 'app-keystore',
   templateUrl: './keystore.component.html',
-  styleUrls: ['./keystore.component.scss']
+  styleUrls: ['./keystore.component.scss'],
+  imports: [
+    NgForOf,
+    NgIf
+  ],
+  standalone: true
 })
 export class KeystoreComponent implements OnInit, OnChanges {
   @Input('Keystore') keystore: Array<KeystoreEntry>;

@@ -19,11 +19,18 @@ import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
 import {CertificateFile, KeystoreEntry} from '../../modell/keystore';
 import {Router} from '@angular/router';
+import {KeystoreComponent} from './keystore/keystore.component';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-certificates',
   templateUrl: './certificates.component.html',
-  styleUrls: ['./certificates.component.scss']
+  styleUrls: ['./certificates.component.scss'],
+  imports: [
+    KeystoreComponent,
+    NgIf
+  ],
+  standalone: true
 })
 export class CertificatesComponent implements OnInit {
   @Input('KeystoreType') keystoreType: string;

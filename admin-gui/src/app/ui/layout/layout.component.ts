@@ -16,11 +16,20 @@
 
 import { Component, OnInit } from '@angular/core';
 import {AdminService} from '../../services/admin.service';
+import {HeaderComponent} from '../header/header.component';
+import {RouterOutlet} from '@angular/router';
+import {FooterComponent} from '../footer/footer.component';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss']
+  styleUrls: ['./layout.component.scss'],
+  imports: [
+    HeaderComponent,
+    RouterOutlet,
+    FooterComponent
+  ],
+  standalone: true
 })
 export class LayoutComponent implements OnInit
 {

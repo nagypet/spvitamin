@@ -18,6 +18,8 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
+import {NgbAlert} from '@ng-bootstrap/ng-bootstrap';
+import {NgForOf, NgIf} from '@angular/common';
 
 export class ServerParameter
 {
@@ -36,7 +38,13 @@ export class ServerParameter
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
+  imports: [
+    NgbAlert,
+    NgForOf,
+    NgIf
+  ],
+  standalone: true
 })
 export class SettingsComponent implements OnInit
 {

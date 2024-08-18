@@ -16,11 +16,20 @@
 
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
+import {NgForOf} from '@angular/common';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-tab-set',
   templateUrl: './tab-set.component.html',
-  styleUrls: ['./tab-set.component.scss']
+  styleUrls: ['./tab-set.component.scss'],
+  imports: [
+    NgForOf,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet
+  ],
+  standalone: true
 })
 export class TabSetComponent implements OnInit
 {

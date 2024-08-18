@@ -20,7 +20,8 @@ import {AdminService} from '../../services/admin.service';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
+  standalone: true
 })
 export class FooterComponent implements OnInit
 {
