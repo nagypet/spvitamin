@@ -18,20 +18,17 @@ package hu.perit.spvitamin.spring.admin;
 
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
-import hu.perit.spvitamin.spring.config.CryptoProperties;
-import hu.perit.spvitamin.spring.config.JwtProperties;
-import hu.perit.spvitamin.spring.config.MetricsProperties;
-import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
-import hu.perit.spvitamin.spring.config.MicroserviceProperties;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.ServerProperties;
-import hu.perit.spvitamin.spring.config.SwaggerProperties;
-import hu.perit.spvitamin.spring.config.SystemProperties;
+import hu.perit.spvitamin.spring.config.*;
+import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
+import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +40,6 @@ import java.util.Map;
 @AllArgsConstructor
 class StandardServerParameters
 {
-
     private final CryptoProperties cryptoProperties;
     private final JwtProperties jwtProperties;
     private final MetricsProperties metricsProperties;
@@ -76,17 +72,15 @@ class StandardServerParameters
             params.add(ServerParameterList.of(entry.getValue(), "microservices." + entry.getKey()));
         }
 
-        /*
         Environment env = SpringEnvironment.getInstance().get();
 
-        List<ServerParameter> parameter = params.getParameter();
+        List<ServerParameter> parameter = params.getParameters();
         MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
-        StreamSupport.stream(propSrcs.spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource)
-                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
-                .flatMap(Arrays::<String>stream)
-                .forEach(propName -> parameter.add(new ServerParameter("Environment." + propName, env.getProperty(propName), false)));
-        */
+        for (PropertySource<?> propertySource : propSrcs.stream().filter(OriginTrackedMapPropertySource.class::isInstance).toList())
+        {
+            Arrays.stream(((EnumerablePropertySource<?>) propertySource).getPropertyNames())
+                    .forEach(propName -> parameter.add(new ServerParameter(propertySource.getName() + "." + propName, env.getProperty(propName), false)));
+        }
 
         return params;
     }

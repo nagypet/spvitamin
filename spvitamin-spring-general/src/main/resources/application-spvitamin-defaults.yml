@@ -67,8 +67,10 @@ management:
           include: "ping, readinessState"
         liveness:
           include: "ping, livenessState"
+    env:
+      show-values: never
   endpoints:
-    web.exposure.include: health,env,info,metrics,prometheus
+    web.exposure.include: health,info,metrics,prometheus
   health:
     db.enabled: false
     ldap.enabled: false

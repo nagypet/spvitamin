@@ -28,7 +28,7 @@ jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-d
 jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
 jakarta-annotation-api = 'jakarta.annotation:jakarta.annotation-api:3.0.0'
 jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.0'
-jaxb-api = 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+jaxb-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
 jsonwebtoken-api = { module = 'io.jsonwebtoken:jjwt-api', version.ref = 'jsonwebtoken' }
 jsonwebtoken-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jsonwebtoken' }
 jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 'jsonwebtoken' }

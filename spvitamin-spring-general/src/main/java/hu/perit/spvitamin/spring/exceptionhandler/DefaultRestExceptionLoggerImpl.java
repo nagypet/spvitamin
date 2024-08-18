@@ -21,6 +21,7 @@ import hu.perit.spvitamin.core.exception.LogLevel;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
  * customized exception logging. Implement the RestExceptionLogger interface in your application if you need special handling.
  */
 
-@Component
+@Configuration
 @Slf4j
 @ConditionalOnMissingBean(RestExceptionLogger.class)
 public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger

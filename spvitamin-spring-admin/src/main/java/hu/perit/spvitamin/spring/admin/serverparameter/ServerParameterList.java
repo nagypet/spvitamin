@@ -36,8 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class ServerParameterList
 {
-
-    private final List<ServerParameter> parameter = new ArrayList<>();
+    private final List<ServerParameter> parameters = new ArrayList<>();
 
     private static final Set<Class<?>> WRAPPER_TYPES = new HashSet<>();
 
@@ -124,7 +123,7 @@ public class ServerParameterList
                 }
                 catch (Exception e)
                 {
-                    serverParameterList.parameter.add(new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
+                    serverParameterList.parameters.add(new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
                 }
             }
         }
@@ -316,15 +315,15 @@ public class ServerParameterList
 
     public void add(ServerParameter serverParameter)
     {
-        if (this.parameter.stream().noneMatch(i -> i.equals(serverParameter)))
+        if (this.parameters.stream().noneMatch(i -> i.equals(serverParameter)))
         {
-            this.parameter.add(serverParameter);
+            this.parameters.add(serverParameter);
         }
     }
 
 
     public void add(ServerParameterList serverParameterList)
     {
-        serverParameterList.parameter.forEach(this::add);
+        serverParameterList.parameters.forEach(this::add);
     }
 }

@@ -43,7 +43,7 @@ public class ServerParameterProvider
         for (String beanName : beanNames)
         {
             ServerParameterList parameterList = (ServerParameterList) this.applicationContext.getBean(beanName);
-            retval.addAll(parameterList.getParameter());
+            retval.addAll(parameterList.getParameters());
         }
 
         retval.sort(Comparator.<ServerParameter>naturalOrder());

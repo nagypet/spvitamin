@@ -226,7 +226,7 @@ public class SimpleHttpSecurityBuilder
             filters.setAccessible(true);
             try
             {
-                List f = (List) filters.get(this.http);
+                List<?> f = (List) filters.get(this.http);
                 return f.stream().anyMatch(i -> i.toString().contains(filterClass.getName()));
             }
             catch (IllegalAccessException e)
