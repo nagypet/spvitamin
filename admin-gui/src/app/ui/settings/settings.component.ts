@@ -18,8 +18,10 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
-import {NgbAlert} from '@ng-bootstrap/ng-bootstrap';
 import {NgForOf, NgIf} from '@angular/common';
+import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatCard, MatCardModule} from '@angular/material/card';
 
 export class ServerParameter
 {
@@ -40,9 +42,11 @@ export class ServerParameter
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
   imports: [
-    NgbAlert,
     NgForOf,
-    NgIf
+    NgIf,
+    MatButtonModule,
+    MatTooltip,
+    MatCardModule
   ],
   standalone: true
 })

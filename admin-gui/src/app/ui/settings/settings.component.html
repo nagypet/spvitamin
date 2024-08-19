@@ -35,11 +35,17 @@
     </table>
     <hr>
 
-    <button *ngIf="authService.isLoggedIn.value === true" type="button" class="btn btn-outline-primary" (click)="onShutdown()" ngbTooltip="Shuts down the service" placement="right">Shutdown</button>
-    <button *ngIf="authService.isLoggedIn.value !== true" disabled type="button" class="btn btn-outline-primary" (click)="onShutdown()">Shutdown</button>
+    @if(authService.isLoggedIn.value === true) {
+      <button mat-raised-button color="primary" (click)="onShutdown()" matTooltip="Shuts down the service" matTooltipPosition="right">Shutdown</button>
+    } @else {
+      <button mat-raised-button disabled>Shutdown</button>
+    }
 
-    <ngb-alert *ngIf="shutdownIsInProgress === true" style="margin: 10px 0 0 0" [dismissible]="false">Shutting down the service...</ngb-alert>
-
+    @if(shutdownIsInProgress === true) {
+      <mat-card appearance="outlined" class="shutdown-warning">
+        <mat-card-content>Shutting down the service...</mat-card-content>
+      </mat-card>
+    }
   </div>
 
   <div class="row" *ngIf="settings === null">

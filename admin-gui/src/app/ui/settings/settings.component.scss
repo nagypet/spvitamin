@@ -19,7 +19,13 @@ table {
   table-layout:fixed;
   width:100%;
 }
+
 td {
   overflow:hidden;
   word-wrap: break-word;
+}
+
+.shutdown-warning {
+  margin-top: 10px;
+  background-color: var(--app-warn-palette-100);
 }

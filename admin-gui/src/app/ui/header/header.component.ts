@@ -18,12 +18,27 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
-import {Router} from '@angular/router';
+import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {NgIf} from '@angular/common';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatBadge} from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  imports: [
+    NgIf,
+    RouterLink,
+    MatToolbar,
+    RouterLinkActive,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    MatBadge
+  ],
   standalone: true
 })
 export class HeaderComponent implements OnInit

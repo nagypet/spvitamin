@@ -14,25 +14,28 @@
   ~ limitations under the License.
   -->
 
-<nav class="navbar navbar-dark bg-dark mb-sm-3">
-  <a class="navbar-brand" href="/">{{title}}
-    <span class="badge badge-info">{{version}}</span>
+<mat-toolbar color="primary" class="titlebar">
+  <a class="navbar-brand" href="/">{{ title }}
+    <span class="badge">{{ version }}</span>
     <span><img src="assets/sonar-quality-gate-passed.svg" style="margin-left: 10px"></span>
   </a>
-  <div class="navbar-expand mr-auto">
-    <div class="navbar-nav">
-      <!--
-      <a class="nav-item nav-link" routerLink="/settings" routerLinkActive="active">Settings</a>
-      <a class="nav-item nav-link" routerLink="/certificates" routerLinkActive="active">Certificates</a>
-      <a class="nav-item nav-link" routerLink="/login" routerLinkActive="active"><span class="glyphicon glyphicon-log-in"></span>Login</a>
-      -->
-    </div>
+  <div class="titlebar-actions">
+    @if (authService.isAuthenticated() !== true) {
+      <button mat-raised-button routerLink="/admin-gui/login">
+        <mat-icon>login</mat-icon>
+        Login
+      </button>
+    } @else {
+      <span class="titlebar-username text-light">Welcome {{authService.getUserName()}}!</span>
+      <button mat-raised-button (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    }
+    <button mat-raised-button color="primary" routerLink="/admin-gui/about">About</button>
+    <!--    <button *ngIf="authService.isAuthenticated() !== true" type="button" class="btn btn-primary" routerLink="/admin-gui/login"><span class="oi oi-account-login"></span> Login</button>-->
+    <!--    <span *ngIf="authService.isAuthenticated() === true" class="text-light">Welcome {{authService.getUserName()}}!</span>-->
+    <!--    <button *ngIf="authService.isAuthenticated() === true" type="button" class="btn btn-secondary" style="margin: 0 0 0 10px" (click)="onLogout()"><span class="oi oi-account-logout"></span> Logout</button>-->
+    <!--    <a class="nav-item nav-link" routerLink="/admin-gui/about" routerLinkActive="active">About</a>-->
   </div>
-  <form class="form-inline">
-    <button *ngIf="authService.isAuthenticated() !== true" type="button" class="btn btn-primary" routerLink="/admin-gui/login"><span class="oi oi-account-login"></span> Login</button>
-    <span *ngIf="authService.isAuthenticated() === true" class="text-light">Welcome {{authService.getUserName()}}!</span>
-    <button *ngIf="authService.isAuthenticated() === true" type="button" class="btn btn-secondary" style="margin: 0 0 0 10px" (click)="onLogout()"><span class="oi oi-account-logout"></span> Logout</button>
-    <a class="nav-item nav-link" routerLink="/admin-gui/about" routerLinkActive="active">About</a>
-  </form>
-</nav>
-
+</mat-toolbar>

@@ -14,12 +14,58 @@
  * limitations under the License.
  */
 /* You can add global styles to this file, and also import other style files */
-@import 'bootstrap/dist/css/bootstrap.min.css';
+
+@use '@angular/material' as mat;
+@use './app/styles/theme' as ngface;
+@include mat.core();
+
 @import 'ngx-toastr/toastr';
 @import 'open-iconic/font/css/open-iconic-bootstrap.css';
-/*@import 'ngx-toastr/toastr-bs4-alert.scss';*/
 @import "constants";
 
+
+$my-primary: mat.m2-define-palette(mat.$m2-light-blue-palette);
+$my-accent: mat.m2-define-palette(mat.$m2-deep-purple-palette);
+$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$my-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: $my-warn
+  )
+));
+
+@include mat.all-component-themes($my-theme);
+
+@include ngface.set-palette($my-primary, primary);
+@include ngface.set-palette($my-warn, warn);
+
+@import './app/styles/material-design-icons';
+@import './app/styles/ngface-dialog';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+button {
+  margin-right: 20px;
+  max-width: 330px;
+
+  border-radius: 24px !important;
+  border: solid 1px var(--app-primary-palette-900, blue) !important;
+  opacity: 1;
+  transition: opacity ease 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+
+hr {
+  color: var(--app-primary-palette-default);
+}
 
 
 /* NAV panel */
@@ -31,6 +77,16 @@
     display: flex;
     height: 46px;
 
+    li:not(:last-child) {
+      border-left: solid 1px var(--app-primary-palette-default);
+      border-top: solid 1px var(--app-primary-palette-default);
+      border-bottom: solid 1px var(--app-primary-palette-default);
+    }
+
+    li:last-child {
+      border: solid 1px var(--app-primary-palette-default);
+    }
+
     li {
       display: inline-block;
       width: 50%;
@@ -39,22 +95,15 @@
         font-weight: bold;
         text-align: center;
         text-decoration: none;
-        border-right: 1px solid #ffffff;
         transition: all 100ms ease;
-        font-size: 15px;
+        font-size: 16px;
         padding: 4px 0;
         display: block;
         height: 100%;
 
-        &:not(.active) {
-          background-color: var(--perit-light-grey);
-          color: var(--perit-dark-grey);
-          cursor: pointer;
-        }
-
         &.active {
-          background-color: var(--perit-dark-grey);
-          color: white;
+          background-color: var(--app-primary-palette-800);
+          color: var(--app-primary-contrast-800);
           cursor: default;
 
           label {
@@ -62,9 +111,16 @@
           }
         }
 
+        &:not(.active) {
+          //background-color: var(--app-primary-palette-100);
+          background-color: white;
+          color: var(--app-primary-palette-200);
+          cursor: pointer;
+        }
+
         &:not(.active):hover, &:not(.active):focus {
-          background-color: var(--perit-mid-grey);
-          color: black;
+          background-color: var(--app-primary-palette-200);
+          color: var(--app-primary-contrast-200);
           cursor: pointer;
 
           label {

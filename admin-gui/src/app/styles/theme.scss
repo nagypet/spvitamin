@@ -1,0 +1,31 @@
+@use '@angular/material' as mat;
+
+@mixin set-palette($palette, $type) {
+  :root {
+    @each $key in (50, 100, 200, 300, 400, 500, 600, 700, 800, 900, default, darker, lighter) {
+      @if map-has-key($palette, $key) {
+        $cssColor: --app-#{$type}-palette-#{$key};
+        $cssContrastColor: --app-#{$type}-contrast-#{$key};
+        $value: #{mat.m2-get-color-from-palette($palette, $key)};
+        $contrastValue: #{mat.m2-get-contrast-color-from-palette($palette, $key)};
+        @debug "#{$cssColor} : #{$value}";
+        @if (not empty($contrastValue)) {
+          @debug "#{$cssContrastColor} : #{$contrastValue}";
+          #{$cssContrastColor}: #{$contrastValue};
+        }
+        #{$cssColor}: #{$value};
+      }
+    }
+  }
+}
+
+@function empty($value) {
+  @if not $value
+      or $value == ""
+      or $value == 0
+      or $value == ()
+      or length($value) == 0 {
+    @return true;
+  }
+  @return false;
+}

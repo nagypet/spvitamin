@@ -15,52 +15,63 @@
   -->
 
 <div>
-  <div class="row" *ngIf="authService.isAuthenticated() === true">
+  @if (authService.isAuthenticated() === true) {
+    <div class="row">
 
-    <div class="col-sm-6">
-      <h2>Server {{keystoreType}}</h2>
-      <app-keystore [Keystore]="keystoreEntries" (OnDelete)="onDelete($event)"></app-keystore>
-      <hr>
-    </div>
-
-    <div class="col-sm-6">
-      <h2>{{certFileName}}</h2>
-
-      <form *ngIf="isCertFileOpen() !== true" autocomplete="off" spellcheck="false">
-
-        <div class="form-group">
-          <div class="custom-file">
-            <input type="file" #fileInput (change)="onFileSelected($event)" class="custom-file-input" id="inputGroupFile01">
-            <label class="custom-file-label" for="inputGroupFile01">{{certFileName}}</label>
-          </div>
-        </div> <!-- form-group// -->
-
-        <div class="form-group">
-          <label>Optional (public keys do not have password)</label>
-          <input class="form-control" type="password" placeholder="Password" #passwordInput>
-        </div> <!-- form-group// -->
-
+      <div class="col-sm-6">
+        <h2>Server {{ keystoreType }}</h2>
+        <app-keystore [Keystore]="keystoreEntries" (OnDelete)="onDelete($event)"></app-keystore>
         <hr>
+      </div>
 
-        <button type="button" class="btn btn-outline-primary" (click)="onOpen()">Open</button>
+      <div class="col-sm-6">
+        <h2>{{ certFileName }}</h2>
 
-      </form>
+        @if (isCertFileOpen() !== true) {
+          <form autocomplete="off" spellcheck="false">
 
-      <div *ngIf="isCertFileOpen() === true">
-        <app-keystore [Keystore]="certFileEntries" [DeleteAllowed]="false" (Selected)="onCertSelected($event)"></app-keystore>
-        <hr>
-        <button *ngIf="selectedCertFileEntry !== null" type="button" class="btn btn-outline-primary" (click)="onImport()">Import</button>
-        <button type="button" class="btn btn-outline-secondary" (click)="onClose()">Close</button>
+            <input
+              type="file" #fileInput
+              (change)="onFileSelected($event)"
+              style="display: none"
+            >
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
+              Browse
+            </button>
+            <label>{{ certFileName }}</label>
+
+            <hr>
+
+            @if (keystoreType === 'keystore') {
+              <div>
+                <mat-form-field class="password-input">
+                  <mat-label>Password (only for private key)</mat-label>
+                  <input matInput type="password" placeholder="Password" #passwordInput>
+                </mat-form-field>
+              </div>
+            }
+
+            <button mat-raised-button color="primary" (click)="onOpen()">Open</button>
+
+          </form>
+        } @else {
+          <app-keystore [Keystore]="certFileEntries" [DeleteAllowed]="false"
+                        (Selected)="onCertSelected($event)"></app-keystore>
+          <hr>
+          <button mat-raised-button color="primary" *ngIf="selectedCertFileEntry !== null" (click)="onImport()">
+            Import
+          </button>
+          <button mat-raised-button (click)="onClose()">Close</button>
+        }
       </div>
     </div>
-  </div>
-
-  <div class="row" *ngIf="authService.isAuthenticated() !== true">
-    <div class="col-sm-12">
-      <div style="padding: 15px 0 0 0">
-        <p>Please log in!</p>
+  } @else {
+    <div class="row">
+      <div class="col-sm-12">
+        <div style="padding: 15px 0 0 0">
+          <p>Please log in!</p>
+        </div>
       </div>
     </div>
-  </div>
-
-  </div>
+  }
+</div>

@@ -13,6 +13,8 @@ import {TokenInterceptor} from './app/interceptors/token-interceptor';
 import {AuthGuard} from './app/services/auth/auth.guard';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideToastr} from 'ngx-toastr';
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -25,6 +27,8 @@ bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(BrowserModule),
     provideRouter(APP_ROUTES, withHashLocation()),
+    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
+    {provide: MAT_DATE_LOCALE, useValue: 'hu'},
     AuthGuard,
     provideAnimations(),
     provideToastr(),

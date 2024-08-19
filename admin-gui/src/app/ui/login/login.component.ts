@@ -17,14 +17,29 @@
 /* tslint:disable:one-line */
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from '../../services/auth/auth.service';
-import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ErrorService} from '../../services/error.service';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
+import {MatInput, MatInputModule} from '@angular/material/input';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
+import {MatCardModule} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatDialogModule,
+    MatFormField,
+    MatInput,
+    CdkTrapFocus,
+    MatCardModule,
+    MatButton,
+  ],
   standalone: true
 })
 export class LoginComponent implements OnInit
@@ -72,7 +87,7 @@ export class LoginComponent implements OnInit
 
   onKeyPress(event: KeyboardEvent)
   {
-    //console.log("onKeyPress " + event.key);
+    // console.log("onKeyPress " + event.key);
     if (event.key === 'Enter')
     {
       this.onLogin();
