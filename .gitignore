@@ -23,8 +23,7 @@ target/
 
 ### Angular
 node_modules
-admin-gui/dist
-.angular
+AdminGUI/dist
 
 #Others
 .gradle

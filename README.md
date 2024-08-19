@@ -3,14 +3,6 @@
 Vitamin for Spring. A general purpose library for developing spring based microservices. For demonstrating the usage please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
-### 3.3.2-1-RELEASE
-- SpringBoot 3.3.2
-- SpingCloud 2023.0.3
-
-### 3.3.0-1-RELEASE
-- SpringBoot 3.3.0
-- SpingCloud 2023.0.2
-
 ### 3.1.5-2-RELEASE
 - SpringBoot 3.1.5
 - SpingCloud 2022.0.4
@@ -65,22 +57,6 @@ dependencyManagement {
 ```
 
 ## Release history
-
-### 3.3.2-1-RELEASE not yet released
-- Compiled with SpringBoot 3.3.2 and SpingCloud 2023.0.3
-- SpvitaminApplication allows environment initializers
-- /actuator/env disabled
-- jaxb-api updated to jakarta-version
-
-
-### 3.3.0-1-RELEASE not yet released
-- Compiled with SpringBoot 3.3.0 and SpingCloud 2023.0.2
-- FileNameUtils added
-- h2-console must be ebaled in the application specific security config
-- /favicon.ico errors and warnings will not be logged by the DefaultRestExceptionLogger
-- new modul added: spvitamin-test
-- graceful shutdown configured as default
-
 
 ### 3.1.5-3-RELEASE not yet released
 - BatchProcessor: new parameter to disable synchronous execution of the first item
