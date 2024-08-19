@@ -15,10 +15,13 @@
   -->
 
 <div class="my-container">
-<app-header class="my-header"></app-header>
-<div class="my-content container-fluid">
-  <p>Version: {{version}} Build: {{build}}</p>
-  <router-outlet></router-outlet>
-</div>
-<app-footer class="my-footer"></app-footer>
+  <app-header class="my-header"></app-header>
+  <div class="my-content container-fluid">
+    <p>Version: {{ version }} Build: {{ build }}</p>
+    <app-tab-set></app-tab-set>
+    <div class="my-tab-panel">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <app-footer class="my-footer"></app-footer>
 </div>

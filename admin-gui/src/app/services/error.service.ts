@@ -17,7 +17,7 @@
 /* tslint:disable:one-line */
 import {Injectable} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
-import {HttpErrorResponse} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 export interface ErrorObject

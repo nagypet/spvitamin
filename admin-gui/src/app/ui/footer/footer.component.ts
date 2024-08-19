@@ -16,11 +16,16 @@
 
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
+import {MatToolbar} from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
+  imports: [
+    MatToolbar
+  ],
+  standalone: true
 })
 export class FooterComponent implements OnInit
 {

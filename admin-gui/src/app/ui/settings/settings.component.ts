@@ -18,29 +18,31 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
+import {NgForOf, NgIf} from '@angular/common';
+import {MatButtonModule} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatCardModule} from '@angular/material/card';
+import {Spvitamin} from '../../spvitamin-admin-models';
+import ServerParameter = Spvitamin.ServerParameter;
+import ServerSettingsResponse = Spvitamin.ServerSettingsResponse;
 
-export class ServerParameter
-{
-  name: string;
-  value: string;
-  link: boolean;
-
-  constructor(name, value, link)
-  {
-    this.name = name;
-    this.value = value;
-    this.link = link;
-  }
-}
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
+  imports: [
+    NgForOf,
+    NgIf,
+    MatButtonModule,
+    MatTooltip,
+    MatCardModule
+  ],
+  standalone: true
 })
 export class SettingsComponent implements OnInit
 {
-  public settings: Array<ServerParameter> | null = new Array<ServerParameter>();
+  public settings: { [index: string]: ServerParameter[] } | null;
   public shutdownIsInProgress = false;
 
   constructor(
@@ -53,20 +55,12 @@ export class SettingsComponent implements OnInit
 
   ngOnInit()
   {
-    this.adminService.getSettings().subscribe(data =>
+    this.adminService.getSettings().subscribe((data: ServerSettingsResponse) =>
     {
-      this.settings = data;
+      this.settings = data.serverParameters;
     }, error =>
     {
       this.settings = null;
-    });
-
-    this.authService.isLoggedIn.subscribe(value =>
-    {
-      if (!value)
-      {
-        this.settings = null;
-      }
     });
   }
 
@@ -77,5 +71,18 @@ export class SettingsComponent implements OnInit
     {
       this.shutdownIsInProgress = true;
     });
+  }
+
+  getKeys()
+  {
+    if (this.settings)
+    {
+      return Object.keys(this.settings);
+    }
+  }
+
+  getSetting(key: string)
+  {
+    return this.settings[key];
   }
 }

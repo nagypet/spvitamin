@@ -14,3 +14,19 @@
  * limitations under the License.
  */
 
+// Titlebar
+.titlebar {
+  display: flex;
+  overflow: hidden;
+}
+
+
+// Actions
+.titlebar-actions {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.titlebar-username {
+  margin-right: 20px;
+}

@@ -15,11 +15,16 @@
  */
 
 import { Component } from '@angular/core';
+import {LayoutComponent} from './ui/layout/layout.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  imports: [
+    LayoutComponent
+  ],
+  standalone: true
 })
 export class AppComponent {
   title = 'admingui';

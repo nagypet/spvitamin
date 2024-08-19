@@ -14,3 +14,13 @@
  * limitations under the License.
  */
 
+.full-width {
+  width: 100%;
+}
+
+.container {
+  padding: 10px;
+  width: 400px;
+  border: 1px solid var(--app-primary-palette-default)!important;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, .16);
+}
