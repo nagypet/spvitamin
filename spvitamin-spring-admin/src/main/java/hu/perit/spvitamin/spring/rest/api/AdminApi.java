@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.rest.api;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.logging.EventLogId;
+import hu.perit.spvitamin.spring.rest.model.ServerSettingsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,7 +38,7 @@ import java.util.Properties;
  * @author Peter Nagy
  */
 
-@Tag(name = "admin-api-controller", description = "Admin REST API")
+@Tag(name = "admin-api-controller", description = "REST API for use by the admin-gui")
 public interface AdminApi
 {
     String BASE_URL_ADMIN = "/api/spvitamin/admin";
@@ -53,7 +54,7 @@ public interface AdminApi
             }
     )
     @EventLogId(eventId = 1)
-    List<ServerParameter> retrieveServerSettingsUsingGET();
+    ServerSettingsResponse retrieveServerSettingsUsingGET();
 
     @GetMapping(BASE_URL_ADMIN + "/version")
     @Operation(summary = "Retrieve version info",

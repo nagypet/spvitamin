@@ -41,6 +41,7 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-admin')
 
     // Lombok
     compileOnly libs.lombok

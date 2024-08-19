@@ -27,6 +27,8 @@ public @interface ConfigProperty
 {
     String name() default "";
 
+    boolean ignored() default false;
+
     boolean hidden() default false;
 
     boolean link() default false;

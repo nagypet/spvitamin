@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,7 @@ public class AdGroup2RoleMappingProperties {
 
 	@Getter
 	@Setter
+	@ToString
 	public static class RoleMapping {
 
 		private List<String> groups = new ArrayList<>();

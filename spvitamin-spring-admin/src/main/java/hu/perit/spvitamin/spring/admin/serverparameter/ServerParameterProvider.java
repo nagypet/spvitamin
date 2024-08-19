@@ -20,9 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author Peter Nagy
@@ -35,18 +36,16 @@ public class ServerParameterProvider
     @Autowired
     ApplicationContext applicationContext;
 
-    public List<ServerParameter> getServerParameters()
+    public Map<String, Set<ServerParameter>> getServerParameters()
     {
         String[] beanNames = this.applicationContext.getBeanNamesForType(ServerParameterList.class);
 
-        List<ServerParameter> retval = new ArrayList<>();
+        Map<String, Set<ServerParameter>> retval = new TreeMap<>();
         for (String beanName : beanNames)
         {
             ServerParameterList parameterList = (ServerParameterList) this.applicationContext.getBean(beanName);
-            retval.addAll(parameterList.getParameters());
+            retval.putAll(parameterList.getParameters());
         }
-
-        retval.sort(Comparator.<ServerParameter>naturalOrder());
 
         return retval;
     }

@@ -17,7 +17,9 @@
 package hu.perit.spvitamin.spring.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Component;
 public class AdminProperties
 {
     @Autowired
+    @Getter(AccessLevel.NONE)
     private ServerProperties serverProperties;
 
     private String defaultSiteUrl = "/admin-gui";

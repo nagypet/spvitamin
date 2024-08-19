@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rest.api;
+package hu.perit.spvitamin.spring.rest.controller;
 
 import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
 import hu.perit.spvitamin.spring.config.AdminProperties;
 import hu.perit.spvitamin.spring.config.Constants;
-import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.manifest.ManifestReader;
+import hu.perit.spvitamin.spring.rest.api.AdminApi;
+import hu.perit.spvitamin.spring.rest.model.ServerSettingsResponse;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -48,9 +50,12 @@ public class AdminController implements AdminApi
 
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public List<ServerParameter> retrieveServerSettingsUsingGET()
+    public ServerSettingsResponse retrieveServerSettingsUsingGET()
     {
-        return this.serverParameterProvider.getServerParameters();
+        Map<String, Set<ServerParameter>> serverParameters = this.serverParameterProvider.getServerParameters();
+        ServerSettingsResponse serverSettingsResponse = new ServerSettingsResponse();
+        serverSettingsResponse.setServerParameters(serverParameters);
+        return serverSettingsResponse;
     }
 
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rest.api;
+package hu.perit.spvitamin.spring.rest.controller;
 
 import com.google.common.reflect.AbstractInvocationHandler;
 import hu.perit.spvitamin.core.connectablecontext.StringContextKey;
@@ -22,6 +22,7 @@ import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.keystore.KeystoreEntry;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
+import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
 import hu.perit.spvitamin.spring.rest.model.CertificateFile;
 import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSession;
@@ -49,7 +50,8 @@ import java.util.List;
 
 @RestController
 @Slf4j
-public class KeystoreController implements KeystoreApi {
+public class KeystoreController implements KeystoreApi
+{
 
     private final KeystoreApi proxy;
 
