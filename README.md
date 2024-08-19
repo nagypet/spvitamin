@@ -71,6 +71,8 @@ dependencyManagement {
 - SpvitaminApplication allows environment initializers
 - /actuator/env disabled
 - jaxb-api updated to jakarta-version
+- admin-gui updated to Angular 18 and Material design
+- ServerParameterList refactored
 
 
 ### 3.3.0-1-RELEASE not yet released
