@@ -17,7 +17,14 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {NgForOf} from '@angular/common';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {MatTabsModule} from '@angular/material/tabs';
+
+export interface TabDef
+{
+  route: string;
+  title: string;
+}
 
 @Component({
   selector: 'app-tab-set',
@@ -27,21 +34,19 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
     NgForOf,
     RouterLink,
     RouterLinkActive,
-    RouterOutlet
+    RouterOutlet,
+    MatTabsModule
   ],
   standalone: true
 })
 export class TabSetComponent implements OnInit
 {
 
-  tabs: Array<{ route: string, title: string }> = [
-    {route: 'settings', title: 'Settings'},
-    {route: 'keystore-disabled', title: 'Keystore'},
-    {route: 'truststore-disabled', title: 'Truststore'}
-  ];
+  tabs: Array<TabDef> = [];
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    public router: Router
   )
   {
   }
@@ -53,12 +58,21 @@ export class TabSetComponent implements OnInit
       const keystoreAdminEnabled = data.KeystoreAdminEnabled;
       if (keystoreAdminEnabled === 'true')
       {
-        this.tabs = [
-          {route: 'settings', title: 'Settings'},
-          {route: 'keystore', title: 'Keystore'},
-          {route: 'truststore', title: 'Truststore'}
-        ];
+        this.tabs.push({route: 'admin-gui/settings', title: 'Settings'});
+        this.tabs.push({route: 'admin-gui/keystore', title: 'Keystore'});
+        this.tabs.push({route: 'admin-gui/truststore', title: 'Truststore'});
+      }
+      else
+      {
+        this.tabs.push({route: 'admin-gui/settings', title: 'Settings'});
+        this.tabs.push({route: 'admin-gui/keystore-disabled', title: 'Keystore'});
+        this.tabs.push({route: 'admin-gui/truststore-disabled', title: 'Truststore'});
       }
     });
+  }
+
+  isActive(tab)
+  {
+    return `/${tab.route}` === this.router.url;
   }
 }

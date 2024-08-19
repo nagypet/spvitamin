@@ -27,16 +27,11 @@ import {NgModule} from '@angular/core';
 export const APP_ROUTES: Routes = [
   {path: '', redirectTo: 'admin-gui/settings', pathMatch: 'full'},
   {path: 'admin-gui', redirectTo: 'admin-gui/settings', pathMatch: 'full'},
-  {
-    path: 'admin-gui', component: TabSetComponent,
-    children: [
-      {path: 'settings', component: SettingsComponent},
-      {path: 'keystore', component: CertificatesComponent, canActivate: [AuthGuard]},
-      {path: 'truststore', component: CertificatesComponent, canActivate: [AuthGuard]},
-      {path: 'keystore-disabled', component: FunctionDisabledWarningComponent},
-      {path: 'truststore-disabled', component: FunctionDisabledWarningComponent},
-    ],
-  },
+  {path: 'admin-gui/settings', component: SettingsComponent},
+  {path: 'admin-gui/keystore', component: CertificatesComponent, canActivate: [AuthGuard]},
+  {path: 'admin-gui/truststore', component: CertificatesComponent, canActivate: [AuthGuard]},
+  {path: 'admin-gui/keystore-disabled', component: FunctionDisabledWarningComponent},
+  {path: 'admin-gui/truststore-disabled', component: FunctionDisabledWarningComponent},
   {path: 'admin-gui/login', component: LoginComponent},
   {path: 'admin-gui/about', component: AboutComponent},
 ];

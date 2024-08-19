@@ -19,6 +19,7 @@ import {AdminService} from '../../services/admin.service';
 import {HeaderComponent} from '../header/header.component';
 import {RouterOutlet} from '@angular/router';
 import {FooterComponent} from '../footer/footer.component';
+import {TabSetComponent} from '../tab-set/tab-set.component';
 
 @Component({
   selector: 'app-layout',
@@ -27,7 +28,8 @@ import {FooterComponent} from '../footer/footer.component';
   imports: [
     HeaderComponent,
     RouterOutlet,
-    FooterComponent
+    FooterComponent,
+    TabSetComponent
   ],
   standalone: true
 })

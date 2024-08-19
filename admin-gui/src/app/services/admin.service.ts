@@ -20,6 +20,8 @@ import { HttpBackend, HttpClient, HttpUrlEncodingCodec } from '@angular/common/h
 import {Observable} from 'rxjs';
 import {CertificateFile} from '../modell/keystore';
 import {environment} from '../../environments/environment';
+import {Spvitamin} from '../spvitamin-admin-models';
+import ServerSettingsResponse = Spvitamin.ServerSettingsResponse;
 
 
 @Injectable({
@@ -52,9 +54,9 @@ export class AdminService
     return this.http.get(`${environment.baseURL}/api/spvitamin/admin/version`);
   }
 
-  public getSettings(): Observable<any>
+  public getSettings(): Observable<ServerSettingsResponse>
   {
-    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`);
+    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`) as Observable<ServerSettingsResponse>;
   }
 
   public postShutdown(): Observable<any>

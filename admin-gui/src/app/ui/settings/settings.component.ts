@@ -19,23 +19,13 @@ import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../../services/admin.service';
 import {AuthService} from '../../services/auth/auth.service';
 import {NgForOf, NgIf} from '@angular/common';
-import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatButtonModule} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
-import {MatCard, MatCardModule} from '@angular/material/card';
+import {MatCardModule} from '@angular/material/card';
+import {Spvitamin} from '../../spvitamin-admin-models';
+import ServerParameter = Spvitamin.ServerParameter;
+import ServerSettingsResponse = Spvitamin.ServerSettingsResponse;
 
-export class ServerParameter
-{
-  name: string;
-  value: string;
-  link: boolean;
-
-  constructor(name, value, link)
-  {
-    this.name = name;
-    this.value = value;
-    this.link = link;
-  }
-}
 
 @Component({
   selector: 'app-settings',
@@ -65,20 +55,12 @@ export class SettingsComponent implements OnInit
 
   ngOnInit()
   {
-    this.adminService.getSettings().subscribe(data =>
+    this.adminService.getSettings().subscribe((data: ServerSettingsResponse) =>
     {
-      this.settings = data;
+      this.settings = data.serverParameters;
     }, error =>
     {
       this.settings = null;
-    });
-
-    this.authService.isLoggedIn.subscribe(value =>
-    {
-      if (!value)
-      {
-        this.settings = null;
-      }
     });
   }
 

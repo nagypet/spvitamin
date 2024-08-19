@@ -54,10 +54,9 @@ import {NgForOf, NgIf} from '@angular/common';
   ],
   standalone: true
 })
-export class KeystoreComponent implements OnInit, OnChanges
-{
+export class KeystoreComponent implements OnInit, OnChanges {
   @Input('Keystore') keystore: Array<KeystoreEntry>;
-  @Input('DeleteAllowed') deleteAllowed: boolean = true;
+  @Input('DeleteAllowed') deleteAllowed = true;
   @Output('Selected') certSelected = new EventEmitter<KeystoreEntry>();
   @Output('OnDelete') onDeleteEmitter = new EventEmitter<string>();
 
@@ -65,66 +64,52 @@ export class KeystoreComponent implements OnInit, OnChanges
 
   constructor(
     public authService: AuthService
-  )
-  {
+  ) {
   }
 
-  ngOnInit()
-  {
+  ngOnInit() {
   }
 
-  onSelectEntry(entry: KeystoreEntry)
-  {
+  onSelectEntry(entry: KeystoreEntry) {
     this.selected = entry;
     this.certSelected.emit(entry);
   }
 
-  isEntrySelected(entry: KeystoreEntry): boolean
-  {
-    if (this.selected == null)
-    {
+  isEntrySelected(entry: KeystoreEntry): boolean {
+    if (this.selected == null) {
       return false;
     }
     return (entry.alias === this.selected.alias);
   }
 
-  onSelectCert(entry: CertInfo)
-  {
+  onSelectCert(entry: CertInfo) {
   }
 
-  isCertSelected(entry: CertInfo): boolean
-  {
+  isCertSelected(entry: CertInfo): boolean {
     return false;
   }
 
-  ngOnChanges(changes: SimpleChanges): void
-  {
-    if (this.keystore.length === 0)
-    {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.keystore.length === 0) {
       this.selected = null;
     }
   }
 
-  getClass(entry: KeystoreEntry)
-  {
+  getClass(entry: KeystoreEntry) {
     let classes = 'list-group-item list-group-item-action d-flex justify-content-between';
 
-    if (entry.inUse === true)
-    {
+    if (entry.inUse === true) {
       classes += ' list-group-item-primary';
-    } else if (entry.valid !== true)
-    {
+    } else if (entry.valid !== true) {
       classes += ' list-group-item-warning';
-    } else
-    {
+    } else {
       classes += ' list-group-item-light';
     }
 
     return classes;
   }
 
-  onDelete(entry: KeystoreEntry)
-  {
+  onDelete(entry: KeystoreEntry) {
     // TODO
     //   const modalRef = this.modalService.open(NgbdModalContent, {centered: true});
     //   modalRef.componentInstance.name = entry.alias;

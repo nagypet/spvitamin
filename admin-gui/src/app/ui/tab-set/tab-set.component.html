@@ -15,20 +15,17 @@
   -->
 
 <div class="main-container">
-  <div class="row">
-    <div class="col-lg-12">
-      <nav class="nav-panel mb-3">
-        <ul>
-          <li *ngFor="let item of tabs">
-            <a [routerLink]="item.route"
-               [routerLinkActive]="item.route ? 'active' : ''">
-              <label class="w-100 mb-0" [innerText]="item.title"></label>
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <router-outlet></router-outlet>
-    </div>
-  </div>
+
+  <nav mat-tab-nav-bar [tabPanel]="tabPanel" animationDuration="200ms">
+    @for (tab of tabs; track tab) {
+      <a mat-tab-link
+         [routerLink]="tab.route"
+         [routerLinkActive]="tab.route ? 'active' : ''"
+         [active]="isActive(tab)"
+      >{{ tab.title }}
+      </a>
+    }
+  </nav>
+  <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 

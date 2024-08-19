@@ -15,7 +15,7 @@
  */
 
 /* tslint:disable:one-line */
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
@@ -39,15 +39,9 @@ export class ErrorInterceptor implements HttpInterceptor
         {
           console.error(error);
 
-          if (error.status === 401)
+          if (error.status !== 200)
           {
-            this.authService.handleAuthError(error);
-          } else
-          {
-            if (error.status !== 200)
-            {
-              this.errorService.handleError(error);
-            }
+            this.errorService.handleError(error);
           }
 
           return throwError(error);

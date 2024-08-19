@@ -15,45 +15,48 @@
   -->
 
 <div>
-  <div *ngIf="settings !== null">
+  @if (settings !== null) {
+    <div>
 
-    <h2>Server settings</h2>
-    <table class="table table-sm table-striped">
-      <thead class="thead-dark">
+      <h2>Server settings</h2>
+      <table class="table table-sm table-striped">
+        <thead class="thead-dark">
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Value</th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         <tr *ngFor="let setting of settings">
-          <th scope="row">{{setting.name}}</th>
-          <td *ngIf="setting.link === true"><a href="{{setting.value}}" target="_blank">{{setting.value}}</a></td>
-          <td *ngIf="setting.link !== true">{{setting.value}}</td>
+          <th scope="row">{{ setting.name }}</th>
+          <td *ngIf="setting.link === true"><a href="{{setting.value}}" target="_blank">{{ setting.value }}</a></td>
+          <td *ngIf="setting.link !== true">{{ setting.value }}</td>
         </tr>
-      </tbody>
-    </table>
-    <hr>
+        </tbody>
+      </table>
+      <hr>
 
-    @if(authService.isLoggedIn.value === true) {
-      <button mat-raised-button color="primary" (click)="onShutdown()" matTooltip="Shuts down the service" matTooltipPosition="right">Shutdown</button>
-    } @else {
-      <button mat-raised-button disabled>Shutdown</button>
-    }
+      @if (authService.isLoggedIn.value === true) {
+        <button mat-raised-button color="primary" (click)="onShutdown()" matTooltip="Shuts down the service"
+                matTooltipPosition="right">Shutdown
+        </button>
+      } @else {
+        <button mat-raised-button disabled>Shutdown</button>
+      }
 
-    @if(shutdownIsInProgress === true) {
-      <mat-card appearance="outlined" class="shutdown-warning">
-        <mat-card-content>Shutting down the service...</mat-card-content>
-      </mat-card>
-    }
-  </div>
-
-  <div class="row" *ngIf="settings === null">
-    <div class="col-sm-12">
-      <div style="padding: 15px 0 0 0">
-        <p>Please log in!</p>
+      @if (shutdownIsInProgress === true) {
+        <mat-card appearance="outlined" class="shutdown-warning">
+          <mat-card-content>Shutting down the service...</mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <div class="row">
+      <div class="col-sm-12">
+        <div style="padding: 15px 0 0 0">
+          <p>Please log in!</p>
+        </div>
       </div>
     </div>
-  </div>
-
+  }
 </div>
