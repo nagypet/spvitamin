@@ -11,15 +11,12 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": {
-              "base": "dist/admingui"
-            },
+            "outputPath": "dist/admingui",
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -28,13 +25,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
-            "aot": false,
-            "extractLicenses": false,
-            "sourceMap": true,
-            "optimization": false,
-            "namedChunks": true,
-            "browser": "src/main.ts"
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -47,13 +38,14 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
+              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
               "baseHref": "./",
-              "outputPath": {
-                "base": "dist/admingui"
-              },
+              "outputPath": "dist/admingui",
               "budgets": [
                 {
                   "type": "initial",
@@ -62,25 +54,24 @@
                 }
               ]
             }
-          },
-          "defaultConfiguration": ""
+          }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "proxy.conf.js",
-            "buildTarget": "admingui:build"
+            "browserTarget": "admingui:build",
+            "proxyConfig": "src/proxy.conf.js"
           },
           "configurations": {
             "production": {
-              "buildTarget": "admingui:build:production"
+              "browserTarget": "admingui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "admingui:build"
+            "browserTarget": "admingui:build"
           }
         },
         "test": {
@@ -97,6 +88,18 @@
             "assets": [
               "src/favicon.ico",
               "src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
             ]
           }
         }
@@ -118,10 +121,20 @@
               "devServerTarget": "admingui:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
         }
       }
     }
   },
+  "defaultProject": "admingui",
   "cli": {
     "analytics": false
   }
