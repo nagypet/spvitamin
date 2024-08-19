@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2024-08-19 08:11:08.
+// Generated using typescript-generator version 3.2.1263 on 2024-08-19 13:46:31.
 
 export namespace Spvitamin {
 
@@ -15,7 +15,7 @@ export namespace Spvitamin {
     }
 
     export interface ServerSettingsResponse {
-        serverParameters: ServerParameter[];
+        serverParameters: { [index: string]: ServerParameter[] };
     }
 
     export interface ServerParameter extends Comparable<ServerParameter> {

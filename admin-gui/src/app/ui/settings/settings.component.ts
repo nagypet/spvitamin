@@ -42,7 +42,7 @@ import ServerSettingsResponse = Spvitamin.ServerSettingsResponse;
 })
 export class SettingsComponent implements OnInit
 {
-  public settings: Array<ServerParameter> | null = new Array<ServerParameter>();
+  public settings: { [index: string]: ServerParameter[] } | null;
   public shutdownIsInProgress = false;
 
   constructor(
@@ -71,5 +71,18 @@ export class SettingsComponent implements OnInit
     {
       this.shutdownIsInProgress = true;
     });
+  }
+
+  getKeys()
+  {
+    if (this.settings)
+    {
+      return Object.keys(this.settings);
+    }
+  }
+
+  getSetting(key: string)
+  {
+    return this.settings[key];
   }
 }
