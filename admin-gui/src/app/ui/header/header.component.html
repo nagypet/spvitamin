@@ -21,17 +21,17 @@
   </a>
   <div class="titlebar-actions">
     @if (authService.isAuthenticated() !== true) {
-      <button mat-raised-button routerLink="/admin-gui/login">
+      <button mat-raised-button  class="titlebar-button" routerLink="/admin-gui/login">
         <mat-icon>login</mat-icon>
         Login
       </button>
     } @else {
       <span class="titlebar-username text-light">Welcome {{authService.getUserName()}}!</span>
-      <button mat-raised-button (click)="onLogout()">
+      <button mat-raised-button class="titlebar-button" (click)="onLogout()">
         <mat-icon>logout</mat-icon>
         Logout
       </button>
     }
-    <button mat-raised-button color="primary" routerLink="/admin-gui/about">About</button>
+    <button mat-raised-button color="primary"  class="titlebar-button" routerLink="/admin-gui/about">About</button>
   </div>
 </mat-toolbar>

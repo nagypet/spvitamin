@@ -57,9 +57,11 @@
         <app-keystore [Keystore]="certFileEntries" [DeleteAllowed]="false"
                       (Selected)="onCertSelected($event)"></app-keystore>
         <hr>
-        <button mat-raised-button color="primary" *ngIf="selectedCertFileEntry !== null" (click)="onImport()">
-          Import
-        </button>
+        @if (selectedCertFileEntry !== null) {
+          <button mat-raised-button color="primary" (click)="onImport()">
+            Import
+          </button>
+        }
         <button mat-raised-button (click)="onClose()">Close</button>
       }
     </div>
