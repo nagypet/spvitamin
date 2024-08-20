@@ -77,9 +77,13 @@ public class ConnectionParam extends DatasourceProperties
 
     public String getPassword()
     {
-        CryptoUtil crypto = new CryptoUtil();
+        if (StringUtils.isNotBlank(this.encryptedPassword))
+        {
+            CryptoUtil crypto = new CryptoUtil();
+            return crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), this.encryptedPassword);
+        }
 
-        return crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), this.getEncryptedPassword());
+        return this.password;
     }
 
     public String getJdbcUrl()

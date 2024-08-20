@@ -48,6 +48,7 @@ public class DatasourceProperties
     @NotNull
     @ConfigProperty(hidden = true)
     protected String encryptedPassword;
+    protected String password;
     protected String dialect;
     protected Integer maxPoolSize = 10;
     protected String connectionInitSql;

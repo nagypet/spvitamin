@@ -20,6 +20,8 @@ import com.netflix.appinfo.EurekaInstanceConfig;
 import com.netflix.discovery.EurekaClientConfig;
 import com.netflix.eureka.EurekaServerConfig;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilder;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
@@ -33,21 +35,21 @@ class EurekaServerParameters
     @Bean(name = "EurekaServerParameters")
     public ServerParameterList getParameterList()
     {
-        ServerParameterList params = new ServerParameterList();
+        ServerParameterList params = new ServerParameterListImpl();
 
         if (SpringContext.isBeanAvailable(EurekaInstanceConfig.class)) {
             EurekaInstanceConfig eurekaInstanceConfig = SpringContext.getBean(EurekaInstanceConfig.class);
-            params.add(ServerParameterList.of(eurekaInstanceConfig));
+            params.add(ServerParameterListBuilder.of(eurekaInstanceConfig));
         }
 
         if (SpringContext.isBeanAvailable(EurekaClientConfig.class)) {
             EurekaClientConfig eurekaClientConfig = SpringContext.getBean(EurekaClientConfig.class);
-            params.add(ServerParameterList.of(eurekaClientConfig));
+            params.add(ServerParameterListBuilder.of(eurekaClientConfig));
         }
 
         if (SpringContext.isBeanAvailable(EurekaServerConfig.class)) {
             EurekaServerConfig eurekaServerConfig = SpringContext.getBean(EurekaServerConfig.class);
-            params.add(ServerParameterList.of(eurekaServerConfig));
+            params.add(ServerParameterListBuilder.of(eurekaServerConfig));
         }
 
         return params;

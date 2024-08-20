@@ -24,6 +24,7 @@ import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilte
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -199,6 +200,14 @@ public class SimpleHttpSecurityBuilder
     public SimpleHttpSecurityBuilder allowFrames() throws Exception
     {
         this.http.headers(i -> i.frameOptions(j -> j.sameOrigin()));
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder h2() throws Exception
+    {
+        allowFrames();
+        this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
         return this;
     }
 

@@ -73,12 +73,14 @@ dependencyManagement {
 - jaxb-api updated to jakarta-version
 - admin-gui updated to Angular 18 and Material design
 - ServerParameterList refactored
+- DataSourceProperties: support for unencrypted password
+- SimpleHttpSecurityBuilder support for authentication h2 endpoints
 
 
 ### 3.3.0-1-RELEASE not yet released
 - Compiled with SpringBoot 3.3.0 and SpingCloud 2023.0.2
 - FileNameUtils added
-- h2-console must be ebaled in the application specific security config
+- h2-console must be enabled in the application specific security config
 - /favicon.ico errors and warnings will not be logged by the DefaultRestExceptionLogger
 - new modul added: spvitamin-test
 - graceful shutdown configured as default
