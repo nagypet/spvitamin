@@ -24,7 +24,6 @@ import hu.perit.spvitamin.spring.config.*;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import hu.perit.spvitamin.spring.rolemapper.AdGroup2RoleMappingProperties;
 import hu.perit.spvitamin.spring.rolemapper.Role2PermissionMappingProperties;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
@@ -79,8 +78,12 @@ class StandardServerParameters
         params.add(ServerParameterListBuilder.of(this.serverProperties));
         params.add(ServerParameterListBuilder.of(this.jacksonProperties));
         params.add(ServerParameterListBuilder.of(this.adminProperties));
-        params.add(ServerParameterListBuilder.of(this.localUserProperties));
         params.add(ServerParameterListBuilder.of(this.role2PermissionMappingProperties));
+
+        for (Map.Entry<String, LocalUserProperties.User> entry : this.localUserProperties.getLocaluser().entrySet())
+        {
+            params.add("Local users", new ServerParameter(entry.getKey(), "", false));
+        }
 
         for (Map.Entry<String, AdGroup2RoleMappingProperties.RoleMapping> entry : this.adGroup2RoleMappingProperties.getRoles().entrySet())
         {

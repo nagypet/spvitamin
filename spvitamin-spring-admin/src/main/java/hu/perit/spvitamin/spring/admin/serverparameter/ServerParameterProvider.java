@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author Peter Nagy
@@ -40,14 +38,14 @@ public class ServerParameterProvider
     {
         String[] beanNames = this.applicationContext.getBeanNamesForType(ServerParameterList.class);
 
-        Map<String, Set<ServerParameter>> retval = new TreeMap<>();
+        ServerParameterList serverParameterList = new ServerParameterListImpl();
         for (String beanName : beanNames)
         {
             ServerParameterList parameterList = (ServerParameterList) this.applicationContext.getBean(beanName);
-            retval.putAll(parameterList.getParameters());
+            serverParameterList.add(parameterList);
         }
 
-        return retval;
+        return serverParameterList.getParameters();
     }
 
 }
