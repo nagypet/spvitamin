@@ -88,6 +88,12 @@ public class ConnectionParam extends DatasourceProperties
 
     public String getJdbcUrl()
     {
+        if (StringUtils.isNotBlank(jdbcUrl))
+        {
+            log.info(this.jdbcUrl);
+            return this.jdbcUrl;
+        }
+
         //jdbc:sqlserver://localhost;databaseName=FLC_DB;socketTimeout=10000
         //jdbc:mysql://192.168.1.7:3306/lms
         //jdbc:oracle:thin:@192.168.7.25:1521/XE

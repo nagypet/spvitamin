@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.data.config;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 
 import hu.perit.spvitamin.spring.config.ConfigProperty;
@@ -35,6 +36,7 @@ import lombok.ToString;
 public class DatasourceProperties
 {
 
+    protected String jdbcUrl;
     protected String dbType = "sqlserver";
     protected String host = "localhost";
     protected String instance;

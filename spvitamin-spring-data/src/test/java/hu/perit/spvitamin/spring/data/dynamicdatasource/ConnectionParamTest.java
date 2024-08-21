@@ -67,4 +67,15 @@ class ConnectionParamTest
         String jdbcUrl = connectionParam.getJdbcUrl();
         assertThat(jdbcUrl).isEqualTo("jdbc:oracle:thin:@db_host:1521/test");
     }
+
+
+    @Test
+    void testNativeJdbc()
+    {
+        DatasourceProperties properties = new DatasourceProperties();
+        properties.setJdbcUrl("jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = server-host)(PORT = 1521))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = service-name)))");
+        ConnectionParam connectionParam = new ConnectionParam(properties);
+        String jdbcUrl = connectionParam.getJdbcUrl();
+        assertThat(jdbcUrl).isEqualTo("jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = server-host)(PORT = 1521))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = service-name)))");
+    }
 }
