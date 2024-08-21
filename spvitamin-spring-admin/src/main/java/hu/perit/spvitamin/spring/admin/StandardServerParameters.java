@@ -25,6 +25,7 @@ import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import hu.perit.spvitamin.spring.rolemapper.AdGroup2RoleMappingProperties;
 import hu.perit.spvitamin.spring.rolemapper.Role2PermissionMappingProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
@@ -43,6 +44,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 class StandardServerParameters
 {
     public static final String LINKS = "1-Links";
@@ -95,20 +97,27 @@ class StandardServerParameters
             params.add(ServerParameterListBuilder.of(entry.getValue(), "microservices." + entry.getKey()));
         }
 
-        Environment env = SpringEnvironment.getInstance().get();
-
-        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
-        for (PropertySource<?> propertySource : propSrcs.stream().filter(OriginTrackedMapPropertySource.class::isInstance).toList())
+        try
         {
-            Arrays.stream(((EnumerablePropertySource<?>) propertySource).getPropertyNames())
-                    .forEach(propName -> {
-                        String propValue = env.getProperty(propName);
-                        if (isSecret(propName))
-                        {
-                            propValue = "*** [hidden]";
-                        }
-                        params.add("2-" + propertySource.getName(), new ServerParameter(propName, propValue, false));
-                    });
+            Environment env = SpringEnvironment.getInstance().get();
+
+            MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+            for (PropertySource<?> propertySource : propSrcs.stream().filter(OriginTrackedMapPropertySource.class::isInstance).toList())
+            {
+                Arrays.stream(((EnumerablePropertySource<?>) propertySource).getPropertyNames())
+                        .forEach(propName -> {
+                            String propValue = env.getProperty(propName);
+                            if (isSecret(propName))
+                            {
+                                propValue = "*** [hidden]";
+                            }
+                            params.add("2-" + propertySource.getName(), new ServerParameter(propName, propValue, false));
+                        });
+            }
+        }
+        catch (RuntimeException e)
+        {
+            log.warn(e.toString());
         }
 
         return params;
