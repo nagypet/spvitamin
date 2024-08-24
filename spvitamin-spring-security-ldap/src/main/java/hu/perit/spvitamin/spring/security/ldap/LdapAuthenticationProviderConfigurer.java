@@ -20,6 +20,8 @@ import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +30,13 @@ import java.util.Map;
 
 @Slf4j
 @Getter
-@Component
+@Configuration
 @RequiredArgsConstructor
 public class LdapAuthenticationProviderConfigurer
 {
     public static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
     private final LdapCollectionProperties ldapCollectionProperties;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
 
     public void configure(HttpSecurity http)
@@ -58,6 +61,7 @@ public class LdapAuthenticationProviderConfigurer
                 provider.setContextEnvironmentProperties(ctxEnvironmentProps);
 
                 http.authenticationProvider(provider);
+                this.authenticationManagerBuilder.authenticationProvider(provider);
             }
         }
     }
