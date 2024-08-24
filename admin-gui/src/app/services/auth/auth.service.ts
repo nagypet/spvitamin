@@ -15,13 +15,14 @@
  */
 
 /* tslint:disable:one-line */
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AuthToken} from './token-model';
 import {ErrorService} from '../error.service';
 import {CookieService} from 'ngx-cookie-service';
 import {environment} from '../../../environments/environment';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class AuthService
 
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
-              private errorService: ErrorService
+              private toastrService: ToastrService
   )
   {
   }
@@ -93,7 +94,7 @@ export class AuthService
     {
       if (withWarning)
       {
-        this.errorService.warningToast('Munkamenete lejárt!', 'Kérjük jelentkezzen be újra!');
+        this.toastrService.warning('Kérjük jelentkezzen be újra!', 'Munkamenete lejárt!');
       }
       this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).subscribe(res => console.log(res));
       this.cleanUpSessionStorage();
@@ -147,7 +148,7 @@ export class AuthService
       console.log('time until expire', tokenValidSeconds);
       if (withInfo)
       {
-        this.errorService.successToast('Bejelentkezés sikeres!', `Munkamenet érvényesség: ${tokenValidMinutes} perc`);
+        this.toastrService.success(`Munkamenet érvényesség: ${tokenValidMinutes} perc`, 'Bejelentkezés sikeres!');
       }
     }
     this.isLoggedIn.next(true);
@@ -170,7 +171,8 @@ export class AuthService
     {
       this.isLoggedIn.next(true);
       return token;
-    } else
+    }
+    else
     {
       this.logout(true);
       return undefined;

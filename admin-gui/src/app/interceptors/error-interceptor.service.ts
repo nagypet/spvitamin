@@ -27,7 +27,7 @@ import {ErrorService} from '../services/error.service';
 export class ErrorInterceptor implements HttpInterceptor
 {
 
-  constructor(private authService: AuthService, private errorService: ErrorService)
+  constructor(private errorService: ErrorService)
   {
   }
 
@@ -39,12 +39,11 @@ export class ErrorInterceptor implements HttpInterceptor
         {
           console.error(error);
 
-          if (error.status !== 200)
+          if (error.status !== 401)
           {
             this.errorService.handleError(error);
           }
-
-          return throwError(error);
+          return throwError(() => error);
         })
       );
   }

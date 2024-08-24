@@ -25,6 +25,7 @@ import {MatInput, MatInputModule} from '@angular/material/input';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {MatCardModule} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -53,7 +54,7 @@ export class LoginComponent implements OnInit
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private errorService: ErrorService
+    private toastrService: ToastrService
   )
   {
   }
@@ -73,7 +74,7 @@ export class LoginComponent implements OnInit
       this.router.navigateByUrl(this.returnUrl);
     }, error =>
     {
-      this.errorService.errorToast('', 'Invalid username or password!');
+      this.toastrService.error('Invalid username or password!', '');
     });
 
   }
@@ -91,7 +92,8 @@ export class LoginComponent implements OnInit
     if (event.key === 'Enter')
     {
       this.onLogin();
-    } else if (event.key === 'Escape')
+    }
+    else if (event.key === 'Escape')
     {
       this.onCancel();
     }

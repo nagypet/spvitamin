@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { Component } from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {LayoutComponent} from './ui/layout/layout.component';
+import {DeviceTypeService} from './services/device-type.service';
 
 @Component({
   selector: 'app-root',
@@ -28,4 +29,20 @@ import {LayoutComponent} from './ui/layout/layout.component';
 })
 export class AppComponent {
   title = 'admingui';
+
+  constructor(public deviceTypeService: DeviceTypeService)
+  {
+  }
+
+  ngOnInit(): void
+  {
+    this.onWindowResize();
+  }
+
+
+  @HostListener('window:resize', ['$event'])
+  onWindowResize(): void
+  {
+    this.deviceTypeService.calculateDeviceType();
+  }
 }

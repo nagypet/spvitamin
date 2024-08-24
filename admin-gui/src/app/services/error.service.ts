@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-/* tslint:disable:one-line */
 import {Injectable} from '@angular/core';
-import {ToastrService} from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
-
-
-export interface ErrorObject
-{
-  httpError: HttpErrorResponse;
-  timestamp: Date;
-}
+import {HttpErrorResponse} from '@angular/common/http';
+import {BehaviorSubject} from 'rxjs';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {DeviceTypeService} from './device-type.service';
+import {NgfaceErrorDialogComponent} from '../ui/dialogs/ngface-error-dialog/ngface-error-dialog.component';
 
 
 @Injectable({
@@ -32,36 +27,47 @@ export interface ErrorObject
 })
 export class ErrorService
 {
-  constructor(private toastr: ToastrService)
+  private currentError: BehaviorSubject<HttpErrorResponse | undefined> = new BehaviorSubject<HttpErrorResponse | undefined>(undefined);
+  private dialogRef?: MatDialogRef<any>;
+
+  constructor(public dialog: MatDialog, private deviceTypeService: DeviceTypeService
+  )
   {
   }
 
-  errorToast(title: string, message: string): void
-  {
-    this.toastr.error(message, title);
-  }
-
-
-  warningToast(title: string, message: string): void
-  {
-    this.toastr.warning(message, title);
-  }
-
-
-  infoToast(title: string, message: string): void
-  {
-    this.toastr.info(message, title);
-  }
-
-
-  successToast(title: string, message: string): void
-  {
-    this.toastr.success(message, title);
-  }
 
   handleError(error: HttpErrorResponse): void
   {
-    this.toastr.error(error.error, error.statusText);
+    this.currentError.next(error);
+    if (!this.dialogRef)
+    {
+      this.dialogRef = this.dialog.open(NgfaceErrorDialogComponent, {
+        minWidth: this.getErrorDialogWidth(),
+        data: this.currentError,
+        backdropClass: 'ngface-modal-dialog-backdrop'
+      });
+    }
   }
 
+
+  private getErrorDialogWidth(): string
+  {
+    if (this.deviceTypeService.deviceType === 'Desktop')
+    {
+      return '800px';
+    }
+
+    if (this.deviceTypeService.deviceType === 'Tablet')
+    {
+      return Math.min(800, this.deviceTypeService.width * 0.8).toString() + 'px';
+    }
+
+    return this.deviceTypeService.width.toString() + 'px';
+  }
+
+
+  errorDialogClosing(): void
+  {
+    this.dialogRef = undefined;
+  }
 }

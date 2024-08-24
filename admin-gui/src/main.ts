@@ -15,6 +15,7 @@ import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideToastr} from 'ngx-toastr';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {ErrorInterceptor} from './app/interceptors/error-interceptor.service';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -36,6 +37,11 @@ bootstrapApplication(AppComponent, {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
       multi: true
     },
 
