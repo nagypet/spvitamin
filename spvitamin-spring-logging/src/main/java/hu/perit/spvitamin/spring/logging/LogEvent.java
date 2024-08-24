@@ -16,11 +16,11 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class LogEvent
@@ -35,8 +35,14 @@ public class LogEvent
     private int eventId;
     private String eventText;
     private String parameters;
+    private Map<String, Object> options;
 
     public static LogEvent of(String traceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn)
+    {
+        return of(traceId, subsystem, ipAddress, hostname, username, eventID, eventText, subject, isDirectionIn, null);
+    }
+
+    public static LogEvent of(String traceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options)
     {
         LogEvent logEvent = new LogEvent();
         logEvent.setEventTime(LocalDateTime.now());
@@ -49,6 +55,7 @@ public class LogEvent
         logEvent.setEventId(eventID);
         logEvent.setEventText(eventText);
         logEvent.setParameters(subject);
+        logEvent.setOptions(options);
 
         return logEvent;
     }

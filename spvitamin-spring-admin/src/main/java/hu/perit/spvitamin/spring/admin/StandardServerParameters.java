@@ -22,8 +22,8 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilde
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.*;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
-import hu.perit.spvitamin.spring.rolemapper.AdGroup2RoleMappingProperties;
-import hu.perit.spvitamin.spring.rolemapper.Role2PermissionMappingProperties;
+import hu.perit.spvitamin.spring.config.RoleMappingProperties;
+import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +60,7 @@ class StandardServerParameters
     private final SwaggerProperties swaggerProperties;
     private final AdminProperties adminProperties;
     private final LocalUserProperties localUserProperties;
-    private final AdGroup2RoleMappingProperties adGroup2RoleMappingProperties;
+    private final RoleMappingProperties roleMappingProperties;
     private final Role2PermissionMappingProperties role2PermissionMappingProperties;
 
     @Bean(name = "StandardServerParameters")
@@ -87,7 +87,7 @@ class StandardServerParameters
             params.add("Local users", new ServerParameter(entry.getKey(), "", false));
         }
 
-        for (Map.Entry<String, AdGroup2RoleMappingProperties.RoleMapping> entry : this.adGroup2RoleMappingProperties.getRoles().entrySet())
+        for (Map.Entry<String, RoleMappingProperties.RoleMapping> entry : this.roleMappingProperties.getRoles().entrySet())
         {
             params.add(getRoleMappingGroupName(entry.getKey()), ServerParameterListBuilder.of(entry.getValue()));
         }
@@ -125,7 +125,7 @@ class StandardServerParameters
 
     private static String getRoleMappingGroupName(String role)
     {
-        return MessageFormat.format("{0}: {1}", AdGroup2RoleMappingProperties.RoleMapping.class.getSimpleName(), role);
+        return MessageFormat.format("{0}: {1}", RoleMappingProperties.RoleMapping.class.getSimpleName(), role);
     }
 
     private static boolean isSecret(String propName)

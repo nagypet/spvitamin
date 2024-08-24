@@ -16,9 +16,10 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter;
 
+import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
-import hu.perit.spvitamin.spring.rolemapper.AdGroupRoleMapper;
-import hu.perit.spvitamin.spring.rolemapper.Role2PermissionMappingProperties;
+import hu.perit.spvitamin.spring.rolemapper.RoleMapperService;
+import hu.perit.spvitamin.spring.rolemapper.RoleMapperServiceImpl;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import jakarta.servlet.FilterChain;
@@ -26,9 +27,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -60,8 +64,8 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
             if (!authenticatedUser.isAnonymous())
             {
 
-                AdGroupRoleMapper mapper = SpringContext.getBean(AdGroupRoleMapper.class);
-                AuthenticatedUser authenticatedUserWithRoles = mapper.mapGrantedAuthorities(authenticatedUser);
+                RoleMapperService mapperService = SpringContext.getBean(RoleMapperServiceImpl.class);
+                AuthenticatedUser authenticatedUserWithRoles = mapperService.mapGrantedAuthorities(authenticatedUser);
 
                 log.debug(String.format("Mapping roles => privileges for authenticated user: '%s'", authenticatedUserWithRoles.toString()));
 
@@ -81,26 +85,25 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
 
             filterChain.doFilter(request, response);
         }
-        // 2023-12-28: I cannot remember anymore, why this block is here?
-//        catch (AuthenticationException ex)
-//        {
-//            SecurityContextHolder.clearContext();
-//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-//            if (resolver.resolveException(request, response, null, ex) == null)
-//            {
-//                throw ex;
-//            }
-//        }
-//        catch (Exception ex)
-//        {
-//            SecurityContextHolder.clearContext();
-//            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-//            if (resolver.resolveException(request, response, null,
-//                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
-//            {
-//                throw ex;
-//            }
-//        }
+        catch (AuthenticationException ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null, ex) == null)
+            {
+                throw ex;
+            }
+        }
+        catch (Exception ex)
+        {
+            SecurityContextHolder.clearContext();
+            HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+            if (resolver.resolveException(request, response, null,
+                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            {
+                throw ex;
+            }
+        }
         finally
         {
             authorizationService.setAuthenticatedUser(null);

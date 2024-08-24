@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.rolemapper;
+package hu.perit.spvitamin.spring.config;
 
 import java.util.HashMap;
 import java.util.List;

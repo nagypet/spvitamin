@@ -27,7 +27,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Simple Reflection Utility
@@ -51,7 +50,7 @@ public class ReflectionUtils
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
                 .filter(method -> isGetter(method) && isNonStatic(method) && isAccesible(method))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -67,7 +66,7 @@ public class ReflectionUtils
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
                 .filter(method -> isSetter(method) && isNonStatic(method) && isAccesible(method))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -83,7 +82,7 @@ public class ReflectionUtils
         Field[] fields = BooleanUtils.isTrue(includePrivate) ? clazz.getDeclaredFields() : clazz.getFields();
         return Arrays.stream(fields)
                 .filter(field -> isNonStatic(field) && isAccesible(field))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
