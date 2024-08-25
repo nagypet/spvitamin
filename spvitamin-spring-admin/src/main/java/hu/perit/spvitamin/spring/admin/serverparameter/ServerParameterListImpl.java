@@ -105,9 +105,12 @@ public class ServerParameterListImpl implements ServerParameterList
     @Override
     public void add(String group, ServerParameterList serverParameterList)
     {
-        for (Map.Entry<String, Set<ServerParameter>> entry : serverParameterList.getParameters().entrySet())
+        if (serverParameterList != null && serverParameterList.getParameters() != null)
         {
-            entry.getValue().forEach(i -> this.add(group != null ? group : entry.getKey(), i));
+            for (Map.Entry<String, Set<ServerParameter>> entry : serverParameterList.getParameters().entrySet())
+            {
+                entry.getValue().forEach(i -> this.add(group != null ? group : entry.getKey(), i));
+            }
         }
     }
 

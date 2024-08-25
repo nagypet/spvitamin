@@ -22,11 +22,10 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilde
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.*;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
-import hu.perit.spvitamin.spring.config.RoleMappingProperties;
-import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.annotation.Bean;
@@ -71,6 +70,11 @@ class StandardServerParameters
         params.add(LINKS, new ServerParameter("(1) Swagger UI", this.getSwaggerUrl(), true));
         params.add(LINKS, new ServerParameter("(2) Swagger API Docs", this.getApiDocsUrl(), true));
         params.add(LINKS, new ServerParameter("(3) Actuator", this.getActuatorUrl(), true));
+        H2ConsoleProperties h2ConsoleProperties = getH2Properties();
+        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
+        {
+            params.add(LINKS, new ServerParameter("H2 console", this.getH2ConsoleUrl(h2ConsoleProperties), true));
+        }
 
         params.add(ServerParameterListBuilder.of(this.cryptoProperties));
         params.add(ServerParameterListBuilder.of(this.jwtProperties));
@@ -90,6 +94,11 @@ class StandardServerParameters
         for (Map.Entry<String, RoleMappingProperties.RoleMapping> entry : this.roleMappingProperties.getRoles().entrySet())
         {
             params.add(getRoleMappingGroupName(entry.getKey()), ServerParameterListBuilder.of(entry.getValue()));
+        }
+
+        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
+        {
+            params.add(ServerParameterListBuilder.of(h2ConsoleProperties));
         }
 
         for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet())
@@ -123,6 +132,18 @@ class StandardServerParameters
         return params;
     }
 
+    private H2ConsoleProperties getH2Properties()
+    {
+        try
+        {
+            return SpringContext.getBean(H2ConsoleProperties.class);
+        }
+        catch (RuntimeException e)
+        {
+            return null;
+        }
+    }
+
     private static String getRoleMappingGroupName(String role)
     {
         return MessageFormat.format("{0}: {1}", RoleMappingProperties.RoleMapping.class.getSimpleName(), role);
@@ -136,6 +157,11 @@ class StandardServerParameters
     private String getActuatorUrl()
     {
         return this.serverProperties.getServiceUrl() + "/actuator";
+    }
+
+    private String getH2ConsoleUrl(H2ConsoleProperties h2ConsoleProperties)
+    {
+        return this.serverProperties.getServiceUrl() + h2ConsoleProperties.getPath();
     }
 
     private String getApiDocsUrl()
