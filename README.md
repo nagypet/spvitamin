@@ -88,6 +88,7 @@ dependencyManagement {
 - RoleMapper slightly refactored
 - TimeFormatter
 - SpvitaminApplication: handling the case when there is no .profiles at all
+- Profile dependent system properties can be loaded from .sysproperties files
 
 ### 3.3.0-1-RELEASE not yet released
 

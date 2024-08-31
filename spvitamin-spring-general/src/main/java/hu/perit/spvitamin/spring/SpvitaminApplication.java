@@ -61,10 +61,21 @@ public class SpvitaminApplication extends SpringApplication
     {
         super(primarySources);
 
+        setAdditionalProfiles();
+
+        setAdditionalSystemProperties();
+
+        this.addListeners(new EnvironmentPostProcessor());
+    }
+
+
+    private static void setAdditionalProfiles()
+    {
         // Setting additional profiles
         String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
         if (StringUtils.isBlank(activeProfiles))
         {
+            // if there is no set profile
             activeProfiles = Objects.requireNonNullElse(getHostBasedProfiles(), "default");
         }
         StringJoiner sj = new StringJoiner(",");
@@ -76,8 +87,6 @@ public class SpvitaminApplication extends SpringApplication
         }
 
         System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
-
-        this.addListeners(new EnvironmentPostProcessor());
     }
 
 
@@ -87,15 +96,15 @@ public class SpvitaminApplication extends SpringApplication
         String hostname = getHostName();
         if (hostname != null)
         {
-            profiles.addAll(getHostBasedProfiles(hostname + ".profiles"));
-            profiles.addAll(getHostBasedProfiles("config/" + hostname + ".profiles"));
+            profiles.addAll(tryGetProfilesFromFile(hostname + ".profiles"));
+            profiles.addAll(tryGetProfilesFromFile("config/" + hostname + ".profiles"));
         }
 
         if (profiles.isEmpty())
         {
             // If there is no host based profile => load the defaults
-            profiles.addAll(getHostBasedProfiles("default.profiles"));
-            profiles.addAll(getHostBasedProfiles("config/default.profiles"));
+            profiles.addAll(tryGetProfilesFromFile("default.profiles"));
+            profiles.addAll(tryGetProfilesFromFile("config/default.profiles"));
         }
 
         if (profiles.isEmpty())
@@ -107,7 +116,7 @@ public class SpvitaminApplication extends SpringApplication
     }
 
 
-    private static List<String> getHostBasedProfiles(String filepath)
+    private static List<String> tryGetProfilesFromFile(String filepath)
     {
         try
         {
@@ -135,4 +144,62 @@ public class SpvitaminApplication extends SpringApplication
 
         return StringUtils.toRootLowerCase(System.getenv("COMPUTERNAME"));
     }
+
+
+    private static void setAdditionalSystemProperties()
+    {
+        String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
+        if (StringUtils.isNotBlank(activeProfiles))
+        {
+            Properties sysProperties = new Properties();
+            // Try loading standard sysproperties
+            sysProperties.putAll(tryGetSysPropertiesFromFile("application.sysproperties"));
+            sysProperties.putAll(tryGetSysPropertiesFromFile("config/application.sysproperties"));
+
+            // Try loading profile-specific sysproperties
+            List<String> profiles = Arrays.stream(activeProfiles.split(",")).distinct().map(i -> StringUtils.strip(i)).toList();
+            if (!profiles.isEmpty())
+            {
+                for (String profile : profiles)
+                {
+                    sysProperties.putAll(tryGetSysPropertiesFromFile(profile + ".sysproperties"));
+                    sysProperties.putAll(tryGetSysPropertiesFromFile("config/" + profile + ".sysproperties"));
+                }
+            }
+            else
+            {
+                // Try loading default sysproperties
+                sysProperties.putAll(tryGetSysPropertiesFromFile("default.sysproperties"));
+                sysProperties.putAll(tryGetSysPropertiesFromFile("config/default.sysproperties"));
+            }
+
+            // Adding loaded sysproperties
+            for (Map.Entry<Object, Object> entry : sysProperties.entrySet())
+            {
+                System.setProperty(entry.getKey().toString(), entry.getValue().toString());
+            }
+        }
+    }
+
+
+    private static Properties tryGetSysPropertiesFromFile(String filepath)
+    {
+        try
+        {
+            log.info("Trying to load system properties from {}", filepath);
+            Path path = Resources.getResourcePath(filepath);
+            InputStream inputStream = Files.newInputStream(path);
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            log.info("Additional system properties loaded from {}: {}", path, properties);
+            return properties;
+        }
+        catch (IOException | ResourceNotFoundException | RuntimeException e)
+        {
+            return new Properties();
+        }
+    }
+
+
+
 }
