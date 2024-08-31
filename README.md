@@ -86,6 +86,8 @@ dependencyManagement {
 - SimpleHttpSecurityBuilder support for authentication h2 endpoints
 - DatasourceProperties: jdbc-url can be specified directly. (for Oracle)
 - RoleMapper slightly refactored
+- TimeFormatter
+- SpvitaminApplication: handling the case when there is no .profiles at all
 
 ### 3.3.0-1-RELEASE not yet released
 

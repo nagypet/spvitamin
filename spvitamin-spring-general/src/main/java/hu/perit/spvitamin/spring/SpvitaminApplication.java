@@ -98,6 +98,11 @@ public class SpvitaminApplication extends SpringApplication
             profiles.addAll(getHostBasedProfiles("config/default.profiles"));
         }
 
+        if (profiles.isEmpty())
+        {
+            profiles.add("default");
+        }
+
         return profiles.stream().distinct().collect(Collectors.joining(","));
     }
 
