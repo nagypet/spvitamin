@@ -2,7 +2,7 @@
 ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version = '3.2.1263' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.6' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.2' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 
 [versions]
@@ -10,8 +10,8 @@ aspectj = '1.9.22.1'
 jackson = '2.17.2'
 jsonwebtoken = '0.12.6'
 junit = '5.10.3'
-logback = '1.5.6'
-mapstruct = '1.5.5.Final'
+logback = '1.5.8'
+mapstruct = '1.6.0'
 springdoc = '2.6.0'
 
 [libraries]
@@ -21,7 +21,7 @@ assertj = 'org.assertj:assertj-core:3.26.3'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
 commons-lang3 = 'org.apache.commons:commons-lang3:3.16.0'
-guava = 'com.google.guava:guava:33.2.1-jre'
+guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }

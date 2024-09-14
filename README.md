@@ -5,6 +5,11 @@ please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
 
+### 3.3.3-1-RELEASE
+
+- SpringBoot 3.3.3
+- SpingCloud 2023.0.3
+
 ### 3.3.2-1-RELEASE
 
 - SpringBoot 3.3.2
@@ -44,7 +49,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.1.5-2-RELEASE')
+    set('spvitaminVersion', '3.3.3-1-RELEASE')
 }
 
 dependencies {
@@ -73,6 +78,11 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 3.3.3-1-RELEASE not yet released
+
+- Compiled with SpringBoot 3.3.3 and SpingCloud 2023.0.3
+- Gradle updated 8.8 -> 8.10.1
 
 ### 3.3.2-1-RELEASE not yet released
 
