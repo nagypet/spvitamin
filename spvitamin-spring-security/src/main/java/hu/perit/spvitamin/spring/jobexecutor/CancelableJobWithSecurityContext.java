@@ -20,7 +20,7 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 
 import java.util.concurrent.Callable;
 
-public interface CancelableJobWithSecurityContext extends Callable<Boolean>
+public interface CancelableJobWithSecurityContext extends Callable<Void>
 {
     AuthenticatedUser getAuthenticatedUser();
 

@@ -36,7 +36,7 @@ public class CancelableJobExecutorWithSecurityContext<T> extends CancelableJobEx
         super(poolSize, context);
     }
 
-    public Future<Boolean> submitJob(T id, CancelableJobWithSecurityContext job)
+    public Future<Void> submitJob(T id, CancelableJobWithSecurityContext job)
     {
         // Setting the AuthenticatedUser
         AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);

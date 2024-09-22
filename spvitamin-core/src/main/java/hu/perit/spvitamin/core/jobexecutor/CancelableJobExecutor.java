@@ -47,14 +47,14 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         this.context = context;
     }
 
-    public Future<Boolean> submitJob(T id, Callable<Boolean> job)
+    public Future<Void> submitJob(T id, Callable<Void> job)
     {
         if (this.futureMap.contains(id))
         {
             throw new JobAlreadyProcessingException(String.format("[%s] Job '%s' is already being processed, request is ignored.", this.context, id.toString()));
         }
 
-        Future<Boolean> future = super.submit(job);
+        Future<Void> future = super.submit(job);
         this.futureMap.put(id, future);
         log.debug("[{}] submitJob({}), {}", this.context, id, statusText());
         return future;
@@ -64,9 +64,8 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
     protected synchronized void beforeExecute(Thread t, Runnable r)
     {
         super.beforeExecute(t, r);
-        if (r instanceof Future<?>)
+        if (r instanceof Future<?> future)
         {
-            Future<?> future = (Future<?>) r;
             T id = this.futureMap.get(future);
             if (id != null)
             {
@@ -91,9 +90,8 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         log.debug("[{}] afterExecute({}, {})", this.context, r, t);
         super.afterExecute(r, t);
 
-        if (t == null && r instanceof Future<?>)
+        if (t == null && r instanceof Future<?> future)
         {
-            Future<?> future = (Future<?>) r;
             try
             {
                 future.get();
@@ -194,10 +192,18 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         return false;
     }
 
+
     public synchronized long countRunning()
     {
         return this.futureMap.getCountByStatus(FutureMap.Status.RUNNING) + this.futureMap.getCountByStatus(FutureMap.Status.STOPPING);
     }
+
+
+    public synchronized int countAll()
+    {
+        return this.futureMap.size();
+    }
+
 
     // intentionally not synchronized
     public void cancelAll()

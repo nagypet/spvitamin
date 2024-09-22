@@ -83,6 +83,7 @@ dependencyManagement {
 
 - Compiled with SpringBoot 3.3.3 and SpingCloud 2023.0.3
 - Gradle updated 8.8 -> 8.10.1
+- CancellableJobExecutor takes Callable<Void>
 
 ### 3.3.2-1-RELEASE not yet released
 
