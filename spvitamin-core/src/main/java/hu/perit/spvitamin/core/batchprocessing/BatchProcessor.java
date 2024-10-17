@@ -21,16 +21,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Peter Nagy
@@ -45,25 +37,25 @@ public abstract class BatchProcessor
     protected final int threadPoolSize;
 
 
-    public boolean process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
+    public void process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
     {
-        return process(batchJobs, true, null, null);
+        process(batchJobs, true, null, null);
     }
 
 
-    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
+    public void process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
     {
-        return process(batchJobs, runFirstSynchronously, null, null);
+        process(batchJobs, runFirstSynchronously, null, null);
     }
 
 
     @SuppressWarnings({"squid:S3776", "squid:S1141", "squid:S1193"})
-    public boolean process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously, Integer reportEveryNProcessed, String name)
-        throws ExecutionException, InterruptedException
+    public void process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously, Integer reportEveryNProcessed, String name)
+            throws ExecutionException, InterruptedException
     {
         if (batchJobs == null || batchJobs.isEmpty())
         {
-            return true;
+            return;
         }
 
         // Creating a copy of the ArrayList of BatchJobs, so that the input remains untouched
@@ -95,14 +87,14 @@ public abstract class BatchProcessor
 
         if (copyOfBatchJobs.isEmpty())
         {
-            return true;
+            return;
         }
 
         ExecutorService executorService = createExecutorService();
 
         // Invoke the rest
         boolean shutdownImmediately = false;
-        final Map<Future<Boolean>, BatchJob> futures = new HashMap<>();
+        final Map<Future<Void>, BatchJob> futures = new HashMap<>();
         try
         {
             BatchJobStatus status = new BatchJobStatus(false);
@@ -112,7 +104,7 @@ public abstract class BatchProcessor
                 if (Thread.currentThread().isInterrupted() || status.isFatalError())
                 {
                     shutdownImmediately = true;
-                    return false;
+                    return;
                 }
                 futures.put(executorService.submit(job), job);
             }
@@ -126,17 +118,17 @@ public abstract class BatchProcessor
             while (thereIsUndone)
             {
                 thereIsUndone = false;
-                Iterator<Map.Entry<Future<Boolean>, BatchJob>> iter = futures.entrySet().iterator();
+                Iterator<Map.Entry<Future<Void>, BatchJob>> iter = futures.entrySet().iterator();
                 lastReportedCount = reportProgress(lastReportedCount, futures.size(), reportEveryNProcessed, name);
                 while (iter.hasNext())
                 {
-                    Map.Entry<Future<Boolean>, BatchJob> mapEntry = iter.next();
-                    Future<Boolean> future = mapEntry.getKey();
+                    Map.Entry<Future<Void>, BatchJob> mapEntry = iter.next();
+                    Future<Void> future = mapEntry.getKey();
 
                     if (Thread.currentThread().isInterrupted())
                     {
                         shutdownImmediately = true;
-                        return false;
+                        return;
                     }
 
                     if (future.isDone())
@@ -178,8 +170,6 @@ public abstract class BatchProcessor
                     TimeUnit.MILLISECONDS.sleep(200);
                 }
             }
-
-            return true;
         }
         catch (InterruptedException ex)
         {

@@ -85,6 +85,7 @@ dependencyManagement {
 - Gradle updated 8.8 -> 8.10.1
 - CancellableJobExecutor takes Callable<Void>
 - FieldMapper for nativ SQL queries
+- BatchJob implements Callable<Void>
 
 ### 3.3.2-1-RELEASE not yet released
 

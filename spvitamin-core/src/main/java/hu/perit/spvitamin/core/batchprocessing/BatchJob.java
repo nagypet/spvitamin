@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
-public abstract class BatchJob implements Callable<Boolean>
+public abstract class BatchJob implements Callable<Void>
 {
 
     // Ez a status a batch-hez tartozó összes job-ban ugyanarra az objektumra hivatkozik, így detektálni lehet, hogy fellépett egy
@@ -40,7 +40,7 @@ public abstract class BatchJob implements Callable<Boolean>
 
     @Override
     @SuppressWarnings("squid:S1193")
-    public Boolean call() throws Exception
+    public Void call() throws Exception
     {
         try
         {
@@ -84,7 +84,7 @@ public abstract class BatchJob implements Callable<Boolean>
         }
     }
 
-    protected abstract Boolean execute() throws Exception; // NOSONAR
+    protected abstract Void execute() throws Exception; // NOSONAR
 
     public abstract boolean isFatalException(Throwable ex);
 }
