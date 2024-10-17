@@ -20,18 +20,13 @@ import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.LogLevel;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * This is a default implementation of RestExceptionLogger. It can be overridden on application level to implement
  * customized exception logging. Implement the RestExceptionLogger interface in your application if you need special handling.
  */
 
-@Configuration
 @Slf4j
-@ConditionalOnMissingBean(RestExceptionLogger.class)
 public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
 {
     public static final String FORMAT = "path: '%s', ex: %s";

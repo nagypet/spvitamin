@@ -86,6 +86,7 @@ dependencyManagement {
 - CancellableJobExecutor takes Callable<Void>
 - FieldMapper for nativ SQL queries
 - BatchJob implements Callable<Void>
+- Configuration of DefaultRestExceptionLoggerImpl fixed
 
 ### 3.3.2-1-RELEASE not yet released
 
