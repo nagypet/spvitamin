@@ -30,6 +30,7 @@ import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -207,28 +208,37 @@ public class PrinterVisitor implements ThingVisitor
         indentLevel++;
 
         int entryCount = 0;
-        for (Map.Entry<String, Thing> entry : valueMap.getProperties().entrySet())
+        List<Map.Entry<String, Thing>> entryList = optionallyFilterNulls(valueMap);
+        for (Map.Entry<String, Thing> entry : entryList)
         {
             String key = entry.getKey();
             Thing property = entry.getValue();
-            if (!(options.ignoreNulls && property.isEmpty()))
+            indent();
+            jsonBuilder.append("\"").append(key).append("\":");
+
+            property.accept(key, this);
+
+            entryCount++;
+            if (entryCount < entryList.size())
             {
-                indent();
-                jsonBuilder.append("\"").append(key).append("\":");
-
-                property.accept(key, this);
-
-                entryCount++;
-                if (entryCount < valueMap.getProperties().size())
-                {
-                    jsonBuilder.append(",");
-                }
-                newLine();
+                jsonBuilder.append(",");
             }
+            newLine();
         }
 
         indentLevel--;
         indent();
         jsonBuilder.append("}");
+    }
+
+
+    private List<Map.Entry<String, Thing>> optionallyFilterNulls(ValueMap valueMap)
+    {
+        if (options.ignoreNulls)
+        {
+            return valueMap.getProperties().entrySet().stream().filter(i -> !i.getValue().isEmpty()).toList();
+        }
+
+        return valueMap.getProperties().entrySet().stream().toList();
     }
 }
