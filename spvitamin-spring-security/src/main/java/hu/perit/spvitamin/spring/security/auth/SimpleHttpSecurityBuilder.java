@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
+import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -40,6 +41,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -228,8 +230,8 @@ public class SimpleHttpSecurityBuilder
 
     private boolean isFilterAlreadyExists(Class<?> filterClass)
     {
-        List<Field> fields = ReflectionUtils.propertiesOf(HttpSecurity.class, true);
-        Field filters = fields.stream().filter(i -> i.getName().equalsIgnoreCase("filters")).findAny().orElse(null);
+        List<Property> fields = ReflectionUtils.allPropertiesOf(HttpSecurity.class, true);
+        Property filters = fields.stream().filter(i -> i.getName().equalsIgnoreCase("filters")).findAny().orElse(null);
         if (filters != null)
         {
             filters.setAccessible(true);
@@ -238,7 +240,7 @@ public class SimpleHttpSecurityBuilder
                 List<?> f = (List) filters.get(this.http);
                 return f.stream().anyMatch(i -> i.toString().contains(filterClass.getName()));
             }
-            catch (IllegalAccessException e)
+            catch (IllegalAccessException | InvocationTargetException e)
             {
                 // Just do nothing
             }

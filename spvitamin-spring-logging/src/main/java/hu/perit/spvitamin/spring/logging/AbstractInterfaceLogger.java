@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,13 @@ public abstract class AbstractInterfaceLogger
 
     protected String iptrace(String traceId, String user, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        LogEvent logEvent = LogEvent.of(traceId, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn);
+        return iptrace(traceId, user, eventID, eventText, subject, isDirectionIn, null);
+    }
+
+
+    protected String iptrace(String traceId, String user, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options)
+    {
+        LogEvent logEvent = LogEvent.of(this, traceId, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn, options);
 
         // Place to forward the event log entry to a log server
         LOG_EVENT.fire(logEvent);

@@ -16,10 +16,8 @@
 
 package hu.perit.spvitamin.spring.httplogging;
 
-import hu.perit.spvitamin.spring.logging.ObjectLogger;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +26,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -148,45 +145,5 @@ public class LoggingHelper
         }
 
         return null;
-    }
-
-
-    @Data
-    private static class Argument
-    {
-        private final String name;
-        private final Object value;
-    }
-
-    public static String getSubject(List<String> argNames, Object[] args)
-    {
-        if (args == null || args.length == 0)
-        {
-            return "";
-        }
-        else
-        {
-            StringJoiner joiner = new StringJoiner(", ", "{", "}");
-            for (int i = 0; i < args.length; i++)
-            {
-                Object object = args[i];
-                if (i < argNames.size())
-                {
-                    String s = quoted(argNames.get(i)) + ":" + ObjectLogger.toString(object);
-                    joiner.add(s);
-                }
-                else
-                {
-                    String s = ObjectLogger.toString(object);
-                    joiner.add(s);
-                }
-            }
-            return joiner.toString();
-        }
-    }
-
-    private static String quoted(String s)
-    {
-        return "\"" + s + "\"";
     }
 }

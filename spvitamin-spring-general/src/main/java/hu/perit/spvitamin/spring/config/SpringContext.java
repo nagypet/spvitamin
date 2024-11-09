@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -34,7 +36,8 @@ import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component(value = "SpvitaminSpringContext")
-public class SpringContext implements ApplicationContextAware
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class SpringContext implements ApplicationContextAware
 {
 
     private static ApplicationContext context;

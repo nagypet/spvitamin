@@ -20,7 +20,20 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilder;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
-import hu.perit.spvitamin.spring.config.*;
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.CryptoProperties;
+import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.config.MetricsProperties;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
+import hu.perit.spvitamin.spring.config.MicroserviceProperties;
+import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
+import hu.perit.spvitamin.spring.config.RoleMappingProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.ServerProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SwaggerProperties;
+import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +42,11 @@ import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.*;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -108,7 +125,7 @@ class StandardServerParameters
 
         try
         {
-            Environment env = SpringEnvironment.getInstance().get();
+            Environment env = SpringEnvironment.get();
 
             MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
             for (PropertySource<?> propertySource : propSrcs.stream().filter(OriginTrackedMapPropertySource.class::isInstance).toList())

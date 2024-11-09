@@ -20,7 +20,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
@@ -82,5 +81,19 @@ public class ServerProperties
         private String trustStore;
         @ConfigProperty(hidden = true)
         private String trustStorePassword;
+    }
+
+
+    @Data
+    public static class ErrorProperties {
+        private boolean includeException = true;
+        private ErrorProperties.IncludeAttribute includeStacktrace = IncludeAttribute.ALWAYS;
+        private ErrorProperties.IncludeAttribute includeMessage = IncludeAttribute.ALWAYS;
+
+        public enum IncludeAttribute {
+            NEVER,
+            ALWAYS,
+            ON_PARAM;
+        }
     }
 }

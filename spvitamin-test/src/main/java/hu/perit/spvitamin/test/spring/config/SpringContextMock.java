@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.config;
+package hu.perit.spvitamin.test.spring.config;
 
+import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.context.ApplicationContext;

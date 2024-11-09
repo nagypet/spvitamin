@@ -21,12 +21,16 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Simple Reflection Utility
@@ -49,7 +53,7 @@ public class ReflectionUtils
     {
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
-                .filter(method -> isGetter(method) && isNonStatic(method) && isAccesible(method))
+                .filter(method -> isGetter(method) && isNonStatic(method))
                 .toList();
     }
 
@@ -65,47 +69,80 @@ public class ReflectionUtils
     {
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
-                .filter(method -> isSetter(method) && isNonStatic(method) && isAccesible(method))
+                .filter(method -> isSetter(method) && isNonStatic(method))
                 .toList();
     }
 
 
     /**
-     * Returns all non-static fields
+     * Returns all properties of the given class
      *
      * @param clazz
      * @param includePrivate
-     * @return
+     * @return List<Property>
      */
-    public static List<Field> propertiesOf(Class<?> clazz, Boolean includePrivate)
+    public static List<Property> propertiesOf(Class<?> clazz, Boolean includePrivate)
     {
-        Field[] fields = BooleanUtils.isTrue(includePrivate) ? clazz.getDeclaredFields() : clazz.getFields();
-        return Arrays.stream(fields)
-                .filter(field -> isNonStatic(field) && isAccesible(field))
+        List<Property> properties = new ArrayList<>();
+
+        List<Method> methods = gettersOf(clazz, false);
+        List<Property> getterProperties = methods.stream()
+                .filter(method -> BooleanUtils.isTrue(includePrivate) || Modifier.isPublic(method.getModifiers()))
+                .map(method -> Property.fromGetter(method))
                 .toList();
+
+        Field[] fields = BooleanUtils.isTrue(includePrivate) ? clazz.getDeclaredFields() : clazz.getFields();
+        List<Property> fieldProperties = Arrays.stream(fields)
+                .filter(field -> isNonStatic(field) && field.getDeclaringClass().equals(clazz))
+                .filter(field -> thereIsNoGetterWithName(getterProperties, field.getName()))
+                .map(field -> Property.fromField(field))
+                .toList();
+
+        properties.addAll(fieldProperties);
+        properties.addAll(getterProperties);
+        return properties;
     }
 
 
-    private static boolean isAccesible(Field field)
+    private static boolean thereIsNoGetterWithName(List<Property> getters, String name)
     {
-        if (field.isAccessible())
+        return getters.stream().noneMatch(method -> method.getName().equals(name));
+    }
+
+
+    /**
+     * Returns all properties of the given class and of each base classes
+     *
+     * @param clazz
+     * @param includePrivate
+     * @return List<Property>
+     */
+    public static List<Property> allPropertiesOf(Class<?> clazz, Boolean includePrivate)
+    {
+        List<Property> properties = new ArrayList<>();
+
+        if (clazz == null || clazz.equals(Object.class))
         {
-            log.debug(String.format("%s() is not accessible", field.getName()));
-            return false;
+            return properties;
         }
 
-        return true;
+        // Adding properties of the superclass
+        properties.addAll(allPropertiesOf(clazz.getSuperclass(), includePrivate));
+
+        // Adding properties of self
+        properties.addAll(propertiesOf(clazz, includePrivate));
+
+        return properties;
     }
 
 
-    private static boolean isStatic(Field field)
+    public static boolean isStatic(Field field)
     {
-        int modifiers = field.getModifiers();
-        return (modifiers & Modifier.STATIC) != 0;
+        return Modifier.isStatic(field.getModifiers());
     }
 
 
-    private static boolean isNonStatic(Field field)
+    public static boolean isNonStatic(Field field)
     {
         return !isStatic(field);
     }
@@ -173,8 +210,7 @@ public class ReflectionUtils
      */
     public static boolean isStatic(Method method)
     {
-        int modifiers = method.getModifiers();
-        return (modifiers & Modifier.STATIC) != 0;
+        return Modifier.isStatic(method.getModifiers());
     }
 
 
@@ -190,24 +226,6 @@ public class ReflectionUtils
     }
 
 
-    /**
-     * Checks if the method is publicly available
-     *
-     * @param method
-     * @return true if the method is public
-     */
-    public static boolean isAccesible(Method method)
-    {
-        if (method.isAccessible())
-        {
-            log.debug(String.format("%s() is not public", method.getName()));
-            return false;
-        }
-
-        return true;
-    }
-
-
     public static Optional<Method> getSetter(Class<?> clazz, String fieldName)
     {
         List<Method> setters = settersOf(clazz, true);
@@ -218,5 +236,55 @@ public class ReflectionUtils
     private static String lowerCamelCase(String name)
     {
         return name.substring(0, 1).toLowerCase() + name.substring(1);
+    }
+
+
+    public static Object getSubject(Method method, Object object)
+    {
+        return isStatic(method) ? null : object;
+    }
+
+
+    public static Object getSubject(Field field, Object object)
+    {
+        return isStatic(field) ? null : object;
+    }
+
+
+    // Returns true, if this type of object cannot be converted
+    public static boolean isTerminalType(Object object)
+    {
+        if (object == null)
+        {
+            return true;
+        }
+
+        return isTerminalType(object.getClass());
+    }
+
+
+    public static boolean isTerminalType(Class<?> clazz)
+    {
+        if (clazz.isPrimitive() || clazz.isEnum())
+        {
+            return true;
+        }
+
+        // Special Java types
+        if (clazz.isAssignableFrom(java.util.Date.class)
+                || clazz.isAssignableFrom(XMLGregorianCalendar.class)
+                || clazz.isAssignableFrom(TimeUnit.class)
+                || clazz.isAssignableFrom(TimeZone.class)
+        )
+        {
+            return true;
+        }
+
+        String packageName = clazz.getPackageName();
+        return packageName.startsWith("java.lang")
+                || packageName.startsWith("java.time")
+                || packageName.startsWith("java.io")
+                || packageName.startsWith("java.math")
+                ;
     }
 }

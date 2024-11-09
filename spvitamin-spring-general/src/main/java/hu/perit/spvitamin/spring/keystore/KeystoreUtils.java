@@ -71,7 +71,7 @@ public class KeystoreUtils
      */
     public static void locateJksStores()
     {
-        Environment env = SpringEnvironment.getInstance().get();
+        Environment env = SpringEnvironment.get();
 
         if (!Boolean.parseBoolean(env.getProperty("server.ssl.enabled")))
         {

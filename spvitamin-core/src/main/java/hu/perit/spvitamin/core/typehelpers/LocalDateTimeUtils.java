@@ -19,12 +19,14 @@ package hu.perit.spvitamin.core.typehelpers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -56,6 +58,18 @@ public final class LocalDateTimeUtils
     }
 
 
+    public static String format(Date date)
+    {
+        if (date == null)
+        {
+            return "";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(date);
+    }
+
+
     /**
      * @return {@link DateTimeFormatter} yyyy-mm-dd hh:mm:ss formátummal,
      * ahogy az adatbázis szereti
@@ -74,5 +88,16 @@ public final class LocalDateTimeUtils
     public static LocalDateTime getLocalDateTimeFromMillis(long millis)
     {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), TimeZone.getDefault().toZoneId());
+    }
+
+
+    public static LocalDateTime fromDate(Date date)
+    {
+        if (date == null)
+        {
+            return null;
+        }
+
+        return getLocalDateTimeFromMillis(date.getTime());
     }
 }

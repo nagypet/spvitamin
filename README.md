@@ -87,6 +87,16 @@ dependencyManagement {
 - FieldMapper for nativ SQL queries
 - BatchJob implements Callable<Void>
 - Configuration of DefaultRestExceptionLoggerImpl fixed
+- AbstractInterfaceLogger Options can be provided
+- SpringEnvironment changed for unit testing
+- LocalDateTimeUtils and FieldMapper improved
+- spvitamin-test restructured
+- server.error autoconfiguration changed
+- Thing class
+- RequestLogger refactored with Thing
+- ReflectionUtils extended with Property class
+- ServerParameterListImpl uses new Property interface from ReflectionUtils
+- Things uses new Property interface from ReflectionUtils
 
 ### 3.3.2-1-RELEASE not yet released
 

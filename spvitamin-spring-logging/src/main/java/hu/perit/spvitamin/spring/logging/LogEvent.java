@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.logging;
 
+import hu.perit.spvitamin.spring.restmethodlogger.Arguments;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,10 +26,11 @@ import java.util.Map;
 @Data
 public class LogEvent
 {
+    private Object source;
     private LocalDateTime eventTime;
     private boolean directionInput;
     private String clientIpAddr;
-    private String traceId;
+    private String externalTraceId;
     private String user;
     private String hostName;
     private String subsystemName;
@@ -36,19 +38,31 @@ public class LogEvent
     private String eventText;
     private String parameters;
     private Map<String, Object> options;
+    private Arguments arguments;
 
-    public static LogEvent of(String traceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn)
+    public static LogEvent of(Object source, String externalTraceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn)
     {
-        return of(traceId, subsystem, ipAddress, hostname, username, eventID, eventText, subject, isDirectionIn, null);
+        return of(source, externalTraceId, subsystem, ipAddress, hostname, username, eventID, eventText, subject, isDirectionIn, null, null);
     }
 
-    public static LogEvent of(String traceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options)
+    public static LogEvent of(Object source, String externalTraceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Arguments arguments)
+    {
+        return of(source, externalTraceId, subsystem, ipAddress, hostname, username, eventID, eventText, subject, isDirectionIn, null, arguments);
+    }
+
+    public static LogEvent of(Object source, String externalTraceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options)
+    {
+        return of(source, externalTraceId, subsystem, ipAddress, hostname, username, eventID, eventText, subject, isDirectionIn, options, null);
+    }
+
+    public static LogEvent of(Object source, String externalTraceId, String subsystem, String ipAddress, String hostname, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options, Arguments arguments)
     {
         LogEvent logEvent = new LogEvent();
+        logEvent.setSource(source);
         logEvent.setEventTime(LocalDateTime.now());
         logEvent.setDirectionInput(isDirectionIn);
         logEvent.setClientIpAddr(ipAddress);
-        logEvent.setTraceId(traceId);
+        logEvent.setExternalTraceId(externalTraceId);
         logEvent.setUser(username);
         logEvent.setHostName(hostname);
         logEvent.setSubsystemName(subsystem);
@@ -56,6 +70,7 @@ public class LogEvent
         logEvent.setEventText(eventText);
         logEvent.setParameters(subject);
         logEvent.setOptions(options);
+        logEvent.setArguments(arguments);
 
         return logEvent;
     }
@@ -66,9 +81,9 @@ public class LogEvent
         return String.format("%s | %s | %s | user: %s | host: %s | system: %s | eventId: %d | event: %s | %s ",
                 this.directionInput ? ">>>" : "<<<",
                 this.clientIpAddr,
-                StringUtils.defaultIfBlank(this.traceId, "null"),
+                StringUtils.defaultIfBlank(this.externalTraceId, "null"),
                 StringUtils.defaultIfBlank(this.user, "null"),
-                StringUtils.defaultString(this.hostName, "null"),
+                StringUtils.defaultIfBlank(this.hostName, "null"),
                 StringUtils.defaultIfBlank(this.subsystemName, "null"),
                 this.eventId,
                 StringUtils.defaultIfBlank(this.eventText, "null"),

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.async;
+package hu.perit.spvitamin.spring.autoconfiguration;
 
 import hu.perit.spvitamin.spring.config.AsyncProperties;
 import lombok.RequiredArgsConstructor;

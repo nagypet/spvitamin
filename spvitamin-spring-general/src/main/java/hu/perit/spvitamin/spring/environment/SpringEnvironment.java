@@ -17,30 +17,29 @@
 package hu.perit.spvitamin.spring.environment;
 
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.core.env.Environment;
 
-public class SpringEnvironment {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class SpringEnvironment
+{
+    private static Environment environment;
 
-    private static SpringEnvironment instance = new SpringEnvironment();
-    private Environment environment;
-
-    public static SpringEnvironment getInstance() {
-        return instance;
-    }
-
-    private SpringEnvironment() {
-    }
-
-    public Environment get() {
-        if (this.environment == null) {
+    public static Environment get()
+    {
+        if (environment == null)
+        {
             throw new UnexpectedConditionException("There is no injected Environment!");
         }
         return environment;
     }
 
-    public void setEnvironment(Environment environment) {
-        if (this.environment == null) {
-            this.environment = environment;
+    public static void setEnvironment(Environment env)
+    {
+        if (environment == null)
+        {
+            environment = env;
         }
     }
 }

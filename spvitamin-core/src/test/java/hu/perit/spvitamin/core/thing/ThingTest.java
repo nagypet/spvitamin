@@ -1,0 +1,162 @@
+package hu.perit.spvitamin.core.thing;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@Slf4j
+class ThingTest
+{
+    public enum Types
+    {
+        ALMA,
+        KORTE
+    }
+
+    @Data
+    public static class Keyword
+    {
+        private final String name;
+        private final String value;
+    }
+
+    @Data
+    public static class ContentStream
+    {
+        private byte[] bytes = null;
+        private String fileName = "";
+        private InputStream stream = new ByteArrayInputStream("alma".getBytes());
+    }
+
+    @Data
+    public static class CreateDocumentRequest
+    {
+        private String documentTypeName;
+        private List<Keyword> keywords;
+        private ContentStream content;
+        private LocalDate documentDate;
+        private String password;
+        private List<String> passwords;
+        private String comment;
+        private Set<Keyword> keywordsSet;
+        private Map<String, Keyword> keywordsMap;
+        private Types type = Types.ALMA;
+        @Getter(AccessLevel.NONE)
+        @Setter(AccessLevel.NONE)
+        private String privateWithoutGetter = "privateWithoutGetter";
+    }
+
+
+    @Test
+    void testSimpleType()
+    {
+        Thing thing = Thing.from("alma");
+        dump(thing);
+
+        assertThat(thing).isInstanceOf(Value.class);
+    }
+
+
+    @Test
+    void testComplexObject()
+    {
+        CreateDocumentRequest request = getCreateDocumentRequest();
+
+        Thing thing = Thing.from(request);
+        dump(thing);
+
+        assertThat(thing).isInstanceOf(ValueMap.class);
+        assertThat(((ValueMap) thing).getProperties()).hasSize(10);
+    }
+
+
+    private static CreateDocumentRequest getCreateDocumentRequest()
+    {
+        CreateDocumentRequest request = new CreateDocumentRequest();
+        request.setDocumentTypeName("testDocumentType");
+        request.setKeywords(getTestKeywords());
+        request.setContent(getTestContent());
+        request.setDocumentDate(LocalDate.of(2024, 11, 3));
+        request.setPassword("my secret password");
+        request.setPasswords(List.of("alma", "körte"));
+        request.setComment("very very very very very very very very very very very very long comment");
+        request.setKeywordsSet(new HashSet<>(getTestKeywords()));
+        request.setKeywordsMap(getTestKeywords().stream().collect(Collectors.toMap(k -> k.getName(), v -> v)));
+        return request;
+    }
+
+
+    @Test
+    void testPropertyMap()
+    {
+        CreateDocumentRequest request = getCreateDocumentRequest();
+
+        Map<String, Object> properties = new LinkedHashMap<>();
+        properties.put("request", request);
+        properties.put("username", "IDXAPI");
+        properties.put("password", "my password");
+        properties.put("traceID", "123");
+
+        Thing thing = Thing.from(properties);
+        dump(thing);
+
+        assertThat(thing).isInstanceOf(ValueMap.class);
+        assertThat(((ValueMap) thing).getProperties()).hasSize(4);
+    }
+
+
+    @Test
+    void testVisitor() throws JsonProcessingException
+    {
+        CreateDocumentRequest request = getCreateDocumentRequest();
+
+        Thing thing = Thing.from(request, true);
+        dump(thing);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        log.debug(objectMapper.writeValueAsString(thing));
+    }
+
+    private static void dump(Thing thing)
+    {
+        PrinterVisitor printerVisitor = new PrinterVisitor(PrinterVisitor.Options.builder().prettyPrint(true).hidePasswords(true).maxStringLength(20).build());
+        thing.accept(null, printerVisitor);
+        log.debug(printerVisitor.getJson());
+    }
+
+
+    private static List<Keyword> getTestKeywords()
+    {
+        return List.of(new Keyword("test-keyword", "keyword value"), new Keyword("password-keyword", "testPassword"));
+    }
+
+
+    private static ContentStream getTestContent()
+    {
+        ContentStream contentStream = new ContentStream();
+        contentStream.setBytes("PHNvYXBlbnY6RW52ZWxvcGUgeG1sbnM6c29hcGVudj0iaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvc29hcC9lbnZlbG9wZS8iIHhtbG5zOm9uYj0iaHR0cDovL2lubm9kb3guY29tL29uYmFzZXNlcnZpY2UiPg0K".getBytes());
+        contentStream.setFileName("alma.txt");
+        return contentStream;
+    }
+}

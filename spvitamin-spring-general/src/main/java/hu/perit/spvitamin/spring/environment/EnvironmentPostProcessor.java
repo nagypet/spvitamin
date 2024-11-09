@@ -17,11 +17,8 @@
 package hu.perit.spvitamin.spring.environment;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
-import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.ApplicationEvent;
@@ -69,13 +66,9 @@ public class EnvironmentPostProcessor implements ApplicationListener<Application
             {
                 // Initializing a singleton object with the current Environment
                 ConfigurableEnvironment env = event.getApplicationContext().getEnvironment();
-                SpringEnvironment.getInstance().setEnvironment(env);
+                SpringEnvironment.setEnvironment(env);
 
                 KeystoreUtils.locateJksStores();
-
-                ServerExceptionProperties.setStackTraceEnabled(ErrorProperties.IncludeStacktrace.ALWAYS.name().equals(env.getProperty("server.error.includeStacktrace", "ALWAYS")));
-                RestExceptionResponse.setExceptionEnabled(Boolean.parseBoolean(env.getProperty("server.error.includeException", "true")));
-                RestExceptionResponse.setMessageEnabled(ErrorProperties.IncludeAttribute.ALWAYS.name().equals(env.getProperty("server.error.includeMessage", "ALWAYS")));
 
                 env.getPropertySources().forEach(this::dumpPropertySource);
             }

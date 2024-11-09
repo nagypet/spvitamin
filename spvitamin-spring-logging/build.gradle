@@ -64,6 +64,8 @@ dependencies {
     // Slf4J
     implementation libs.slf4j.api
 
+    // JAXB
+    implementation libs.jaxb.api
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies

@@ -32,4 +32,19 @@ public @interface LoggedRestMethod
     int eventId();
     String subsystem();
     boolean muted() default false;
+
+    /**
+     * These arguments will be put into the ThreadContext for logging
+     */
+    String[] ctx() default {};
+
+    /**
+     * This argument will be provided as externalTraceId in the LogEvent
+     */
+    String externalTraceId() default "";
+
+    /**
+     * If not the logged-in user should be used for user
+     */
+    String user() default "";
 }

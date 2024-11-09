@@ -42,6 +42,10 @@ dependencies {
     implementation libs.commons.lang3
     implementation libs.commons.collections4
 
+    // Jackson
+    implementation libs.jackson.annotations
+    implementation libs.jackson.databind
+
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
@@ -55,6 +59,9 @@ dependencies {
     implementation libs.slf4j.api
     testImplementation libs.slf4j.log4j12
     testImplementation libs.log4j.log4j
+
+    // Jackson
+    testImplementation libs.jackson.datatype.jsr310
 }
 
 

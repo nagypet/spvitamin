@@ -19,11 +19,13 @@ package hu.perit.spvitamin.spring.restmethodlogger;
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import hu.perit.spvitamin.spring.logging.LogEvent;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.logging.RequestLogger;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.ThreadContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -36,7 +38,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -59,28 +60,58 @@ public class LoggedRestMethodAspect
     {
         final MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
         final Method method = signature.getMethod();
-        List<String> argNames = Arrays.stream(method.getParameters()).map(Parameter::getName).collect(Collectors.toList());
+
+        // Creating list of parameters with names
+        List<String> argNames = Arrays.stream(method.getParameters()).map(Parameter::getName).toList();
+        Object[] args = proceedingJoinPoint.getArgs();
+        Arguments arguments = Arguments.create(argNames, args);
 
         LoggedRestMethod annotation = method.getAnnotation(LoggedRestMethod.class);
 
-        AuthenticatedUser user = this.authorizationService.getAuthenticatedUser();
+        // Putting the externalTraceId into the ThreadContext for logging
+        if (StringUtils.isNotBlank(annotation.externalTraceId()))
+        {
+            ThreadContext.put("externalTraceId", arguments.getString(annotation.externalTraceId()));
+        }
+
+        // Putting arguments into the ThreadContext for logging
+        for (String threadContextArgument : annotation.ctx())
+        {
+            Object arg = arguments.get(threadContextArgument);
+            if (arg != null)
+            {
+                ThreadContext.put(threadContextArgument, arg.toString());
+            }
+        }
+
+        String username = getUsername(annotation, arguments);
 
         try (Took took = new Took(method, !annotation.muted()))
         {
-            callIn(null, annotation.subsystem(), user.getUsername(), method.getName(), annotation.eventId(), argNames, proceedingJoinPoint.getArgs(), annotation.muted());
+            callIn(arguments.getString(annotation.externalTraceId()), annotation.subsystem(), username, method.getName(), annotation.eventId(), arguments, annotation.muted());
             return proceedingJoinPoint.proceed();
         }
         catch (Throwable ex)
         {
-            callOut(null, annotation.subsystem(), user.getUsername(), method.getName(), annotation.eventId(), ex, annotation.muted());
+            callOut(arguments.getString(annotation.externalTraceId()), annotation.subsystem(), username, method.getName(), annotation.eventId(), ex, annotation.muted());
             throw ex;
         }
     }
 
 
-    private void callIn(String traceId, String subsystem, String username, String method, int eventId, List<String> argNames, Object[] args, boolean muted)
+    private String getUsername(LoggedRestMethod annotation, Arguments arguments)
     {
-        LogEvent logEvent = createAndPublishLogEvent(traceId, subsystem, username, eventId, method, LoggingHelper.getSubject(argNames, args), true);
+        if (StringUtils.isNotBlank(annotation.user()))
+        {
+            return arguments.getString(annotation.user());
+        }
+
+        return this.authorizationService.getAuthenticatedUser().getUsername();
+    }
+
+    private void callIn(String traceId, String subsystem, String username, String method, int eventId, Arguments arguments, boolean muted)
+    {
+        LogEvent logEvent = createAndPublishLogEvent(traceId, subsystem, username, eventId, method, RequestLogger.toSubject(arguments), true, arguments);
         if (!muted)
         {
             log.debug(logEvent.toString());
@@ -90,7 +121,7 @@ public class LoggedRestMethodAspect
 
     private void callOut(String traceId, String subsystem, String username, String method, int eventId, Throwable ex, boolean muted)
     {
-        LogEvent logEvent = createAndPublishLogEvent(traceId, subsystem, username, eventId, method, ex.toString(), false);
+        LogEvent logEvent = createAndPublishLogEvent(traceId, subsystem, username, eventId, method, ex.toString(), false, (Arguments) null);
         if (!muted)
         {
             log.debug(logEvent.toString());
@@ -98,9 +129,9 @@ public class LoggedRestMethodAspect
     }
 
 
-    protected LogEvent createAndPublishLogEvent(String traceId, String subsystem, String username, int eventID, String eventText, String subject, boolean isDirectionIn)
+    protected LogEvent createAndPublishLogEvent(String traceId, String subsystem, String username, int eventID, String eventText, String subject, boolean isDirectionIn, Arguments arguments)
     {
-        LogEvent logEvent = LogEvent.of(traceId, subsystem, LoggingHelper.getClientIpAddr(this.httpRequest), LoggingHelper.getHostName(), username, eventID, eventText, subject, isDirectionIn);
+        LogEvent logEvent = LogEvent.of(this, traceId, subsystem, LoggingHelper.getClientIpAddr(this.httpRequest), LoggingHelper.getHostName(), username, eventID, eventText, subject, isDirectionIn, arguments);
 
         // Place to forward the event log entry to a log server
         this.publisher.publishEvent(logEvent);

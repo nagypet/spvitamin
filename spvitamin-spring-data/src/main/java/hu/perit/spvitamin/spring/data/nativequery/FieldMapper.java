@@ -37,11 +37,34 @@ public final class FieldMapper
         {
             return StringUtils.strip(stringValue);
         }
-        throw new ClassCastException(MessageFormat.format("Cannot cast {0} to long!", field.getClass()));
+        return StringUtils.strip(field.toString());
     }
 
 
-    public static long toLong(Object field)
+    public static Integer toInt(Object field)
+    {
+        if (field == null)
+        {
+            return 0;
+        }
+
+        if (field instanceof Integer intValue)
+        {
+            return intValue;
+        }
+        if (field instanceof BigInteger bigInteger)
+        {
+            return bigInteger.intValue();
+        }
+        else if (field instanceof Number)
+        {
+            return Integer.parseInt(field.toString());
+        }
+        throw new ClassCastException(MessageFormat.format("Cannot cast {0} to {1}!", field.getClass(), Integer.class.getName()));
+    }
+
+
+    public static Long toLong(Object field)
     {
         if (field == null)
         {
@@ -56,6 +79,10 @@ public final class FieldMapper
         {
             return bigInteger.longValue();
         }
-        throw new ClassCastException(MessageFormat.format("Cannot cast {0} to long!", field.getClass()));
+        else if (field instanceof Number)
+        {
+            return Long.parseLong(field.toString());
+        }
+        throw new ClassCastException(MessageFormat.format("Cannot cast {0} to {1}!", field.getClass(), Long.class.getName()));
     }
 }

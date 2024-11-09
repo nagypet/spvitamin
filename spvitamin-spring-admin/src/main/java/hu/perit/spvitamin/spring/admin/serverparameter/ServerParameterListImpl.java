@@ -16,18 +16,18 @@
 
 package hu.perit.spvitamin.spring.admin.serverparameter;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
+import hu.perit.spvitamin.core.reflection.Property;
+import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import hu.perit.spvitamin.spring.config.ConfigProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author Peter Nagy
@@ -40,46 +40,18 @@ public class ServerParameterListImpl implements ServerParameterList
 {
     private final Map<String, Set<ServerParameter>> parameters = new TreeMap<>();
 
-    private static final Set<Class<?>> WRAPPER_TYPES = new HashSet<>();
 
-    static
+    public ServerParameterListImpl(Object object, String namePrefix)
     {
-        WRAPPER_TYPES.add(Boolean.class);
-        WRAPPER_TYPES.add(boolean.class);
-        WRAPPER_TYPES.add(Byte.class);
-        WRAPPER_TYPES.add(byte.class);
-        WRAPPER_TYPES.add(Character.class);
-        WRAPPER_TYPES.add(char.class);
-        WRAPPER_TYPES.add(Short.class);
-        WRAPPER_TYPES.add(short.class);
-        WRAPPER_TYPES.add(Integer.class);
-        WRAPPER_TYPES.add(int.class);
-        WRAPPER_TYPES.add(Long.class);
-        WRAPPER_TYPES.add(long.class);
-        WRAPPER_TYPES.add(Double.class);
-        WRAPPER_TYPES.add(double.class);
-        WRAPPER_TYPES.add(Float.class);
-        WRAPPER_TYPES.add(float.class);
-        WRAPPER_TYPES.add(String.class);
-        WRAPPER_TYPES.add(TimeZone.class);
-        WRAPPER_TYPES.add(Map.class);
-        WRAPPER_TYPES.add(Set.class);
-        WRAPPER_TYPES.add(List.class);
-        WRAPPER_TYPES.add(TimeUnit.class);
-    }
-
-    public ServerParameterListImpl(Object o, String namePrefix)
-    {
-        this(o != null ? o.getClass().getSimpleName() : null, o, namePrefix);
+        this(object != null ? object.getClass().getSimpleName() : null, object, namePrefix);
     }
 
 
-    public ServerParameterListImpl(String group, Object o, String namePrefix)
+    public ServerParameterListImpl(String group, Object object, String namePrefix)
     {
-        if (o != null)
+        if (object != null)
         {
-            getPropertiesByFields(group, o, namePrefix);
-            getPropertiesByGetters(group, o, namePrefix);
+            getProperties(group, object, namePrefix);
         }
     }
 
@@ -115,38 +87,38 @@ public class ServerParameterListImpl implements ServerParameterList
     }
 
 
-    private void getPropertiesByFields(String group, Object o, String namePrefix)
+    private void getProperties(String group, Object object, String namePrefix)
     {
 
-        Class<?> objectClass = o.getClass();
+        Class<?> objectClass = object.getClass();
 
-        Field[] fields = objectClass.getDeclaredFields();
-        for (Field field : fields)
+        List<Property> properties = ReflectionUtils.allPropertiesOf(objectClass, false);
+        for (Property property : properties)
         {
-            if (isIgnored(field))
+            if (isIgnored(property))
             {
                 continue;
             }
-            //String fieldName = String.format("%s.%s", StringUtils.isNotBlank(namePrefix) ? namePrefix : objectClass.getSimpleName(), field.getName());
-            String fieldName = getFieldName(namePrefix, field.getName());
-            if (isHidden(field) || isHidden(fieldName))
+            String propertyName = getPropertyName(namePrefix, property.getName());
+            if (isHidden(property) || isHidden(propertyName))
             {
-                add(group, new ServerParameter(fieldName, "*** [hidden]", false));
+                add(group, new ServerParameter(propertyName, "*** [hidden]", false));
             }
             else
             {
                 try
                 {
-                    Object fieldValue = getFieldValue(field, o);
-                    if (fieldValue != null)
+                    if (property.canAccess(object))
                     {
-                        if (isPrimitiveType(fieldValue.getClass()) || fieldValue.getClass().isEnum())
+                        Object propertyValue = property.get(object);
+
+                        if (isPrimitiveType(propertyValue))
                         {
-                            add(group, new ServerParameter(fieldName, fieldValue.toString(), false));
+                            add(group, new ServerParameter(propertyName, String.valueOf(propertyValue), false));
                         }
                         else
                         {
-                            add(new ServerParameterListImpl(group, fieldValue, fieldName));
+                            add(new ServerParameterListImpl(group, propertyValue, propertyName));
                         }
                     }
                 }
@@ -156,142 +128,27 @@ public class ServerParameterListImpl implements ServerParameterList
                 }
                 catch (Exception e)
                 {
-                    add(group, new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
+                    add(group, new ServerParameter(propertyName, String.format("Conversion error: %s", e.getMessage()), false));
                 }
             }
         }
     }
 
 
-    private static Object getFieldValue(Field field, Object o) throws InvocationTargetException, IllegalAccessException
-    {
-        Object subject = getSubject(field, o);
-        if (field.canAccess(subject))
-        {
-            return field.get(subject);
-        }
-        else
-        {
-            return tryInvokeGetter(field, o);
-        }
-    }
-
-
-    private static Object getSubject(Field field, Object o)
-    {
-        Object subject = o;
-        int modifiers = field.getModifiers();
-        if ((modifiers & Modifier.STATIC) != 0)
-        {
-            subject = null;
-        }
-        return subject;
-    }
-
-
-    private static Object getSubject(Method method, Object o)
-    {
-        Object subject = o;
-        int modifiers = method.getModifiers();
-        if ((modifiers & Modifier.STATIC) != 0)
-        {
-            subject = null;
-        }
-        return subject;
-    }
-
-
-    private static String getFieldName(String namePrefix, String fieldName)
+    private static String getPropertyName(String namePrefix, String propertyName)
     {
         if (StringUtils.isNotBlank(namePrefix))
         {
-            return String.format("%s.%s", namePrefix, fieldName);
+            return String.format("%s.%s", namePrefix, propertyName);
         }
 
-        return fieldName;
-    }
-
-    private void getPropertiesByGetters(String group, Object o, String namePrefix)
-    {
-
-        Class<?> objectClass = o.getClass();
-
-        Method[] declaredMethods = objectClass.getDeclaredMethods();
-        for (Method method : declaredMethods)
-        {
-            if (isIgnored(method))
-            {
-                continue;
-            }
-            if (isGetter(method))
-            {
-                //String fieldName = String.format("%s.%s", StringUtils.isNotBlank(namePrefix) ? namePrefix : objectClass.getSimpleName(), getFieldNameFromGetter(method));
-                String fieldName = getFieldName(namePrefix, getFieldNameFromGetter(method));
-                if (isHidden(fieldName))
-                {
-                    add(group, new ServerParameter(fieldName, "*** [hidden]", false));
-                }
-                else
-                {
-                    try
-                    {
-                        Object fieldValue = invokeGetter(method, o);
-                        if (fieldValue != null)
-                        {
-                            if (isPrimitiveType(fieldValue.getClass()))
-                            {
-                                add(group, new ServerParameter(fieldName, fieldValue.toString(), false));
-                            }
-                            else
-                            {
-                                add(new ServerParameterListImpl(group, fieldValue, fieldName));
-                            }
-                        }
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        // private property
-                    }
-                    catch (Exception e)
-                    {
-                        add(group, new ServerParameter(fieldName, String.format("Conversion error: %s", e.getMessage()), false));
-                    }
-                }
-            }
-        }
+        return propertyName;
     }
 
 
-    private static String getFieldNameFromGetter(Method method)
+    private static boolean isHidden(Property property)
     {
-        if (method.getName().startsWith("get"))
-        {
-            return lowerCamelCase(method.getName().substring(3));
-        }
-        else if (method.getName().startsWith("is"))
-        {
-            return lowerCamelCase(method.getName().substring(2));
-        }
-
-        throw new UnexpectedConditionException(String.format("'%s' is not a getter method!", method.getName()));
-    }
-
-
-    private static String lowerCamelCase(String name)
-    {
-        return name.substring(0, 1).toLowerCase() + name.substring(1);
-    }
-
-
-    private static boolean isGetter(Method method)
-    {
-        return method.getParameters().length == 0 && (method.getName().startsWith("get") || method.getName().startsWith("is"));
-    }
-
-
-    private static boolean isHidden(Field field)
-    {
-        ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
+        ConfigProperty configProperty = property.getAnnotation(ConfigProperty.class);
         if (configProperty == null)
         {
             return false;
@@ -299,9 +156,10 @@ public class ServerParameterListImpl implements ServerParameterList
         return configProperty.hidden();
     }
 
-    private static boolean isIgnored(Field field)
+
+    private static boolean isIgnored(Property property)
     {
-        ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
+        ConfigProperty configProperty = property.getAnnotation(ConfigProperty.class);
         if (configProperty == null)
         {
             return false;
@@ -309,74 +167,26 @@ public class ServerParameterListImpl implements ServerParameterList
         return configProperty.ignored();
     }
 
-    private static boolean isIgnored(Method method)
-    {
-        ConfigProperty configProperty = method.getAnnotation(ConfigProperty.class);
-        if (configProperty == null)
-        {
-            return false;
-        }
-        return configProperty.ignored();
-    }
 
     private static boolean isHidden(String fieldName)
     {
         return fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("secret");
     }
 
-    private static boolean isPrimitiveType(Class<?> clazz)
+
+    private static boolean isPrimitiveType(Object object)
     {
+        if (object == null)
+        {
+            return true;
+        }
+
+        Class<?> clazz = object.getClass();
         if (clazz.getName().startsWith("com.netflix"))
         {
             return true;
         }
 
-        for (Class<?> type : WRAPPER_TYPES)
-        {
-            if (type.isAssignableFrom(clazz))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    private static Object tryInvokeGetter(Field field, Object o) throws InvocationTargetException, IllegalAccessException
-    {
-        for (Method method : o.getClass().getDeclaredMethods())
-        {
-            if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase()) && isGetter(method))
-            {
-                if ((method.getName().startsWith("get") && (method.getName().length() == (field.getName().length() + 3)))
-                        || (method.getName().startsWith("is") && (method.getName().length() == (field.getName().length() + 2)))
-                )
-                {
-                    Object subject = getSubject(method, o);
-                    if (method.canAccess(subject))
-                    {
-                        return method.invoke(subject);
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-    private static Object invokeGetter(Method method, Object o) throws InvocationTargetException, IllegalAccessException
-    {
-        if (isGetter(method))
-        {
-            Object subject = getSubject(method, o);
-            if (method.canAccess(subject))
-            {
-                return method.invoke(subject);
-            }
-        }
-
-        return null;
+        return ReflectionUtils.isTerminalType(clazz);
     }
 }
