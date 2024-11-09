@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 
@@ -34,7 +35,7 @@ import java.text.MessageFormat;
 
 @Getter
 @EqualsAndHashCode
-public class Property
+public class Property implements Member
 {
     public enum Type
     {
@@ -70,6 +71,8 @@ public class Property
         return property;
     }
 
+
+    @Override
     public Class<?> getDeclaringClass()
     {
         return switch (type)
@@ -77,6 +80,24 @@ public class Property
             case FIELD -> field.getDeclaringClass();
             case GETTER -> getter.getDeclaringClass();
         };
+    }
+
+
+    @Override
+    public int getModifiers()
+    {
+        return switch (type)
+        {
+            case FIELD -> field.getModifiers();
+            case GETTER -> getter.getModifiers();
+        };
+    }
+
+
+    @Override
+    public boolean isSynthetic()
+    {
+        return false;
     }
 
 
@@ -95,7 +116,7 @@ public class Property
     }
 
 
-    public static String lowerCamelCase(String name)
+    private static String lowerCamelCase(String name)
     {
         return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
@@ -136,7 +157,7 @@ public class Property
      *
      * @return Object
      */
-    public Object get(Object object) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
+    public Object get(Object object) throws IllegalAccessException, InvocationTargetException
     {
         if (object == null)
         {
@@ -146,7 +167,7 @@ public class Property
         {
             if (!field.canAccess(object) && !field.trySetAccessible())
             {
-                return MessageFormat.format("{0} is not accessible!", field.getName());
+                throw new IllegalAccessException(MessageFormat.format("{0} is not accessible!", field.getName()));
             }
 
             return field.get(object);
@@ -155,7 +176,7 @@ public class Property
         {
             if (!getter.canAccess(object) && !getter.trySetAccessible())
             {
-                return MessageFormat.format("{0} is not accessible!", getter.getName());
+                throw new IllegalAccessException(MessageFormat.format("{0} is not accessible!", field.getName()));
             }
             return getter.invoke(object);
         }

@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public abstract class Thing
                 Object propertyValue = property.get(object);
                 valueMap.getProperties().put(property.getName(), valueToThing(propertyValue, includePrivate));
             }
-            catch (Exception e)
+            catch (IllegalAccessException | InvocationTargetException | RuntimeException e)
             {
                 log.warn("Cannot process property {}.{}: {}", object.getClass().getName(), property.getName(), e.getMessage());
             }
