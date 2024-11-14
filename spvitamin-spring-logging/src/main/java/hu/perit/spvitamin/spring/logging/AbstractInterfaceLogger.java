@@ -20,6 +20,7 @@ import hu.perit.spvitamin.core.event.Event;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.ThreadContext;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -116,6 +117,7 @@ public abstract class AbstractInterfaceLogger
 
     protected String iptrace(String traceId, String user, int eventID, String eventText, String subject, boolean isDirectionIn, Map<String, Object> options)
     {
+        ThreadContext.put(hu.perit.spvitamin.spring.logging.Constants.EXTERNAL_TRACE_ID, traceId);
         LogEvent logEvent = LogEvent.of(this, traceId, this.getSubsystemName(), getClientIpAddr(), LoggingHelper.getHostName(), user, eventID, eventText, subject, isDirectionIn, options);
 
         // Place to forward the event log entry to a log server

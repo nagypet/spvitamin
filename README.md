@@ -97,6 +97,7 @@ dependencyManagement {
 - ReflectionUtils extended with Property class
 - ServerParameterListImpl uses new Property interface from ReflectionUtils
 - Things uses new Property interface from ReflectionUtils
+- ReflectionUtils gettersOf, settersOf return methods alphabetically sorted
 
 ### 3.3.2-1-RELEASE not yet released
 

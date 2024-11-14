@@ -64,7 +64,7 @@ class RequestLoggerTest
         request.setComment("very very very very very very very very very very very very very very very very very very long comment");
 
         String subject = RequestLogger.toSubject(request);
-        assertThat(subject).isEqualTo("{\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}],\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"comment\":\"String of size 102 beginning with: very very very very very ve...\"}");
+        assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}]}");
     }
 
     private static List<Keyword> getTestKeywords()
@@ -94,6 +94,6 @@ class RequestLoggerTest
 
         String subject = RequestLogger.toSubject(Arguments.create(List.of("request", "username", "password", "processID"), request, "IDXAPI", "Obama", "123"));
         log.debug(subject);
-        assertThat(subject).isEqualTo("{\"request\":{\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}],\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"comment\":\"String of size 102 beginning with: very very very very very ve...\"},\"username\":\"IDXAPI\",\"password\":\"*** [hidden]\",\"processID\":\"123\"}");
+        assertThat(subject).isEqualTo("{\"request\":{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}]},\"username\":\"IDXAPI\",\"password\":\"*** [hidden]\",\"processID\":\"123\"}");
     }
 }

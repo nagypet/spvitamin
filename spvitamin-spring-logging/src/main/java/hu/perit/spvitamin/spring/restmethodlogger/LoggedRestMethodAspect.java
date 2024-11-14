@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.restmethodlogger;
 
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
+import hu.perit.spvitamin.spring.logging.Constants;
 import hu.perit.spvitamin.spring.logging.LogEvent;
 import hu.perit.spvitamin.spring.logging.RequestLogger;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
@@ -71,7 +72,7 @@ public class LoggedRestMethodAspect
         // Putting the externalTraceId into the ThreadContext for logging
         if (StringUtils.isNotBlank(annotation.externalTraceId()))
         {
-            ThreadContext.put("externalTraceId", arguments.getString(annotation.externalTraceId()));
+            ThreadContext.put(Constants.EXTERNAL_TRACE_ID, arguments.getString(annotation.externalTraceId()));
         }
 
         // Putting arguments into the ThreadContext for logging

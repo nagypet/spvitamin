@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
@@ -54,6 +55,7 @@ public class ReflectionUtils
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
                 .filter(method -> isGetter(method) && isNonStatic(method))
+                .sorted(Comparator.comparing(Method::getName))
                 .toList();
     }
 
@@ -70,6 +72,7 @@ public class ReflectionUtils
         Method[] methods = BooleanUtils.isTrue(includeInherited) ? clazz.getMethods() : clazz.getDeclaredMethods();
         return Arrays.stream(methods)
                 .filter(method -> isSetter(method) && isNonStatic(method))
+                .sorted(Comparator.comparing(Method::getName))
                 .toList();
     }
 
@@ -226,10 +229,25 @@ public class ReflectionUtils
     }
 
 
+    public static Optional<Method> getGetter(Class<?> clazz, String fieldName)
+    {
+        List<Method> getters = gettersOf(clazz, true);
+        return getters.stream()
+                .filter(getter -> getFieldNameFromMethod(getter).map(s -> s.equalsIgnoreCase(fieldName)).orElse(false)).findFirst();
+    }
+
+
     public static Optional<Method> getSetter(Class<?> clazz, String fieldName)
     {
         List<Method> setters = settersOf(clazz, true);
         return setters.stream().filter(setter -> getFieldNameFromMethod(setter).map(s -> s.equalsIgnoreCase(fieldName)).orElse(false)).findFirst();
+    }
+
+
+    public static Optional<Field> getField(Class<?> clazz, String fieldName)
+    {
+        Field[] fields = clazz.getDeclaredFields();
+        return Arrays.stream(fields).filter(field -> field.getName().equals(fieldName)).findFirst();
     }
 
 
@@ -276,6 +294,11 @@ public class ReflectionUtils
                 || clazz.isAssignableFrom(TimeUnit.class)
                 || clazz.isAssignableFrom(TimeZone.class)
         )
+        {
+            return true;
+        }
+
+        if (clazz.getSimpleName().equals("JAXBElement"))
         {
             return true;
         }

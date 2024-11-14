@@ -37,13 +37,13 @@ import java.text.MessageFormat;
 @EqualsAndHashCode
 public class Property implements Member
 {
-    public enum Type
+    public enum Kind
     {
         FIELD,
         GETTER
     }
 
-    protected Type type;
+    protected Kind kind;
     protected String name;
     protected Field field;
     protected Method getter;
@@ -51,7 +51,7 @@ public class Property implements Member
     protected static Property fromField(Field field)
     {
         Property property = new Property();
-        property.type = Type.FIELD;
+        property.kind = Kind.FIELD;
         property.name = field.getName();
         property.field = field;
         return property;
@@ -65,7 +65,7 @@ public class Property implements Member
         }
 
         Property property = new Property();
-        property.type = Type.GETTER;
+        property.kind = Kind.GETTER;
         property.name = getFieldNameFromGetter(getter);
         property.getter = getter;
         return property;
@@ -75,7 +75,7 @@ public class Property implements Member
     @Override
     public Class<?> getDeclaringClass()
     {
-        return switch (type)
+        return switch (kind)
         {
             case FIELD -> field.getDeclaringClass();
             case GETTER -> getter.getDeclaringClass();
@@ -86,7 +86,7 @@ public class Property implements Member
     @Override
     public int getModifiers()
     {
-        return switch (type)
+        return switch (kind)
         {
             case FIELD -> field.getModifiers();
             case GETTER -> getter.getModifiers();
@@ -124,17 +124,41 @@ public class Property implements Member
 
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass)
     {
-        return switch (type)
+        if (this.kind == Kind.FIELD)
         {
-            case FIELD -> field.getAnnotation(annotationClass);
-            case GETTER -> getter.getAnnotation(annotationClass);
-        };
+            T annotation = this.field.getAnnotation(annotationClass);
+            if (annotation != null)
+            {
+                return annotation;
+            }
+            // Find the getter if exists
+            Method propertyGetter = ReflectionUtils.getGetter(this.field.getDeclaringClass(), this.name).orElse(null);
+            if (propertyGetter != null)
+            {
+                return propertyGetter.getAnnotation(annotationClass);
+            }
+        }
+        else if (this.kind == Kind.GETTER)
+        {
+            T annotation = this.getter.getAnnotation(annotationClass);
+            if (annotation != null)
+            {
+                return annotation;
+            }
+            // Find the field if exist
+            Field propertyField = ReflectionUtils.getField(this.getter.getDeclaringClass(), this.name).orElse(null);
+            if (propertyField != null)
+            {
+                return propertyField.getAnnotation(annotationClass);
+            }
+        }
+        return null;
     }
 
 
     public boolean canAccess(Object object)
     {
-        return switch (type)
+        return switch (kind)
         {
             case FIELD -> field.canAccess(object);
             case GETTER -> getter.canAccess(object);
@@ -144,7 +168,7 @@ public class Property implements Member
 
     public void setAccessible(boolean accessible)
     {
-        switch (type)
+        switch (kind)
         {
             case FIELD -> field.setAccessible(accessible);
             case GETTER -> getter.setAccessible(accessible);
@@ -163,7 +187,7 @@ public class Property implements Member
         {
             return null;
         }
-        if (type == Type.FIELD)
+        if (kind == Kind.FIELD)
         {
             if (!field.canAccess(object) && !field.trySetAccessible())
             {
@@ -172,7 +196,7 @@ public class Property implements Member
 
             return field.get(object);
         }
-        else if (type == Type.GETTER)
+        else if (kind == Kind.GETTER)
         {
             if (!getter.canAccess(object) && !getter.trySetAccessible())
             {
@@ -184,11 +208,21 @@ public class Property implements Member
     }
 
 
+    public Class<?> getType()
+    {
+        return switch (kind)
+        {
+            case FIELD -> field.getType();
+            case GETTER -> getter.getReturnType();
+        };
+    }
+
+
     @Override
     public String toString()
     {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("type", type)
+                .append("type", kind)
                 .append("name", name)
                 .toString();
     }
