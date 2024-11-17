@@ -28,7 +28,7 @@ spring:
     time-zone: ${system.time-zone}
   mvc.pathmatch.matching-strategy: ant_path_matcher
   jpa.open-in-view: false
-
+  lifecycle.timeout-per-shutdown-phase: 5s
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Server settings
