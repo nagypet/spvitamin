@@ -86,9 +86,10 @@ class ThingTest
     void testSimpleType()
     {
         Thing thing = Thing.from("alma");
-        dump(thing);
-
         assertThat(thing).isInstanceOf(Value.class);
+
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("\"alma\"");
     }
 
 
@@ -98,10 +99,57 @@ class ThingTest
         CreateDocumentRequest request = getCreateDocumentRequest();
 
         Thing thing = Thing.from(request);
-        dump(thing);
-
         assertThat(thing).isInstanceOf(ValueMap.class);
         assertThat(((ValueMap) thing).getProperties()).hasSize(10);
+
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("""
+                {
+                  "comment":"String of size 72 beginning with: very very very ve...",
+                  "content":{
+                    "bytes":"byte[] of length: 164 bytes",
+                    "fileName":"alma.txt",
+                    "stream":"java.io.ByteArrayInputStream of size 4"
+                  },
+                  "documentDate":"2024-11-03",
+                  "documentTypeName":"testDocumentType",
+                  "keywords":[
+                    {
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    },
+                    {
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    }
+                  ],
+                  "keywordsMap":{
+                    "test-keyword":{
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    },
+                    "password-keyword":{
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    }
+                  },
+                  "keywordsSet":[
+                    {
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    },
+                    {
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    }
+                  ],
+                  "password":"*** [hidden]",
+                  "passwords":[
+                    "*** [hidden]",
+                    "*** [hidden]"
+                  ],
+                  "type":"ALMA"
+                }""");
     }
 
 
@@ -133,10 +181,62 @@ class ThingTest
         properties.put("traceID", "123");
 
         Thing thing = Thing.from(properties);
-        dump(thing);
-
         assertThat(thing).isInstanceOf(ValueMap.class);
         assertThat(((ValueMap) thing).getProperties()).hasSize(4);
+
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("""
+                {
+                  "request":{
+                    "comment":"String of size 72 beginning with: very very very ve...",
+                    "content":{
+                      "bytes":"byte[] of length: 164 bytes",
+                      "fileName":"alma.txt",
+                      "stream":"java.io.ByteArrayInputStream of size 4"
+                    },
+                    "documentDate":"2024-11-03",
+                    "documentTypeName":"testDocumentType",
+                    "keywords":[
+                      {
+                        "name":"test-keyword",
+                        "value":"keyword value"
+                      },
+                      {
+                        "name":"password-keyword",
+                        "value":"testPassword"
+                      }
+                    ],
+                    "keywordsMap":{
+                      "test-keyword":{
+                        "name":"test-keyword",
+                        "value":"keyword value"
+                      },
+                      "password-keyword":{
+                        "name":"password-keyword",
+                        "value":"testPassword"
+                      }
+                    },
+                    "keywordsSet":[
+                      {
+                        "name":"password-keyword",
+                        "value":"testPassword"
+                      },
+                      {
+                        "name":"test-keyword",
+                        "value":"keyword value"
+                      }
+                    ],
+                    "password":"*** [hidden]",
+                    "passwords":[
+                      "*** [hidden]",
+                      "*** [hidden]"
+                    ],
+                    "type":"ALMA"
+                  },
+                  "username":"IDXAPI",
+                  "password":"*** [hidden]",
+                  "traceID":"123"
+                }""");
     }
 
 
@@ -146,7 +246,55 @@ class ThingTest
         CreateDocumentRequest request = getCreateDocumentRequest();
 
         Thing thing = Thing.from(request, true);
-        dump(thing);
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("""
+                {
+                  "privateWithoutGetter":"privateWithoutGetter",
+                  "comment":"String of size 72 beginning with: very very very ve...",
+                  "content":{
+                    "bytes":"byte[] of length: 164 bytes",
+                    "fileName":"alma.txt",
+                    "stream":"java.io.ByteArrayInputStream of size 4"
+                  },
+                  "documentDate":"2024-11-03",
+                  "documentTypeName":"testDocumentType",
+                  "keywords":[
+                    {
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    },
+                    {
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    }
+                  ],
+                  "keywordsMap":{
+                    "test-keyword":{
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    },
+                    "password-keyword":{
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    }
+                  },
+                  "keywordsSet":[
+                    {
+                      "name":"password-keyword",
+                      "value":"testPassword"
+                    },
+                    {
+                      "name":"test-keyword",
+                      "value":"keyword value"
+                    }
+                  ],
+                  "password":"*** [hidden]",
+                  "passwords":[
+                    "*** [hidden]",
+                    "*** [hidden]"
+                  ],
+                  "type":"ALMA"
+                }""");
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -154,11 +302,13 @@ class ThingTest
         log.debug(objectMapper.writeValueAsString(thing));
     }
 
-    private static void dump(Thing thing)
+    private static String dump(Thing thing)
     {
         PrinterVisitor printerVisitor = new PrinterVisitor(PrinterVisitor.Options.builder().prettyPrint(true).hidePasswords(true).maxStringLength(20).build());
-        thing.accept(null, printerVisitor);
-        log.debug(printerVisitor.getJson());
+        thing.accept(printerVisitor);
+        String json = printerVisitor.getJson();
+        log.debug(json);
+        return json;
     }
 
 

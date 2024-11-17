@@ -41,7 +41,7 @@ public final class RequestLogger
         {
             Thing thing = Thing.from(request);
             RequestLoggerVisitor visitor = new RequestLoggerVisitor(PrinterVisitor.Options.builder().hidePasswords(true).ignoreNulls(true).build());
-            thing.accept(null, visitor);
+            thing.accept(visitor);
             return visitor.getJson();
         }
         catch (Exception e)
@@ -63,7 +63,7 @@ public final class RequestLogger
         {
             Thing thing = Thing.from(arguments.getArgumentMap());
             RequestLoggerVisitor visitor = new RequestLoggerVisitor(PrinterVisitor.Options.builder().hidePasswords(true).ignoreNulls(true).build());
-            thing.accept(null, visitor);
+            thing.accept(visitor);
             return visitor.getJson();
         }
         catch (Exception e)

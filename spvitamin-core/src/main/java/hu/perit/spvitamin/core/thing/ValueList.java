@@ -17,23 +17,30 @@
 package hu.perit.spvitamin.core.thing;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
 @JsonSerialize(using = ValueListSerializer.class)
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class ValueList extends Thing
 {
     private final List<Thing> elements = new ArrayList<>();
 
-    @Override
-    public void accept(String name, ThingVisitor visitor)
+    protected ValueList(String name)
     {
-        visitor.visit(name, this);
+        super(name);
+    }
+
+    @Override
+    public void accept(ThingVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @Override

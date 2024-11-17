@@ -17,19 +17,27 @@
 package hu.perit.spvitamin.core.thing;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
 @JsonSerialize(using = ValueSerializer.class)
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class Value extends Thing
 {
     private final Object value;
 
-    public void accept(String name, ThingVisitor visitor)
+    public Value(String name, Object value)
     {
-        visitor.visit(name, this);
+        super(name);
+        this.value = value;
+    }
+
+    public void accept(ThingVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @Override

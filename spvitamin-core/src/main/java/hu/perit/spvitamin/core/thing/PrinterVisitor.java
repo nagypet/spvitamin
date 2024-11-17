@@ -78,7 +78,7 @@ public class PrinterVisitor implements ThingVisitor
     }
 
     @Override
-    public void visit(String name, Value value)
+    public void visit(Value value)
     {
         if (value.isEmpty())
         {
@@ -86,7 +86,7 @@ public class PrinterVisitor implements ThingVisitor
             return;
         }
 
-        String convertedValue = convertProperty(name, value.getValue());
+        String convertedValue = convertProperty(value.getName(), value.getValue());
         String escaped = convertedValue
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
@@ -175,7 +175,7 @@ public class PrinterVisitor implements ThingVisitor
 
 
     @Override
-    public void visit(String name, ValueList valueList)
+    public void visit(ValueList valueList)
     {
         jsonBuilder.append("[");
         newLine();
@@ -185,7 +185,7 @@ public class PrinterVisitor implements ThingVisitor
         for (Thing element : valueList.getElements())
         {
             indent();
-            element.accept(name, this);
+            element.accept(this);
 
             elementCount++;
             if (elementCount < valueList.getElements().size())
@@ -201,7 +201,7 @@ public class PrinterVisitor implements ThingVisitor
     }
 
     @Override
-    public void visit(String name, ValueMap valueMap)
+    public void visit(ValueMap valueMap)
     {
         jsonBuilder.append("{");
         newLine();
@@ -216,7 +216,7 @@ public class PrinterVisitor implements ThingVisitor
             indent();
             jsonBuilder.append("\"").append(key).append("\":");
 
-            property.accept(key, this);
+            property.accept(this);
 
             entryCount++;
             if (entryCount < entryList.size())

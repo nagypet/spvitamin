@@ -19,9 +19,10 @@ package hu.perit.spvitamin.core.thing;
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,90 +35,93 @@ import java.util.Map;
  */
 
 @Getter
-@Setter
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
+@EqualsAndHashCode
 public abstract class Thing
 {
-    private String name;
+    private final String name;
 
     public static Thing from(Object object)
     {
-        return valueToThing(object, false);
+        return valueToThing(null, object, false);
     }
 
     public static Thing from(Object object, Boolean includePrivate)
     {
-        return valueToThing(object, includePrivate);
+        return valueToThing(null, object, includePrivate);
     }
 
-    public abstract void accept(String name, ThingVisitor visitor);
+    public abstract void accept(ThingVisitor visitor);
 
     abstract boolean isEmpty();
 
 
-    private static Value objectToValue(Object object)
+    private static Value objectToValue(String name, Object object)
     {
-        return new Value(object);
+        return new Value(name, object);
     }
 
 
-    private static Thing valueToThing(Object object, Boolean includePrivate)
+    private static Thing valueToThing(String name, Object object, Boolean includePrivate)
     {
         if (object == null || ReflectionUtils.isTerminalType(object))
         {
-            return objectToValue(object);
+            return objectToValue(name, object);
         }
 
         if (object instanceof Collection<?> list)
         {
-            return convertCollection(list, includePrivate);
+            return convertCollection(name, list, includePrivate);
         }
         else if (object instanceof Map<?, ?> map)
         {
-            return convertMap(map, includePrivate);
+            return convertMap(name, map, includePrivate);
         }
 
         List<Property> properties = ReflectionUtils.propertiesOf(object.getClass(), includePrivate);
         if (properties.isEmpty())
         {
             // Enums come here
-            return objectToValue(object);
+            return objectToValue(name, object);
         }
-        ValueMap valueMap = new ValueMap();
+        ValueMap valueMap = new ValueMap(name);
         for (Property property : properties)
         {
+            String propertyName = property.getName();
             try
             {
                 Object propertyValue = property.get(object);
-                valueMap.getProperties().put(property.getName(), valueToThing(propertyValue, includePrivate));
+                valueMap.getProperties().put(propertyName, valueToThing(propertyName, propertyValue, includePrivate));
             }
             catch (IllegalAccessException | InvocationTargetException | RuntimeException e)
             {
-                log.warn("Cannot process property {}.{}: {}", object.getClass().getName(), property.getName(), e.getMessage());
+                log.warn("Cannot process property {}.{}: {}", object.getClass().getName(), propertyName, e.getMessage());
             }
         }
         return valueMap;
     }
 
 
-    private static ValueList convertCollection(Collection<?> collection, Boolean includePrivate)
+    private static ValueList convertCollection(String name, Collection<?> collection, Boolean includePrivate)
     {
-        ValueList valueList = new ValueList();
+        ValueList valueList = new ValueList(name);
         for (Object item : collection)
         {
-            valueList.getElements().add(valueToThing(item, includePrivate));
+            valueList.getElements().add(valueToThing(name, item, includePrivate));
         }
         return valueList;
     }
 
 
-    private static ValueMap convertMap(Map<?, ?> map, Boolean includePrivate)
+    private static ValueMap convertMap(String name, Map<?, ?> map, Boolean includePrivate)
     {
-        ValueMap valueMap = new ValueMap();
+        ValueMap valueMap = new ValueMap(name);
         for (Map.Entry<?, ?> entry : map.entrySet())
         {
-            valueMap.getProperties().put(entry.getKey().toString(), valueToThing(entry.getValue(), includePrivate));
+            String propertyName = entry.getKey().toString();
+            valueMap.getProperties().put(propertyName, valueToThing(propertyName, entry.getValue(), includePrivate));
         }
         return valueMap;
     }

@@ -17,29 +17,33 @@
 package hu.perit.spvitamin.core.thing;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AccessLevel;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Setter;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
 @Slf4j
 @JsonSerialize(using = ValueMapSerializer.class)
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class ValueMap extends Thing
 {
-    @Setter(AccessLevel.NONE)
     private final Map<String, Thing> properties = new LinkedHashMap<>();
+
+    protected ValueMap(String name)
+    {
+        super(name);
+    }
 
 
     @Override
-    public void accept(String name, ThingVisitor visitor)
+    public void accept(ThingVisitor visitor)
     {
-        visitor.visit(name, this);
+        visitor.visit(this);
     }
 
 
