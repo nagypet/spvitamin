@@ -45,6 +45,7 @@ mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
+reflections = 'org.reflections:reflections:0.10.2'
 slf4j-api = 'org.slf4j:slf4j-api:2.0.13'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
 spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'

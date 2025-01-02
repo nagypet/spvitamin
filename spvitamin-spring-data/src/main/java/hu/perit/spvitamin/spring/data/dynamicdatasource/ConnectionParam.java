@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.data.dynamicdatasource;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.core.typehelpers.LongUtils;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.data.mapper.ConnectionParamMapper;
@@ -27,6 +28,8 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * A convenience class, which creates a JDBC connection string using the raw datasource properties for the popular database systems.
@@ -116,24 +119,30 @@ public class ConnectionParam extends DatasourceProperties
     {
         return switch (this.dbType)
         {
-            case DBTYPE_SQLSERVER -> getOptionsSeparatedWithSemicolon(true);
-            case DBTYPE_H2 -> getOptionsSeparatedWithSemicolon(false);
-            case DBTYPE_ORACLE, DBTYPE_MYSQL, DBTYPE_POSTGRESQL -> "";
+            case DBTYPE_SQLSERVER -> getOptions(true, TimeUnit.MILLISECONDS, ";", ";");
+            case DBTYPE_POSTGRESQL -> getOptions(true, TimeUnit.SECONDS, "?", "&");
+            case DBTYPE_H2 -> getOptions(false, null, ";", ";");
+            case DBTYPE_ORACLE, DBTYPE_MYSQL -> "";
             default -> throw new InvalidInputException(String.format(NOT_YET_SUPPORTED, this.dbType));
         };
     }
 
 
-    private String getOptionsSeparatedWithSemicolon(boolean includeSocketTimeout)
+    private String getOptions(boolean includeSocketTimeout, TimeUnit timeUnit, String firstSeparator, String furtherSeparator)
     {
         StringBuilder sb = new StringBuilder();
         if (includeSocketTimeout)
         {
-            sb.append(";").append(String.format("socketTimeout=%d", this.getSocketTimeout()));
+            long socketTimeout = LongUtils.get(this.getSocketTimeout());
+            if (timeUnit == TimeUnit.SECONDS)
+            {
+                socketTimeout /= 1000;
+            }
+            sb.append(firstSeparator).append(String.format("socketTimeout=%d", socketTimeout));
         }
         if (this.options != null)
         {
-            sb.append(";").append(this.options);
+            sb.append(furtherSeparator).append(this.options);
         }
         return sb.toString();
     }

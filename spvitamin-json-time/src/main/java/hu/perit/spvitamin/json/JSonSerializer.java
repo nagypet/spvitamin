@@ -22,6 +22,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * @author Peter Nagy
@@ -44,8 +50,34 @@ public final class JSonSerializer
 
     public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
     {
+        String fixedJson = fixRoorLevelObjects(jsonString, target);
         ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-        return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
+        return mapper.readValue(fixedJson, mapper.getTypeFactory().constructType(target));
+    }
+
+
+    // Root level objects must be put into quotes in order to trigger custom deserializers
+    private static <T> String fixRoorLevelObjects(final String json, Class<T> clazz)
+    {
+        String retval = json;
+        if (clazz == LocalDate.class
+                || clazz == LocalDateTime.class
+                || clazz == OffsetDateTime.class
+                || clazz == ZonedDateTime.class
+                || clazz == Instant.class
+                || clazz == Date.class
+        )
+        {
+            if (!retval.startsWith("\""))
+            {
+                retval = "\"" + retval;
+            }
+            if (!retval.endsWith("\""))
+            {
+                retval = retval + "\"";
+            }
+        }
+        return retval;
     }
 
 

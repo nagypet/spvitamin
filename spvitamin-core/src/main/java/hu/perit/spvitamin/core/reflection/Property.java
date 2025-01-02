@@ -218,6 +218,17 @@ public class Property implements Member
     }
 
 
+    public Object getGenericType()
+    {
+        return switch (kind)
+        {
+            case FIELD -> field.getGenericType();
+            case GETTER -> getter.getGenericReturnType();
+        };
+    }
+
+
+
     @Override
     public String toString()
     {

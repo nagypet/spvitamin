@@ -32,6 +32,8 @@ public class JacksonAutoConfiguration
     @Bean
     public ObjectMapper objectMapper()
     {
-        return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        TypeRegistry.registerTypesInMapper(mapper);
+        return mapper;
     }
 }

@@ -82,6 +82,12 @@ dependencyManagement {
 ### 3.3.3-2-RELEASE not yet released
 
 - Thing refactored
+- OffsetDateTimeUtils to parse an OffsetDateTime from string
+- @AutoregisterJsonType and @EnableJsonSubtypeAutoconfiguration annotations. The ObjectMapper is configured to automatically register subtypes of abstract classes
+- SizeUtils for converting and parsing file sizes to and from human-readable forms
+- ParallelRunner: a simple solution for running jobs parallely and propagating the ThreadContext and the SecurityContext 
+- json-time module handles the form yyyy.MM.dd
+- ConnectionParams handles socket-timeout in the PostgreSQL syntax
 
 ### 3.3.3-1-RELEASE not yet released
 
