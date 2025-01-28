@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,3 +14,26 @@
  * limitations under the License.
  */
 
+package hu.perit.spvitamin.core.typehelpers;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class MapUtils
+{
+    public static <K, V> Map<K, V> toMap(Collection<V> collection, Function<V, K> keySupplier)
+    {
+        if (collection == null)
+        {
+            return Map.of();
+        }
+
+        return collection.stream().collect(Collectors.toMap(keySupplier, v -> v));
+    }
+}

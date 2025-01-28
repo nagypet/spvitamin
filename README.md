@@ -88,6 +88,8 @@ dependencyManagement {
 - ParallelRunner: a simple solution for running jobs parallely and propagating the ThreadContext and the SecurityContext 
 - json-time module handles the form yyyy.MM.dd
 - ConnectionParams handles socket-timeout in the PostgreSQL syntax
+- FileNameUtils improved
+- MapUtils for creating a Map from a Collection
 
 ### 3.3.3-1-RELEASE not yet released
 
