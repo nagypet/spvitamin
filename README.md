@@ -90,6 +90,7 @@ dependencyManagement {
 - ConnectionParams handles socket-timeout in the PostgreSQL syntax
 - FileNameUtils improved
 - MapUtils for creating a Map from a Collection
+- Profile loading at startup fixed
 
 ### 3.3.3-1-RELEASE not yet released
 

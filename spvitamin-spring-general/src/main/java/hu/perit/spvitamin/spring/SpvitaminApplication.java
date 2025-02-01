@@ -29,9 +29,8 @@ import org.springframework.core.env.AbstractEnvironment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +85,7 @@ public class SpvitaminApplication extends SpringApplication
             sj.add(hostname);
         }
 
+        log.info("Setting property: {}: {}", AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
         System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, sj.toString());
     }
 
@@ -118,31 +118,34 @@ public class SpvitaminApplication extends SpringApplication
 
     private static List<String> tryGetProfilesFromFile(String filepath)
     {
-        try
+        log.info("Trying to load profiles from {}", filepath);
+        try (InputStream inputStream = Resources.getResourceAsInputStream(filepath))
         {
-            log.info("Trying to load profiles from {}", filepath);
-            Path activeProfilesPath = Resources.getResourcePath(filepath);
-            InputStream inputStream = Files.newInputStream(activeProfilesPath);
             String activeProfiles = StringUtils.strip(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
-            log.info("Additional profiles loaded from {}: {}", activeProfilesPath, activeProfiles);
-            return List.of(activeProfiles.split(","));
+            log.info("Additional profiles loaded from {}: '{}'", filepath, activeProfiles);
+            if (!StringUtils.isBlank(activeProfiles))
+            {
+                return List.of(activeProfiles.split(","));
+            }
         }
         catch (IOException | ResourceNotFoundException | RuntimeException e)
         {
-            return Collections.emptyList();
+            log.warn("Error loading resource from {}: {}", filepath, e.getMessage());
         }
+        return Collections.emptyList();
     }
 
 
     private static String getHostName()
     {
-        String hostname = System.getenv("HOSTNAME");
-        if (hostname != null)
+        try
         {
-            return hostname.toLowerCase();
+            return InetAddress.getLocalHost().getHostName();
         }
-
-        return StringUtils.toRootLowerCase(System.getenv("COMPUTERNAME"));
+        catch (Exception e)
+        {
+            return "unknown-host";
+        }
     }
 
 
@@ -176,6 +179,7 @@ public class SpvitaminApplication extends SpringApplication
             // Adding loaded sysproperties
             for (Map.Entry<Object, Object> entry : sysProperties.entrySet())
             {
+                log.info("Setting property: {}: {}", entry.getKey(), entry.getValue());
                 System.setProperty(entry.getKey().toString(), entry.getValue().toString());
             }
         }
@@ -184,14 +188,12 @@ public class SpvitaminApplication extends SpringApplication
 
     private static Properties tryGetSysPropertiesFromFile(String filepath)
     {
-        try
+        log.info("Trying to load system properties from {}", filepath);
+        try (InputStream inputStream = Resources.getResourceAsInputStream(filepath))
         {
-            log.info("Trying to load system properties from {}", filepath);
-            Path path = Resources.getResourcePath(filepath);
-            InputStream inputStream = Files.newInputStream(path);
             Properties properties = new Properties();
             properties.load(inputStream);
-            log.info("Additional system properties loaded from {}: {}", path, properties);
+            log.info("Additional system properties loaded from {}: {}", filepath, properties);
             return properties;
         }
         catch (IOException | ResourceNotFoundException | RuntimeException e)
@@ -199,7 +201,6 @@ public class SpvitaminApplication extends SpringApplication
             return new Properties();
         }
     }
-
 
 
 }

@@ -21,8 +21,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -30,24 +31,24 @@ import java.text.MessageFormat;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Resources
 {
-    public static Path getResourcePath(String resourcePath) throws ResourceNotFoundException
+    public static InputStream getResourceAsInputStream(String resourcePath) throws ResourceNotFoundException
     {
-        String baseDir = System.getProperty("user.dir");
-        Path configPath = Paths.get(baseDir, resourcePath).toAbsolutePath();
-        if (configPath.toFile().exists())
-        {
-            return configPath;
-        }
-
-        // Trying to load from the classpath
+        Path configPath = null;
         try
         {
-            File resource = new ClassPathResource(resourcePath).getFile();
-            return Paths.get(resource.getAbsolutePath()).toAbsolutePath();
+            String baseDir = System.getProperty("user.dir");
+            configPath = Paths.get(baseDir, resourcePath).toAbsolutePath();
+            if (configPath.toFile().exists())
+            {
+                return Files.newInputStream(configPath);
+            }
+
+            // Trying to load from the classpath
+            return new ClassPathResource(resourcePath).getInputStream();
         }
         catch (IOException e)
         {
-            throw new ResourceNotFoundException(MessageFormat.format("Resource not found: {0}", resourcePath), e);
+            throw new ResourceNotFoundException(MessageFormat.format("Resource not found: {0}", configPath), e);
         }
     }
 }
