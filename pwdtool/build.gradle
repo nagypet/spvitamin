@@ -26,7 +26,7 @@ repositories {
 
 
 application {
-    mainClassName = 'hu.perit.crypto.Application'
+    mainClassName = 'hu.perit.crypto.PwdToolApplication'
     // Some JVM options already set in common.gradle
     applicationDefaultJvmArgs += ['-Xmx256m', '-Xms32m']
 }

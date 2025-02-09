@@ -80,7 +80,7 @@ public abstract class Thing
             return convertMap(name, map, includePrivate);
         }
 
-        List<Property> properties = ReflectionUtils.propertiesOf(object.getClass(), includePrivate);
+        List<Property> properties = ReflectionUtils.allPropertiesOf(object.getClass(), includePrivate);
         if (properties.isEmpty())
         {
             // Enums come here

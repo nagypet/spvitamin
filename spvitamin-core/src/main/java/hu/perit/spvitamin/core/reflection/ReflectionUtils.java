@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.core.reflection;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +92,8 @@ public class ReflectionUtils
         List<Method> methods = gettersOf(clazz, false);
         List<Property> getterProperties = methods.stream()
                 .filter(method -> BooleanUtils.isTrue(includePrivate) || Modifier.isPublic(method.getModifiers()))
+                .filter(method -> !isCommonBaseMethod(method.getName()))
+                .filter(method -> !isIgnored(method))
                 .map(method -> Property.fromGetter(method))
                 .toList();
 
@@ -104,6 +107,16 @@ public class ReflectionUtils
         properties.addAll(fieldProperties);
         properties.addAll(getterProperties);
         return properties;
+    }
+
+    private static boolean isIgnored(Method method)
+    {
+        return method.getAnnotation(JsonIgnore.class) != null;
+    }
+
+    private static boolean isCommonBaseMethod(String name)
+    {
+        return "getClass".equalsIgnoreCase(name);
     }
 
 

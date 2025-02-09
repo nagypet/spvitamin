@@ -91,6 +91,9 @@ dependencyManagement {
 - FileNameUtils improved
 - MapUtils for creating a Map from a Collection
 - Profile loading at startup fixed
+- pwdtool added feature --keygen for AES encryption
+- ReflectionUtils.gettersOf() fixed: methods annotated with @JsonIgnore will not be returned. getClass() is not returned.
+- Thing fixed: using ReflectionUtils.allPropertiesOf() instead of ReflectionUtils.propertiesOf() to get base class properties too
 
 ### 3.3.3-1-RELEASE not yet released
 

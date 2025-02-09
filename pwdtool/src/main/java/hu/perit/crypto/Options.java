@@ -20,6 +20,9 @@ package hu.perit.crypto;
 import hu.perit.spvitamin.core.InitParams;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.EnumSet;
 
 @Getter
 @Slf4j
@@ -29,7 +32,8 @@ public class Options
     {
         NONE,
         ENCRYPT,
-        DECRYPT
+        DECRYPT,
+        KEYGEN
     }
 
     private String[] args;
@@ -60,11 +64,16 @@ public class Options
         }
         else
         {
+            if (args[0].equalsIgnoreCase("--keygen"))
+            {
+                this.command = Commands.KEYGEN;
+                return true;
+            }
+
             int countOptions = args.length - 1;
             for (int i = 0; i < countOptions; i++)
             {
                 String arg = args[i];
-                //log.debug(arg);
                 switch (arg)
                 {
                     case "--encrypt":
@@ -114,14 +123,25 @@ public class Options
             return false;
         }
 
-        if (this.text == null)
+        if (EnumSet.of(Commands.ENCRYPT, Commands.DECRYPT).contains(this.command))
         {
-            System.out.println("No text specified!");
-            return false;
+            if (StringUtils.isBlank(this.text))
+            {
+                System.out.println("No text specified!");
+                return false;
+            }
+            System.out.format("%s '%s' with secret key '%s'%n", this.command, this.text, this.key);
+            return true;
         }
 
-        System.out.format("%s '%s' with secret key '%s'%n", this.command, this.text, this.key);
-        return true;
+        if (EnumSet.of(Commands.KEYGEN).contains(this.command))
+        {
+            System.out.format("%s%n", this.command);
+            return true;
+        }
+
+        System.out.println("Unknown command!");
+        return false;
     }
 
 
@@ -131,6 +151,7 @@ public class Options
                 + "\toptions:%n"
                 + "\t\t--encrypt%n"
                 + "\t\t--decrypt%n"
+                + "\t\t--keygen%n"
                 + "\t\t--key encryption_key: if no key is specified the default is '%s'%n"
                 + "%n\te.g. pwdtool --encrypt --key changeit alma%n", this.key
         );

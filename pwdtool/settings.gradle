@@ -15,6 +15,14 @@
  * limitations under the License.
  */
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from(files("../gradle/version-catalog.toml"))
+        }
+    }
+}
+
 apply from: '../gradle/include-project-dependencies.gradle'
 
 rootProject.name = 'pwdtool'

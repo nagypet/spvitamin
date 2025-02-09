@@ -31,8 +31,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class SpvitaminApplication extends SpringApplication
@@ -59,6 +67,10 @@ public class SpvitaminApplication extends SpringApplication
     public SpvitaminApplication(Class<?>... primarySources)
     {
         super(primarySources);
+
+        log.info("Environment variables:");
+        Map<String, String> env = System.getenv();
+        env.keySet().stream().sorted().forEach(i -> log.info("{}={}", i, env.get(i)));
 
         setAdditionalProfiles();
 
@@ -125,7 +137,10 @@ public class SpvitaminApplication extends SpringApplication
             log.info("Additional profiles loaded from {}: '{}'", filepath, activeProfiles);
             if (!StringUtils.isBlank(activeProfiles))
             {
-                return List.of(activeProfiles.split(","));
+                return Stream.of(activeProfiles.split(","))
+                        .map(i -> StringUtils.strip(i))
+                        .filter(i -> !i.startsWith("#"))
+                        .toList();
             }
         }
         catch (IOException | ResourceNotFoundException | RuntimeException e)

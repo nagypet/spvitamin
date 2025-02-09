@@ -25,7 +25,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Parameters from properties file.
@@ -69,6 +73,8 @@ public class InitParams
     {
         final String defaultAppPropertiesFileConfigName = "application.configuration";
 
+        this.computerName = getComputerName();
+
         String configFile = System.getProperty(defaultAppPropertiesFileConfigName);
         if (configFile == null)
         {
@@ -85,16 +91,19 @@ public class InitParams
         }
 
         this.properties = this.loadPropertiesFromFile(configFile);
-        this.computerName = System.getenv("COMPUTERNAME"); // NOSONAR
-        if (this.computerName != null)
-        {
-            this.computerName = this.computerName.toUpperCase();
-        }
-        else
-        {
-            this.computerName = "";
-        }
         log.debug(String.format("%s loaded successfully for %s via location %s", this.configFileName, this.computerName, this.configFileLocation));
+    }
+
+
+    private String getComputerName()
+    {
+        String computername = System.getenv("COMPUTERNAME"); // NOSONAR
+        if (StringUtils.isNoneBlank(computername))
+        {
+            return StringUtils.toRootUpperCase(computername);
+        }
+        String hostname = System.getenv("HOSTNAME"); // NOSONAR
+        return StringUtils.toRootUpperCase(hostname);
     }
 
 
@@ -121,24 +130,46 @@ public class InitParams
             {
                 return loadPropertiesFromFile(location, fileName);
             }
-            catch (Exception e)
+            catch (IOException e)
             {
                 // Let's try the next location
             }
         }
 
         // trying to load from the resource
-        try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName))
+        IOException exception = null;
+        List<String> resourceLocations = List.of("config", "");
+        for (String location : resourceLocations)
+        {
+            try
+            {
+                return loadPropertiesFromResource(location, fileName);
+            }
+            catch (IOException e)
+            {
+                exception = e;
+                // Let's try the next location
+            }
+        }
+
+        throw exception;
+    }
+
+
+    private Properties loadPropertiesFromResource(String location, String fileName) throws IOException
+    {
+        String resourceLocation = location + "/" + fileName;
+        try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceLocation))
         {
             if (stream == null)
             {
                 this.configFileLocation = null;
                 this.configFileName = null;
-                throw new IOException("File not found " + fileName);
+                throw new IOException("Resource not found " + resourceLocation);
             }
 
             this.configFileLocation = "classpath";
-            this.configFileName = fileName;
+            this.configFileName = resourceLocation;
             Properties props = new Properties();
             props.load(stream);
             return props;
