@@ -69,7 +69,7 @@ public class LdapAuthenticationProviderConfigurer
 
     private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN, String bindUserPattern)
     {
-        log.debug(String.format("'%s' url: '%s', rootDN: '%s', filter: '%s', domain: '%s', with domain: '%b'", name, url, rootDN, filter, domain, withDomain));
+        log.info(String.format("'%s' url: '%s', rootDN: '%s', filter: '%s', domain: '%s', with domain: '%b'", name, url, rootDN, filter, domain, withDomain));
 
         LdapAuthenticationProvider provider = new LdapAuthenticationProvider(domain, url, rootDN);
         provider.setSearchFilter(filter);

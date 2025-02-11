@@ -94,6 +94,7 @@ dependencyManagement {
 - pwdtool added feature --keygen for AES encryption
 - ReflectionUtils.gettersOf() fixed: methods annotated with @JsonIgnore will not be returned. getClass() is not returned.
 - Thing fixed: using ReflectionUtils.allPropertiesOf() instead of ReflectionUtils.propertiesOf() to get base class properties too
+- LdapAuthenticationProviderConfigurer logging with INFO level
 
 ### 3.3.3-1-RELEASE not yet released
 
