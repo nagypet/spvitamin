@@ -49,5 +49,6 @@ public class ForwardingAuthRequestInterceptor implements RequestInterceptor
             }
         }
         template.header("Authorization", this.authorization);
+        template.header("Content-Type", "application/json");
     }
 }

@@ -17,13 +17,10 @@
 package hu.perit.spvitamin.spring.config;
 
 import jakarta.annotation.PostConstruct;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,11 +30,22 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "spring.cloud.openfeign.client.config.default")
+@ConfigurationProperties(prefix = "spvitamin.feign")
 @Slf4j
 public class FeignProperties
 {
     private String loggerLevel = "BASIC";
+
+    @NestedConfigurationProperty
+    private Retry retry = new Retry();
+
+    @Data
+    public static class Retry
+    {
+       private int maxAttempts = 3;
+       private int maxPeriod = 2000;
+       private int period = 500;
+    }
 
     @PostConstruct
     private void postConstruct()

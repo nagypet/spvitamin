@@ -24,8 +24,10 @@ import feign.Retryer;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
+import hu.perit.spvitamin.spring.config.FeignProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
+import org.springframework.cloud.openfeign.support.SpringMvcContract;
 
 /**
  * @author Peter Nagy
@@ -44,12 +46,15 @@ public class SimpleFeignClientBuilder
     public SimpleFeignClientBuilder()
     {
         ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        FeignProperties feignProperties = SysConfig.getFeignProperties();
         this.builder = Feign.builder()
+                .contract(new SpringMvcContract())
                 .decoder(new JacksonDecoder(objectMapper))
                 .encoder(new JacksonEncoder(objectMapper))
-                .retryer(Retryer.NEVER_RETRY)
+                .retryer(new Retryer.Default(feignProperties.getRetry().getPeriod(), feignProperties.getRetry().getMaxPeriod(), feignProperties.getRetry().getMaxAttempts()))
+                //.retryer(Retryer.NEVER_RETRY)
                 .logger(new Slf4jLogger(getClass()))
-                .logLevel(getLevel(SysConfig.getFeignProperties().getLoggerLevel()))
+                .logLevel(getLevel(feignProperties.getLoggerLevel()))
                 .errorDecoder(new RestExceptionResponseDecoder());
     }
 
