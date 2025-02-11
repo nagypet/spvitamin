@@ -18,17 +18,36 @@ package hu.perit.spvitamin.spring.feignclients;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-public class ForwardingAuthRequestInterceptor implements RequestInterceptor {
+public class ForwardingAuthRequestInterceptor implements RequestInterceptor
+{
+    private String authorization;
 
-    private final String headerValue;
+    public ForwardingAuthRequestInterceptor()
+    {
+        this.authorization = null;
+    }
 
-    public ForwardingAuthRequestInterceptor(String headerValue) {
-        this.headerValue = headerValue;
+    public ForwardingAuthRequestInterceptor(String authorization)
+    {
+        this.authorization = authorization;
     }
 
     @Override
-    public void apply(RequestTemplate template) {
-        template.header("Authorization", headerValue);
+    public void apply(RequestTemplate template)
+    {
+        if (this.authorization == null)
+        {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object details = authentication.getDetails();
+            if (details instanceof JwtString jwtString)
+            {
+                this.authorization = "Bearer " + jwtString.getJwt();
+            }
+        }
+        template.header("Authorization", this.authorization);
     }
 }

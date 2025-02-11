@@ -63,6 +63,11 @@ public class SysConfig
         return SpringContext.getBean(MicroserviceCollectionProperties.class);
     }
 
+    public static FeignProperties getFeignProperties()
+    {
+        return SpringContext.getBean(FeignProperties.class);
+    }
+
 
     private static <T> T validate(T bean)
     {

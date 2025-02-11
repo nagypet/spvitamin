@@ -18,42 +18,57 @@ package hu.perit.spvitamin.spring.feignclients;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Feign;
+import feign.Logger;
 import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.slf4j.Slf4jLogger;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SysConfig;
 
 /**
  * @author Peter Nagy
  */
 
-public class SimpleFeignClientBuilder {
+public class SimpleFeignClientBuilder
+{
+    private final Feign.Builder builder;
 
-    private Feign.Builder builder;
-
-    public static SimpleFeignClientBuilder newInstance() {
+    public static SimpleFeignClientBuilder newInstance()
+    {
         return new SimpleFeignClientBuilder();
     }
 
 
-    public SimpleFeignClientBuilder() {
+    public SimpleFeignClientBuilder()
+    {
         ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
         this.builder = Feign.builder()
                 .decoder(new JacksonDecoder(objectMapper))
                 .encoder(new JacksonEncoder(objectMapper))
                 .retryer(Retryer.NEVER_RETRY)
+                .logger(new Slf4jLogger(getClass()))
+                .logLevel(getLevel(SysConfig.getFeignProperties().getLoggerLevel()))
                 .errorDecoder(new RestExceptionResponseDecoder());
     }
 
 
-    public SimpleFeignClientBuilder requestInterceptor(RequestInterceptor requestInterceptor) {
+    private static Logger.Level getLevel(String level)
+    {
+        return Logger.Level.valueOf(level.toUpperCase());
+    }
+
+
+    public SimpleFeignClientBuilder requestInterceptor(RequestInterceptor requestInterceptor)
+    {
         this.builder.requestInterceptor(requestInterceptor);
         return this;
     }
 
 
-    public <T> T build(Class<T> apiType, String url) {
+    public <T> T build(Class<T> apiType, String url)
+    {
         return this.builder.target(apiType, url);
     }
 }
