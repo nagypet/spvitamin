@@ -36,6 +36,7 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract;
 public class SimpleFeignClientBuilder
 {
     private final Feign.Builder builder;
+    private final RequestInterceptorAdapter requestInterceptorAdapter = new RequestInterceptorAdapter();
 
     public static SimpleFeignClientBuilder newInstance()
     {
@@ -45,10 +46,14 @@ public class SimpleFeignClientBuilder
 
     public SimpleFeignClientBuilder()
     {
+        // Adding the TracingFeignInterceptor
+        this.requestInterceptorAdapter.addInterceptor(new TracingFeignInterceptor());
+
         ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
         FeignProperties feignProperties = SysConfig.getFeignProperties();
         this.builder = Feign.builder()
                 .contract(new SpringMvcContract())
+                .requestInterceptor(this.requestInterceptorAdapter)
                 .decoder(new JacksonDecoder(objectMapper))
                 .encoder(new JacksonEncoder(objectMapper))
                 .retryer(new Retryer.Default(feignProperties.getRetry().getPeriod(), feignProperties.getRetry().getMaxPeriod(), feignProperties.getRetry().getMaxAttempts()))
@@ -67,7 +72,7 @@ public class SimpleFeignClientBuilder
 
     public SimpleFeignClientBuilder requestInterceptor(RequestInterceptor requestInterceptor)
     {
-        this.builder.requestInterceptor(requestInterceptor);
+        this.requestInterceptorAdapter.addInterceptor(requestInterceptor);
         return this;
     }
 
