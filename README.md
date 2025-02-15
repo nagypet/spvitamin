@@ -97,6 +97,8 @@ dependencyManagement {
 - LdapAuthenticationProviderConfigurer logging with INFO level
 - SimpleFeignClientBuilder: logging
 - ForwardingAuthRequestInterceptor: forwards incoming token
+- JwtPropertiesPublic for special validation for the public key only
+- spring-cloud-eureka removed
 
 ### 3.3.3-1-RELEASE not yet released
 

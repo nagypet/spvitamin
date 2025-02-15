@@ -46,7 +46,6 @@ dependencies {
         api project(":spvitamin-json-time")
         api project(":spvitamin-spring-admin")
         api project(":spvitamin-spring-cloud-client")
-        api project(":spvitamin-spring-cloud-eureka")
         api project(":spvitamin-spring-cloud-feign")
         api project(":spvitamin-spring-data")
         api project(":spvitamin-spring-general")

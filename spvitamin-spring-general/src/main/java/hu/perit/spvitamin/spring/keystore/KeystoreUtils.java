@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.keystore;
 import hu.perit.spvitamin.core.crypto.CryptoException;
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.JwtPropertiesPublic;
 import hu.perit.spvitamin.spring.config.ServerProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
@@ -30,20 +31,11 @@ import org.springframework.core.env.Environment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.UnrecoverableEntryException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -157,7 +149,7 @@ public class KeystoreUtils
             KeyStore serverKeystore = getServerKeyStore();
             CryptoUtil crypto = new CryptoUtil();
             key = serverKeystore.getKey(jwtProperties.getPrivateKeyAlias(),
-                crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), jwtProperties.getPrivateKeyEncryptedPassword()).toCharArray());
+                    crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), jwtProperties.getPrivateKeyEncryptedPassword()).toCharArray());
         }
         catch (Exception ex)
         {
@@ -167,7 +159,7 @@ public class KeystoreUtils
         if (key == null)
         {
             throw new InvalidInputException(
-                String.format("'%s' not found in keystore '%s'!", jwtProperties.getPrivateKeyAlias(), System.getProperty(SERVER_SSL_KEYSTORE)));
+                    String.format("'%s' not found in keystore '%s'!", jwtProperties.getPrivateKeyAlias(), System.getProperty(SERVER_SSL_KEYSTORE)));
         }
         return key;
     }
@@ -176,7 +168,7 @@ public class KeystoreUtils
     public static PublicKey getPublicKey()
     {
 
-        JwtProperties jwtProperties = SysConfig.getJwtProperties();
+        JwtPropertiesPublic jwtProperties = SysConfig.getJwtPropertiesPublic();
         Certificate certificate = null;
         try
         {
@@ -191,7 +183,7 @@ public class KeystoreUtils
         if (certificate == null)
         {
             throw new InvalidInputException(
-                String.format("'%s' not found in truststore '%s'!", jwtProperties.getPublicKeyAlias(), System.getProperty(SERVER_SSL_TRUSTSTORE)));
+                    String.format("'%s' not found in truststore '%s'!", jwtProperties.getPublicKeyAlias(), System.getProperty(SERVER_SSL_TRUSTSTORE)));
         }
         return certificate.getPublicKey();
     }
@@ -360,16 +352,16 @@ public class KeystoreUtils
             // file:/C:/Users/nagy_peter/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar
             // file:/C:/Users/nagy_peter/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar
             return Stream.of(optClassPathFromManifest.get().split("file:/"))
-                .map(String::strip)
-                .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
-                .collect(Collectors.toList());
+                    .map(String::strip)
+                    .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
+                    .collect(Collectors.toList());
         }
         else
         {
             return Stream.of(classPath.split(File.pathSeparator))
-                .map(String::strip)
-                .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
-                .collect(Collectors.toList());
+                    .map(String::strip)
+                    .filter(entry -> !entry.endsWith(".jar") && !entry.isBlank())
+                    .collect(Collectors.toList());
         }
     }
 

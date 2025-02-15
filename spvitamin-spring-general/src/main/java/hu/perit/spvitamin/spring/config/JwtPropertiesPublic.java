@@ -14,7 +14,25 @@
  * limitations under the License.
  */
 
-apply from: '../gradle/include-project-dependencies.gradle'
+package hu.perit.spvitamin.spring.config;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author Peter Nagy
+ */
 
 
-rootProject.name = 'spvitamin-spring-cloud-eureka'
+@Data
+@Component
+@ConfigurationProperties(prefix = "jwt")
+@Valid
+public class JwtPropertiesPublic
+{
+    @NotNull
+    private String publicKeyAlias;
+}

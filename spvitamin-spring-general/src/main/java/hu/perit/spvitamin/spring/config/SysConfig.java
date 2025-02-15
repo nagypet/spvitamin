@@ -33,6 +33,11 @@ public class SysConfig
         return validate(SpringContext.getBean(JwtProperties.class));
     }
 
+    public static JwtPropertiesPublic getJwtPropertiesPublic()
+    {
+        return validate(SpringContext.getBean(JwtPropertiesPublic.class));
+    }
+
     public static SecurityProperties getSecurityProperties()
     {
         return SpringContext.getBean(SecurityProperties.class);
