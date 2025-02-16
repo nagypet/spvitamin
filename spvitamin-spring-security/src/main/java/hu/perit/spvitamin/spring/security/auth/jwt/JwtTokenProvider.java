@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.auth.jwt;
 
+import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
@@ -58,15 +59,17 @@ public class JwtTokenProvider
             Date iat = Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant());
             Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
+            DomainUser domainUser = DomainUser.newInstance(subject);
+
             String jwt = Jwts.builder()
-                .subject(subject)
+                .subject(domainUser.getCanonicalName())
                 .issuedAt(iat)
                 .expiration(exp)
                 .claims(additionalClaims)
                 .signWith(privateKey, SignatureAlgorithm.RS512)
                 .compact();
 
-            return new AuthorizationToken(subject, jwt, issuedAt, expiryDate);
+            return new AuthorizationToken(domainUser.getCanonicalName(), jwt, issuedAt, expiryDate);
         }
         catch (Exception e)
         {

@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
+import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -68,49 +69,47 @@ public class AuthorizationService
         Authentication authentication = securityContext.getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken)
         {
-            return AuthenticatedUser.builder() //
-                    .username("anonymousUser") //
-                    .authorities(Collections.emptyList()) //
-                    .userId(-1) //
-                    .anonymous(true) //
+            return AuthenticatedUser.builder()
+                    .username("anonymousUser")
+                    .authorities(Collections.emptyList())
+                    .userId(-1)
+                    .anonymous(true)
                     .build();
         }
 
         Object principal = authentication.getPrincipal();
 
-        if (principal instanceof AuthenticatedUser)
+        if (principal instanceof AuthenticatedUser authenticatedUser)
         {
-            AuthenticatedUser user = (AuthenticatedUser) principal;
-            user.setLdapUrl(calculateUrl(authentication));
-            return user;
+            authenticatedUser.setLdapUrl(calculateUrl(authentication));
+            return authenticatedUser;
         }
-        else if (principal instanceof UserDetails)
+        else if (principal instanceof UserDetails userDetails)
         {
-            return AuthenticatedUser.builder() //
-                    .username(((UserDetails) principal).getUsername()) //
-                    .authorities(((UserDetails) principal).getAuthorities()) //
-                    .userId(-1) //
-                    .anonymous(false) //
+            return AuthenticatedUser.builder()
+                    .username(DomainUser.newInstance(userDetails.getUsername()).getCanonicalName())
+                    .authorities(userDetails.getAuthorities())
+                    .userId(-1)
+                    .anonymous(false)
                     .ldapUrl(calculateUrl(authentication))
                     .build();
         }
-        else if (principal instanceof String)
+        else if (principal instanceof String username)
         {
-            String username = (String) principal;
-            return AuthenticatedUser.builder() //
-                    .username(username) //
-                    .authorities(Collections.emptyList()) //
-                    .userId(-1) //
-                    .anonymous(false) //
+            return AuthenticatedUser.builder()
+                    .username(DomainUser.newInstance(username).getCanonicalName())
+                    .authorities(Collections.emptyList())
+                    .userId(-1)
+                    .anonymous(false)
                     .build();
         }
         // So that we do not need the keycloak dependency 
         else if ("org.keycloak.KeycloakPrincipal".equals(principal.getClass().getName()))
         {
-            return AuthenticatedUser.builder() //
-                    .username(((Principal) principal).getName()) //
-                    .authorities(authentication.getAuthorities()) //
-                    .userId(-1) //
+            return AuthenticatedUser.builder()
+                    .username(((Principal) principal).getName())
+                    .authorities(authentication.getAuthorities())
+                    .userId(-1)
                     .anonymous(false).build();
         }
 

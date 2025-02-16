@@ -45,6 +45,13 @@ class DomainUserTest {
     }
 
     @Test
+    void equals2B() {
+        DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
+        DomainUser user2 = DomainUser.newInstance("kozpont.ignored\\ps_sap_mw_T1");
+        Assertions.assertEquals(user1, user2);
+    }
+
+    @Test
     void equals3() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("IDXAPI");

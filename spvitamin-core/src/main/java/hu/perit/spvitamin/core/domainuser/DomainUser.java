@@ -32,63 +32,93 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor
 @ToString
-public class DomainUser {
+public class DomainUser
+{
 
     public static final DomainUser ANY = DomainUser.newInstance("*");
 
     private String domain = null;
     private String username = null;
 
-    public static DomainUser newInstance(String userName) {
+    public static DomainUser newInstance(String userName)
+    {
         Objects.requireNonNull(userName, "username is 'null'!");
 
         DomainUser user = new DomainUser();
-        if (userName.contains("\\")) {
+        if (userName.contains("\\"))
+        {
             String[] userNameParts = userName.split("\\\\");
-            if (userNameParts.length == 2) {
-                user.setDomain(userNameParts[0]);
+            if (userNameParts.length == 2)
+            {
+                user.setDomain(extractDomain(userNameParts[0]));
                 user.setUsername(userNameParts[1]);
             }
-            else {
+            else
+            {
                 throw new IllegalArgumentException(String.format("Wrong username format: '%s'! Expected plain username or domain\\username or username@domain or username@domain.xyz", userName));
             }
         }
-        else if (userName.contains("@")) {
+        else if (userName.contains("@"))
+        {
             // username@domainname -> domainname\\username
             String[] userNameParts = userName.split("@");
-            if (userNameParts.length == 2) {
+            if (userNameParts.length == 2)
+            {
                 user.setUsername(userNameParts[0]);
-                String domain = userNameParts[1];
-                if (domain.contains(".")) {
-                    domain = domain.substring(0, domain.indexOf('.'));
-                }
-                user.setDomain(domain);
+                user.setDomain(extractDomain(userNameParts[1]));
             }
-            else {
+            else
+            {
                 throw new IllegalArgumentException(String.format("Wrong username format: '%s'! Expected plain username or domain\\username or username@domain or username@domain.xyz", userName));
             }
         }
-        else {
+        else
+        {
             user.setUsername(userName);
         }
         return user;
     }
 
 
-    public void setDomain(String domain) {
+    private static String extractDomain(String domain)
+    {
+        if (domain != null && domain.contains("."))
+        {
+            domain = domain.substring(0, domain.indexOf('.'));
+        }
+        return domain;
+    }
+
+
+    public String getCanonicalName()
+    {
+        if (this.domain == null)
+        {
+            return this.username;
+        }
+
+        return this.username + "@" + this.domain;
+    }
+
+    public void setDomain(String domain)
+    {
         this.domain = domain != null ? domain.trim() : null;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String username)
+    {
         this.username = username != null ? username.trim() : null;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof DomainUser)) {
+        if (!(o instanceof DomainUser))
+        {
             return false;
         }
 
@@ -101,7 +131,8 @@ public class DomainUser {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder(17, 37)
                 .append(StringUtils.lowerCase(domain))
                 .append(StringUtils.lowerCase(username))

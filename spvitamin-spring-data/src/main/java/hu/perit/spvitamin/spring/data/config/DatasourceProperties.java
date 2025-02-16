@@ -61,7 +61,7 @@ public class DatasourceProperties
     from the pool. If this time is exceeded without a connection becoming available, a SQLException will be thrown.
     Lowest acceptable connection timeout is 250 ms. Default: 30000 (30 seconds)
     
-    Set to 5 seconds, since DynamicDataSource has a retry mechanism with 5 seconds delay multiplied by 2 in each attempt.
+    Set to 5 seconds, since DynamicDataSource has a retry mechanism with 10 seconds delay multiplied by 2 in each attempt.
     1st timeout 5 s
     delay       10 s
     2nd timeout 5 s
