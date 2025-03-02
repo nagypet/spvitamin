@@ -27,7 +27,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -37,6 +39,14 @@ import java.util.Collections;
 @Service(value = "SpvitaminAuthorizationService")
 public class AuthorizationService
 {
+    private final List<AuthenticatedUserFactory> authenticatedUserFactories = new ArrayList<>();
+
+
+    public void registerAuthenticatedUserFactory(AuthenticatedUserFactory authenticatedUserFactory)
+    {
+        authenticatedUserFactories.add(authenticatedUserFactory);
+    }
+
 
     public void setAuthenticatedUser(AuthenticatedUser authenticatedUser)
     {
@@ -111,6 +121,15 @@ public class AuthorizationService
                     .authorities(authentication.getAuthorities())
                     .userId(-1)
                     .anonymous(false).build();
+        }
+
+        // Trying specific factories
+        for (AuthenticatedUserFactory authenticatedUserFactory : this.authenticatedUserFactories)
+        {
+            if (authenticatedUserFactory.canHandle(principal))
+            {
+                return authenticatedUserFactory.createAuthenticatedUser(principal);
+            }
         }
 
         throw new AuthorizationException(

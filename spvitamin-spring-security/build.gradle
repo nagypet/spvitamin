@@ -60,6 +60,10 @@ dependencies {
     implementation libs.bundles.jsonwebtoken
     implementation libs.jaxb.api
 
+    // Swagger
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
+
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
     // -----------------------------------------------------------------------------------------------------------------

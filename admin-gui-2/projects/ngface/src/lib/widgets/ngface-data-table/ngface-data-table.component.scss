@@ -1,0 +1,136 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.ngface-paginator-container.desktop {
+  display: flex;
+
+  .ngface-notification {
+    margin-left: 2px;
+    padding-top: 5px;
+    flex-grow: 1;
+    display: inline-flex;
+    color: var(--app-warn-palette-darker, red);
+    white-space: normal;
+  }
+}
+
+.ngface-paginator-container.phone {
+  flex-direction: column;
+}
+
+
+table {
+  width: 100%;
+  //table-layout: fixed;
+  border-collapse: separate;
+}
+
+
+table tr:first-child td /*To remove the first border*/
+{
+  border-top: 0 solid
+}
+
+
+table tr:last-child td /*To remove the last border*/
+{
+  //border-bottom: 0 solid
+}
+
+tr.mat-mdc-header-row {
+  height: 36px;
+  background-color: var(--app-primary-palette-200, #f5f5f5);
+}
+
+tr.mat-mdc-row, tr.mat-mdc-footer-row {
+  height: 30px;
+}
+
+tr.mat-mdc-footer-row {
+  background-color: var(--app-primary-palette-100, #f5f5f5);
+}
+
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+}
+
+// Selectable
+.ngface-data-table-selectable {
+  .mat-mdc-row .mat-mdc-cell {
+    cursor: pointer;
+  }
+
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-top-color: var(--app-primary-palette-100, rgba(0, 0, 0, .12));
+    border-bottom-color: var(--app-primary-palette-100, rgba(0, 0, 0, .12));
+  }
+
+  .ngface-row-selected {
+    background-color: var(--app-primary-palette-50, rgba(0, 0, 0, .02));
+  }
+}
+
+th {
+  padding: 0 6px 0 20px !important;
+
+  .mdc-checkbox {
+    margin-top: 10px!important;
+  }
+}
+
+td {
+  padding: 0 20px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .mat-mdc-icon-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    // does not work! :-(
+    .mat-mdc-button-touch-target {
+      width: 30px;
+      height: 30px;
+    }
+  }
+}
+
+
+th.mat-mdc-header-cell {
+  font-size: 12px;
+  line-height: normal;
+  color: var(--app-primary-contrast-200, #0000008a);
+}
+
+//th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
+th.mat-mdc-header-cell:not(:first-of-type) {
+  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-cell:not(:first-of-type) {
+  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-footer-cell:not(:first-of-type) {
+  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-footer-cell {
+  border-top: var(--app-primary-palette-100, rgba(0, 0, 0, .12)) solid 1px!important;
+}

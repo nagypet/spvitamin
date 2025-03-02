@@ -1,0 +1,62 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$panel-width: 300px;
+
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 100px;
+}
+
+.login-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  width: 500px;
+  border-radius: 15px;
+  max-height: 100vh;
+  max-width: 100vw;
+  border: solid var(--app-primary-palette-default, #0d6efd) 1px;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, .16);
+}
+.login-form.phone {
+  border-radius: 0;
+}
+
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: $panel-width;
+}
+
+.system-name {
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: var(--app-primary-palette-700);
+}
+
+.logon-error {
+  height: 40px;
+  color: var(--app-warn-palette-default);
+  margin-bottom: 20px;
+}

@@ -101,6 +101,8 @@ dependencyManagement {
 - spring-cloud-eureka removed
 - LdapAuthenticationProvider only accepts username with domain
 - AuthorizationService uses the canonical form of domain usernames, e.g. admin@perit 
+- spvitamin-spring-security-oauth2
+- admin-gui-2
 
 ### 3.3.3-1-RELEASE not yet released
 

@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright 2020-2025 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div responsiveClass="login-form-container" class="ngface-form">
+  <div responsiveClass="login-form">
+    <div responsiveClass="login-panel">
+      <div responsiveClass="system-name">Admin-GUI Login</div>
+      <ngface-form [formdata]="formData" (keyup)="onKeyPress($event)">
+        @if (!selectedAuthenticationType) {
+          @for (type of this.authenticationTypes; track type) {
+            <button class="ngface-button" mat-raised-button color="primary" (click)="onAuthenticationSelect(type)">{{ type.label }}</button>
+          }
+          <div responsiveClass="ngface-dialog-actions">
+            <ngface-button [formdata]="formData" widgetid="button-cancel" (click)="onCancel()"/>
+          </div>
+        } @else if (selectedAuthenticationType.type === 'basic') {
+          <!-- Basic auth -->
+          <ngface-text-input [formdata]="formData" [focused]=true widgetid="username"/>
+          <ngface-text-input [formdata]="formData" widgetid="password"/>
+          <div responsiveClass="logon-error">{{ errorText }}</div>
+          <div responsiveClass="ngface-dialog-actions">
+            <ngface-button [formdata]="formData" widgetid="button-login" (click)="onLogin()"/>
+            <ngface-button [formdata]="formData" widgetid="button-cancel" (click)="onCancel()"/>
+          </div>
+        } @else {
+          <p>Signing you in...</p>
+          <div responsiveClass="ngface-dialog-actions">
+            <ngface-button [formdata]="formData" widgetid="button-cancel" (click)="onCancel()"/>
+          </div>
+        }
+      </ngface-form>
+
+    </div>
+  </div>
+</div>

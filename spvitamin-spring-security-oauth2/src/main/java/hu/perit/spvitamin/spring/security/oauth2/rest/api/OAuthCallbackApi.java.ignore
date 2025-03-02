@@ -1,0 +1,14 @@
+package hu.perit.spvitamin.spring.security.oauth2.rest.api;
+
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@RequestMapping("/api/oauth")
+public interface OAuthCallbackApi
+{
+    @GetMapping("/callback")
+    ResponseEntity<?> callback(@RequestParam("code") String code, @RequestParam("state") String provider) throws ResourceNotFoundException;
+}

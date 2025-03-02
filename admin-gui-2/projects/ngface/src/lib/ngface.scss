@@ -1,0 +1,349 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+//@import url("https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp");
+@import './styles/material-design-icons';
+@import '@angular/cdk/overlay-prebuilt.css';
+@import './styles/ngface-button';
+@import './styles/ngface-dialog';
+
+//----------------------------------------------------------------------------------------------------------------------
+// Color constants
+//----------------------------------------------------------------------------------------------------------------------
+:root {
+  --color-disabled: rgba(0, 0, 0, .12);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-form
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-form {
+  width: 100%;
+  padding: 20px;
+  border: solid var(--app-primary-palette-default, #0d6efd) 1px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.ngface-form.desktop {
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, .16);
+}
+
+.ngface-form.mobile {
+  padding: 10px 0 0 0;
+  margin: 0;
+  border-top: solid var(--app-primary-palette-default, #0d6efd) 1px;
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
+  border-radius: 0;
+}
+
+.ngface-form.phone.portrait {
+  max-width: 330px;
+  margin: auto;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-row
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  // When ngface-input-field placed in a ngface-row, there should be a right margin
+  .ngface-input-field {
+    margin-right: 20px;
+  }
+}
+
+.ngface-row.phone.portrait {
+  align-items: unset !important;
+  flex-direction: column;
+}
+
+.ngface-row:last-child {
+  margin-bottom: 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-col
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-col {
+  display: flex;
+  flex-direction: column;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-input-field
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-input-field {
+  width: 250px;
+  max-width: 330px;
+  margin-bottom: 10px;
+
+  mat-hint {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+//.ngface-input-field.phone {
+//  width: calc(100vw - 45px) !important;
+//}
+
+.ngface-date-range-input {
+  width: 300px;
+}
+
+.mat-mdc-form-field-error {
+  font-size: 12px;
+  line-height: 12px;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-number
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-number {
+  .mat-mdc-input-element {
+    text-align: end;
+  }
+
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    display: none;
+  }
+
+  input {
+    -moz-appearance: textfield;
+  }
+
+  .mat-mdc-form-field-text-prefix {
+    margin-right: 5px;
+  }
+
+  .mat-mdc-form-field-text-suffix {
+    margin-left: 5px;
+  }
+}
+
+
+.ngface-mat-icon-enabled {
+  color: var(--app-primary-palette-default, #0d6efd);
+}
+
+.ngface-mat-icon-enabled:hover {
+  color: var(--app-primary-palette-800, blue);
+}
+
+
+.ngface-mat-icon-disabled {
+  color: var(--color-disabled, rgba(0, 0, 0, .12));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// tooltip
+//----------------------------------------------------------------------------------------------------------------------
+.mat-mdc-tooltip {
+  background-color: white;
+  border: 1px solid var(--app-primary-palette-default, #0d6efd);
+  border-radius: 5px;
+  padding: 5px 15px !important;
+  --mdc-plain-tooltip-container-color: white;
+  --mdc-plain-tooltip-supporting-text-color: var(--app-primary-palette-default, #0d6efd) !important;
+  --mdc-plain-tooltip-supporting-text-size: 14px;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// mat-paginator
+//----------------------------------------------------------------------------------------------------------------------
+.mat-mdc-paginator-container {
+  flex-wrap: nowrap !important;
+  min-width: 300px;
+  align-items: baseline !important;
+}
+
+.mat-mdc-paginator-page-size-label {
+  white-space: nowrap;
+}
+
+.mat-mdc-paginator-range-label.tablet,
+.mat-mdc-paginator-range-label.desktop {
+  white-space: nowrap;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// data-table
+//----------------------------------------------------------------------------------------------------------------------
+.ngface-data-table {
+  width: 100%;
+  //margin: 20px auto;
+
+  .ngface-data-table-scrollable-area {
+    border: var(--app-primary-palette-300 ,rgba(0, 0, 0, .12)) solid 1px;
+    border-radius: 5px;
+    // height should be set in the app, where the table widget is used
+    height: 600px;
+    overflow: auto;
+    --scrollbar-size: 10px;
+    --scrollbar-thumb-color: rgba(0, 0, 0, 0.07);
+    --scrollbar-hover-size: 12px;
+    //--scrollbar-track-color: rgba(0, 0, 0, 0.05);
+    --scrollbar-border-radius: 10px;
+  }
+
+  .size-auto {
+    width: auto;
+  }
+
+  .size-xsmall {
+    width: 60px;
+  }
+
+  .size-small {
+    width: 110px;
+  }
+
+  .size-medium {
+    width: 180px;
+  }
+
+  .size-large {
+    width: 300px;
+  }
+
+  .size-xlarge {
+    width: 500px;
+  }
+
+  .size-timestamp {
+    width: 180px;
+  }
+
+  .size-number {
+    width: 140px;
+  }
+
+  .align-left {
+    text-align: left;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .align-right {
+    text-align: right;
+  }
+
+  .cellvalue-null {
+    color: lightgray;
+    font-style: italic;
+  }
+
+  label {
+    margin-left: 2px;
+    margin-bottom: 8px;
+  }
+}
+
+/*
+::-webkit-scrollbar {
+  width: 4px;
+  overflow-y: scroll;
+  background: grey;
+  box-shadow: inset 0 0 4px #707070;
+}
+
+::-webkit-scrollbar-thumb {
+  background: blue;
+  border-radius: 10px;
+}
+*/
+
+.ngface-data-table-scrollable-area .ng-scrollbar-wrapper[deactivated=false] > scrollbar-y.scrollbar-control {
+  display: none; // The y-scrollbar will be set visible programmatically
+}
+
+.mat-badge-content {
+  width: auto !important;
+  min-width: 22px !important;
+  padding: 0 5px 0 5px !important;
+  border-radius: 11px !important;
+  text-overflow: unset !important;
+  right: 0 !important;
+  left: unset !important;
+}
+
+.mdc-checkbox__ripple {
+  display: none !important;
+}
+
+.mdc-icon-button__ripple {
+  display: none !important;
+}
+
+ngface-data-table {
+  .mdc-form-field {
+    height: 24px;
+    width: 100%;
+  }
+
+  .mat-mdc-checkbox-touch-target {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mdc-checkbox__background {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// ngface-excel-filter
+//----------------------------------------------------------------------------------------------------------------------
+ngface-excel-filter {
+  .mdc-form-field {
+    height: 24px;
+    width: 100%;
+  }
+
+  .mat-mdc-checkbox-touch-target {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mdc-checkbox__background {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mat-mdc-checkbox {
+    label {
+      font-size: 12px;
+      line-height: 12px;
+      white-space: nowrap;
+    }
+  }
+}

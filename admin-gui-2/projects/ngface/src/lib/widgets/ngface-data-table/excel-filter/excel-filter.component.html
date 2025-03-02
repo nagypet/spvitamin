@@ -1,0 +1,50 @@
+<!--
+  ~ Copyright 2020-2025 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div class="ngface-excel-filter" (click)="$event.stopPropagation()">
+  <div class="links">
+    <button type="button" (click)="onClearFilter()">Clear filter</button>
+  </div>
+  <div class="searchbox">
+    <input type="text" placeholder="Search..." [formControl]="formControlSearch"
+           (debounceInput)="onSearchTextChange($event)" cdkTrapFocus
+           [cdkTrapFocusAutoCapture]="true"
+           [debounceTime]="500"
+           (keydown.escape)="onCancel()"
+           (keydown.enter)="onOk()"
+    >
+    <mat-icon>search</mat-icon>
+  </div>
+  <div class="listbox">
+    @for (valueSetItem of valueSetProvider.getVisibleItems();track valueSetItem) {
+      <div class="list-item" (click)="onItemSelected(valueSetItem)">
+        @if (valueSetItem.selectable) {
+          <mat-checkbox
+            [ngModel]="valueSetItem.masterSelect ? isAllSelected(valueSetItem): valueSetItem.selected"
+            [disabled]="!isCheckBoxEnabled(valueSetItem)"
+            [indeterminate]="isAnySelected(valueSetItem) && !isAllSelected(valueSetItem)"
+            (ngModelChange)="onCheckBoxClicked(valueSetItem, $event)"
+            (click)="$event.stopPropagation()">{{ valueSetItem.text }}
+          </mat-checkbox>
+        }
+      </div>
+    }
+  </div>
+  <div class="action-bar" style="background-color: white">
+    <button mat-button (click)="onOk()">OK</button>
+    <button mat-button (click)="onCancel()">Cancel</button>
+  </div>
+</div>

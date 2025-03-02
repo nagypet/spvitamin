@@ -1,0 +1,53 @@
+package hu.perit.spvitamin.spring.security.oauth2.rest.controller;
+
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.security.oauth2.rest.api.OAuthCallbackApi;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import java.text.MessageFormat;
+import java.util.Map;
+
+@RestController
+@RequiredArgsConstructor
+public class OAuthCallbackController implements OAuthCallbackApi
+{
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Override
+    public ResponseEntity<?> callback(String code, String provider) throws ResourceNotFoundException
+    {
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);
+
+        if (clientRegistration == null)
+        {
+            throw new ResourceNotFoundException(MessageFormat.format("Provider {0} not found!", provider));
+        }
+
+        // 1. Token lekérése
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("client_id", clientRegistration.getClientId());
+        requestBody.add("client_secret", clientRegistration.getClientSecret());
+        requestBody.add("grant_type", "authorization_code");
+        requestBody.add("code", code);
+        requestBody.add("redirect_uri", clientRegistration.getRedirectUri());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(clientRegistration.getProviderDetails().getTokenUri(), request, Map.class);
+
+        return ResponseEntity.ok(response.getBody());
+    }
+}

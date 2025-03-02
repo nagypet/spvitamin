@@ -1,0 +1,63 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.ngface-sort-filter-header {
+  width: 100%;
+  display: inline-flex;
+
+  /*
+  .mat-icon-button {
+    display: inline!important;
+    color: var(--bs-gray-500);
+  }
+  */
+
+  ::ng-deep .mat-sort-header-arrow {
+    color: var(--app-primary-palette-800, #6c757d);
+  }
+
+
+  .ngface-sort-header {
+    display: inline-flex;
+    flex-grow: 1;
+  }
+
+  .ngface-nosort-header {
+    display: inline;
+    flex-grow: 1;
+    padding-top: 4px;
+  }
+
+  .ngface-filter-header {
+    display: inline-flex;
+    border: none !important;
+    background-color: rgba(0, 0, 0, 0);
+    outline: none;
+    color: var(--app-primary-palette-400, #adb5bd);
+  }
+
+  .ngface-filter-header:hover {
+    color: var(--app-primary-palette-800, #6c757d);
+  }
+
+  .ngface-filter-header-set {
+    color: var(--app-primary-palette-900, #212529);
+  }
+
+  .ngface-table-header-icon {
+    transform: scale(0.8);
+  }
+}

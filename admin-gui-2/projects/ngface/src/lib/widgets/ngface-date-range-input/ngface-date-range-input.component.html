@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright 2020-2025 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<mat-form-field responsiveClass="ngface-input-field ngface-date-range-input" [floatLabel]="floatLabelControl.value" [subscriptSizing]="'dynamic'">
+  <mat-label>{{getData().label}}</mat-label>
+  <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+    <input matStartDate autocomplete="off" formControlName="start"
+           [placeholder]="getData().placeholder"
+           [required]="isRequired()"
+           [errorStateMatcher]="errorStateMatcher"
+    >
+    <input matEndDate autocomplete="off" formControlName="end"
+           [placeholder]="getData().placeholder2"
+           [required]="isRequired()"
+           [errorStateMatcher]="errorStateMatcher"
+    >
+  </mat-date-range-input>
+  <mat-date-range-picker #picker></mat-date-range-picker>
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-hint>{{getData().hint}}</mat-hint>
+  <mat-error *ngIf="!range.valid">{{getValidationErrors()}}</mat-error>
+</mat-form-field>

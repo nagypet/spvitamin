@@ -1,0 +1,140 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$element-regular-height: 48px;
+$element-phone-height: 40px;
+
+
+// Titlebar
+.ngface-titlebar {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(101deg, var(--app-primary-palette-800), var(--app-primary-palette-700), var(--app-primary-palette-600), var(--app-primary-palette-500), var(--app-primary-palette-400));
+  height: 92px;
+}
+
+.ngface-titlebar.phone {
+  max-height: 50px;
+}
+
+.ngface-menuitem.selected {
+  background-color: var(--app-primary-palette-100);
+}
+
+.ngface-header-button.desktop {
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 0 20px 0 20px!important;
+
+  &:hover {
+    //background-color: var(--app-primary-palette-700);
+  }
+}
+.ngface-header-button.tablet,
+.ngface-header-button.desktop {
+  height: $element-regular-height;
+}
+.ngface-header-button.phone {
+  height: $element-phone-height;
+}
+
+.ngface-header-button.selected {
+  text-decoration: underline;
+}
+
+// Main menu
+.titlebar-main-menu {
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding-bottom: 6px;
+}
+
+.logo {
+  margin-right: 20px;
+  height: 50px;
+  padding: 0;
+}
+.logo.phone {
+  height: $element-phone-height;
+}
+.logo.phone.portrait {
+  display: none;
+}
+
+
+// App title
+.titlebar-app-title {
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  font-size: 20px;
+  margin: 0 20px 0 20px;
+}
+
+
+.right-block {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+// Session timeout
+.session-timeout {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: white;
+  cursor: auto;
+  padding: 0 10px;
+  border-radius: 5px;
+  height: $element-regular-height;
+  //border: 1px solid rgba(white, 0.8);
+}
+.session-timeout.phone {
+  height: $element-phone-height;
+}
+.session-timeout.phone:not(.session-timeout-warning) {
+  display: none;
+}
+
+@keyframes flash-red {
+  0%, 100% {
+    background-color: red;
+    color: yellow;
+  }
+  50% {
+    background-color: transparent;
+    color: white;
+  }
+}
+
+.session-timeout-warning {
+  animation: flash-red 1s infinite; // Az animáció 1 mp-enként ismétlődik
+}
+
+
+// Actions
+.titlebar-actions {
+}
+
+.titlebar-actions .mat-icon {
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+  margin: 0;
+}
+
+
