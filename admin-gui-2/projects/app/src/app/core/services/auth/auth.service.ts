@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-/* tslint:disable:one-line */
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {AuthToken} from './token-model';
 import {CookieService} from 'ngx-cookie-service';
 import {ToastrService} from 'ngx-toastr';
@@ -28,14 +27,12 @@ import {environment} from '../../../../environments/environment';
 })
 export class AuthService
 {
-
-  public loginSubject: Subject<boolean> = new Subject<boolean>();
-  private _isLoggedIn = false;
+  private loginSubject$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   get isLoggedIn(): boolean
   {
-    return this._isLoggedIn;
+    return this.loginSubject$.value;
   }
-
+  public loggedIn$ = this.loginSubject$.asObservable();
 
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
@@ -43,11 +40,6 @@ export class AuthService
   )
   {
     this.checkToken();
-
-    this.loginSubject.subscribe((loggedIn: boolean) =>
-    {
-      this._isLoggedIn = loggedIn;
-    });
   }
 
 
@@ -66,10 +58,12 @@ export class AuthService
       }, error =>
       {
         // error
+        this.loginSubject$.next(false);
         observer.error(error);
       });
     });
   }
+
 
   /**
    * Calling auth with basic header to retrieve token
@@ -113,7 +107,7 @@ export class AuthService
       this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).subscribe(res =>
       {
         console.log(res);
-        this.loginSubject.next(false);
+        this.loginSubject$.next(false);
       });
     }
     this.cleanUpSessionStorage();
@@ -168,13 +162,13 @@ export class AuthService
         this.toastrService.success(`Session validity: ${tokenValidMinutes} minutes`, `Welcome ${token.sub}`);
       }
     }
-    this.loginSubject.next(true);
+    this.loginSubject$.next(true);
   }
 
 
-  public checkToken(): AuthToken | undefined
+  public checkToken(t?: AuthToken): AuthToken | undefined
   {
-    const token = this.getToken();
+    const token = t ?? this.getToken();
     if (!token)
     {
       this.logout(true);
@@ -186,7 +180,7 @@ export class AuthService
 
     if (tokenValidSeconds > 0)
     {
-      this.loginSubject.next(true);
+      this.loginSubject$.next(true);
       return token;
     }
     else

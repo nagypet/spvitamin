@@ -3,6 +3,7 @@ package hu.perit.spvitamin.spring.security.oauth2.rest.controller;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.oauth2.rest.api.OAuthProxyApi;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,42 +35,26 @@ public class OAuthProxyController implements OAuthProxyApi
             throw new ResourceNotFoundException(MessageFormat.format("Provider {0} not found!", provider));
         }
 
-        // https://login.microsoftonline.com/aaef3ba4-e05f-4282-a763-ad4698e5e531/oauth2/v2.0/authorize?
-        // client_id=48de203b-3973-4e90-875c-d78b27beb2e2
-        // &response_type=code
-        // &redirect_uri=http://localhost:8410/login/oauth2/code/microsoft
-        // &scope=openid,profile,email
-//        String redirectUri = getRedirectUri(clientRegistration.getRegistrationId());
-//        String authorizationUri = clientRegistration.getProviderDetails().getAuthorizationUri()
-//                + "?client_id=" + clientRegistration.getClientId()
-//                + "&response_type=code"
-//                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
-//                + "&scope=" + String.join(",", clientRegistration.getScopes())
-//                ;
-//
-//        log.info("Authorization URI: {}", authorizationUri);
-//
-//        this.httpServletResponse.sendRedirect(authorizationUri);
+        String referer = httpServletRequest.getHeader("Referer");
+        if (referer == null)
+        {
+            referer = getBaseUrl();
+        }
 
-        // https://login.microsoftonline.com/aaef3ba4-e05f-4282-a763-ad4698e5e531/oauth2/v2.0/authorize?
-        // response_type=code
-        // &client_id=48de203b-3973-4e90-875c-d78b27beb2e2
-        // &scope=openid profile email
-        // &state=0OSUNrKl3N8F3x694xk-O-_XCEG2KNKkhu7q4HAilL4=
-        // &redirect_uri=http://localhost:8410/login/oauth2/code/microsoft
-        // &nonce=BW4SzZq1rgl-hG05XWlPDTAF0VLK98Vv3ysnJhI9uUg
-        String redirectUri = getBaseUrl() + "/oauth2/authorization/" + provider;
-        log.info("OAuth2 redirect URL: {}", redirectUri);
-        this.httpServletResponse.sendRedirect(redirectUri);
-    }
+        log.info("Authorization request from: {}", referer);
 
+        // Saving the referer in the oauth2_state cookie
+        Cookie stateCookie = new Cookie("oauth2_state", referer);
+        stateCookie.setHttpOnly(true);
+        stateCookie.setPath("/");
+        stateCookie.setMaxAge(300);
+        httpServletResponse.addCookie(stateCookie);
 
-    private String getRedirectUri(String registrationId)
-    {
-        String baseUrl = getBaseUrl();
-        String action = "login";
+        // OAuth2 authorization URL
+        String authUrl = getBaseUrl() + "/oauth2/authorization/" + provider;
 
-        return baseUrl + "/" + action + "/oauth2/code/" + registrationId;
+        log.info("Redirecting to the authorization URL: {}", authUrl);
+        this.httpServletResponse.sendRedirect(authUrl);
     }
 
 
