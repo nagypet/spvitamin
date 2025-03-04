@@ -17,6 +17,7 @@
 import {Component, HostListener} from '@angular/core';
 import {LayoutComponent} from './ui/layout/layout.component';
 import {DeviceTypeService} from './core/services/device-type.service';
+import {AuthService} from './core/services/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -30,12 +31,16 @@ import {DeviceTypeService} from './core/services/device-type.service';
 export class AppComponent {
   title = 'admingui';
 
-  constructor(public deviceTypeService: DeviceTypeService)
+  constructor(
+    private deviceTypeService: DeviceTypeService,
+    private authService: AuthService,
+  )
   {
   }
 
   ngOnInit(): void
   {
+    this.authService.getProfile().subscribe();
     this.onWindowResize();
   }
 

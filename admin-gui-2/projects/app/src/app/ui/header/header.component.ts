@@ -76,8 +76,6 @@ export class HeaderComponent  extends FormBaseComponent implements OnInit
       this.title = data.Title;
       this.version = data.Version;
     });
-
-    this.authService.getProfile().subscribe();
   }
 
   onLogout()
