@@ -106,7 +106,7 @@ public class OAuth2Configurer
                 .clientId(provider.getClientId())
                 .clientSecret(provider.getClientSecret())
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .redirectUri(provider.getRedirectUri())
                 .scope(provider.getScopes())
                 .authorizationUri(wellKnownEndpoints.getAuthorizationUri())
                 .tokenUri(wellKnownEndpoints.getTokenUri())

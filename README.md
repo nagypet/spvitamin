@@ -103,6 +103,7 @@ dependencyManagement {
 - AuthorizationService uses the canonical form of domain usernames, e.g. admin@perit 
 - spvitamin-spring-security-oauth2
 - admin-gui-2
+- RequestInfoService returnes the real parameters of a HTTP request, even if the server is running behind a reverse proxy
 
 ### 3.3.3-1-RELEASE not yet released
 

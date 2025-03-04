@@ -1,6 +1,7 @@
 package hu.perit.spvitamin.spring.security.oauth2.rest.controller;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.info.RequestInfoService;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.oauth2.rest.api.OAuthProxyApi;
 import jakarta.servlet.http.Cookie;
@@ -23,6 +24,7 @@ public class OAuthProxyController implements OAuthProxyApi
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;
+    private final RequestInfoService requestInfoService;
 
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = "hu.perit.spvitamin.spring.security.oauth2")
@@ -38,7 +40,7 @@ public class OAuthProxyController implements OAuthProxyApi
         String referer = httpServletRequest.getHeader("Referer");
         if (referer == null)
         {
-            referer = getBaseUrl();
+            referer = this.requestInfoService.getBaseUrl();
         }
 
         log.info("Authorization request from: {}", referer);
@@ -51,26 +53,9 @@ public class OAuthProxyController implements OAuthProxyApi
         httpServletResponse.addCookie(stateCookie);
 
         // OAuth2 authorization URL
-        String authUrl = getBaseUrl() + "/oauth2/authorization/" + provider;
+        String authUrl = this.requestInfoService.getBaseUrl() + "/oauth2/authorization/" + provider;
 
         log.info("Redirecting to the authorization URL: {}", authUrl);
         this.httpServletResponse.sendRedirect(authUrl);
-    }
-
-
-    public String getBaseUrl()
-    {
-        String scheme = httpServletRequest.getScheme();
-        String serverName = httpServletRequest.getServerName();
-        int serverPort = httpServletRequest.getServerPort();
-
-        if ((scheme.equals("http") && serverPort == 80) || (scheme.equals("https") && serverPort == 443))
-        {
-            return scheme + "://" + serverName;
-        }
-        else
-        {
-            return scheme + "://" + serverName + ":" + serverPort;
-        }
     }
 }

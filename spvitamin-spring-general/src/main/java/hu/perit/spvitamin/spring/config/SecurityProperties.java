@@ -67,6 +67,7 @@ public class SecurityProperties
         @NotNull
         private String displayName;
         private String issuerUri;
+        private String redirectUri = "{baseUrl}/login/oauth2/code/{registrationId}";
         @NotNull
         private String clientId;
         @NotNull
