@@ -18,13 +18,11 @@ package hu.perit.spvitamin.spring.rolemapper;
 
 import hu.perit.spvitamin.spring.config.RoleMappingProperties;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,14 +42,6 @@ public class RoleMapperServiceImpl implements RoleMapperService
     public RoleMapperServiceImpl(RoleMappingProperties roleMappingProperties)
     {
         this.roleMappingProperties = roleMappingProperties;
-    }
-
-
-    @Override
-    public boolean userHasRole(String username, String role)
-    {
-        Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(username, Collections.emptySet());
-        return roles.stream().map(i -> i.getAuthority()).anyMatch(i -> StringUtils.equalsIgnoreCase(i, role));
     }
 
 
@@ -79,10 +69,14 @@ public class RoleMapperServiceImpl implements RoleMapperService
         {
             if (adGroup.getAuthority().startsWith(ROLE_PREFIX))
             {
-                roles.add(adGroup.getAuthority());
+                // This is a ROLE_
+                String role = adGroup.getAuthority();
+                roles.add(role);
+                roles.addAll(roleMappingProperties.getIncludedRoles(role));
             }
             else
             {
+                // This is an AD group
                 roles.addAll(this.roleMappingProperties.getGroupRoles(adGroup.getAuthority()));
             }
         }

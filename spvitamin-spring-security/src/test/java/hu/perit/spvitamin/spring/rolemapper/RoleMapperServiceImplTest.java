@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class RoleMapperServiceImplTest
 {
+    // Roles
+    public static final String ROLE_USER = "ROLE_USER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_EMPTY = "ROLE_EMPTY";
+    // Users
+    public static final String ADMIN = "admin";
+    public static final String USER = "user";
+    public static final String MICROSOFT_ENTRA = "Microsoft Entra";
+    public static final String ADMIN_USER = "admin-user";
+    public static final String USER_USER = "user-user";
+    // Groups
+    public static final String ADMIN_GROUP = "admin-group";
+    public static final String USER_GROUP = "user-group";
+
     private RoleMappingProperties roleMappingProperties;
 
 
@@ -51,8 +64,8 @@ class RoleMapperServiceImplTest
         RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedAdmin());
         log.info(authenticatedUser.toString());
-        assertThat(authenticatedUser.getAuthorities()).hasSize(2);
-        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
+        assertThat(authenticatedUser.getAuthorities()).hasSize(3);
+        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder(ROLE_USER, ROLE_ADMIN, ROLE_EMPTY);
     }
 
 
@@ -63,8 +76,8 @@ class RoleMapperServiceImplTest
         RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserInAdminGroup());
         log.info(authenticatedUser.toString());
-        assertThat(authenticatedUser.getAuthorities()).hasSize(2);
-        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
+        assertThat(authenticatedUser.getAuthorities()).hasSize(3);
+        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder(ROLE_USER, ROLE_ADMIN, ROLE_EMPTY);
     }
 
 
@@ -75,8 +88,20 @@ class RoleMapperServiceImplTest
         RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedUser());
         log.info(authenticatedUser.toString());
-        assertThat(authenticatedUser.getAuthorities()).hasSize(1);
-        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder("ROLE_USER");
+        assertThat(authenticatedUser.getAuthorities()).hasSize(2);
+        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder(ROLE_USER, ROLE_EMPTY);
+    }
+
+
+    @Test
+    void testUserNamedMicrosoftEntra()
+    {
+
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedMicrosoftEntra());
+        log.info(authenticatedUser.toString());
+        assertThat(authenticatedUser.getAuthorities()).hasSize(2);
+        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder(ROLE_EMPTY, ROLE_USER);
     }
 
 
@@ -86,51 +111,48 @@ class RoleMapperServiceImplTest
         RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserInUserGroup());
         log.info(authenticatedUser.toString());
-        assertThat(authenticatedUser.getAuthorities()).hasSize(1);
-        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder("ROLE_USER");
-    }
-
-
-    @Test
-    void testUserHasRole()
-    {
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
-        assertThat(roleMapperService.userHasRole("admin", "ROLE_ADMIN")).isTrue();
-        assertThat(roleMapperService.userHasRole("admin", "ROLE_USER")).isTrue();
-        assertThat(roleMapperService.userHasRole("user", "ROLE_ADMIN")).isFalse();
-        assertThat(roleMapperService.userHasRole("user", "ROLE_USER")).isTrue();
+        assertThat(authenticatedUser.getAuthorities()).hasSize(2);
+        assertThat(authenticatedUser.getAuthorities().stream().map(i -> i.getAuthority()).toList()).containsExactlyInAnyOrder(ROLE_USER, ROLE_EMPTY);
     }
 
 
     private AuthenticatedUser getUserNamedAdmin()
     {
         return AuthenticatedUser.builder()
-                .username("admin")
-                .authorities(Collections.emptyList())
+                .username(ADMIN)
+                .authorities(List.of(new SimpleGrantedAuthority(ROLE_EMPTY)))
                 .build();
     }
 
     private AuthenticatedUser getUserNamedUser()
     {
         return AuthenticatedUser.builder()
-                .username("user")
-                .authorities(Collections.emptyList())
+                .username(USER)
+                .authorities(List.of(new SimpleGrantedAuthority(ROLE_EMPTY)))
+                .build();
+    }
+
+    private AuthenticatedUser getUserNamedMicrosoftEntra()
+    {
+        return AuthenticatedUser.builder()
+                .username(MICROSOFT_ENTRA)
+                .authorities(List.of(new SimpleGrantedAuthority(ROLE_EMPTY)))
                 .build();
     }
 
     private AuthenticatedUser getUserInAdminGroup()
     {
         return AuthenticatedUser.builder()
-                .username("admin-user")
-                .authorities(List.of(new SimpleGrantedAuthority("admin-group")))
+                .username(ADMIN_USER)
+                .authorities(List.of(new SimpleGrantedAuthority(ADMIN_GROUP), new SimpleGrantedAuthority(ROLE_EMPTY)))
                 .build();
     }
 
     private AuthenticatedUser getUserInUserGroup()
     {
         return AuthenticatedUser.builder()
-                .username("user-user")
-                .authorities(List.of(new SimpleGrantedAuthority("user-group")))
+                .username(USER_USER)
+                .authorities(List.of(new SimpleGrantedAuthority(USER_GROUP), new SimpleGrantedAuthority(ROLE_EMPTY)))
                 .build();
     }
 
@@ -138,15 +160,19 @@ class RoleMapperServiceImplTest
     {
         Map<String, RoleMappingProperties.RoleMapping> roles = new HashMap<>();
         RoleMappingProperties.RoleMapping adminRole = new RoleMappingProperties.RoleMapping();
-        adminRole.setUsers(List.of("admin"));
-        adminRole.setGroups(List.of("admin-group"));
-        adminRole.setIncludes(List.of("ROLE_USER"));
-        roles.put("ROLE_ADMIN", adminRole);
+        adminRole.setUsers(List.of(ADMIN));
+        adminRole.setGroups(List.of(ADMIN_GROUP));
+        adminRole.setIncludes(List.of(ROLE_USER));
+        roles.put(ROLE_ADMIN, adminRole);
 
         RoleMappingProperties.RoleMapping userRole = new RoleMappingProperties.RoleMapping();
-        userRole.setUsers(List.of("user"));
-        userRole.setGroups(List.of("user-group"));
-        roles.put("ROLE_USER", userRole);
+        userRole.setUsers(List.of(USER));
+        userRole.setGroups(List.of(USER_GROUP));
+        roles.put(ROLE_USER, userRole);
+
+        RoleMappingProperties.RoleMapping emptyRole = new RoleMappingProperties.RoleMapping();
+        emptyRole.setIncludes(List.of(ROLE_USER));
+        roles.put(ROLE_EMPTY, emptyRole);
 
         return roles;
     }

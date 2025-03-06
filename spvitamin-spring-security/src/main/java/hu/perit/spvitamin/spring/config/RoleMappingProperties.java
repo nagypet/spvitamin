@@ -82,7 +82,7 @@ public class RoleMappingProperties
     }
 
 
-    private Set<String> getIncludedRoles(String role)
+    public Set<String> getIncludedRoles(String role)
     {
 
         if (!this.roles.containsKey(role))

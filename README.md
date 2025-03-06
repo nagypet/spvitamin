@@ -104,6 +104,7 @@ dependencyManagement {
 - spvitamin-spring-security-oauth2
 - admin-gui-2
 - RequestInfoService returnes the real parameters of a HTTP request, even if the server is running behind a reverse proxy
+- role mapping fixed
 
 ### 3.3.3-1-RELEASE not yet released
 

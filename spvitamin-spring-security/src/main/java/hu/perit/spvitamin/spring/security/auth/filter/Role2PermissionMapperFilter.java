@@ -119,8 +119,9 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
         Set<GrantedAuthority> permissions = new HashSet<>();
 
         // filtering only ROLEs
-        List<? extends GrantedAuthority> roles = authorities.stream().filter(a -> a.getAuthority().startsWith("ROLE_"))
-                .collect(Collectors.toList());
+        List<? extends GrantedAuthority> roles = authorities.stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .toList();
         for (GrantedAuthority role : roles)
         {
             // Adding the role itself
@@ -129,7 +130,7 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
             if (role2PermissionMapping.getRolemap().containsKey(role.getAuthority()))
             {
                 List<String> permissionList = role2PermissionMapping.getRolemap().get(role.getAuthority());
-                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).collect(Collectors.toList()));
+                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).toList());
             }
         }
 
