@@ -19,7 +19,6 @@ package hu.perit.spvitamin.spring.resttemplate;
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -43,13 +42,6 @@ public class RestTemplateErrorHandler extends DefaultResponseErrorHandler
         {
             ServerException.throwFrom(ex);
         }
-    }
-
-
-    @Override
-    protected void handleError(ClientHttpResponse response, HttpStatusCode statusCode) throws IOException
-    {
-        handleError(response);
     }
 
 

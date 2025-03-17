@@ -79,6 +79,9 @@ dependencyManagement {
 
 ## Release history
 
+### 3.4.3-1-RELEASE not yet released
+- Java21, SpringBoot 3.4.3
+
 ### 3.3.3-2-RELEASE not yet released
 
 - Thing refactored

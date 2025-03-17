@@ -1,19 +1,20 @@
-[plugins]
-ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
-habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version = '3.2.1263' }
-io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.6' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.3' }
-sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
-
 [versions]
 aspectj = '1.9.22.1'
 jackson = '2.17.2'
 jsonwebtoken = '0.12.6'
-junit = '5.10.3'
+junit = '5.11.4'
 logback = '1.5.8'
 mapstruct = '1.6.0'
 springdoc = '2.6.0'
+czhabarta = '3.2.1263'
 
+
+[plugins]
+ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
+habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
+io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '3.4.3' }
+sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 [libraries]
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
@@ -46,9 +47,9 @@ mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.re
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 reflections = 'org.reflections:reflections:0.10.2'
-slf4j-api = 'org.slf4j:slf4j-api:2.0.13'
+slf4j-api = 'org.slf4j:slf4j-api:2.0.15'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
-spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
+spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0'
 
 
 [bundles]

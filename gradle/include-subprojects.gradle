@@ -19,45 +19,44 @@ new ProjectConfigurer(settings).doIt()
 
 
 class ProjectConfigurer {
-	File rootDir
-	Settings settings
+    File rootDir
+    Settings settings
 
-	ProjectConfigurer(Settings settings) {
-		this.rootDir = settings.getRootDir()
-		this.settings = settings
-	}
-	
-	
-	void doIt() {
-		long startTime = System.currentTimeMillis()
-		println "Included projects:"
-		
-		this.discoverRecursive(this.rootDir)
-		
-		println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
-	}
+    ProjectConfigurer(Settings settings) {
+        this.rootDir = settings.getRootDir()
+        this.settings = settings
+    }
 
 
-	private void discoverRecursive(File root) {
-		root.eachDir(){ dir ->
-			if (this.isDirRelevant(dir)) {
-				if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin")) {
-					this.settings.include "${dir.name}"
-					def projDir = new File("${root}", "${dir.name}")
-					this.settings.project(":${dir.name}").projectDir = projDir
-					println "  :${dir.name} => ${projDir}"
-				}
-				else {
-					discoverRecursive(dir)
-				}
-			}
-		}
-	}
-	
-	
-	private boolean isDirRelevant(File dir) {
-		return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out"))
-	}
+    void doIt() {
+        long startTime = System.currentTimeMillis()
+        println "Included projects:"
+
+        this.discoverRecursive(this.rootDir)
+
+        println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
+    }
+
+
+    private void discoverRecursive(File root) {
+        root.eachDir() { dir ->
+            if (isDirRelevant(dir)) {
+                if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin")) {
+                    this.settings.include "${dir.name}"
+                    def projDir = new File("${root}", "${dir.name}")
+                    this.settings.project(":${dir.name}").projectDir = projDir
+                    println "  :${dir.name} => ${projDir}"
+                } else {
+                    discoverRecursive(dir)
+                }
+            }
+        }
+    }
+
+
+    private static boolean isDirRelevant(File dir) {
+        return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out"))
+    }
 }
 
 
