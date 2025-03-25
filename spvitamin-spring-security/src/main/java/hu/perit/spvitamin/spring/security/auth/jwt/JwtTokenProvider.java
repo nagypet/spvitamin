@@ -24,7 +24,6 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,13 +70,14 @@ public class JwtTokenProvider
                     .issuedAt(iat)
                     .expiration(exp)
                     .claims(additionalClaims)
-                    .signWith(privateKey, SignatureAlgorithm.RS512)
+                    .signWith(privateKey)
                     .compact();
 
             return AuthorizationToken.builder()
                     .sub(domainUser.getCanonicalName())
                     .preferredUsername(authenticatedUser.getDisplayName())
-                    .jwt(jwt).iat(issuedAt)
+                    .jwt(jwt)
+                    .iat(issuedAt)
                     .exp(expiryDate)
                     .uid(authenticatedUser.getUserId())
                     .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
