@@ -36,7 +36,6 @@ import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -83,46 +82,6 @@ public class JwtTokenProvider
                     .uid(authenticatedUser.getUserId())
                     .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
                     .source(authenticatedUser.getSource())
-                    .build();
-        }
-        catch (Exception e)
-        {
-            throw new JwtException("Token creation failed!", e);
-        }
-    }
-
-
-    @Deprecated
-    // Use hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider.generateToken(hu.perit.spvitamin.spring.security.AuthenticatedUser)
-    public AuthorizationToken generateToken(String subject, Claims additionalClaims)
-    {
-        try
-        {
-            LocalDateTime issuedAt = LocalDateTime.now();
-            LocalDateTime expiryDate = issuedAt.plusMinutes(jwtProperties.getExpirationInMinutes());
-            Key privateKey = KeystoreUtils.getPrivateKey();
-
-            Date iat = Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant());
-            Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
-
-            DomainUser domainUser = DomainUser.newInstance(subject);
-
-            String jwt = Jwts.builder()
-                    .subject(domainUser.getCanonicalName())
-                    .issuedAt(iat)
-                    .expiration(exp)
-                    .claims(additionalClaims)
-                    .signWith(privateKey, SignatureAlgorithm.RS512)
-                    .compact();
-
-            return AuthorizationToken.builder()
-                    .sub(domainUser.getCanonicalName())
-                    .jwt(jwt)
-                    .iat(issuedAt)
-                    .uid(additionalClaims.get(TokenClaims.USERID, Long.class))
-                    .rls(additionalClaims.get(TokenClaims.ROLES, Set.class))
-                    .source(additionalClaims.get(TokenClaims.SRC, String.class))
-                    .exp(expiryDate)
                     .build();
         }
         catch (Exception e)
