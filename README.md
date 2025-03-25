@@ -5,6 +5,11 @@ please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
 
+### 3.4.3-1-RELEASE
+
+- SpringBoot 3.4.3
+- SpingCloud 2024.0.0
+
 ### 3.3.3-2-RELEASE
 
 - SpringBoot 3.3.3
@@ -81,6 +86,11 @@ dependencyManagement {
 
 ### 3.4.3-1-RELEASE not yet released
 - Java21, SpringBoot 3.4.3
+- AuthorizationToken extended with roles and preferred_username. Admin-Gui shows the preferred_username if available.
+- LdapAuthenticationProvider improved to change the NetBIOS form domain\username into `user principal name`.
+- DurationUtils to format a Duration type to human-readable form.
+- AuthApi moved to spvitamin-spring-security
+- spvitamin-spring-security-authservice-api removed
 
 ### 3.3.3-2-RELEASE not yet released
 

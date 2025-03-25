@@ -51,7 +51,6 @@ dependencies {
         api project(":spvitamin-spring-general")
         api project(":spvitamin-spring-logging")
         api project(":spvitamin-spring-security")
-        api project(":spvitamin-spring-security-authservice-api")
         api project(":spvitamin-spring-security-authservice")
         api project(":spvitamin-spring-security-keycloak")
         api project(":spvitamin-spring-security-ldap")

@@ -42,7 +42,6 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
-    implementation project(':spvitamin-spring-security-authservice-api')
     implementation project(':spvitamin-spring-cloud-feign')
 
     // Lombok

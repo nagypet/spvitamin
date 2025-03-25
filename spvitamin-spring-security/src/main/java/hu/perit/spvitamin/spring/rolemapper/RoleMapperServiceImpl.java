@@ -52,13 +52,9 @@ public class RoleMapperServiceImpl implements RoleMapperService
 
         Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(authenticatedUser.getUsername(), adGroups);
 
-        return AuthenticatedUser.builder() //
-                .username(authenticatedUser.getUsername()) //
-                .authorities(roles) //
-                .userId(authenticatedUser.getUserId()) //
-                .anonymous(authenticatedUser.isAnonymous())
-                .ldapUrl(authenticatedUser.getLdapUrl())
-                .build();
+        AuthenticatedUser clone = authenticatedUser.clone();
+        clone.setAuthorities(roles);
+        return clone;
     }
 
 

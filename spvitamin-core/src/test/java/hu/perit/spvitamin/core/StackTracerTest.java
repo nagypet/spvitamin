@@ -116,7 +116,7 @@ class StackTracerTest
             ExceptionWrapper exception = ExceptionWrapper.of(ex);
             Assertions.assertTrue(exception.causedBy(RuntimeException.class));
             Assertions.assertTrue(exception.causedBy(MyVerySpecialException.class));
-            Optional<Throwable> fromCauseChain = exception.getFromCauseChain(RuntimeException.class);
+            Optional<RuntimeException> fromCauseChain = exception.getFromCauseChain(RuntimeException.class);
             Assertions.assertEquals("original cause", fromCauseChain.get().getMessage());
         }
         log.debug("next line");

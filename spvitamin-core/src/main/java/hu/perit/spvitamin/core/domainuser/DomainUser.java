@@ -26,6 +26,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Objects;
 
 /**
+ * NetBIOS name: perit\nagypet
+ * User Principal Name: nagypet@perit.hu
+ *
  * @author Peter Nagy
  */
 
@@ -50,7 +53,7 @@ public class DomainUser
             String[] userNameParts = userName.split("\\\\");
             if (userNameParts.length == 2)
             {
-                user.setDomain(extractDomain(userNameParts[0]));
+                user.setDomain(extractNetbiosDomain(userNameParts[0]));
                 user.setUsername(userNameParts[1]);
             }
             else
@@ -60,12 +63,12 @@ public class DomainUser
         }
         else if (userName.contains("@"))
         {
-            // username@domainname -> domainname\\username
+            // User Principal Name
             String[] userNameParts = userName.split("@");
             if (userNameParts.length == 2)
             {
                 user.setUsername(userNameParts[0]);
-                user.setDomain(extractDomain(userNameParts[1]));
+                user.setDomain(userNameParts[1]);
             }
             else
             {
@@ -80,13 +83,19 @@ public class DomainUser
     }
 
 
-    private static String extractDomain(String domain)
+    private static String extractNetbiosDomain(String domain)
     {
         if (domain != null && domain.contains("."))
         {
             domain = domain.substring(0, domain.indexOf('.'));
         }
         return domain;
+    }
+
+
+    private static boolean isQualifiedDomain(String domain)
+    {
+        return domain != null && domain.contains(".");
     }
 
 
@@ -117,16 +126,22 @@ public class DomainUser
         {
             return true;
         }
-        if (!(o instanceof DomainUser))
+        if (!(o instanceof DomainUser other))
         {
             return false;
         }
 
-        DomainUser domainUser = (DomainUser) o;
+        if (isQualifiedDomain(domain) && isQualifiedDomain(other.domain))
+        {
+            return new EqualsBuilder()
+                    .append(StringUtils.lowerCase(domain), StringUtils.lowerCase(other.domain))
+                    .append(StringUtils.lowerCase(username), StringUtils.lowerCase(other.username))
+                    .isEquals();
+        }
 
         return new EqualsBuilder()
-                .append(StringUtils.lowerCase(domain), StringUtils.lowerCase(domainUser.domain))
-                .append(StringUtils.lowerCase(username), StringUtils.lowerCase(domainUser.username))
+                .append(StringUtils.lowerCase(extractNetbiosDomain(domain)), StringUtils.lowerCase(extractNetbiosDomain(other.domain)))
+                .append(StringUtils.lowerCase(username), StringUtils.lowerCase(other.username))
                 .isEquals();
     }
 

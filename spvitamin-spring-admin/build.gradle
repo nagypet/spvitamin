@@ -87,7 +87,7 @@ generateTypeScript {
     outputFile = 'build/spvitamin-admin-models.ts'
     outputFileType = 'implementationFile'
     outputKind = 'module'
-    namespace = 'Spvitamin'
+    namespace = 'SpvitaminAdmin'
     //disableTaggedUnions = true
     optionalProperties = 'useSpecifiedAnnotations'
     optionalAnnotations = [

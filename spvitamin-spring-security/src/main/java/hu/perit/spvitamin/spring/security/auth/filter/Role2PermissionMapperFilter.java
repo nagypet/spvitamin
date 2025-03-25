@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -71,13 +70,9 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
 
                 // Mapping roles => privileges
                 Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
-                AuthenticatedUser authenticatedUserWithPrivileges = AuthenticatedUser.builder() //
-                        .username(authenticatedUserWithRoles.getUsername()) //
-                        .authorities(privileges) //
-                        .anonymous(authenticatedUserWithRoles.isAnonymous())
-                        .userId(authenticatedUserWithRoles.getUserId())
-                        .ldapUrl(authenticatedUserWithRoles.getLdapUrl())
-                        .build();
+                AuthenticatedUser authenticatedUserWithPrivileges = authenticatedUserWithRoles.clone();
+                authenticatedUserWithPrivileges.setAuthorities(privileges);
+
                 log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
 
                 authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);

@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security;
 
+import java.io.Serial;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -29,18 +30,34 @@ import lombok.Data;
  */
 
 
-@SuppressWarnings("serial")
 @Data
 @Builder
 public class AuthenticatedUser implements UserDetails
 {
+    @Serial
+    private static final long serialVersionUID = -4734744978387700215L;
 
     private String username;
     private long userId;
+    private String displayName;
     private Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
     private boolean anonymous = true;
-    private String ldapUrl;
+    private String source;
+
+
+    public AuthenticatedUser clone()
+    {
+        return AuthenticatedUser.builder()
+                .username(username)
+                .userId(userId)
+                .displayName(displayName)
+                .authorities(authorities)
+                .anonymous(anonymous)
+                .source(source)
+                .build();
+    }
+
 
     @Override
     public String getPassword()

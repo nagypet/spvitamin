@@ -23,7 +23,7 @@
     @if (!authService.isLoggedIn) {
       <ngface-button [formdata]="formData" widgetid="button-login" routerLink="/admin-gui/login"/>
     } @else {
-      <span class="titlebar-username text-light">Welcome {{authService.getUserName()}}!</span>
+      <span class="titlebar-username text-light">Welcome {{authService.getDisplayName()}}!</span>
       <ngface-button [formdata]="formData" widgetid="button-logout" (click)="onLogout()"/>
     }
     <ngface-button [formdata]="formData" widgetid="button-about" routerLink="/admin-gui/about"/>

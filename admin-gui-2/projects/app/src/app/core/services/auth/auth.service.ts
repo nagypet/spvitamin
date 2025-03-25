@@ -17,10 +17,10 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {AuthToken} from './token-model';
 import {CookieService} from 'ngx-cookie-service';
 import {ToastrService} from 'ngx-toastr';
 import {environment} from '../../../../environments/environment';
+import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
 
 @Injectable({
   providedIn: 'root'
@@ -46,11 +46,11 @@ export class AuthService
   /**
    * This checks if the session is already authenticated
    */
-  getProfile(): Observable<AuthToken>
+  getProfile(): Observable<SpvitaminSecurity.AuthorizationToken>
   {
-    return new Observable<AuthToken>(observer =>
+    return new Observable<SpvitaminSecurity.AuthorizationToken>(observer =>
     {
-      this.httpClient.get<AuthToken>(`${environment.baseURL}/api/spvitamin/authenticate`).subscribe(token =>
+      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`).subscribe(token =>
       {
         // OK
         this.loginSuccess(token);
@@ -70,14 +70,14 @@ export class AuthService
    * @param username
    * @param password
    */
-  login(username: string, password: string): Observable<AuthToken>
+  login(username: string, password: string): Observable<SpvitaminSecurity.AuthorizationToken>
   {
-    return new Observable<AuthToken>(observer =>
+    return new Observable<SpvitaminSecurity.AuthorizationToken>(observer =>
     {
       let headers = new HttpHeaders();
       // Accended characters fix
       headers = headers.append('Authorization', 'Basic ' + btoa(unescape(encodeURIComponent(username + ':' + password))));
-      this.httpClient.get<AuthToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
+      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
       {
         // OK
         this.loginSuccess(token);
@@ -138,7 +138,7 @@ export class AuthService
 
     let headers = new HttpHeaders();
     headers = headers.append('Authorization', 'Bearer ' + token.jwt);
-    this.httpClient.get<AuthToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
+    this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
     {
       this.loginSuccess(token, false);
     }, error =>
@@ -147,7 +147,7 @@ export class AuthService
     });
   }
 
-  private loginSuccess(token: AuthToken, withInfo: boolean = true): void
+  private loginSuccess(token: SpvitaminSecurity.AuthorizationToken, withInfo: boolean = true): void
   {
     console.log('loginSuccess');
 
@@ -159,14 +159,14 @@ export class AuthService
       console.log('time until expire', tokenValidSeconds);
       if (withInfo)
       {
-        this.toastrService.success(`Session validity: ${tokenValidMinutes} minutes`, `Welcome ${token.sub}`);
+        this.toastrService.success(`Session validity: ${tokenValidMinutes} minutes`, `Welcome ${this.getDisplayName()}`);
       }
     }
     this.loginSubject$.next(true);
   }
 
 
-  public checkToken(t?: AuthToken): AuthToken | undefined
+  public checkToken(t?: SpvitaminSecurity.AuthorizationToken): SpvitaminSecurity.AuthorizationToken | undefined
   {
     const token = t ?? this.getToken();
     if (!token)
@@ -191,7 +191,7 @@ export class AuthService
   }
 
 
-  public getTokenValidSeconds(token?: AuthToken): number
+  public getTokenValidSeconds(token?: SpvitaminSecurity.AuthorizationToken): number
   {
     if (!token)
     {
@@ -201,7 +201,7 @@ export class AuthService
   }
 
 
-  public getToken(): AuthToken | undefined
+  public getToken(): SpvitaminSecurity.AuthorizationToken | undefined
   {
     const tokenString = sessionStorage.getItem('token');
     if (tokenString === null)
@@ -215,5 +215,11 @@ export class AuthService
   getUserName(): string
   {
     return this.getToken()?.sub ?? 'Anonymous';
+  }
+
+
+  getDisplayName(): string
+  {
+    return this.getToken()?.preferred_username ?? this.getUserName();
   }
 }

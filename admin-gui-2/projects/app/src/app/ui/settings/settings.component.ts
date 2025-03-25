@@ -22,7 +22,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {MatCardModule} from '@angular/material/card';
 import {AdminService} from '../../core/services/admin.service';
 import {AuthService} from '../../core/services/auth/auth.service';
-import {Spvitamin} from '../../model/spvitamin-admin-models';
+import {SpvitaminAdmin} from '../../model/spvitamin-admin-models';
 
 
 @Component({
@@ -40,7 +40,7 @@ import {Spvitamin} from '../../model/spvitamin-admin-models';
 })
 export class SettingsComponent implements OnInit
 {
-  public settings: { [index: string]: Spvitamin.ServerParameter[] } | null = null;
+  public settings: { [index: string]: SpvitaminAdmin.ServerParameter[] } | null = null;
   public shutdownIsInProgress = false;
 
   constructor(
@@ -53,7 +53,7 @@ export class SettingsComponent implements OnInit
 
   ngOnInit()
   {
-    this.adminService.getSettings().subscribe((data: Spvitamin.ServerSettingsResponse) =>
+    this.adminService.getSettings().subscribe((data: SpvitaminAdmin.ServerSettingsResponse) =>
     {
       this.settings = data.serverParameters;
     }, error =>
@@ -80,7 +80,7 @@ export class SettingsComponent implements OnInit
     return [];
   }
 
-  getSetting(key: string): Spvitamin.ServerParameter[]
+  getSetting(key: string): SpvitaminAdmin.ServerParameter[]
   {
     if (this.settings)
     {

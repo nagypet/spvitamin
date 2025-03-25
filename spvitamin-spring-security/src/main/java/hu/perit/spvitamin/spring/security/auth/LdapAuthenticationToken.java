@@ -16,26 +16,28 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serial;
 import java.util.Collection;
 
-public class LdapAuthenticationToken extends UsernamePasswordAuthenticationToken {
+@Getter
+public class LdapAuthenticationToken extends UsernamePasswordAuthenticationToken
+{
+    @Serial
+    private static final long serialVersionUID = 537004967566037245L;
 
-    private String url;
+    @Setter
+    private String userCN;
+    private final String url;
 
-    public LdapAuthenticationToken(Object principal, Object credentials, String url) {
-        super(principal, credentials);
-        this.url = url;
-    }
-
-    public LdapAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities, String url) {
+    public LdapAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities, String url, String userCN)
+    {
         super(principal, credentials, authorities);
         this.url = url;
-    }
-
-    public String getUrl() {
-        return url;
+        this.userCN = userCN;
     }
 }

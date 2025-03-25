@@ -16,28 +16,30 @@
 
 package hu.perit.spvitamin.spring.security.authservice.provider;
 
-import org.springframework.stereotype.Service;
-
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.security.authservice.restclient.AuthClient;
+import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import org.springframework.stereotype.Service;
 
 @Service
-public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthenticationProvider {
+public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthenticationProvider
+{
 
-    protected AuthorizationToken getAuthorizationToken(String userName, String password) {
-        AuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+    protected AuthorizationToken getAuthorizationToken(String userName, String password)
+    {
+        AuthApi templateAuthClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor(userName, password))
-                .build(AuthClient.class, getServiceUrl());
+                .build(AuthApi.class, getServiceUrl());
 
-        return templateAuthClient.authenticate(null);
+        return templateAuthClient.authenticateUsingGET(null);
     }
 
 
-    public static String getServiceUrl() {
+    public static String getServiceUrl()
+    {
         MicroserviceCollectionProperties microserviceCollectionProperties = SysConfig.getSysMicroservices();
         return microserviceCollectionProperties.get("auth-service").getUrl();
     }

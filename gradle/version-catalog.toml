@@ -5,7 +5,7 @@ jsonwebtoken = '0.12.6'
 junit = '5.11.4'
 logback = '1.5.8'
 mapstruct = '1.6.0'
-springdoc = '2.6.0'
+springdoc = '2.8.5'
 czhabarta = '3.2.1263'
 
 

@@ -16,6 +16,10 @@
 
 package hu.perit.spvitamin.spring.security.authservice.provider;
 
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.security.auth.BasicAuthHeader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,22 +27,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.security.auth.BasicAuthHeader;
-
 @Service
-public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServiceAuthenticationProvider {
+public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServiceAuthenticationProvider
+{
 
     private final RestTemplate restTemplate;
 
-    public AuthServiceAuthenticationProviderWithRestTemplate(RestTemplate restTemplate) {
+    public AuthServiceAuthenticationProviderWithRestTemplate(RestTemplate restTemplate)
+    {
         this.restTemplate = restTemplate;
     }
 
     @Override
-    protected AuthorizationToken getAuthorizationToken(String userName, String password) {
+    protected AuthorizationToken getAuthorizationToken(String userName, String password)
+    {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, BasicAuthHeader.fromUsernamePassword(userName, password));
@@ -56,7 +58,8 @@ public class AuthServiceAuthenticationProviderWithRestTemplate extends AuthServi
     }
 
 
-    public static String getServiceUrl() {
+    public static String getServiceUrl()
+    {
         MicroserviceCollectionProperties microserviceCollectionProperties = SysConfig.getSysMicroservices();
         return microserviceCollectionProperties.get("auth-service").getUrl();
     }

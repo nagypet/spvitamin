@@ -16,28 +16,39 @@
 
 package hu.perit.spvitamin.spring.auth;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
+ * This class is only a wrapper around the token, basically for use in the frontend. The content is more or less
+ * identical with the payload of the token.
+ * The backend uses always the signed token to restore the authentication information.
+ *
  * @author Peter Nagy
  */
 
 @Data
 @NoArgsConstructor
-public class AuthorizationToken implements AbstractAuthorizationToken {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
+@AllArgsConstructor
+public class AuthorizationToken implements AbstractAuthorizationToken
+{
 
     private String sub;
+    @JsonProperty("preferred_username")
+    private String preferredUsername;
     private String jwt;
     private LocalDateTime iat;
     private LocalDateTime exp;
-
-    public AuthorizationToken(String sub, String jwt, LocalDateTime iat, LocalDateTime exp) {
-        this.sub = sub;
-        this.jwt = jwt;
-        this.iat = iat;
-        this.exp = exp;
-    }
+    private Long uid;
+    private Set<String> rls;
+    private String source;
 }

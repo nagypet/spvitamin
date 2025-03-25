@@ -19,9 +19,9 @@ package hu.perit.spvitamin.spring.security.authservice.filter;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.feignclients.ForwardingAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
+import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.authservice.provider.AuthServiceAuthenticationProviderWithFeign;
-import hu.perit.spvitamin.spring.security.authservice.restclient.AuthClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 
@@ -47,10 +47,10 @@ public class AuthServiceAuthenticationFilter extends AbstractTokenAuthentication
 
     @Override
     protected AuthorizationToken getJwtFromRequest(HttpServletRequest request) {
-        AuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+        AuthApi templateAuthClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new ForwardingAuthRequestInterceptor(request.getHeader(HttpHeaders.AUTHORIZATION)))
-                .build(AuthClient.class, AuthServiceAuthenticationProviderWithFeign.getServiceUrl());
+                .build(AuthApi.class, AuthServiceAuthenticationProviderWithFeign.getServiceUrl());
 
-        return templateAuthClient.authenticate(null);
+        return templateAuthClient.authenticateUsingGET(null);
     }
 }

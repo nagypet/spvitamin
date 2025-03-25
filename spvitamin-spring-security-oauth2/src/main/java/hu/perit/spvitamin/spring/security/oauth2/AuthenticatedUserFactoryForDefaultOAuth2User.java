@@ -24,19 +24,21 @@ public class AuthenticatedUserFactoryForDefaultOAuth2User implements Authenticat
         if (principal instanceof DefaultOAuth2User defaultOAuth2User)
         {
             return AuthenticatedUser.builder()
-                    .username(getName(defaultOAuth2User))
+                    .username(getName(defaultOAuth2User, "email"))
+                    .displayName(getName(defaultOAuth2User, "name"))
                     .authorities(getRoles(defaultOAuth2User))
                     .userId(-1)
+                    .source("oauth2")
                     .anonymous(false).build();
         }
 
         return null;
     }
 
-    private static String getName(DefaultOAuth2User defaultOAuth2User)
+    private static String getName(DefaultOAuth2User defaultOAuth2User, String attribute)
     {
         Map<String, Object> attributes = defaultOAuth2User.getAttributes();
-        return (String) attributes.get("name");
+        return (String) attributes.get(attribute);
     }
 
 

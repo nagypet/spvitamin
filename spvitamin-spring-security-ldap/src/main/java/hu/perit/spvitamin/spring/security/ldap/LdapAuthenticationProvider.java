@@ -164,15 +164,16 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
                 () -> this.messages.getMessage("LdapAuthenticationProvider.onlySupports",
                         "Only UsernamePasswordAuthenticationToken is supported"));
-        UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
-        DomainUser domainUser = DomainUser.newInstance(userToken.getName());
+        // authenticationName is the name which the user typed in. E.g. perit\nagypet or nagypet@perit.hu
+        String authenticationName = authentication.getName();
+        DomainUser domainUser = DomainUser.newInstance(authenticationName);
         if (domainUser.getDomain() == null || !this.domain.contains(domainUser.getDomain()))
         {
             return null;
         }
         String username = domainUser.getUsername();
         String password = (String) authentication.getCredentials();
-        this.logger.debug(LogMessage.format("Processing authentication request for user: %s", username));
+        this.logger.debug(LogMessage.format("Processing authentication request for user: %s", authenticationName));
         if (!StringUtils.hasLength(username))
         {
             throw new BadCredentialsException(
@@ -184,18 +185,35 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
                     this.messages.getMessage("AbstractLdapAuthenticationProvider.emptyPassword", "Empty Password"));
         }
         Assert.notNull(password, "Null password was supplied in authentication token");
+
+        UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
         DirContextOperations userData = doAuthentication(userToken);
-        UserDetails user = this.userDetailsContextMapper.mapUserFromContext(userData, authentication.getName(),
-                loadUserAuthorities(userData, authentication.getName(), (String) authentication.getCredentials()));
-        return createSuccessfulAuthentication(userToken, user);
+        Collection<? extends GrantedAuthority> authorities = loadUserAuthorities(userData, authenticationName, (String) authentication.getCredentials());
+        UserDetails user = this.userDetailsContextMapper.mapUserFromContext(
+                userData,
+                //authenticationName,
+                // Fixing the username so that it is a complete UPN
+                getUserPrincipalName(username),
+                authorities
+        );
+        return createSuccessfulAuthentication(userToken, user, userData);
+    }
+
+    private String getUserPrincipalName(String username)
+    {
+        return username + "@" + this.domain;
     }
 
     protected Authentication createSuccessfulAuthentication(UsernamePasswordAuthenticationToken authentication,
-                                                            UserDetails user)
+                                                            UserDetails user,
+                                                            DirContextOperations userData
+    )
     {
         GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-        LdapAuthenticationToken result = new LdapAuthenticationToken(user, authentication.getCredentials(),
-                authoritiesMapper.mapAuthorities(user.getAuthorities()), url);
+        LdapAuthenticationToken result = new LdapAuthenticationToken(
+                user,
+                authentication.getCredentials(),
+                authoritiesMapper.mapAuthorities(user.getAuthorities()), url, userData.getStringAttribute("cn"));
         result.setDetails(authentication.getDetails());
         return result;
     }

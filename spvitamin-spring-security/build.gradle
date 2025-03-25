@@ -21,6 +21,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
+    alias libs.plugins.habarta.typescript.generator
 }
 apply from: '../gradle/common.gradle'
 
@@ -74,4 +75,23 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+
+generateTypeScript {
+    jsonLibrary = 'jackson2'
+    classPatterns = [
+            'hu.perit.spvitamin.spring.auth.AuthorizationToken',
+            'hu.perit.spvitamin.spring.security.config.AuthenticationRepository'
+    ]
+    outputFile = 'build/spvitamin-security-models.ts'
+    outputFileType = 'implementationFile'
+    outputKind = 'module'
+    namespace = 'SpvitaminSecurity'
+    //disableTaggedUnions = true
+    optionalProperties = 'useSpecifiedAnnotations'
+    optionalAnnotations = [
+            'javax.annotation.Nullable'
+    ]
+    optionalPropertiesDeclaration = 'nullableType'
 }

@@ -11,7 +11,6 @@ copy gradle.properties spvitamin-spring-general
 copy gradle.properties spvitamin-spring-logging
 copy gradle.properties spvitamin-spring-security
 copy gradle.properties spvitamin-spring-security-authservice
-copy gradle.properties spvitamin-spring-security-authservice-api
 copy gradle.properties spvitamin-spring-security-keycloak
 copy gradle.properties spvitamin-spring-security-ldap
 copy gradle.properties spvitamin-spring-security-oauth2

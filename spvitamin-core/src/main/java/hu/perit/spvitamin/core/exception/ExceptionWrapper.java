@@ -112,16 +112,16 @@ public class ExceptionWrapper implements ServerExceptionInterface
     }
 
 
-    public Optional<Throwable> getFromCauseChain(Class<? extends Throwable> anExceptionClass)
+    public <T extends Throwable> Optional<T> getFromCauseChain(Class<T> anExceptionClass)
     {
         List<Throwable> allCauses = this.getAllCauses();
         allCauses.add(this.exception);
         List<Throwable> throwables = allCauses.stream()
                 .filter(i -> getClassName(i).equals(anExceptionClass.getName()))
-                .collect(Collectors.toList());
+                .toList();
         if (!throwables.isEmpty())
         {
-            return Optional.of(throwables.get(0));
+            return Optional.of((T) throwables.get(0));
         }
         else
         {

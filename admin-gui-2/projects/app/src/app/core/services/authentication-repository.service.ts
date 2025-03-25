@@ -18,7 +18,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
-import {AuthenticationRepository, AuthenticationType} from '../../model/auth-model';
+import {SpvitaminSecurity} from '../../model/spvitamin-security-models';
 
 @Injectable({
   providedIn: 'root'
@@ -32,8 +32,8 @@ export class AuthenticationRepositoryService
   }
 
 
-  public getAuthenticationRepository(): Observable<AuthenticationRepository>
+  public getAuthenticationRepository(): Observable<SpvitaminSecurity.AuthenticationRepository>
   {
-    return this.httpClient.get(`${environment.baseURL}${this.serviceUrl}`) as Observable<AuthenticationRepository>;
+    return this.httpClient.get(`${environment.baseURL}${this.serviceUrl}`) as Observable<SpvitaminSecurity.AuthenticationRepository>;
   }
 }

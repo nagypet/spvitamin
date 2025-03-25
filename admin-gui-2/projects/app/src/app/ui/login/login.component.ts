@@ -26,9 +26,9 @@ import {FormBaseComponent} from '../../../../../ngface/src/lib/form/form-base.co
 import {Ngface} from '../../../../../ngface/src/lib/ngface-models';
 import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-widget-factory';
 import {AuthenticationRepositoryService} from '../../core/services/authentication-repository.service';
-import {AuthenticationRepository, AuthenticationType} from '../../model/auth-model';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
+import {SpvitaminSecurity} from '../../model/spvitamin-security-models';
 
 @Component({
   selector: 'app-login',
@@ -46,10 +46,10 @@ import {environment} from '../../../environments/environment';
 export class LoginComponent extends FormBaseComponent implements OnInit
 {
   protected errorText?: string;
-  protected selectedAuthenticationType?: AuthenticationType;
+  protected selectedAuthenticationType?: SpvitaminSecurity.AuthenticationType;
 
   private returnUrl = '';
-  protected authenticationTypes: Array<AuthenticationType> = [];
+  protected authenticationTypes: Array<SpvitaminSecurity.AuthenticationType> = [];
 
 
   constructor(
@@ -78,7 +78,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
 
   ngOnInit()
   {
-    this.authenticationRepositoryService.getAuthenticationRepository().subscribe((result: AuthenticationRepository) =>
+    this.authenticationRepositoryService.getAuthenticationRepository().subscribe((result: SpvitaminSecurity.AuthenticationRepository) =>
     {
       this.authenticationTypes = result.authenticationTypes;
       if (result.authenticationTypes && result.authenticationTypes.length == 1)
@@ -135,7 +135,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
   }
 
 
-  onAuthenticationSelect(type: AuthenticationType)
+  onAuthenticationSelect(type: SpvitaminSecurity.AuthenticationType)
   {
     console.log(`Selected authentication type: ${type.label}`);
     this.selectedAuthenticationType = type;

@@ -18,9 +18,9 @@
 import {Injectable} from '@angular/core';
 import { HttpBackend, HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Spvitamin} from '../../model/spvitamin-admin-models';
 import {environment} from '../../../environments/environment';
 import {CertificateFile} from '../../model/keystore';
+import {SpvitaminAdmin} from '../../model/spvitamin-admin-models';
 
 
 @Injectable({
@@ -53,9 +53,9 @@ export class AdminService
     return this.http.get(`${environment.baseURL}/api/spvitamin/admin/version`);
   }
 
-  public getSettings(): Observable<Spvitamin.ServerSettingsResponse>
+  public getSettings(): Observable<SpvitaminAdmin.ServerSettingsResponse>
   {
-    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`) as Observable<Spvitamin.ServerSettingsResponse>;
+    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`) as Observable<SpvitaminAdmin.ServerSettingsResponse>;
   }
 
   public postShutdown(): Observable<any>

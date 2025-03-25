@@ -43,7 +43,7 @@ class ServerExceptionPropertiesTest {
 
         ServerException serverException = new ServerException(exceptionProperties);
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(serverException);
-        Optional<Throwable> npeOptional = exceptionWrapper.getFromCauseChain(NullPointerException.class);
+        Optional<NullPointerException> npeOptional = exceptionWrapper.getFromCauseChain(NullPointerException.class);
         Assertions.assertTrue(npeOptional.isPresent());
 
         log.debug(StackTracer.toString(npeOptional.get()));
@@ -65,7 +65,7 @@ class ServerExceptionPropertiesTest {
 
         ServerException serverException = new ServerException(exceptionProperties);
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(serverException);
-        Optional<Throwable> npeOptional = exceptionWrapper.getFromCauseChain(NullPointerException.class);
+        Optional<NullPointerException> npeOptional = exceptionWrapper.getFromCauseChain(NullPointerException.class);
         Assertions.assertTrue(npeOptional.isPresent());
 
         log.debug(StackTracer.toString(npeOptional.get()));

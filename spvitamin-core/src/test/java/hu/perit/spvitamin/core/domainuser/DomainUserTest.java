@@ -16,12 +16,13 @@
 
 package hu.perit.spvitamin.core.domainuser;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.Assertions;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * @author Peter Nagy
@@ -34,28 +35,28 @@ class DomainUserTest {
     void equals1() {
         DomainUser user1 = DomainUser.newInstance("IDXAPI");
         DomainUser user2 = DomainUser.newInstance("IDXAPI");
-        Assertions.assertEquals(user1, user2);
+        assertThat(user1).isEqualTo(user2);
     }
 
     @Test
     void equals2() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("kozpont\\ps_sap_mw_T1");
-        Assertions.assertEquals(user1, user2);
+        assertThat(user1).isEqualTo(user2);
     }
 
     @Test
     void equals2B() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("kozpont.ignored\\ps_sap_mw_T1");
-        Assertions.assertEquals(user1, user2);
+        assertThat(user1).isEqualTo(user2);
     }
 
     @Test
     void equals3() {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("IDXAPI");
-        Assertions.assertNotEquals(user1, user2);
+        assertThat(user1).isNotEqualTo(user2);
     }
 
     @Test
@@ -66,7 +67,7 @@ class DomainUserTest {
             log.debug(String.format("Comparing %s to %s", i.toString(), user1.toString()));
             return i.equals(user1);
         });
-        Assertions.assertTrue(b);
+        assertThat(b).isTrue();
     }
 
     @Test
@@ -77,7 +78,7 @@ class DomainUserTest {
             log.debug(String.format("Comparing %s to %s", i.toString(), user1.toString()));
             return i.equals(user1);
         });
-        Assertions.assertTrue(b);
+        assertThat(b).isTrue();
     }
 
     @Test
@@ -88,7 +89,7 @@ class DomainUserTest {
             log.debug(String.format("Comparing %s to %s", i.toString(), user1.toString()));
             return i.equals(user1);
         });
-        Assertions.assertFalse(b);
+        assertThat(b).isFalse();
     }
 
     @Test
@@ -99,7 +100,7 @@ class DomainUserTest {
             log.debug(String.format("Comparing %s to %s", i.toString(), user1.toString()));
             return i.equals(user1);
         });
-        Assertions.assertFalse(b);
+        assertThat(b).isFalse();
     }
 
 
@@ -111,6 +112,13 @@ class DomainUserTest {
             log.debug(String.format("Comparing %s to %s", i.toString(), user1.toString()));
             return i.equals(user1);
         });
-        Assertions.assertTrue(b);
+        assertThat(b).isTrue();
+    }
+
+    @Test
+    void equals9() {
+        DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
+        DomainUser user2 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.hu");
+        assertThat(user1).isNotEqualTo(user2);
     }
 }

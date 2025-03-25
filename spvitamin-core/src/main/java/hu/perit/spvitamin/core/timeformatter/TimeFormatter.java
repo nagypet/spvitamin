@@ -28,32 +28,32 @@ public final class TimeFormatter
         return getHumanReadableDuration(System.currentTimeMillis() - start);
     }
 
-    public static String getHumanReadableDuration(long elapsedMillis)
+    public static String getHumanReadableDuration(long duration)
     {
         double sec = 1000.0;
         double min = 60 * sec;
         double hour = 60.0 * min;
-        if (elapsedMillis < 1 * sec)
+        if (duration < 1 * sec)
         {
-            return String.format("%d ms", elapsedMillis);
+            return String.format("%d ms", duration);
         }
-        else if (elapsedMillis < 1 * min)
+        else if (duration < 1 * min)
         {
-            return DurationFormatUtils.formatDuration(elapsedMillis, "s.S") + " sec";
+            return DurationFormatUtils.formatDuration(duration, "s.S") + " sec";
         }
-        else if (elapsedMillis < 10 * min)
+        else if (duration < 10 * min)
         {
-            return DurationFormatUtils.formatDuration(elapsedMillis, "m:ss.S") + " min";
+            return DurationFormatUtils.formatDuration(duration, "m:ss.S") + " min";
         }
-        else if (elapsedMillis < 1 * hour)
+        else if (duration < 1 * hour)
         {
-            return DurationFormatUtils.formatDuration(elapsedMillis, "m:ss") + " min";
+            return DurationFormatUtils.formatDuration(duration, "m:ss") + " min";
         }
-        else if (elapsedMillis < 24 * hour)
+        else if (duration < 24 * hour)
         {
-            return DurationFormatUtils.formatDuration(elapsedMillis, "H:mm:ss") + " hour";
+            return DurationFormatUtils.formatDuration(duration, "H:mm:ss") + " hour";
         }
 
-        return DurationFormatUtils.formatDuration(elapsedMillis, "d:HH:mm:ss") + " day";
+        return DurationFormatUtils.formatDuration(duration, "d:HH:mm:ss") + " day";
     }
 }

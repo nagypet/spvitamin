@@ -57,7 +57,8 @@ public class AuthorizationService
                     authenticatedUser,
                     null,
                     authenticatedUser.getAuthorities(),
-                    authenticatedUser.getLdapUrl());
+                    authenticatedUser.getSource(),
+                    authenticatedUser.getDisplayName());
 
             Authentication authentication = securityContext.getAuthentication();
             if (authentication != null)
@@ -91,17 +92,26 @@ public class AuthorizationService
 
         if (principal instanceof AuthenticatedUser authenticatedUser)
         {
-            authenticatedUser.setLdapUrl(calculateUrl(authentication));
             return authenticatedUser;
         }
         else if (principal instanceof UserDetails userDetails)
         {
+            if (authentication instanceof LdapAuthenticationToken ldapAuthenticationToken)
+            {
+                return AuthenticatedUser.builder()
+                        .username(ldapAuthenticationToken.getName())
+                        .displayName(ldapAuthenticationToken.getUserCN())
+                        .authorities(ldapAuthenticationToken.getAuthorities())
+                        .userId(-1)
+                        .anonymous(false)
+                        .source(ldapAuthenticationToken.getUrl())
+                        .build();
+            }
             return AuthenticatedUser.builder()
                     .username(DomainUser.newInstance(userDetails.getUsername()).getCanonicalName())
                     .authorities(userDetails.getAuthorities())
                     .userId(-1)
                     .anonymous(false)
-                    .ldapUrl(calculateUrl(authentication))
                     .build();
         }
         else if (principal instanceof String username)
@@ -134,15 +144,5 @@ public class AuthorizationService
 
         throw new AuthorizationException(
                 String.format("Unknown principal type '%s'!", principal != null ? principal.getClass().getName() : "null"));
-    }
-
-    private String calculateUrl(Authentication authentication)
-    {
-        if (!(authentication instanceof LdapAuthenticationToken))
-        {
-            return "Not an AD user";
-        }
-
-        return ((LdapAuthenticationToken) authentication).getUrl();
     }
 }

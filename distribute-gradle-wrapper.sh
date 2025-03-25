@@ -34,7 +34,6 @@ copyTo spvitamin-spring-general
 copyTo spvitamin-spring-logging
 copyTo spvitamin-spring-security
 copyTo spvitamin-spring-security-authservice
-copyTo spvitamin-spring-security-authservice-api
 copyTo spvitamin-spring-security-keycloak
 copyTo spvitamin-spring-security-ldap
 copyTo spvitamin-spring-server

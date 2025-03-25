@@ -32,19 +32,22 @@ import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AuthServiceAuthenticationProvider implements AuthenticationProvider {
+public abstract class AuthServiceAuthenticationProvider implements AuthenticationProvider
+{
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        try {
-            if (!(authentication instanceof UsernamePasswordAuthenticationToken)) {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException
+    {
+        try
+        {
+            if (!(authentication instanceof UsernamePasswordAuthenticationToken inputToken))
+            {
                 throw new UnsupportedOperationException("Only UsernamePasswordAuthenticationToken supported!");
             }
 
-            UsernamePasswordAuthenticationToken inputToken = (UsernamePasswordAuthenticationToken) authentication;
-
             AuthorizationToken token = this.getAuthorizationToken((String) inputToken.getPrincipal(), (String) inputToken.getCredentials());
 
+            // the new AuthenticatedUser will be constructed from the JWT token
             String jwt = token.getJwt();
 
             JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
@@ -54,8 +57,10 @@ public abstract class AuthServiceAuthenticationProvider implements Authenticatio
 
             AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
                     .username(claims.getSubject())
+                    .displayName(claims.getPreferredUsername())
                     .authorities(authorities)
                     .userId(claims.getUserId())
+                    .source(claims.getSource())
                     .build();
 
             UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authorities);
@@ -63,14 +68,16 @@ public abstract class AuthServiceAuthenticationProvider implements Authenticatio
 
             return newAuthentication;
         }
-        catch (RuntimeException ex) {
+        catch (RuntimeException ex)
+        {
             log.debug("Authentication failed: " + ex.getMessage());
             throw new AuthServiceAuthenticationException("Authentication failed!", ex);
         }
     }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(Class<?> aClass)
+    {
         return aClass.equals(UsernamePasswordAuthenticationToken.class);
     }
 

@@ -24,19 +24,21 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
         if (principal instanceof OidcUser oidcUser)
         {
             return AuthenticatedUser.builder()
-                    .username(getName(oidcUser))
+                    .username(getAttribute(oidcUser, "email"))
+                    .displayName(getAttribute(oidcUser, "name"))
                     .authorities(getRoles(oidcUser))
                     .userId(-1)
+                    .source("oauth2")
                     .anonymous(false).build();
         }
 
         return null;
     }
 
-    private static String getName(OidcUser oidcUser)
+    private static String getAttribute(OidcUser oidcUser, String attribute)
     {
         Map<String, Object> attributes = oidcUser.getAttributes();
-        return (String) attributes.get("name");
+        return (String) attributes.get(attribute);
     }
 
 
