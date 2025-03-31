@@ -71,7 +71,7 @@ class JwtTokenProviderTest
                 .username("nagy_peter")
                 .authorities(List.of(new SimpleGrantedAuthority("ADMIN")))
                 .source("ldapUrl")
-                .userId(12)
+                .userId("12")
                 .build();
         final AuthorizationToken token = this.jwtTokenProvider.generateToken(authenticatedUser);
 

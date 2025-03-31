@@ -22,8 +22,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,14 +43,15 @@ import java.util.Set;
 @AllArgsConstructor
 public class AuthorizationToken implements AbstractAuthorizationToken
 {
-
     private String sub;
     @JsonProperty("preferred_username")
     private String preferredUsername;
     private String jwt;
     private LocalDateTime iat;
     private LocalDateTime exp;
-    private Long uid;
+    private String uid;
     private Set<String> rls;
     private String source;
+    @Singular("additionalClaim")
+    private Map<String, Object> additionalClaims;
 }

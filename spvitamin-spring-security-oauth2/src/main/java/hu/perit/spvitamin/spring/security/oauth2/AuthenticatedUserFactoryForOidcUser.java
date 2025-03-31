@@ -27,7 +27,7 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
                     .username(getAttribute(oidcUser, "email"))
                     .displayName(getAttribute(oidcUser, "name"))
                     .authorities(getRoles(oidcUser))
-                    .userId(-1)
+                    .userId(null)
                     .source("oauth2")
                     .anonymous(false).build();
         }

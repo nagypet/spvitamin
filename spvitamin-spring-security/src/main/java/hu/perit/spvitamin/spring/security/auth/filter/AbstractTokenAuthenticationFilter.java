@@ -61,21 +61,12 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
-                    Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
 
-                    AuthenticatedUser authenticatedUser =
-                            AuthenticatedUser.builder()
-                                    .username(claims.getSubject())
-                                    .displayName(claims.getPreferredUsername())
-                                    .authorities(privileges)
-                                    .userId(claims.getUserId())
-                                    .anonymous(false)
-                                    .source(claims.getSource())
-                                    .build();
-
+                    AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
                     UsernamePasswordAuthenticationToken authentication;
+                    Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
                     if (StringUtils.hasText(authenticatedUser.getSource()))
                     {
                         authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getSource(), claims.getPreferredUsername());

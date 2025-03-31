@@ -83,7 +83,7 @@ public class AuthorizationService
             return AuthenticatedUser.builder()
                     .username("anonymousUser")
                     .authorities(Collections.emptyList())
-                    .userId(-1)
+                    .userId(null)
                     .anonymous(true)
                     .build();
         }
@@ -102,7 +102,7 @@ public class AuthorizationService
                         .username(ldapAuthenticationToken.getName())
                         .displayName(ldapAuthenticationToken.getUserCN())
                         .authorities(ldapAuthenticationToken.getAuthorities())
-                        .userId(-1)
+                        .userId(null)
                         .anonymous(false)
                         .source(ldapAuthenticationToken.getUrl())
                         .build();
@@ -110,7 +110,7 @@ public class AuthorizationService
             return AuthenticatedUser.builder()
                     .username(DomainUser.newInstance(userDetails.getUsername()).getCanonicalName())
                     .authorities(userDetails.getAuthorities())
-                    .userId(-1)
+                    .userId(null)
                     .anonymous(false)
                     .build();
         }
@@ -119,7 +119,7 @@ public class AuthorizationService
             return AuthenticatedUser.builder()
                     .username(DomainUser.newInstance(username).getCanonicalName())
                     .authorities(Collections.emptyList())
-                    .userId(-1)
+                    .userId(null)
                     .anonymous(false)
                     .build();
         }
@@ -129,7 +129,7 @@ public class AuthorizationService
             return AuthenticatedUser.builder()
                     .username(((Principal) principal).getName())
                     .authorities(authentication.getAuthorities())
-                    .userId(-1)
+                    .userId(null)
                     .anonymous(false).build();
         }
 

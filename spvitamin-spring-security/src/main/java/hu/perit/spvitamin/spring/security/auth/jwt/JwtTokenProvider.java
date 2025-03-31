@@ -62,14 +62,17 @@ public class JwtTokenProvider
 
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
-            TokenClaims additionalClaims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource());
-            additionalClaims.setPreferredUsername(authenticatedUser.getDisplayName());
+            TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource());
+            claims.setPreferredUsername(authenticatedUser.getDisplayName());
+
+            // Put the additional claims into the token
+            claims.put("add", authenticatedUser.getAdditionalClaims());
 
             String jwt = Jwts.builder()
                     .subject(domainUser.getCanonicalName())
                     .issuedAt(iat)
                     .expiration(exp)
-                    .claims(additionalClaims)
+                    .claims(claims)
                     .signWith(privateKey)
                     .compact();
 
@@ -82,6 +85,7 @@ public class JwtTokenProvider
                     .uid(authenticatedUser.getUserId())
                     .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
                     .source(authenticatedUser.getSource())
+                    .additionalClaims(authenticatedUser.getAdditionalClaims())
                     .build();
         }
         catch (Exception e)

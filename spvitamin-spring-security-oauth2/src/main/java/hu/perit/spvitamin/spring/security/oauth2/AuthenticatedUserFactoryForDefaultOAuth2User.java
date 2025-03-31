@@ -27,7 +27,7 @@ public class AuthenticatedUserFactoryForDefaultOAuth2User implements Authenticat
                     .username(getName(defaultOAuth2User, "email"))
                     .displayName(getName(defaultOAuth2User, "name"))
                     .authorities(getRoles(defaultOAuth2User))
-                    .userId(-1)
+                    .userId(null)
                     .source("oauth2")
                     .anonymous(false).build();
         }

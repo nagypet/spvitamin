@@ -91,6 +91,7 @@ dependencyManagement {
 - DurationUtils to format a Duration type to human-readable form.
 - AuthApi moved to spvitamin-spring-security
 - spvitamin-spring-security-authservice-api removed
+- Token may contain application-specific claims
 
 ### 3.3.3-2-RELEASE not yet released
 

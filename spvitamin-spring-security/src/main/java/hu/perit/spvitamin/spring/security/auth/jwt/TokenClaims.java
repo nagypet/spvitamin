@@ -23,7 +23,6 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class TokenClaims extends DefaultClaims
     }
 
 
-    public TokenClaims(long userId, Collection<? extends GrantedAuthority> authorities, String source)
+    public TokenClaims(String userId, Collection<? extends GrantedAuthority> authorities, String source)
     {
         this.setUserId(userId);
         this.setAuthorities(authorities);
@@ -53,13 +52,13 @@ public class TokenClaims extends DefaultClaims
     }
 
 
-    public long getUserId()
+    public String getUserId()
     {
-        return this.get(USERID, Long.class);
+        return this.get(USERID, String.class);
     }
 
 
-    public void setUserId(long userId)
+    public void setUserId(String userId)
     {
         this.put(USERID, userId);
     }
