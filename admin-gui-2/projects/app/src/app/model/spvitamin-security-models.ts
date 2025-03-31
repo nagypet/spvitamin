@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-03-25 06:56:51.
+// Generated using typescript-generator version 3.2.1263 on 2025-03-31 08:34:07.
 
 export namespace SpvitaminSecurity {
 
@@ -8,9 +8,10 @@ export namespace SpvitaminSecurity {
         sub: string;
         iat: Date;
         exp: Date;
-        uid: number;
+        uid: string;
         rls: string[];
         source: string;
+        additionalClaims: { [index: string]: any };
         preferred_username: string;
     }
 

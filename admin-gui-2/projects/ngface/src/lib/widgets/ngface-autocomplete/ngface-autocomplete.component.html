@@ -25,6 +25,7 @@
          [errorStateMatcher]="errorStateMatcher"
          (debounceInput)="onSearchTextChange($event)"
          [debounceTime]="500"
+         (click)="onClick($event)"
   >
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
     @for (option of valueSetProvider.filteredOptions | async;track option) {

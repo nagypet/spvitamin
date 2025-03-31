@@ -14,73 +14,66 @@
  * limitations under the License.
  */
 
+import {BehaviorSubject, Subject, Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import {Ngface} from '../../ngface-models';
-import {map, Observable, startWith, Subject} from 'rxjs';
 
 export class AutocompleteValueSetProvider
 {
-    // valueSet
-    // tslint:disable-next-line:variable-name
-    private _valueSet?: Ngface.ValueSet;
+  private _valueSet?: Ngface.ValueSet;
+  private _searchText: Subject<string> = new Subject<string>();
 
-    set valueSet(value: Ngface.ValueSet)
+  // BehaviorSubject for filteredOptions
+  private _filteredOptions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  get filteredOptions(): Observable<string[]>
+  {
+    return this._filteredOptions.asObservable();
+  }
+
+  set valueSet(value: Ngface.ValueSet)
+  {
+    this._valueSet = value;
+
+    if (!value.remote)
     {
-        this._valueSet = value;
-        if (!value.remote)
-        {
-            this._filteredOptions = this._searchText.pipe(
-                startWith(''),
-                map(i => this.filter(i || ''))
-            );
-        }
-        else
-        {
-            const items = value.values.map(i => i.text);
-            if (value.truncated)
-            {
-                items.push('...');
-            }
-            this._filteredOptions = new Observable<string[]>(observer =>
-            {
-                observer.next(items);
-                observer.complete();
-            });
-        }
+      this._searchText.pipe(
+        startWith(''),
+        map(i => this.filter(i || ''))
+      ).subscribe(filtered =>
+      {
+        this._filteredOptions.next(filtered);
+      });
     }
-
-    // searchText
-    // tslint:disable-next-line:variable-name
-    private _searchText: Subject<string> = new Subject<string>();
-
-    set searchText(value: string)
+    else
     {
-        this._searchText.next(value);
+      const items = value.values.map(i => i.text);
+      if (value.truncated)
+      {
+        items.push('...');
+      }
+      this._filteredOptions.next(items);
     }
+  }
 
-    // filteredOptions
-    // tslint:disable-next-line:variable-name
-    private _filteredOptions: Observable<string[]> = new Observable<string[]>();
-    get filteredOptions(): Observable<string[]>
+  set searchText(value: string)
+  {
+    this._searchText.next(value);
+  }
+
+  private filter(value: string): string[]
+  {
+    const filterValue = value.toLowerCase();
+    if (!this._valueSet)
     {
-        return this._filteredOptions;
+      return [];
     }
+    return this._valueSet.values
+      .map(i => i.text)
+      .filter(item => item.toLowerCase().includes(filterValue));
+  }
 
-    private filter(value: string): string[]
-    {
-        const filterValue = value.toLowerCase();
-
-        if (!this._valueSet)
-        {
-            return [];
-        }
-
-        return this._valueSet.values
-            .map(i => i.text)
-            .filter(item => item.toLowerCase().includes(filterValue));
-    }
-
-    public isRemote(): boolean
-    {
-        return !!this._valueSet?.remote;
-    }
+  public isRemote(): boolean
+  {
+    return !!this._valueSet?.remote;
+  }
 }

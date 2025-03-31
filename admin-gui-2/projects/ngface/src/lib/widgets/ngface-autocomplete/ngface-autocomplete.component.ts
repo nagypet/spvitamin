@@ -28,6 +28,7 @@ import {DebounceInputDirective} from '../../directives/debounce-input-directive'
 import {A11yModule} from '@angular/cdk/a11y';
 import {AutocompleteValueSetProvider} from './autocomplete-value-set-provider';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
+import {colors} from 'ng-packagr/lib/utils/color';
 
 export interface AutocompleteRequest
 {
@@ -70,11 +71,20 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
   @Output()
   onValueChange: EventEmitter<AutocompleteValueChangeEvent> = new EventEmitter();
 
-  valueSetProvider = new AutocompleteValueSetProvider();
+  protected valueSetProvider = new AutocompleteValueSetProvider();
+
+  private isValueSetEmpty = true;
+
 
   constructor()
   {
     super();
+
+    this.valueSetProvider.filteredOptions.subscribe(values =>
+    {
+      this.isValueSetEmpty = values.length === 0;
+      //console.log(`Autocomplete response for ${this.widgetid}:`, values);
+    });
   }
 
 
@@ -111,10 +121,14 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
 
   onSearchTextChange($event: string): void
   {
-    this.onValueChange.emit({widgetId: this.widgetid, value: $event});
+    if (this.isValueSetEmpty)
+    {
+      this.onValueChange.emit({widgetId: this.widgetid, value: $event});
+    }
 
     if (this.valueSetProvider.isRemote())
     {
+      //console.log(`Autocomplete request for ${this.widgetid}: ${$event}`);
       this.onAutocompleteRequest.emit({widgetId: this.widgetid, searchText: $event, valueSetProvider: this.valueSetProvider});
     }
     else
@@ -127,5 +141,15 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
   onOptionSelected($event: MatAutocompleteSelectedEvent)
   {
     this.onValueChange.emit({widgetId: this.widgetid, value: $event.option.value});
+  }
+
+
+  onClick($event: MouseEvent)
+  {
+    if (this.valueSetProvider.isRemote())
+    {
+      //console.log(`Autocomplete request for ${this.widgetid}: ''`);
+      this.onAutocompleteRequest.emit({widgetId: this.widgetid, searchText: '', valueSetProvider: this.valueSetProvider});
+    }
   }
 }
