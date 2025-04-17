@@ -103,12 +103,15 @@ export class LoginComponent extends FormBaseComponent implements OnInit
       const userName = (submitData['username'] as Ngface.TextInput.Data).value!;
       const password = (submitData['password'] as Ngface.TextInput.Data).value!;
 
-      this.authService.login(userName, password).subscribe(data =>
-      {
-        this.router.navigateByUrl(this.returnUrl);
-      }, error =>
-      {
-        this.errorText = 'Invalid username or password!';
+      this.authService.login(userName, password).subscribe({
+        next: token =>
+        {
+          this.router.navigateByUrl(this.returnUrl);
+        },
+        error: err =>
+        {
+          this.errorText = 'Invalid username or password!';
+        }
       });
     }
   }
@@ -116,8 +119,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
 
   onCancel()
   {
-    this.authService.logout();
-    this.router.navigateByUrl('/');
+    this.authService.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 
 

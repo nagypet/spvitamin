@@ -16,11 +16,12 @@
 
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, mapTo, Observable, of, switchMap, throwError} from 'rxjs';
 import {CookieService} from 'ngx-cookie-service';
 import {ToastrService} from 'ngx-toastr';
 import {environment} from '../../../../environments/environment';
 import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
+import {catchError, finalize, map, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,8 @@ export class AuthService
     return this.loginSubject$.value;
   }
   public loggedIn$ = this.loginSubject$.asObservable();
+
+  public isRefreshing = false;
 
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
@@ -48,18 +51,23 @@ export class AuthService
    */
   getProfile(): Observable<SpvitaminSecurity.AuthorizationToken>
   {
+    console.log('getProfile()');
     return new Observable<SpvitaminSecurity.AuthorizationToken>(observer =>
     {
-      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`).subscribe(token =>
-      {
-        // OK
-        this.loginSuccess(token);
-        observer.next(token);
-      }, error =>
-      {
-        // error
-        this.loginSubject$.next(false);
-        observer.error(error);
+      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`).subscribe({
+        next: token =>
+        {
+          // OK
+          console.log(`getProfile successful for ${token.sub}`);
+          this.loginSuccess(token, false);
+          observer.next(token);
+        }, error: err =>
+        {
+          // error
+          console.log('getProfile failed', err);
+          this.loginSubject$.next(false);
+          observer.error(err);
+        }
       });
     });
   }
@@ -69,49 +77,65 @@ export class AuthService
    * Calling auth with basic header to retrieve token
    * @param username
    * @param password
+   * @param withInfo
    */
-  login(username: string, password: string): Observable<SpvitaminSecurity.AuthorizationToken>
+  login(username: string, password: string, withInfo: boolean = true): Observable<SpvitaminSecurity.AuthorizationToken>
   {
-    return new Observable<SpvitaminSecurity.AuthorizationToken>(observer =>
-    {
-      let headers = new HttpHeaders();
-      // Accended characters fix
-      headers = headers.append('Authorization', 'Basic ' + btoa(unescape(encodeURIComponent(username + ':' + password))));
-      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
+    this.isRefreshing = true;
+
+    let headers = new HttpHeaders().append(
+      'Authorization',
+      'Basic ' + btoa(unescape(encodeURIComponent(`${username}:${password}`)))
+    );
+
+    return this.logout().pipe(
+      switchMap(() => this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(
+        `${environment.baseURL}/api/spvitamin/authenticate`,
+        {
+          headers,
+          withCredentials: true
+        })),
+      tap(token => this.loginSuccess(token, withInfo)),
+      catchError(error =>
       {
-        // OK
-        this.loginSuccess(token);
-        observer.next(token);
-      }, error =>
-      {
-        // error
-        this.logout();
-        observer.error(error);
-      });
-    });
+        // ha a login hibás, attól még a logout már megtörtént
+        return throwError(() => error);
+      }),
+      finalize(() => this.isRefreshing = false)
+    );
   }
+
 
   /**
    * logout
    */
-  logout(withWarning?: boolean): void
+  logout(withWarning?: boolean): Observable<void>
   {
     console.log('logout');
 
-    if (this.getToken())
+    const hasToken = !!this.getToken();
+
+    if (!hasToken)
     {
-      if (withWarning)
-      {
-        this.toastrService.warning('Please login again!', 'Session expired!');
-      }
-      this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).subscribe(res =>
-      {
-        console.log(res);
-        this.loginSubject$.next(false);
-      });
+      this.cleanUpSessionStorage();
+      return of(void 0); // nincs token, azonnal visszatérünk
     }
-    this.cleanUpSessionStorage();
+
+    return this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).pipe(
+      tap(() =>
+      {
+        if (withWarning)
+        {
+          this.toastrService.warning('Please login again!', 'Session expired!');
+        }
+
+        this.loginSubject$.next(false);
+      }),
+      mapTo(void 0), // típus: Observable<void>
+      finalize(() => this.cleanUpSessionStorage())
+    );
   }
+
 
   private cleanUpSessionStorage(): void
   {
@@ -128,28 +152,35 @@ export class AuthService
     this.logout();
   }
 
+  private renewToken$(token: SpvitaminSecurity.AuthorizationToken): Observable<SpvitaminSecurity.AuthorizationToken>
+  {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + token.jwt);
+    return this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(
+      `${environment.baseURL}/api/spvitamin/authenticate`,
+      {headers}
+    );
+  }
+
+
   renewToken(): void
   {
+    console.log('renewToken()');
+
     const token = this.getToken();
     if (!token)
     {
       return;
     }
 
-    let headers = new HttpHeaders();
-    headers = headers.append('Authorization', 'Bearer ' + token.jwt);
-    this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`, {headers}).subscribe(token =>
-    {
-      this.loginSuccess(token, false);
-    }, error =>
-    {
-      this.logout();
+    this.renewToken$(token).subscribe({
+      next: (token) => this.loginSuccess(token, false),
+      error: () => this.logout().subscribe()
     });
   }
 
   private loginSuccess(token: SpvitaminSecurity.AuthorizationToken, withInfo: boolean = true): void
   {
-    console.log('loginSuccess');
+    console.log(`loginSuccess for ${token.sub}`);
 
     sessionStorage.setItem('token', JSON.stringify(token));
     if (token)
@@ -166,13 +197,13 @@ export class AuthService
   }
 
 
-  public checkToken(t?: SpvitaminSecurity.AuthorizationToken): SpvitaminSecurity.AuthorizationToken | undefined
+  public checkToken(t?: SpvitaminSecurity.AuthorizationToken): Observable<SpvitaminSecurity.AuthorizationToken | undefined>
   {
     const token = t ?? this.getToken();
+
     if (!token)
     {
-      this.logout(true);
-      return undefined;
+      return this.logout(true).pipe(map(() => undefined));
     }
 
     const tokenValidSeconds = this.getTokenValidSeconds(token);
@@ -181,12 +212,11 @@ export class AuthService
     if (tokenValidSeconds > 0)
     {
       this.loginSubject$.next(true);
-      return token;
+      return of(token);
     }
     else
     {
-      this.logout(true);
-      return undefined;
+      return this.logout(true).pipe(map(() => undefined));
     }
   }
 

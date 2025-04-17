@@ -80,7 +80,6 @@ export class HeaderComponent  extends FormBaseComponent implements OnInit
 
   onLogout()
   {
-    this.authService.logout();
-    this.router.navigateByUrl('/');
+    this.authService.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 }
