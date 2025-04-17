@@ -17,8 +17,16 @@
 package hu.perit.spvitamin.spring.rolemapper;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
+import java.util.Set;
 
 public interface RoleMapperService
 {
     AuthenticatedUser mapGrantedAuthorities(AuthenticatedUser authenticatedUser);
+
+    Set<GrantedAuthority> mapUsernameAndGroupToRoles(String username, Collection<? extends GrantedAuthority> groups);
+
+    Set<GrantedAuthority> mapRolesToPrivileges(Collection<? extends GrantedAuthority> authorities);
 }

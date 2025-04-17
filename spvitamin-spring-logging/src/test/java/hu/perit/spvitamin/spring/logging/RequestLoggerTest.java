@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +52,7 @@ class RequestLoggerTest
         private ContentStream content;
         private LocalDate documentDate;
         private String comment;
+        private UUID uuid;
     }
 
     @Test
@@ -62,6 +64,7 @@ class RequestLoggerTest
         request.setContent(getTestContent());
         request.setDocumentDate(LocalDate.of(2024, 11, 3));
         request.setComment("very very very very very very very very very very very very very very very very very very long comment");
+        request.setUuid(UUID.randomUUID());
 
         String subject = RequestLogger.toSubject(request);
         assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}]}");

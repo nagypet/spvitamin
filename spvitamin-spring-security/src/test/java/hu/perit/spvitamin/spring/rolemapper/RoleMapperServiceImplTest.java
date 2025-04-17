@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.rolemapper;
 
+import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import hu.perit.spvitamin.spring.config.RoleMappingProperties;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ class RoleMapperServiceImplTest
     public static final String USER_GROUP = "user-group";
 
     private RoleMappingProperties roleMappingProperties;
+    private Role2PermissionMappingProperties role2PermissionMappingProperties;
 
 
     @BeforeEach
@@ -54,6 +56,8 @@ class RoleMapperServiceImplTest
     {
         this.roleMappingProperties = new RoleMappingProperties();
         this.roleMappingProperties.setRoles(getRoles());
+
+        this.role2PermissionMappingProperties = new Role2PermissionMappingProperties();
     }
 
 
@@ -61,7 +65,7 @@ class RoleMapperServiceImplTest
     void testUserNamedAdmin()
     {
 
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties, role2PermissionMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedAdmin());
         log.info(authenticatedUser.toString());
         assertThat(authenticatedUser.getAuthorities()).hasSize(3);
@@ -73,7 +77,7 @@ class RoleMapperServiceImplTest
     void testUserInAdminGroup()
     {
 
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties, role2PermissionMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserInAdminGroup());
         log.info(authenticatedUser.toString());
         assertThat(authenticatedUser.getAuthorities()).hasSize(3);
@@ -85,7 +89,7 @@ class RoleMapperServiceImplTest
     void testUserNamedUser()
     {
 
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties, role2PermissionMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedUser());
         log.info(authenticatedUser.toString());
         assertThat(authenticatedUser.getAuthorities()).hasSize(2);
@@ -97,7 +101,7 @@ class RoleMapperServiceImplTest
     void testUserNamedMicrosoftEntra()
     {
 
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties, role2PermissionMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserNamedMicrosoftEntra());
         log.info(authenticatedUser.toString());
         assertThat(authenticatedUser.getAuthorities()).hasSize(2);
@@ -108,7 +112,7 @@ class RoleMapperServiceImplTest
     @Test
     void testUserInUserGroup()
     {
-        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties);
+        RoleMapperService roleMapperService = new RoleMapperServiceImpl(roleMappingProperties, role2PermissionMappingProperties);
         AuthenticatedUser authenticatedUser = roleMapperService.mapGrantedAuthorities(getUserInUserGroup());
         log.info(authenticatedUser.toString());
         assertThat(authenticatedUser.getAuthorities()).hasSize(2);

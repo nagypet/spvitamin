@@ -16,13 +16,17 @@
 
 package hu.perit.spvitamin.spring.rolemapper;
 
+import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import hu.perit.spvitamin.spring.config.RoleMappingProperties;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,47 +37,48 @@ import java.util.stream.Collectors;
  */
 
 @Service
+@RequiredArgsConstructor
 public class RoleMapperServiceImpl implements RoleMapperService
 {
     public static final String ROLE_PREFIX = "ROLE_";
 
     private final RoleMappingProperties roleMappingProperties;
-
-    public RoleMapperServiceImpl(RoleMappingProperties roleMappingProperties)
-    {
-        this.roleMappingProperties = roleMappingProperties;
-    }
+    private final Role2PermissionMappingProperties role2PermissionMappingProperties;
 
 
     @Override
     public AuthenticatedUser mapGrantedAuthorities(AuthenticatedUser authenticatedUser)
     {
-        Collection<? extends GrantedAuthority> adGroups = authenticatedUser.getAuthorities();
+        Collection<? extends GrantedAuthority> groups = authenticatedUser.getAuthorities();
 
-        Collection<GrantedAuthority> roles = this.mapAdGroupsAndUsers(authenticatedUser.getUsername(), adGroups);
+        Collection<GrantedAuthority> roles = this.mapUsernameAndGroupToRoles(authenticatedUser.getUsername(), groups);
+
+        // Mapping roles => privileges
+        Collection<? extends GrantedAuthority> privileges = mapRolesToPrivileges(roles);
 
         AuthenticatedUser clone = authenticatedUser.clone();
-        clone.setAuthorities(roles);
+        clone.setAuthorities(privileges);
         return clone;
     }
 
 
-    private Collection<GrantedAuthority> mapAdGroupsAndUsers(String username, Collection<? extends GrantedAuthority> adGroups)
+    @Override
+    public Set<GrantedAuthority> mapUsernameAndGroupToRoles(String username, Collection<? extends GrantedAuthority> groups)
     {
         Set<String> roles = this.roleMappingProperties.getUserRoles(username);
-        for (GrantedAuthority adGroup : adGroups)
+        for (GrantedAuthority group : groups)
         {
-            if (adGroup.getAuthority().startsWith(ROLE_PREFIX))
+            if (group.getAuthority().startsWith(ROLE_PREFIX))
             {
                 // This is a ROLE_
-                String role = adGroup.getAuthority();
+                String role = group.getAuthority();
                 roles.add(role);
                 roles.addAll(roleMappingProperties.getIncludedRoles(role));
             }
             else
             {
                 // This is an AD group
-                roles.addAll(this.roleMappingProperties.getGroupRoles(adGroup.getAuthority()));
+                roles.addAll(this.roleMappingProperties.getGroupRoles(group.getAuthority()));
             }
         }
 
@@ -89,5 +94,30 @@ public class RoleMapperServiceImpl implements RoleMapperService
         }
 
         return roleName.startsWith(ROLE_PREFIX) ? roleName : ROLE_PREFIX + roleName;
+    }
+
+
+    @Override
+    public Set<GrantedAuthority> mapRolesToPrivileges(Collection<? extends GrantedAuthority> authorities)
+    {
+        Set<GrantedAuthority> permissions = new HashSet<>();
+
+        // filtering only ROLEs
+        List<? extends GrantedAuthority> roles = authorities.stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .toList();
+        for (GrantedAuthority role : roles)
+        {
+            // Adding the role itself
+            permissions.add(role);
+
+            if (role2PermissionMappingProperties.getRolemap().containsKey(role.getAuthority()))
+            {
+                List<String> permissionList = role2PermissionMappingProperties.getRolemap().get(role.getAuthority());
+                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).toList());
+            }
+        }
+
+        return permissions;
     }
 }

@@ -93,6 +93,9 @@ dependencyManagement {
 - spvitamin-spring-security-authservice-api removed
 - Token may contain application-specific claims
 - admin-gui rebuilt
+- ReflectionUtils: UUID support
+- Role2PermissionMapperFilter and RoleMapperService refactored
+- AuthenticatedUser getAdditionalClaim(), putAdditionalClaim()
 
 ### 3.3.3-2-RELEASE not yet released
 

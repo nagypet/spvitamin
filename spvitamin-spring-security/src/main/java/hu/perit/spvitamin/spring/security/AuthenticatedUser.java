@@ -27,7 +27,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Peter Nagy
@@ -66,13 +68,37 @@ public class AuthenticatedUser implements UserDetails
     }
 
 
-    public <T> T getAdditionalClaim(String name, Class<T> clazz)
+    public <T> T getAdditionalClaimThrow(String name, Class<T> clazz)
     {
         if (!additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
         {
             throw new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''{1}''", this.username, name));
         }
         return (T) additionalClaims.get(name);
+    }
+
+
+    public <T> Optional<T> getAdditionalClaim(String name, Class<T> clazz)
+    {
+        if ("null".equals(additionalClaims.get(name)))
+        {
+            return Optional.empty();
+        }
+        return (Optional<T>) Optional.ofNullable(additionalClaims.get(name));
+    }
+
+
+    public void putAdditionalClaim(String name, Object value)
+    {
+        if (this.additionalClaims == null)
+        {
+            this.additionalClaims = new HashMap<>();
+        }
+        else if (!(this.additionalClaims instanceof HashMap))
+        {
+            this.additionalClaims = new HashMap<>(this.additionalClaims);
+        }
+        this.additionalClaims.put(name, value);
     }
 
 

@@ -16,7 +16,6 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter;
 
-import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.rolemapper.RoleMapperService;
 import hu.perit.spvitamin.spring.rolemapper.RoleMapperServiceImpl;
@@ -28,17 +27,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -62,18 +55,10 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
 
             if (!authenticatedUser.isAnonymous())
             {
-
                 RoleMapperService mapperService = SpringContext.getBean(RoleMapperServiceImpl.class);
-                AuthenticatedUser authenticatedUserWithRoles = mapperService.mapGrantedAuthorities(authenticatedUser);
+                AuthenticatedUser authenticatedUserWithPrivileges = mapperService.mapGrantedAuthorities(authenticatedUser);
 
-                log.debug(String.format("Mapping roles => privileges for authenticated user: '%s'", authenticatedUserWithRoles.toString()));
-
-                // Mapping roles => privileges
-                Collection<? extends GrantedAuthority> privileges = mapPrivileges2Roles(authenticatedUserWithRoles.getAuthorities());
-                AuthenticatedUser authenticatedUserWithPrivileges = authenticatedUserWithRoles.clone();
-                authenticatedUserWithPrivileges.setAuthorities(privileges);
-
-                log.debug(String.format("Granted privileges: '%s'", privileges.toString()));
+                log.debug(String.format("Granted privileges: '%s'", authenticatedUserWithPrivileges.getAuthorities().toString()));
 
                 authorizationService.setAuthenticatedUser(authenticatedUserWithPrivileges);
             }
@@ -103,32 +88,5 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
         {
             authorizationService.setAuthenticatedUser(null);
         }
-    }
-
-
-    private Collection<? extends GrantedAuthority> mapPrivileges2Roles(Collection<? extends GrantedAuthority> authorities)
-    {
-
-        Role2PermissionMappingProperties role2PermissionMapping = SpringContext.getBean(Role2PermissionMappingProperties.class);
-
-        Set<GrantedAuthority> permissions = new HashSet<>();
-
-        // filtering only ROLEs
-        List<? extends GrantedAuthority> roles = authorities.stream()
-                .filter(a -> a.getAuthority().startsWith("ROLE_"))
-                .toList();
-        for (GrantedAuthority role : roles)
-        {
-            // Adding the role itself
-            permissions.add(role);
-
-            if (role2PermissionMapping.getRolemap().containsKey(role.getAuthority()))
-            {
-                List<String> permissionList = role2PermissionMapping.getRolemap().get(role.getAuthority());
-                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).toList());
-            }
-        }
-
-        return permissions;
     }
 }
