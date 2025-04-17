@@ -133,7 +133,7 @@ export class IntlNumericInputComponent implements ControlValueAccessor, OnInit, 
   valueText = '';
   value?: number;
 
-  valueChangeSubject: Subject<number | undefined> = new Subject<number | undefined>();
+  private valueChangeSubject: Subject<number | undefined> = new Subject<number | undefined>();
 
   ngOnInit(): void
   {

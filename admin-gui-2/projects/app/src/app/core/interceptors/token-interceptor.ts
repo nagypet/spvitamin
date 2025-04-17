@@ -15,28 +15,27 @@
  */
 
 /* tslint:disable:one-line */
-import {Injectable} from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import {Injectable, Injector} from '@angular/core';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {AuthService} from '../services/auth/auth.service';
 import {Observable} from 'rxjs';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor
 {
-
-  constructor(public authService: AuthService)
+  constructor(private injector: Injector)
   {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
-    // If authentication is occuring no need to inject token.
     if (request.url.includes('authenticate'))
     {
       return next.handle(request);
     }
 
-    const token = this.authService.getToken();
+    const authService = this.injector.get(AuthService);
+    const token = authService.getToken();
     if (!token)
     {
       return next.handle(request);

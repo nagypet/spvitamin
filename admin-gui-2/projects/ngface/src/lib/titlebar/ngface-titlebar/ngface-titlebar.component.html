@@ -14,63 +14,61 @@
   ~ limitations under the License.
   -->
 
-<p>
-  <mat-toolbar color="primary" responsiveClass="ngface-titlebar">
-    @if (isMobileDesign()) {
-      <div responsiveClass="titlebar-main-menu">
-        <!-- Main menu -->
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-          <mat-icon>menu</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-          @for (menuItem of getData().menu.items; track menuItem.id) {
-            <button mat-menu-item responsiveClass="ngface-menuitem" [ngClass]="getClass(menuItem)"
-                    (click)="onMenuClick(menuItem)">
-              <mat-icon>{{ menuItem.icon }}</mat-icon>
-              <span>{{ menuItem.label }}</span>
-            </button>
-          }
-        </mat-menu>
-      </div>
-    }
-
-    @if (logo) {
-      <img responsiveClass="logo" src="{{logo}}">
-    }
-
-    <!-- App title -->
-    <div responsiveClass="titlebar-app-title" [matTooltip]="getData().buildTime">
-      {{ getData().appTitle }} {{ getData().version }}
-    </div>
-
-    @if (!isMobileDesign()) {
-      @for (menuItem of getData().menu.items; track menuItem.id) {
-        <button responsiveClass="ngface-header-button" mat-button [ngClass]="getClass(menuItem)"
-                (click)="onMenuClick(menuItem)">
-          <mat-icon responsiveClass="material-icons-outlined">
-            {{ menuItem.icon }}
-          </mat-icon>
-          <span>{{ menuItem.label }}</span>
-        </button>
-      }
-    }
-
-    <div class="right-block">
-      <!-- Session timeout -->
-      @if (tokenValidSeconds) {
-        <div responsiveClass="session-timeout" [ngClass]="getSessionTimeoutAdditionalClasses()">
-          {{ tokenValidSecondsString }}
-        </div>
-      }
-
-      <!-- Action buttons -->
-      <div responsiveClass="titlebar-actions">
-        @for (action of getData().actions; track action) {
-          <button responsiveClass="ngface-header-button" mat-button (click)="onActionClick(action)">
-            <mat-icon responsiveClass="material-icons-outlined" [matTooltip]="action.label">{{ action.icon }}</mat-icon>
+<mat-toolbar color="primary" responsiveClass="ngface-titlebar">
+  @if (isMobileDesign()) {
+    <div responsiveClass="titlebar-main-menu">
+      <!-- Main menu -->
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        @for (menuItem of getData().menu.items; track menuItem.id) {
+          <button mat-menu-item responsiveClass="ngface-menuitem" [ngClass]="getClass(menuItem)"
+                  (click)="onMenuClick(menuItem)">
+            <mat-icon>{{ menuItem.icon }}</mat-icon>
+            <span>{{ menuItem.label }}</span>
           </button>
         }
-      </div>
+      </mat-menu>
     </div>
-  </mat-toolbar>
-</p>
+  }
+
+  @if (logo) {
+    <img responsiveClass="logo" src="{{logo}}">
+  }
+
+  <!-- App title -->
+  <div responsiveClass="titlebar-app-title" [matTooltip]="getData().buildTime">
+    {{ getData().appTitle }} {{ getData().version }}
+  </div>
+
+  @if (!isMobileDesign()) {
+    @for (menuItem of getData().menu.items; track menuItem.id) {
+      <button responsiveClass="ngface-header-button" mat-button [ngClass]="getClass(menuItem)"
+              (click)="onMenuClick(menuItem)">
+        <mat-icon responsiveClass="material-icons-outlined">
+          {{ menuItem.icon }}
+        </mat-icon>
+        <span>{{ menuItem.label }}</span>
+      </button>
+    }
+  }
+
+  <div class="right-block">
+    <!-- Session timeout -->
+    @if (tokenValidSeconds) {
+      <div responsiveClass="session-timeout" [ngClass]="getSessionTimeoutAdditionalClasses()">
+        {{ tokenValidSecondsString }}
+      </div>
+    }
+
+    <!-- Action buttons -->
+    <div responsiveClass="titlebar-actions">
+      @for (action of getData().actions; track action.id) {
+        <button responsiveClass="ngface-header-button" mat-button (click)="onActionClick(action)">
+          <mat-icon responsiveClass="material-icons-outlined" [matTooltip]="action.label">{{ action.icon }}</mat-icon>
+        </button>
+      }
+    </div>
+  </div>
+</mat-toolbar>

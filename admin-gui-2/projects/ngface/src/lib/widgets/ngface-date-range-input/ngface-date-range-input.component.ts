@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {InputBaseComponent} from '../input-base.component';
 import {Ngface} from '../../ngface-models';
 import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn} from '@angular/forms';
@@ -22,7 +22,7 @@ import {NgIf} from '@angular/common';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
-import {debounceTime} from 'rxjs';
+import {debounceTime, Subscription} from 'rxjs';
 
 export interface DateRangeValueChangeEvent
 {
@@ -38,7 +38,7 @@ export interface DateRangeValueChangeEvent
   standalone: true,
   imports: [MatFormFieldModule, MatDatepickerModule, ReactiveFormsModule, NgIf, ResponsiveClassDirective]
 })
-export class NgfaceDateRangeInputComponent extends InputBaseComponent implements OnInit, OnChanges
+export class NgfaceDateRangeInputComponent extends InputBaseComponent implements OnInit, OnDestroy, OnChanges
 {
   @Output()
   onValueChange: EventEmitter<DateRangeValueChangeEvent> = new EventEmitter();
@@ -65,6 +65,7 @@ export class NgfaceDateRangeInputComponent extends InputBaseComponent implements
   // tslint:disable-next-line:variable-name
   protected override get_form_group_item: AbstractControl = this.formGroupItem;
 
+  private subscriptions = new Array<Subscription | undefined>();
 
 
   constructor()
@@ -74,7 +75,7 @@ export class NgfaceDateRangeInputComponent extends InputBaseComponent implements
 
   ngOnInit(): void
   {
-    this.range.valueChanges
+    this.subscriptions.push(this.range.valueChanges
       .pipe(debounceTime(1000))
       .subscribe(value =>
       {
@@ -87,8 +88,21 @@ export class NgfaceDateRangeInputComponent extends InputBaseComponent implements
             this.onValueChange.emit(event);
           }
         }
-      });
+      }));
   }
+
+
+  ngOnDestroy(): void
+  {
+    this.subscriptions.forEach(i =>
+    {
+      if (i)
+      {
+        i.unsubscribe();
+      }
+    });
+  }
+
 
   override ngOnChanges(): void
   {

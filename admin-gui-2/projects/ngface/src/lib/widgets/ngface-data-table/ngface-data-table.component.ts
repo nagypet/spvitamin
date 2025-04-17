@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, LOCALE_ID, OnChanges, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  LOCALE_ID,
+  OnChanges,
+  OnDestroy,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortModule, SortDirection} from '@angular/material/sort';
 import {MatTable, MatTableModule} from '@angular/material/table';
 import {DataTableDataSource} from './data-table-datasource';
 import {tap} from 'rxjs/operators';
-import {merge} from 'rxjs';
+import {merge, Subscription} from 'rxjs';
 import {MatCheckboxChange, MatCheckboxModule} from '@angular/material/checkbox';
 import {NumericFormatter} from '../../numeric-formatter';
 import {ValueSetSearchEvent} from './excel-filter/excel-filter.component';
@@ -76,7 +88,7 @@ export interface TableMasterToggleEvent
   standalone: true,
   imports: [NgClass, NgIf, NgScrollbarModule, MatTableModule, MatSortModule, NgFor, MatCheckboxModule, SortFilterHeaderComponent, MatTooltipModule, MatButtonModule, MatIconModule, MatPaginatorModule, SafeHtmlPipe, ResponsiveClassDirective]
 })
-export class NgfaceDataTableComponent implements OnChanges, AfterViewInit
+export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterViewInit
 {
   @Input()
   formdata?: Ngface.Form;
@@ -116,10 +128,24 @@ export class NgfaceDataTableComponent implements OnChanges, AfterViewInit
   displayedColumns: string[] = [];
   columnGroups: string[] = [];
 
+  private subscriptions = new Array<Subscription | undefined>();
+
   constructor(@Inject(LOCALE_ID) public locale: string,
               private el: ElementRef)
   {
   }
+
+  ngOnDestroy(): void
+  {
+    this.subscriptions.forEach(i =>
+    {
+      if (i)
+      {
+        i.unsubscribe();
+      }
+    });
+  }
+
 
   ngOnChanges(): void
   {
@@ -234,11 +260,11 @@ export class NgfaceDataTableComponent implements OnChanges, AfterViewInit
   {
     this.matTable.dataSource = this.dataSource;
 
-    merge(this.matSort.sortChange, this.matPaginator.page)
+    this.subscriptions.push(merge(this.matSort.sortChange, this.matPaginator.page)
       .pipe(
         tap(() => this.reloadTable())
       )
-      .subscribe();
+      .subscribe());
 
     setTimeout(() => this.setHeightScrollbarY(), 500);
   }
@@ -513,6 +539,11 @@ export class NgfaceDataTableComponent implements OnChanges, AfterViewInit
 
   onRowClick(row: Ngface.Row<any>): void
   {
+    if (this.getData().selectMode === 'NONE')
+    {
+      return
+    }
+
     if (this.getData().selectMode === 'SINGLE')
     {
       this.getData().rows.forEach(r => r.selected = false);

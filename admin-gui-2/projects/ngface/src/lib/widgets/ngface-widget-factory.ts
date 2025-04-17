@@ -35,6 +35,35 @@ export class NgfaceWidgetFactory
   }
 
 
+  public static createRemoteAutocomplete(input: Partial<{
+    id: string;
+    label: string;
+    value: string;
+    validators: Ngface.Validator[];
+  }> = {}): Ngface.Autocomplete
+  {
+    const defaults = {
+      id: '',
+      label: 'undefined label',
+      value: '',
+      validators: [],
+    };
+
+    const params = {...defaults, ...input};
+
+    return {
+      id: params.id,
+      type: 'Autocomplete',
+      label: params.label,
+      placeholder: params.label,
+      hint: '',
+      data: {type: 'Autocomplete.Data', value: params.value, extendedReadOnlyData: {valueSet: {remote: true, truncated: false, values: []}}},
+      enabled: true,
+      validators: params.validators
+    } as Ngface.Autocomplete;
+  }
+
+
   public static createButton(input: Partial<{ id: string, label: string, style: Ngface.Style, enabled: boolean }> = {}): Ngface.Button
   {
     const defaults = {

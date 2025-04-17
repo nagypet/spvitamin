@@ -21,7 +21,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, OnDestroy,
   OnInit,
   Output,
   QueryList
@@ -35,6 +35,7 @@ import {FormGroup} from '@angular/forms';
 import {Ngface} from '../../ngface-models';
 import {NgfaceAutocompleteComponent} from '../../widgets/ngface-autocomplete/ngface-autocomplete.component';
 import {NgfaceDateTimeInputComponent} from '../../widgets/ngface-date-time-input/ngface-date-time-input.component';
+import {Subscription} from 'rxjs';
 
 export class ControlData
 {
@@ -48,7 +49,7 @@ export class ControlData
   styleUrls: ['./ngface-form.component.css'],
   standalone: true
 })
-export class NgfaceFormComponent implements OnInit, OnChanges, AfterViewInit
+export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit
 {
 
   get formGroup(): FormGroup
@@ -79,6 +80,7 @@ export class NgfaceFormComponent implements OnInit, OnChanges, AfterViewInit
   @ContentChildren(NgfaceSelectComponent, {descendants: true}) selectInputComponents?: QueryList<NgfaceSelectComponent>;
   @ContentChildren(NgfaceAutocompleteComponent, {descendants: true}) autocompleteInputComponents?: QueryList<NgfaceAutocompleteComponent>;
 
+  private subscriptions = new Array<Subscription | undefined>();
 
   private static getLocalDateTime(date: Date): Date | null
   {
@@ -101,6 +103,17 @@ export class NgfaceFormComponent implements OnInit, OnChanges, AfterViewInit
   {
   }
 
+  ngOnDestroy(): void
+  {
+    this.subscriptions.forEach(i =>
+    {
+      if (i)
+      {
+        i.unsubscribe();
+      }
+    });
+  }
+
   ngOnChanges(): void
   {
     this.onDataChange.emit({data: this.getSubmitData()});
@@ -118,13 +131,13 @@ export class NgfaceFormComponent implements OnInit, OnChanges, AfterViewInit
     this.updateControlsInFormGroup(this.autocompleteInputComponents);
 
     // Listening changes in ContentChildren elements
-    this.textInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.textInputComponents));
-    this.numericInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.numericInputComponents));
-    this.dateInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateInputComponents));
-    this.dateTimeInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateTimeInputComponents));
-    this.dateRangeInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateRangeInputComponents));
-    this.selectInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.selectInputComponents));
-    this.autocompleteInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.autocompleteInputComponents));
+    this.subscriptions.push(this.textInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.textInputComponents)));
+    this.subscriptions.push(this.numericInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.numericInputComponents)));
+    this.subscriptions.push(this.dateInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateInputComponents)));
+    this.subscriptions.push(this.dateTimeInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateTimeInputComponents)));
+    this.subscriptions.push(this.dateRangeInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.dateRangeInputComponents)));
+    this.subscriptions.push(this.selectInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.selectInputComponents)));
+    this.subscriptions.push(this.autocompleteInputComponents?.changes.subscribe(() => this.updateControlsInFormGroup(this.autocompleteInputComponents)));
 
     // This solution is for the web-component solution
     const allControls = this.getAllNgfaceControls(this.el.nativeElement);

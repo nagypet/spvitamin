@@ -69,6 +69,9 @@ export class NgfaceTitlebarComponent implements OnChanges
   @Output()
   actionClick: EventEmitter<Ngface.Action> = new EventEmitter();
 
+  @Output()
+  ready = new EventEmitter<void>();
+
   constructor(
     public deviceTypeService: DeviceTypeService,
     private router: Router,
@@ -81,18 +84,20 @@ export class NgfaceTitlebarComponent implements OnChanges
   {
     if (changes['formdata'] || changes['widgetid'])
     {
-        this.selectedMenuItemId = this.getData().menu.defaultItemId;
-        const item = this.getData().menu.items.find(i => i.id === this.selectedMenuItemId);
-        if (item)
-        {
-          this.onMenuClick(item);
-        }
+      this.selectedMenuItemId = this.getData().menu.defaultItemId;
+      const item = this.getData().menu.items.find(i => i.id === this.selectedMenuItemId);
+      if (item)
+      {
+        this.onMenuClick(item);
+      }
     }
 
     if (changes['tokenValidSeconds'])
     {
       this.tokenValidSecondsString = this.formatTime(this.tokenValidSeconds);
     }
+
+    setTimeout(() => this.ready.emit());
   }
 
 
