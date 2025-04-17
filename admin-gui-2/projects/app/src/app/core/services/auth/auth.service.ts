@@ -20,8 +20,8 @@ import {BehaviorSubject, mapTo, Observable, of, switchMap, throwError} from 'rxj
 import {CookieService} from 'ngx-cookie-service';
 import {ToastrService} from 'ngx-toastr';
 import {environment} from '../../../../environments/environment';
-import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
 import {catchError, finalize, map, tap} from 'rxjs/operators';
+import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
 
 @Injectable({
   providedIn: 'root'
@@ -29,20 +29,36 @@ import {catchError, finalize, map, tap} from 'rxjs/operators';
 export class AuthService
 {
   private loginSubject$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loggedIn$ = this.loginSubject$.asObservable();
+
+  private loginPageVisibleSubject$ = new BehaviorSubject<boolean>(false);
+  public loginPageVisible$ = this.loginPageVisibleSubject$.asObservable();
+
+  public isRefreshing = false;
+
+  setLoginPageVisible(value: boolean)
+  {
+    this.loginPageVisibleSubject$.next(value);
+  }
+
+  get isLoginPageVisible(): boolean
+  {
+    return this.loginPageVisibleSubject$.value;
+  }
+
+
   get isLoggedIn(): boolean
   {
     return this.loginSubject$.value;
   }
-  public loggedIn$ = this.loginSubject$.asObservable();
 
-  public isRefreshing = false;
 
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
               private toastrService: ToastrService
   )
   {
-    this.checkToken();
+    this.checkToken().subscribe();
   }
 
 
@@ -106,6 +122,20 @@ export class AuthService
   }
 
 
+  loginFrontendAnonym(): Observable<void>
+  {
+    console.log('loginFrontendAnonym()');
+    return this.login('frontend-anonym', 'an0n1m', false).pipe(
+      catchError(err =>
+      {
+        console.error('loginFrontendAnonym() failed', err);
+        return throwError(() => err);
+      }),
+      mapTo(void 0)
+    );
+  }
+
+
   /**
    * logout
    */
@@ -149,8 +179,9 @@ export class AuthService
    */
   handleAuthError(error: HttpErrorResponse): void
   {
-    this.logout();
+    this.logout().subscribe();
   }
+
 
   private renewToken$(token: SpvitaminSecurity.AuthorizationToken): Observable<SpvitaminSecurity.AuthorizationToken>
   {
@@ -177,6 +208,7 @@ export class AuthService
       error: () => this.logout().subscribe()
     });
   }
+
 
   private loginSuccess(token: SpvitaminSecurity.AuthorizationToken, withInfo: boolean = true): void
   {
