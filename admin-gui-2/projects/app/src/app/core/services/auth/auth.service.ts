@@ -158,11 +158,13 @@ export class AuthService
         {
           this.toastrService.warning('Please login again!', 'Session expired!');
         }
-
-        this.loginSubject$.next(false);
       }),
       mapTo(void 0), // típus: Observable<void>
-      finalize(() => this.cleanUpSessionStorage())
+      finalize(() =>
+      {
+        this.cleanUpSessionStorage();
+        this.loginSubject$.next(false);
+      })
     );
   }
 
