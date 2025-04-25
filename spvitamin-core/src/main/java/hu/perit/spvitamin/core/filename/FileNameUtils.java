@@ -21,6 +21,10 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileNameUtils
 {
@@ -35,6 +39,18 @@ public final class FileNameUtils
     }
 
 
+    public static String getFileName(String path)
+    {
+        return FilenameUtils.getName(path);
+    }
+
+
+    public static String getFolder(String path)
+    {
+        return FilenameUtils.getPath(path);
+    }
+
+
     public static String getBaseName(String fileName)
     {
         return FilenameUtils.getBaseName(fileName);
@@ -44,5 +60,15 @@ public final class FileNameUtils
     public static String getFileExtension(String fileName)
     {
         return StringUtils.toRootLowerCase(FilenameUtils.getExtension(sanitizeFileName(fileName)));
+    }
+
+
+    public static String getPath(String... parts)
+    {
+        return Arrays.stream(parts)
+                .filter(Objects::nonNull)
+                .map(part -> part.replaceAll("^/+", "").replaceAll("/+$", ""))
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.joining("/"));
     }
 }

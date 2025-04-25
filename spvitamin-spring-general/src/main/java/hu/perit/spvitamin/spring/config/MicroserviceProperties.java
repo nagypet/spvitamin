@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,13 @@ import lombok.Setter;
 @Setter
 public class MicroserviceProperties
 {
-
     private String url;
+    private User auth;
+
+    @Data
+    public static class User {
+        private String username;
+        private String password;
+        private String encryptedPassword;
+    }
 }

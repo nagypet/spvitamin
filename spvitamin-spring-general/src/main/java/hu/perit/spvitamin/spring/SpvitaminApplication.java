@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring;
 
 import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
+import hu.perit.spvitamin.spring.sysproperty.SystemPropertyLoader;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.resource.Resources;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,10 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,7 +73,7 @@ public class SpvitaminApplication extends SpringApplication
 
         setAdditionalProfiles();
 
-        setAdditionalSystemProperties();
+        SystemPropertyLoader.setAdditionalSystemProperties();
 
         this.addListeners(new EnvironmentPostProcessor());
     }
@@ -162,60 +161,4 @@ public class SpvitaminApplication extends SpringApplication
             return "unknown-host";
         }
     }
-
-
-    private static void setAdditionalSystemProperties()
-    {
-        String activeProfiles = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
-        if (StringUtils.isNotBlank(activeProfiles))
-        {
-            Properties sysProperties = new Properties();
-            // Try loading standard sysproperties
-            sysProperties.putAll(tryGetSysPropertiesFromFile("application.sysproperties"));
-            sysProperties.putAll(tryGetSysPropertiesFromFile("config/application.sysproperties"));
-
-            // Try loading profile-specific sysproperties
-            List<String> profiles = Arrays.stream(activeProfiles.split(",")).distinct().map(i -> StringUtils.strip(i)).toList();
-            if (!profiles.isEmpty())
-            {
-                for (String profile : profiles)
-                {
-                    sysProperties.putAll(tryGetSysPropertiesFromFile(profile + ".sysproperties"));
-                    sysProperties.putAll(tryGetSysPropertiesFromFile("config/" + profile + ".sysproperties"));
-                }
-            }
-            else
-            {
-                // Try loading default sysproperties
-                sysProperties.putAll(tryGetSysPropertiesFromFile("default.sysproperties"));
-                sysProperties.putAll(tryGetSysPropertiesFromFile("config/default.sysproperties"));
-            }
-
-            // Adding loaded sysproperties
-            for (Map.Entry<Object, Object> entry : sysProperties.entrySet())
-            {
-                log.info("Setting property: {}: {}", entry.getKey(), entry.getValue());
-                System.setProperty(entry.getKey().toString(), entry.getValue().toString());
-            }
-        }
-    }
-
-
-    private static Properties tryGetSysPropertiesFromFile(String filepath)
-    {
-        log.info("Trying to load system properties from {}", filepath);
-        try (InputStream inputStream = Resources.getResourceAsInputStream(filepath))
-        {
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            log.info("Additional system properties loaded from {}: {}", filepath, properties);
-            return properties;
-        }
-        catch (IOException | ResourceNotFoundException | RuntimeException e)
-        {
-            return new Properties();
-        }
-    }
-
-
 }
