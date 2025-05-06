@@ -101,6 +101,8 @@ dependencyManagement {
 - ContextAwareBatchJob
 - HtmlTag
 - SimpleHttpSecurityBuilder: deprecated things updated
+- LocalDateUtils
+- json-time modul: additional date formats
 
 
 ### 3.3.3-2-RELEASE not yet released
