@@ -44,6 +44,7 @@ public abstract class BatchJob implements Callable<Void>
     {
         try
         {
+            this.setUp();
             return this.execute();
         }
         catch (Exception ex)
@@ -82,6 +83,11 @@ public abstract class BatchJob implements Callable<Void>
             }
             throw ex;
         }
+    }
+
+    protected void setUp()
+    {
+
     }
 
     protected abstract Void execute() throws Exception; // NOSONAR

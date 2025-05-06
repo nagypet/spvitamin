@@ -98,6 +98,9 @@ dependencyManagement {
 - AuthenticatedUser getAdditionalClaim(), putAdditionalClaim()
 - LocalDate can be parsed from the 'yyyyMMdd' format as well
 - FileNameUtils extended with new methods
+- ContextAwareBatchJob
+- HtmlTag
+- SimpleHttpSecurityBuilder: deprecated things updated
 
 
 ### 3.3.3-2-RELEASE not yet released

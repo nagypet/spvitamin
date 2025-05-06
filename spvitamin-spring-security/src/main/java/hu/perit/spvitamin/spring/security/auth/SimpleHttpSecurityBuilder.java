@@ -24,6 +24,7 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
+import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.Customizer;
@@ -32,6 +33,8 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
@@ -40,7 +43,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -161,16 +163,32 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder jwtAuth() throws Exception
+    public SimpleHttpSecurityBuilder jwtAuth()
     {
         // applying JWT Filter
         if (!isFilterAlreadyExists(JwtAuthenticationFilter.class))
         {
-            this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+            this.http.addFilterAfter(new JwtAuthenticationFilter(), SecurityContextHolderFilter.class);
         }
         if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
         {
-            this.http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+            this.http.addFilterBefore(new Role2PermissionMapperFilter(), AuthorizationFilter.class);
+        }
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder apiKeyAuth(Filter apiKeyFilter)
+    {
+        // applying JWT Filter
+        if (!isFilterAlreadyExists(apiKeyFilter.getClass()))
+        {
+            this.http.addFilterAfter(apiKeyFilter, SecurityContextHolderFilter.class);
+        }
+        if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
+        {
+            this.http.addFilterBefore(new Role2PermissionMapperFilter(), AuthorizationFilter.class);
         }
 
         return this;
@@ -218,7 +236,7 @@ public class SimpleHttpSecurityBuilder
     {
         if (!isFilterAlreadyExists(SecurityContextRemoverFilter.class))
         {
-            this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextPersistenceFilter.class);
+            this.http.addFilterAfter(new SecurityContextRemoverFilter(), SecurityContextHolderFilter.class);
         }
         else
         {
