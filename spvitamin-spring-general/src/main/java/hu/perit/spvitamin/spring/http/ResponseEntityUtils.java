@@ -26,8 +26,13 @@ public final class ResponseEntityUtils
 {
     public static ResponseEntity<byte[]> createFileDownloadResponse(byte[] fileContent, String fileName)
     {
+        return ResponseEntityUtils.createFileDownloadResponse(fileContent, fileName, null);
+    }
+
+    public static ResponseEntity<byte[]> createFileDownloadResponse(byte[] fileContent, String fileName, MediaType mediaType)
+    {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentType(mediaType != null ? mediaType : MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(
                 ContentDisposition.attachment()
                         .filename(FileNameUtils.sanitizeFileName(fileName))

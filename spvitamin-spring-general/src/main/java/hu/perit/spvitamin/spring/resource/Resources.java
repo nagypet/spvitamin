@@ -27,17 +27,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Resources
 {
     public static InputStream getResourceAsInputStream(String resourcePath) throws ResourceNotFoundException
     {
+        Objects.requireNonNull(resourcePath, "Resource path cannot be null!");
         Path configPath = null;
         try
         {
-            String baseDir = System.getProperty("user.dir");
-            configPath = Paths.get(baseDir, resourcePath).toAbsolutePath();
+            configPath = getPath(resourcePath);
             if (configPath.toFile().exists())
             {
                 return Files.newInputStream(configPath);
@@ -50,5 +51,17 @@ public final class Resources
         {
             throw new ResourceNotFoundException(MessageFormat.format("Resource not found: {0}", configPath), e);
         }
+    }
+
+
+    private static Path getPath(String resourcePath)
+    {
+        Path path = Paths.get(resourcePath);
+        if (path.isAbsolute())
+        {
+            return path;
+        }
+        String baseDir = System.getProperty("user.dir");
+        return Paths.get(baseDir, resourcePath).toAbsolutePath();
     }
 }

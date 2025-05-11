@@ -107,6 +107,8 @@ dependencyManagement {
 - ReflectionUtils: getAnnotationRecursive
 - Thing ignores properties annotated with `@JsonIgnore`
 - PessimisticJpaRepository: findByIdWithWriteLock 
+- ResponseEntityUtils: MediaType can be defined
+- Resources: getResourceAsInputStream() can handle absolute paths too
 
 
 ### 3.3.3-2-RELEASE not yet released
