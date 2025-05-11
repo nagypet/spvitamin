@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.core.reflection;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -122,6 +123,12 @@ public class Property implements Member
     }
 
 
+    public boolean isIgnored()
+    {
+        return getAnnotation(JsonIgnore.class) != null;
+    }
+
+
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass)
     {
         if (this.kind == Kind.FIELD)
@@ -135,12 +142,12 @@ public class Property implements Member
             Method propertyGetter = ReflectionUtils.getGetter(this.field.getDeclaringClass(), this.name).orElse(null);
             if (propertyGetter != null)
             {
-                return propertyGetter.getAnnotation(annotationClass);
+                return ReflectionUtils.getAnnotationRecursive(propertyGetter, annotationClass);
             }
         }
         else if (this.kind == Kind.GETTER)
         {
-            T annotation = this.getter.getAnnotation(annotationClass);
+            T annotation = ReflectionUtils.getAnnotationRecursive(this.getter, annotationClass);
             if (annotation != null)
             {
                 return annotation;

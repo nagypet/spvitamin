@@ -93,7 +93,10 @@ public abstract class Thing
             try
             {
                 Object propertyValue = property.get(object);
-                valueMap.getProperties().put(propertyName, valueToThing(propertyName, propertyValue, includePrivate));
+                if (!property.isIgnored())
+                {
+                    valueMap.getProperties().put(propertyName, valueToThing(propertyName, propertyValue, includePrivate));
+                }
             }
             catch (IllegalAccessException | InvocationTargetException | RuntimeException e)
             {

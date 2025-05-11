@@ -103,6 +103,10 @@ dependencyManagement {
 - SimpleHttpSecurityBuilder: deprecated things updated
 - LocalDateUtils
 - json-time modul: additional date formats
+- Property improved
+- ReflectionUtils: getAnnotationRecursive
+- Thing ignores properties annotated with `@JsonIgnore`
+- PessimisticJpaRepository: findByIdWithWriteLock 
 
 
 ### 3.3.3-2-RELEASE not yet released

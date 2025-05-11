@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -104,10 +105,12 @@ public class ReflectionUtils
         return properties;
     }
 
+
     private static boolean isIgnored(Method method)
     {
         return method.getAnnotation(JsonIgnore.class) != null;
     }
+
 
     private static boolean isCommonBaseMethod(String name)
     {
@@ -274,6 +277,55 @@ public class ReflectionUtils
     public static Object getSubject(Field field, Object object)
     {
         return isStatic(field) ? null : object;
+    }
+
+
+    public static <A extends Annotation> A getAnnotationRecursive(Method method, Class<A> annotationClass)
+    {
+        // Elsőként próbáljuk meg a metóduson
+        A annotation = method.getAnnotation(annotationClass);
+        if (annotation != null)
+        {
+            return annotation;
+        }
+
+        // Szülőosztályok és interfészek vizsgálata
+        Class<?> declaringClass = method.getDeclaringClass();
+        for (Class<?> iface : declaringClass.getInterfaces())
+        {
+            try
+            {
+                Method interfaceMethod = iface.getMethod(method.getName(), method.getParameterTypes());
+                annotation = interfaceMethod.getAnnotation(annotationClass);
+                if (annotation != null)
+                {
+                    return annotation;
+                }
+            }
+            catch (NoSuchMethodException ignored)
+            {
+            }
+        }
+
+        Class<?> superclass = declaringClass.getSuperclass();
+        while (superclass != null && superclass != Object.class)
+        {
+            try
+            {
+                Method superMethod = superclass.getMethod(method.getName(), method.getParameterTypes());
+                annotation = superMethod.getAnnotation(annotationClass);
+                if (annotation != null)
+                {
+                    return annotation;
+                }
+            }
+            catch (NoSuchMethodException ignored)
+            {
+            }
+            superclass = superclass.getSuperclass();
+        }
+
+        return null;
     }
 
 

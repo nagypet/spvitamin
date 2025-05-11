@@ -252,7 +252,8 @@ public class SpvitaminWebSecurityConfig
                         mvc.pattern(swaggerUiPath + "/**"),
 
                         // api-docs
-                        mvc.pattern(apiDocsPath + "/**")
+                        mvc.pattern(apiDocsPath + "/**"),
+                        mvc.pattern(apiDocsPath + ".yaml")
                 );
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
