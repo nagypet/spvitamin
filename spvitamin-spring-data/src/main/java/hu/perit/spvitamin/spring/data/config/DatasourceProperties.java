@@ -16,10 +16,8 @@
 
 package hu.perit.spvitamin.spring.data.config;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.NotNull;
-
 import hu.perit.spvitamin.spring.config.ConfigProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -55,6 +53,8 @@ public class DatasourceProperties
     protected Integer maxPoolSize = 10;
     protected String connectionInitSql;
     protected String options;
+    protected boolean encryptedConnection = false;
+
 
     /*
     connectionTimeout controls the maximum number of milliseconds that a client (that's you) will wait for a connection

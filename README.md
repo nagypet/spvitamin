@@ -109,6 +109,7 @@ dependencyManagement {
 - PessimisticJpaRepository: findByIdWithWriteLock 
 - ResponseEntityUtils: MediaType can be defined
 - Resources: getResourceAsInputStream() can handle absolute paths too
+- Support for encrypted oracle connection
 
 
 ### 3.3.3-2-RELEASE not yet released

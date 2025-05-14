@@ -54,6 +54,7 @@ public class ConnectionParam extends DatasourceProperties
 
     private final String portDelimiter;
 
+
     public ConnectionParam(DatasourceProperties properties)
     {
         if (properties == null)
@@ -88,6 +89,7 @@ public class ConnectionParam extends DatasourceProperties
 
         return this.password;
     }
+
 
     public String getJdbcUrl()
     {
@@ -205,6 +207,7 @@ public class ConnectionParam extends DatasourceProperties
         };
     }
 
+
     private String getHostString()
     {
         if (host == null || host.isEmpty())
@@ -235,6 +238,7 @@ public class ConnectionParam extends DatasourceProperties
         }
     }
 
+
     private String getHostStringOracle()
     {
         if (host == null || host.isEmpty())
@@ -242,7 +246,7 @@ public class ConnectionParam extends DatasourceProperties
             return "";
         }
 
-        if (host2 == null || port2 == null)
+        if (!encryptedConnection && (host2 == null || port2 == null))
         {
             return ":@" + host + portDelimiter + port;
         }
@@ -255,13 +259,21 @@ public class ConnectionParam extends DatasourceProperties
           (CONNECT_DATA = (SERVICE_NAME = dbName ))) 
         */
 
-        return ":@(DESCRIPTION = " +
-                String.format("(CONNECT_TIMEOUT = %d)", getConnectionTimeout() / 1000) +
-                String.format("(TRANSPORT_CONNECT_TIMEOUT = %d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000) +
-                String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host, port) +
-                String.format("(ADDRESS = (PROTOCOL = TCP)(HOST = %s)(PORT = %s ))", host2, port2) +
-                String.format("(CONNECT_DATA = (SERVICE_NAME = %s )))", dbName);
+        StringBuilder b = new StringBuilder();
+        String protocol = encryptedConnection ? "TCPS" : "TCP";
+        b.append(":@(DESCRIPTION=");
+        b.append(String.format("(CONNECT_TIMEOUT=%d)", getConnectionTimeout() / 1000));
+        b.append(String.format("(TRANSPORT_CONNECT_TIMEOUT=%d)(RETRY_COUNT=50)(RETRY_DELAY=3)", getSocketTimeout() / 1000));
+        b.append(String.format("(ADDRESS=(PROTOCOL=%s)(HOST=%s)(PORT=%s))", protocol, host, port));
+        if ((host2 != null && port2 != null))
+        {
+            b.append(String.format("(ADDRESS=(PROTOCOL=%s)(HOST=%s)(PORT=%s))", protocol, host2, port2));
+        }
+        b.append(String.format("(CONNECT_DATA=(SERVICE_NAME=%s)))", dbName));
+
+        return b.toString();
     }
+
 
     private String getDbNameString()
     {
@@ -276,7 +288,7 @@ public class ConnectionParam extends DatasourceProperties
                 return ";databaseName=" + this.dbName;
 
             case DBTYPE_ORACLE:
-                if (host2 != null && port2 != null)
+                if (this.encryptedConnection || host2 != null && port2 != null)
                 {
                     return "";
                 }
