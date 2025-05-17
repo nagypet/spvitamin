@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,5 +36,31 @@ public final class MapUtils
         }
 
         return collection.stream().collect(Collectors.toMap(keySupplier, v -> v));
+    }
+
+
+    public static <K, V> Map<K, Set<V>> groupBy(Collection<V> collection, Function<V, K> keySupplier)
+    {
+        if (collection == null)
+        {
+            return Map.of();
+        }
+
+        return collection.stream().collect(Collectors.groupingBy(keySupplier, Collectors.toSet()));
+    }
+
+
+    public static <K, V, V2> Map<K, Set<V2>> groupBy(Collection<V> collection, Function<V, K> keySupplier, Function<V, V2> valueSupplier)
+    {
+        if (collection == null)
+        {
+            return Map.of();
+        }
+
+        return collection.stream()
+                .collect(Collectors.groupingBy(
+                        keySupplier,
+                        Collectors.mapping(valueSupplier, Collectors.toSet())
+                ));
     }
 }
