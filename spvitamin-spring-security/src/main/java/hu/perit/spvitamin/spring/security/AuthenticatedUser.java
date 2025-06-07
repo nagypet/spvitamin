@@ -29,6 +29,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -116,11 +117,24 @@ public class AuthenticatedUser implements UserDetails
     }
 
 
+    public boolean hasRole(String role)
+    {
+        if (getAuthorities() == null)
+        {
+            return false;
+        }
+
+        return getAuthorities().stream()
+                .anyMatch(auth -> Objects.equals(role, auth.getAuthority()));
+    }
+
+
     @Override
     public String getPassword()
     {
         throw new UnsupportedOperationException("getPassword()");
     }
+
 
     @Override
     public boolean isAccountNonExpired()
@@ -128,17 +142,20 @@ public class AuthenticatedUser implements UserDetails
         return true;
     }
 
+
     @Override
     public boolean isAccountNonLocked()
     {
         return true;
     }
 
+
     @Override
     public boolean isCredentialsNonExpired()
     {
         return true;
     }
+
 
     @Override
     public boolean isEnabled()

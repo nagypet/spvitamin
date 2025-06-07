@@ -23,6 +23,7 @@ import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
 import feign.jackson.JacksonEncoder;
 import feign.optionals.OptionalDecoder;
@@ -54,6 +55,7 @@ public class SimpleFeignClientBuilder
 
     private Encoder encoder;
     private Decoder decoder;
+    private ErrorDecoder errorDecoder = new RestExceptionResponseDecoder();
 
 
     public static SimpleFeignClientBuilder newInstance()
@@ -85,8 +87,7 @@ public class SimpleFeignClientBuilder
                 .retryer(new Retryer.Default(feignProperties.getRetry().getPeriod(), feignProperties.getRetry().getMaxPeriod(), feignProperties.getRetry().getMaxAttempts()))
                 //.retryer(Retryer.NEVER_RETRY)
                 .logger(new Slf4jLogger(getClass()))
-                .logLevel(getLevel(feignProperties.getLoggerLevel()))
-                .errorDecoder(new RestExceptionResponseDecoder());
+                .logLevel(getLevel(feignProperties.getLoggerLevel()));
     }
 
 
@@ -115,6 +116,13 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder errorDecoder(ErrorDecoder errorDecoder)
+    {
+        this.errorDecoder = errorDecoder;
+        return this;
+    }
+
+
     private static Logger.Level getLevel(String level)
     {
         return Logger.Level.valueOf(level.toUpperCase());
@@ -132,6 +140,7 @@ public class SimpleFeignClientBuilder
     {
         this.builder.encoder(this.encoder);
         this.builder.decoder(this.decoder);
+        this.builder.errorDecoder(this.errorDecoder);
 
         return this.builder.target(apiType, url);
     }

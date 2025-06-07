@@ -64,10 +64,10 @@ class RequestLoggerTest
         request.setContent(getTestContent());
         request.setDocumentDate(LocalDate.of(2024, 11, 3));
         request.setComment("very very very very very very very very very very very very very very very very very very long comment");
-        request.setUuid(UUID.randomUUID());
+        request.setUuid(UUID.fromString("28321ad7-3abc-4899-b0ab-c006c3d2392c"));
 
         String subject = RequestLogger.toSubject(request);
-        assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}]}");
+        assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}],\"uuid\":\"28321ad7-3abc-4899-b0ab-c006c3d2392c\"}");
     }
 
     private static List<Keyword> getTestKeywords()

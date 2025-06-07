@@ -66,19 +66,22 @@ public class RoleMapperServiceImpl implements RoleMapperService
     public Set<GrantedAuthority> mapUsernameAndGroupToRoles(String username, Collection<? extends GrantedAuthority> groups)
     {
         Set<String> roles = this.roleMappingProperties.getUserRoles(username);
-        for (GrantedAuthority group : groups)
+        if (groups != null)
         {
-            if (group.getAuthority().startsWith(ROLE_PREFIX))
+            for (GrantedAuthority group : groups)
             {
-                // This is a ROLE_
-                String role = group.getAuthority();
-                roles.add(role);
-                roles.addAll(roleMappingProperties.getIncludedRoles(role));
-            }
-            else
-            {
-                // This is an AD group
-                roles.addAll(this.roleMappingProperties.getGroupRoles(group.getAuthority()));
+                if (group.getAuthority().startsWith(ROLE_PREFIX))
+                {
+                    // This is a ROLE_
+                    String role = group.getAuthority();
+                    roles.add(role);
+                    roles.addAll(roleMappingProperties.getIncludedRoles(role));
+                }
+                else
+                {
+                    // This is an AD group
+                    roles.addAll(this.roleMappingProperties.getGroupRoles(group.getAuthority()));
+                }
             }
         }
 
