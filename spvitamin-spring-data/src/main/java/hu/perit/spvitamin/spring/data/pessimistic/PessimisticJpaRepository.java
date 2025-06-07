@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,5 +18,13 @@ public interface PessimisticJpaRepository<T, ID> extends JpaRepository<T, ID>
     default Optional<T> findByIdWithWriteLock(ID id)
     {
         return findById(id);
+    }
+
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
+    default List<T> findAllByIdWithWriteLock(Iterable<ID> ids)
+    {
+        return findAllById(ids);
     }
 }

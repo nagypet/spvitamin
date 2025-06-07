@@ -185,6 +185,10 @@ public class HtmlTag
         return tag("h2", attr, text);
     }
 
+    public HtmlTag p(String attr, String text)
+    {
+        return tag("p", attr, text);
+    }
 
     public HtmlTag br()
     {

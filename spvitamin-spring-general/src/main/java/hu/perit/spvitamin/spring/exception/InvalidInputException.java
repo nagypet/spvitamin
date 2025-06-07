@@ -34,6 +34,13 @@ public class InvalidInputException extends RuntimeException {
         super(message);
     }
 
+
+    public InvalidInputException(Throwable cause)
+    {
+        super(cause);
+    }
+
+
     public InvalidInputException(String message, Throwable cause) {
         super(message, cause);
     }

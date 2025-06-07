@@ -111,6 +111,9 @@ dependencyManagement {
 - Resources: getResourceAsInputStream() can handle absolute paths too
 - Support for encrypted oracle connection
 - MapUtils improved
+- SoftEnum
+- MicroserviceProperties extended by apiKey
+- ApiKeyRequestInterceptor
 
 
 ### 3.3.3-2-RELEASE not yet released

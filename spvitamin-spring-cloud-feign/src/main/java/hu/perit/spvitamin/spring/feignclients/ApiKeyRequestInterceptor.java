@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.config;
+package hu.perit.spvitamin.spring.feignclients;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import lombok.RequiredArgsConstructor;
 
-@Getter
-@Setter
-public class MicroserviceProperties
+/**
+ * An interceptor that adds the request header needed to use API-Key authenticate.
+ *
+ * @author Peter Nagy
+ */
+
+@RequiredArgsConstructor
+public class ApiKeyRequestInterceptor implements RequestInterceptor
 {
-    private String url;
-    private Credentials auth;
+    private final String header;
+    private final String apiKey;
 
-    @Data
-    public static class Credentials
+
+    @Override
+    public void apply(RequestTemplate template)
     {
-        private String username;
-        private String password;
-        private String encryptedPassword;
-        private String apiKey;
+        template.header(header, apiKey);
     }
 }
