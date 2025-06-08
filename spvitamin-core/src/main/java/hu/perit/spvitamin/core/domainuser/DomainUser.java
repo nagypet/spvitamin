@@ -29,7 +29,7 @@ import java.util.Objects;
  * A class for representing and manipulating domain user identities.
  * 
  * <p>This class provides functionality for parsing, normalizing, and comparing domain user
- * identifiers in different formats. It supports both NetBIOS format (domain\username) and
+ * identifiers in different formats. It supports both NetBIOS format (domain&#92;username) and
  * User Principal Name format (username@domain.com), and handles domain name normalization
  * for proper comparison.</p>
  * 
@@ -44,7 +44,7 @@ import java.util.Objects;
  * 
  * <p>Supported formats:</p>
  * <ul>
- *   <li>NetBIOS name: domain\username (e.g., perit\nagypet)</li>
+ *   <li>NetBIOS name: domain&#92;username (e.g., perit\nagypet)</li>
  *   <li>User Principal Name: username@domain (e.g., nagypet@perit.hu)</li>
  *   <li>Plain username (e.g., nagypet)</li>
  * </ul>
