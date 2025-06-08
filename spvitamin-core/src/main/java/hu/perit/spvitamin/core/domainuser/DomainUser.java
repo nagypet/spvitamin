@@ -26,8 +26,41 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Objects;
 
 /**
- * NetBIOS name: perit\nagypet
- * User Principal Name: nagypet@perit.hu
+ * A class for representing and manipulating domain user identities.
+ * 
+ * <p>This class provides functionality for parsing, normalizing, and comparing domain user
+ * identifiers in different formats. It supports both NetBIOS format (domain\username) and
+ * User Principal Name format (username@domain.com), and handles domain name normalization
+ * for proper comparison.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Parse user identifiers from different formats</li>
+ *   <li>Extract domain and username components</li>
+ *   <li>Case-insensitive comparison of user identities</li>
+ *   <li>Domain name normalization (handling both NetBIOS and FQDN formats)</li>
+ *   <li>Canonical name representation</li>
+ * </ul>
+ * 
+ * <p>Supported formats:</p>
+ * <ul>
+ *   <li>NetBIOS name: domain\username (e.g., perit\nagypet)</li>
+ *   <li>User Principal Name: username@domain (e.g., nagypet@perit.hu)</li>
+ *   <li>Plain username (e.g., nagypet)</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Create from different formats
+ * DomainUser user1 = DomainUser.newInstance("domain\\username");
+ * DomainUser user2 = DomainUser.newInstance("username@domain.com");
+ * 
+ * // Get canonical representation
+ * String canonical = user1.getCanonicalName(); // "username@domain"
+ * 
+ * // Compare users (case-insensitive)
+ * boolean equal = user1.equals(user2); // true if same domain and username
+ * </pre>
  *
  * @author Peter Nagy
  */

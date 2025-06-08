@@ -20,6 +20,31 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+/**
+ * A utility class for formatting time durations in a human-readable format.
+ * 
+ * <p>This class provides methods to convert time durations (in milliseconds) into
+ * human-readable strings with appropriate units. It automatically selects the most
+ * appropriate time unit (milliseconds, seconds, minutes, hours, or days) based on
+ * the magnitude of the duration.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Format elapsed time since a start timestamp</li>
+ *   <li>Convert raw millisecond durations to human-readable format</li>
+ *   <li>Automatic unit selection based on duration magnitude</li>
+ *   <li>Appropriate precision for different duration ranges</li>
+ * </ul>
+ * 
+ * <p>Example outputs:</p>
+ * <ul>
+ *   <li>500 ms</li>
+ *   <li>2.5 sec</li>
+ *   <li>3:45.2 min</li>
+ *   <li>1:23:45 hour</li>
+ *   <li>2:05:30:00 day</li>
+ * </ul>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TimeFormatter
 {

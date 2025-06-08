@@ -24,6 +24,28 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * A utility class for measuring and logging method execution time.
+ * 
+ * <p>This class implements AutoCloseable to enable usage with try-with-resources blocks,
+ * automatically logging the execution time when the block completes. It captures the
+ * calling method name and provides various constructors to customize the behavior.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Automatic method name detection from the call stack</li>
+ *   <li>Optional context information in logs</li>
+ *   <li>Configurable logging behavior</li>
+ *   <li>Detailed timing information including start and end timestamps</li>
+ *   <li>Support for explicit method references</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * try (Took took = new Took("context info")) {
+ *     // Code to measure
+ * } // Execution time is automatically logged when exiting the block
+ * </pre>
+ * 
  * @author Peter Nagy
  */
 

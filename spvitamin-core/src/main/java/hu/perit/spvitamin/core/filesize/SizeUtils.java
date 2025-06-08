@@ -23,6 +23,30 @@ import org.apache.commons.io.FileUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * A utility class for converting between byte sizes and human-readable size formats.
+ * 
+ * <p>This class provides methods to convert file sizes between raw byte counts and
+ * human-readable string representations (e.g., "1.5 GB", "500 kB"). It supports
+ * standard binary size units (B, kB, MB, GB, TB) with 1024-based conversions.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Convert byte counts to human-readable size strings</li>
+ *   <li>Parse human-readable size strings back to byte counts</li>
+ *   <li>Support for all common size units (B, kB, MB, GB, TB)</li>
+ *   <li>Proper handling of decimal values in size strings</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Convert bytes to human-readable format
+ * String readable = SizeUtils.convertToHumanReadable(1536000L); // "1.5 MB"
+ * 
+ * // Convert human-readable format to bytes
+ * long bytes = SizeUtils.convertToBytes("2.5 GB"); // 2684354560
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SizeUtils
 {

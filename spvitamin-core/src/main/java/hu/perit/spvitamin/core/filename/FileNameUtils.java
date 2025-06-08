@@ -25,6 +25,36 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * A utility class for file name and path operations.
+ * 
+ * <p>This class provides methods for working with file names and paths, including
+ * sanitization, extraction of components, and path construction. It builds upon
+ * Apache Commons IO's FilenameUtils with additional functionality.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Sanitize file names by removing invalid characters</li>
+ *   <li>Extract file names, folders, base names, and extensions from paths</li>
+ *   <li>Construct paths from multiple parts with proper separator handling</li>
+ *   <li>Normalize file extensions to lowercase</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Sanitize a file name
+ * String safe = FileNameUtils.sanitizeFileName("file:with?invalid*chars.txt"); // "filewithinvalidchars.txt"
+ * 
+ * // Extract components from a path
+ * String name = FileNameUtils.getFileName("/path/to/file.txt"); // "file.txt"
+ * String folder = FileNameUtils.getFolder("/path/to/file.txt"); // "path/to/"
+ * String base = FileNameUtils.getBaseName("/path/to/file.txt"); // "file"
+ * String ext = FileNameUtils.getFileExtension("/path/to/file.txt"); // "txt"
+ * 
+ * // Construct a path
+ * String path = FileNameUtils.getPath("path", "to", "file.txt"); // "path/to/file.txt"
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileNameUtils
 {

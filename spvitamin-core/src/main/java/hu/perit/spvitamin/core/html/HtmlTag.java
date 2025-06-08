@@ -4,6 +4,33 @@ import lombok.Setter;
 
 import java.util.Collections;
 
+/**
+ * A builder class for programmatically creating HTML documents with proper structure and formatting.
+ * 
+ * <p>This class provides a fluent API for constructing HTML documents by creating and nesting
+ * HTML tags with attributes and content. It maintains the parent-child relationships between
+ * tags and handles proper indentation and rendering of the final HTML output.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Fluent builder pattern for creating HTML documents</li>
+ *   <li>Support for nested tags with proper parent-child relationships</li>
+ *   <li>Convenience methods for common HTML tags (head, body, table, etc.)</li>
+ *   <li>Proper indentation and formatting of the rendered HTML</li>
+ *   <li>Support for self-closing tags</li>
+ *   <li>Simple content and complex nested content handling</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * HtmlTag html = HtmlTag.newInstance("en");
+ * HtmlTag head = html.head();
+ * head.title("My Page");
+ * HtmlTag body = html.body("class=\"main\"");
+ * body.h1(null, "Welcome");
+ * System.out.println(html.render());
+ * </pre>
+ */
 public class HtmlTag
 {
     @Setter

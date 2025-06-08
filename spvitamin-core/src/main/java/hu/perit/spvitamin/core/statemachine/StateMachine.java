@@ -24,6 +24,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * A generic implementation of a finite state machine (FSM).
+ * 
+ * <p>This class provides a type-safe implementation of a finite state machine where
+ * states and events are represented as enum values. It supports defining transitions
+ * between states based on events, and provides methods to trigger state changes by
+ * sending events to the machine.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Type-safe state and event definitions using enums</li>
+ *   <li>Fluent API for configuring state transitions</li>
+ *   <li>Thread-safe event processing</li>
+ *   <li>Validation of event applicability in current state</li>
+ *   <li>Detection of ambiguous transition definitions</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Define states and events as enums
+ * enum State { IDLE, RUNNING, PAUSED, STOPPED }
+ * enum Event { START, PAUSE, RESUME, STOP }
+ * 
+ * // Create and configure the state machine
+ * StateMachine&lt;State, Event&gt; machine = new StateMachine&lt;&gt;()
+ *     .currentState(State.IDLE)
+ *     .configureTransactions()
+ *         .add().source(State.IDLE).target(State.RUNNING).event(Event.START)
+ *         .add().source(State.RUNNING).target(State.PAUSED).event(Event.PAUSE)
+ *         .add().source(State.PAUSED).target(State.RUNNING).event(Event.RESUME)
+ *         .add().source(State.RUNNING).target(State.STOPPED).event(Event.STOP);
+ * 
+ * // Send events to trigger state transitions
+ * machine.sendEvent(Event.START); // State changes to RUNNING
+ * </pre>
+ * 
+ * @param <S> the enum type representing states
+ * @param <E> the enum type representing events
+ */
 @Slf4j
 public class StateMachine<S extends Enum<?>, E extends Enum<?>>
 {

@@ -21,6 +21,29 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * A utility class providing helper methods for working with Java Lists.
+ * 
+ * <p>This class offers convenience methods that handle common List operations
+ * with built-in null safety. It simplifies code by eliminating the need for
+ * repetitive null checks when working with lists.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Null-safe access to the last element of a list</li>
+ *   <li>Null-safe size calculation</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Get the last element safely (returns null for empty or null lists)
+ * List&lt;String&gt; names = Arrays.asList("Alice", "Bob", "Charlie");
+ * String lastName = ListUtils.last(names); // "Charlie"
+ * 
+ * // Get size safely (returns 0 for null lists)
+ * int count = ListUtils.size(null); // 0
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListUtils
 {

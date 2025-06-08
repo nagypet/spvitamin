@@ -31,7 +31,25 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Simple Reflection Utility
+ * A comprehensive utility class for Java reflection operations.
+ * 
+ * <p>This class provides a collection of static methods to simplify common reflection
+ * tasks such as discovering properties, working with getters and setters, accessing
+ * fields, and handling annotations. It includes special handling for various Java types
+ * and supports both public and private member access.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Property discovery and access from classes</li>
+ *   <li>Getter and setter method identification and invocation</li>
+ *   <li>Field name extraction from method names</li>
+ *   <li>Static and non-static member differentiation</li>
+ *   <li>Recursive annotation lookup through class hierarchies</li>
+ *   <li>Terminal type detection for object traversal</li>
+ * </ul>
+ * 
+ * <p>The class is designed to handle edge cases and provide consistent behavior
+ * across different Java types and inheritance hierarchies.</p>
  *
  * @author Peter Nagy
  */

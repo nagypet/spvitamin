@@ -25,6 +25,34 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A utility class for working with Java Maps and Collections.
+ * 
+ * <p>This class provides methods for converting collections to maps and performing
+ * grouping operations with functional programming techniques. It simplifies common
+ * map operations using Java Stream API and handles null collections gracefully.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Convert collections to maps using key extraction functions</li>
+ *   <li>Group collection elements by a key into sets</li>
+ *   <li>Group and transform collection elements in a single operation</li>
+ *   <li>Null-safe operations (empty maps returned for null collections)</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Convert a collection to a map
+ * List&lt;Person&gt; people = List.of(new Person(1, "Alice"), new Person(2, "Bob"));
+ * Map&lt;Integer, Person&gt; peopleById = MapUtils.toMap(people, Person::getId);
+ * 
+ * // Group people by their city
+ * Map&lt;String, Set&lt;Person&gt;&gt; peopleByCity = MapUtils.groupBy(people, Person::getCity);
+ * 
+ * // Group and transform: get names of people by city
+ * Map&lt;String, Set&lt;String&gt;&gt; namesByCity = MapUtils.groupBy(people, Person::getCity, Person::getName);
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapUtils
 {

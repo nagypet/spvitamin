@@ -10,6 +10,36 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * A utility class for working with Java's Duration objects.
+ * 
+ * <p>This class provides methods for formatting, analyzing, and manipulating Duration
+ * objects. It includes functionality for human-readable formatting with localization
+ * support, detecting the original time unit of a duration, and rounding durations to
+ * specific time units.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Convert durations to human-readable strings</li>
+ *   <li>Support for English and Hungarian localization</li>
+ *   <li>Detect the most likely original time unit of a duration</li>
+ *   <li>Round durations to days, hours, minutes, seconds, or milliseconds</li>
+ *   <li>Proper handling of singular/plural forms in formatted output</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Format a duration as a human-readable string
+ * Duration duration = Duration.ofHours(25).plusMinutes(30);
+ * String readable = DurationUtils.getHumanReadableDuration(duration); // "1 day, 1 hour, 30 minutes"
+ * 
+ * // Detect the original time unit
+ * ChronoUnit unit = DurationUtils.detectOriginalUnit(Duration.ofMinutes(60)); // HOURS
+ * 
+ * // Round a duration to a specific unit
+ * Duration rounded = DurationUtils.roundDuration(duration, ChronoUnit.HOURS); // 25 hours
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DurationUtils
 {

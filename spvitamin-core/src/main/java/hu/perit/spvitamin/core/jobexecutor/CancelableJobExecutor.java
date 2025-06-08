@@ -29,6 +29,28 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A specialized ThreadPoolExecutor that provides enhanced job tracking and cancellation capabilities.
+ * 
+ * <p>This executor maintains a registry of submitted jobs with their execution status,
+ * allowing for individual job cancellation, status monitoring, and graceful shutdown.
+ * Each job is identified by a unique ID of type T, which enables tracking and management
+ * throughout its lifecycle.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Job tracking by ID with status monitoring (queued, running, stopping)</li>
+ *   <li>Individual job cancellation</li>
+ *   <li>Batch cancellation of all jobs</li>
+ *   <li>Graceful shutdown with configurable timeout</li>
+ *   <li>Detailed logging of job lifecycle events</li>
+ *   <li>Prevention of duplicate job submissions</li>
+ * </ul>
+ * 
+ * <p>This executor is particularly useful for long-running tasks that may need
+ * to be cancelled, or in scenarios where the application needs to track the
+ * status of specific jobs and ensure proper cleanup of resources.</p>
+ * 
+ * @param <T> the type of job identifier
  * @author Peter Nagy
  */
 

@@ -30,6 +30,34 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
+ * A utility class for working with Java's date and time classes.
+ * 
+ * <p>This class provides methods for formatting, converting, and manipulating
+ * various date-time objects including LocalDateTime, OffsetDateTime, and Date.
+ * It offers consistent formatting across different date-time types and simplifies
+ * conversion between them.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Format date-time objects as strings in a consistent format</li>
+ *   <li>Convert between different date-time types (Date, LocalDateTime, etc.)</li>
+ *   <li>Create LocalDateTime from epoch milliseconds</li>
+ *   <li>Standardized DateTimeFormatter for database-compatible formatting</li>
+ *   <li>Null-safe operations</li>
+ * </ul>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * // Format a LocalDateTime as a string
+ * String formatted = LocalDateTimeUtils.format(LocalDateTime.now()); // "2023-05-15 14:30:45"
+ * 
+ * // Convert from Date to LocalDateTime
+ * LocalDateTime ldt = LocalDateTimeUtils.fromDate(new Date());
+ * 
+ * // Create from milliseconds
+ * LocalDateTime fromMillis = LocalDateTimeUtils.getLocalDateTimeFromMillis(System.currentTimeMillis());
+ * </pre>
+ * 
  * @author nagy_peter
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -71,8 +99,10 @@ public final class LocalDateTimeUtils
 
 
     /**
-     * @return {@link DateTimeFormatter} yyyy-mm-dd hh:mm:ss formátummal,
-     * ahogy az adatbázis szereti
+     * Returns a DateTimeFormatter with yyyy-MM-dd HH:mm:ss format,
+     * which is compatible with database timestamp formats.
+     *
+     * @return {@link DateTimeFormatter} with database-friendly format
      */
     public static DateTimeFormatter getDateTimeFormatter()
     {

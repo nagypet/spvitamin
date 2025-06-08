@@ -27,6 +27,21 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ * A utility class for enhanced stack trace handling and exception formatting.
+ * 
+ * <p>This class provides methods to format and display stack traces in a more readable
+ * and useful way than the standard Java stack trace output. It can filter stack traces
+ * to show only relevant parts, track which stack trace elements have already been printed,
+ * and format exceptions with their causes in a compact form.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Configurable "own package" detection to highlight application-specific code</li>
+ *   <li>Compact exception formatting with cause chains</li>
+ *   <li>Partial stack trace extraction to avoid redundancy</li>
+ *   <li>Current thread stack trace formatting</li>
+ * </ul>
+ * 
  * @author Peter Nagy
  */
 

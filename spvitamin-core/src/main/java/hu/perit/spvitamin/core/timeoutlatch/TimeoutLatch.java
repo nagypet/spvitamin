@@ -16,6 +16,26 @@
 
 package hu.perit.spvitamin.core.timeoutlatch;
 
+/**
+ * A latch implementation with automatic timeout-based reopening.
+ * 
+ * <p>This class implements a latch that can be manually closed but will automatically
+ * reopen after a specified timeout period (hysteresis). This behavior is useful for
+ * implementing temporary blocking mechanisms like circuit breakers, rate limiters,
+ * or cooldown periods.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Configurable hysteresis timeout period</li>
+ *   <li>Thread-safe operation with synchronized methods</li>
+ *   <li>Automatic reopening after the timeout period</li>
+ *   <li>Simple open/closed state checking</li>
+ * </ul>
+ * 
+ * <p>The latch starts in an open state and can be closed with {@link #setClosed()}.
+ * Once closed, it will automatically reopen after the specified hysteresis period
+ * has elapsed.</p>
+ */
 public class TimeoutLatch
 {
     private final Long hysteresisMillis;
