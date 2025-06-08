@@ -71,6 +71,12 @@ public abstract class Thing
             return objectToValue(name, object);
         }
 
+        // Special handling for byte arrays - treat them as terminal types
+        if (object instanceof byte[])
+        {
+            return objectToValue(name, object);
+        }
+
         if (object instanceof Collection<?> list)
         {
             return convertCollection(name, list, includePrivate);
@@ -78,6 +84,10 @@ public abstract class Thing
         else if (object instanceof Map<?, ?> map)
         {
             return convertMap(name, map, includePrivate);
+        }
+        else if (object.getClass().isArray())
+        {
+            return convertArray(name, object, includePrivate);
         }
 
         List<Property> properties = ReflectionUtils.allPropertiesOf(object.getClass(), includePrivate);
@@ -127,5 +137,18 @@ public abstract class Thing
             valueMap.getProperties().put(propertyName, valueToThing(propertyName, entry.getValue(), includePrivate));
         }
         return valueMap;
+    }
+
+
+    private static ValueList convertArray(String name, Object array, Boolean includePrivate)
+    {
+        ValueList valueList = new ValueList(name);
+        int length = java.lang.reflect.Array.getLength(array);
+        for (int i = 0; i < length; i++)
+        {
+            Object item = java.lang.reflect.Array.get(array, i);
+            valueList.getElements().add(valueToThing(name, item, includePrivate));
+        }
+        return valueList;
     }
 }

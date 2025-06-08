@@ -348,6 +348,12 @@ public class ReflectionUtils
             return true;
         }
 
+        // Arrays are not terminal types
+        if (clazz.isArray())
+        {
+            return false;
+        }
+
         // Special Java types
         if (clazz.isAssignableFrom(java.util.Date.class)
                 || clazz.isAssignableFrom(XMLGregorianCalendar.class)

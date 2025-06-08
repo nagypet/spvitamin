@@ -47,8 +47,13 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         this.context = context;
     }
 
-    public Future<Void> submitJob(T id, Callable<Void> job)
+    public synchronized Future<Void> submitJob(T id, Callable<Void> job)
     {
+        if (id == null)
+        {
+            throw new IllegalArgumentException("Job id cannot be null");
+        }
+
         if (this.futureMap.contains(id))
         {
             throw new JobAlreadyProcessingException(String.format("[%s] Job '%s' is already being processed, request is ignored.", this.context, id.toString()));
@@ -90,26 +95,35 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         log.debug("[{}] afterExecute({}, {})", this.context, r, t);
         super.afterExecute(r, t);
 
-        if (t == null && r instanceof Future<?> future)
+        if (r instanceof Future<?> future)
         {
             try
             {
-                future.get();
-            }
-            catch (CancellationException ce)
-            {
-                t = ce;
-            }
-            catch (ExecutionException ee)
-            {
-                t = ee.getCause();
-            }
-            catch (InterruptedException ie)
-            {
-                Thread.currentThread().interrupt(); // ignore/reset
-            }
-            finally
-            {
+                if (t == null)
+                {
+                    try
+                    {
+                        future.get();
+                    }
+                    catch (CancellationException ce)
+                    {
+                        t = ce;
+                    }
+                    catch (ExecutionException ee)
+                    {
+                        t = ee.getCause();
+                    }
+                    catch (InterruptedException ie)
+                    {
+                        Thread.currentThread().interrupt(); // ignore/reset
+                    }
+                    catch (RuntimeException re)
+                    {
+                        t = re;
+                        log.error("[{}] RuntimeException caught from future.get(): {}", this.context, re.toString());
+                    }
+                }
+
                 String action = (t instanceof CancellationException) ? "has been cancelled" : "has finished";
                 T id = removeFrom(this.futureMap, future);
                 if (id != null)
@@ -117,17 +131,40 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
                     log.debug("[{}] afterExecute(): {}", this.context, statusTextWithAction(id, action));
                 }
             }
+            catch (Exception ex)
+            {
+                // Catch any unexpected exceptions to ensure we don't leave futures in the map
+                log.error("[{}] Unexpected exception in afterExecute: {}", this.context, ex.toString());
+                try
+                {
+                    // Last attempt to remove the future from the map
+                    T id = removeFrom(this.futureMap, future);
+                    if (id != null)
+                    {
+                        log.debug("[{}] Future removed after exception: {}", this.context, id);
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.error("[{}] Failed to remove future from map: {}", this.context, e.toString());
+                }
+            }
         }
+        else
+        {
+            log.warn("[{}] afterExecute received non-Future runnable: {}", this.context, r);
+        }
+
         if (t != null && !(t instanceof CancellationException))
         {
-            log.error(t.toString());
+            log.error("[{}] Task execution failed: {}", this.context, t.toString());
         }
     }
 
 
     private String statusTextWithAction(T id, String action)
     {
-        return String.format("Job %s %s! %s", id != null ? id.toString() : "null", action, statusText());
+        return String.format("Job %s %s! %s", id != null ? id : "null", action, statusText());
     }
 
     private String statusText()
@@ -157,11 +194,24 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 
     public synchronized boolean cancelJob(T id)
     {
-        log.debug("[{}] cancelJob({})", this.context, id.toString());
+        if (id == null)
+        {
+            log.warn("[{}] cancelJob called with null id", this.context);
+            return false;
+        }
+
+        log.debug("[{}] cancelJob({})", this.context, id);
         if (this.futureMap.contains(id))
         {
             FutureMap.Status status = this.futureMap.getStatus(id);
             Future<?> future = this.futureMap.get(id);
+
+            if (future == null)
+            {
+                log.error("[{}] Future is null for job {}", this.context, id);
+                this.futureMap.remove(id);
+                return false;
+            }
 
             if (!future.isDone() && status != FutureMap.Status.STOPPING)
             {
@@ -205,8 +255,23 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
     }
 
 
-    // intentionally not synchronized
+    /**
+     * Cancels all running jobs and waits for them to complete.
+     * This method has a default timeout of 30 seconds, which can be overridden.
+     */
     public void cancelAll()
+    {
+        cancelAll(30, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Cancels all running jobs and waits for them to complete with a specified timeout.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return true if all jobs were cancelled successfully, false if the timeout was reached
+     */
+    public boolean cancelAll(long timeout, TimeUnit unit)
     {
         synchronized (this.futureMap)
         {
@@ -218,13 +283,18 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
             }
         }
 
-        int countRetries = 0;
+        long timeoutMillis = unit.toMillis(timeout);
+        long startTime = System.currentTimeMillis();
+        long elapsedTime;
+
         while (!Thread.currentThread().isInterrupted() && (countRunning() > 0))
         {
-            if (++countRetries > 300)
+            elapsedTime = System.currentTimeMillis() - startTime;
+            if (elapsedTime > timeoutMillis)
             {
-                log.error("[{}] Some jobs could not be cancelled!", this.context);
-                return;
+                log.error("[{}] Timeout reached. Some jobs could not be cancelled within {} {}!", 
+                    this.context, timeout, unit);
+                return false;
             }
 
             if (countRunning() > 0)
@@ -234,13 +304,66 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
 
             try
             {
+                // Sleep for a short time to avoid busy waiting, but not too long to be responsive
                 TimeUnit.MILLISECONDS.sleep(100);
             }
             catch (InterruptedException e)
             {
                 Thread.currentThread().interrupt();
+                log.warn("[{}] Interrupted while waiting for jobs to cancel", this.context);
+                return false;
             }
         }
+
         log.info("[{}] All jobs cancelled.", this.context);
+        return true;
+    }
+
+    /**
+     * Shuts down this executor in an orderly fashion.
+     * First attempts to cancel all running jobs, then shuts down the executor.
+     * If jobs don't complete within the specified timeout, the executor is forcibly shut down.
+     * 
+     * @param timeout the maximum time to wait for jobs to complete
+     * @param unit the time unit of the timeout argument
+     * @return true if all jobs completed and the executor shut down normally, false otherwise
+     */
+    public boolean shutdown(long timeout, TimeUnit unit)
+    {
+        log.info("[{}] Shutting down...", this.context);
+
+        boolean allCancelled = cancelAll(timeout, unit);
+
+        // Initiate orderly shutdown
+        super.shutdown();
+
+        boolean terminated = false;
+        try
+        {
+            // Wait for tasks to terminate
+            terminated = super.awaitTermination(timeout, unit);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            log.warn("[{}] Interrupted while waiting for termination", this.context);
+        }
+
+        if (!terminated)
+        {
+            log.warn("[{}] Not all tasks completed, forcing shutdown", this.context);
+            super.shutdownNow();
+        }
+
+        log.info("[{}] Shutdown complete", this.context);
+        return allCancelled && terminated;
+    }
+
+    /**
+     * Shuts down this executor in an orderly fashion with a default timeout of 30 seconds.
+     */
+    public void shutdown()
+    {
+        shutdown(30, TimeUnit.SECONDS);
     }
 }

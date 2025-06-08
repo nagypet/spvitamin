@@ -20,8 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
@@ -120,5 +123,133 @@ class DomainUserTest {
         DomainUser user1 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.otp");
         DomainUser user2 = DomainUser.newInstance("ps_sap_mw_T1@kozpont.hu");
         assertThat(user1).isNotEqualTo(user2);
+    }
+
+    @Test
+    void testNewInstanceWithPlainUsername() {
+        // Arrange & Act
+        DomainUser user = DomainUser.newInstance("username");
+
+        // Assert
+        assertThat(user.getUsername()).isEqualTo("username");
+        assertThat(user.getDomain()).isNull();
+    }
+
+    @Test
+    void testNewInstanceWithNetbiosFormat() {
+        // Arrange & Act
+        DomainUser user = DomainUser.newInstance("domain\\username");
+
+        // Assert
+        assertThat(user.getUsername()).isEqualTo("username");
+        assertThat(user.getDomain()).isEqualTo("domain");
+    }
+
+    @Test
+    void testNewInstanceWithUpnFormat() {
+        // Arrange & Act
+        DomainUser user = DomainUser.newInstance("username@domain.com");
+
+        // Assert
+        assertThat(user.getUsername()).isEqualTo("username");
+        assertThat(user.getDomain()).isEqualTo("domain.com");
+    }
+
+    @Test
+    void testNewInstanceWithInvalidFormat() {
+        // Arrange & Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            DomainUser.newInstance("domain\\user\\name");
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            DomainUser.newInstance("user@name@domain");
+        });
+    }
+
+    @Test
+    void testNewInstanceWithNullUsername() {
+        // Arrange & Act & Assert
+        assertThrows(NullPointerException.class, () -> {
+            DomainUser.newInstance(null);
+        });
+    }
+
+    @Test
+    void testGetCanonicalName() {
+        // Arrange
+        DomainUser userWithDomain = DomainUser.newInstance("username@domain.com");
+        DomainUser userWithoutDomain = DomainUser.newInstance("username");
+
+        // Act & Assert
+        assertThat(userWithDomain.getCanonicalName()).isEqualTo("username@domain.com");
+        assertThat(userWithoutDomain.getCanonicalName()).isEqualTo("username");
+    }
+
+    @Test
+    void testAnyConstant() {
+        // Arrange
+        DomainUser anyUser = DomainUser.ANY;
+
+        // Act & Assert
+        assertThat(anyUser.getUsername()).isEqualTo("*");
+        assertThat(anyUser.getDomain()).isNull();
+    }
+
+    @Test
+    void testHashCode() {
+        // Arrange
+        DomainUser user1 = DomainUser.newInstance("username@domain.com");
+        DomainUser user2 = DomainUser.newInstance("username@domain.com");
+        DomainUser user3 = DomainUser.newInstance("USERNAME@DOMAIN.COM"); // Different case
+        DomainUser user4 = DomainUser.newInstance("domain\\username");
+        DomainUser user5 = DomainUser.newInstance("different@domain.com");
+
+        // Act & Assert
+        assertThat(user1.hashCode()).isEqualTo(user2.hashCode());
+        assertThat(user1.hashCode()).isEqualTo(user3.hashCode()); // Case insensitive
+        assertThat(user1.hashCode()).isNotEqualTo(user4.hashCode()); // Different domain format
+        assertThat(user1.hashCode()).isNotEqualTo(user5.hashCode()); // Different username
+    }
+
+    @Test
+    void testToString() {
+        // Arrange
+        DomainUser user = DomainUser.newInstance("username@domain.com");
+
+        // Act & Assert
+        assertThat(user.toString()).contains("username");
+        assertThat(user.toString()).contains("domain.com");
+    }
+
+    @Test
+    void testHashSetWithDomainUsers() {
+        // Arrange
+        DomainUser user1 = DomainUser.newInstance("username@domain.com");
+        DomainUser user2 = DomainUser.newInstance("USERNAME@domain.com"); // Different case
+        DomainUser user3 = DomainUser.newInstance("domain\\username");
+        DomainUser user4 = DomainUser.newInstance("different@domain.com");
+
+        // Act
+        Set<DomainUser> userSet = new HashSet<>();
+        userSet.add(user1);
+        userSet.add(user2);
+        userSet.add(user3);
+        userSet.add(user4);
+
+        // Assert
+        // user1 and user2 should be considered equal due to case insensitivity
+        assertThat(userSet).hasSize(3);
+        assertThat(userSet).contains(user1, user3, user4);
+    }
+
+    @Test
+    void testTrimming() {
+        // Arrange & Act
+        DomainUser user = DomainUser.newInstance(" username @ domain.com ");
+
+        // Assert
+        assertThat(user.getUsername()).isEqualTo("username");
+        assertThat(user.getDomain()).isEqualTo("domain.com");
     }
 }

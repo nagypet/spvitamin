@@ -16,6 +16,10 @@
 
 package hu.perit.spvitamin.core;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +27,24 @@ import java.util.List;
  * @author Peter Nagy
  */
 
-public class NpCollections {
-
-    private NpCollections() {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class NpCollections
+{
+    public static boolean isArrayListEmpty(List<String> stringList)
+    {
+        if (stringList == null || stringList.isEmpty())
+        {
+            return true;
+        }
+        return stringList.stream().allMatch(i -> StringUtils.isBlank(i));
     }
 
-    public static boolean isArrayListEmpty(List<String> stringList) {
-        return stringList == null || stringList.isEmpty() || stringList.get(0) == null || stringList.get(0).isEmpty();
-    }
 
-
-    public static List<String> newArrayListFromString(String text) {
+    public static List<String> newArrayListFromString(String text)
+    {
         List<String> retval = new ArrayList<>();
-        if (text != null && !text.isEmpty()) {
+        if (text != null && !text.isEmpty())
+        {
             retval.add(text);
         }
         return retval;

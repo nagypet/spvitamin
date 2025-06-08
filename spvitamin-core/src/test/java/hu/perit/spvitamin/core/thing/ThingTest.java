@@ -48,12 +48,14 @@ class ThingTest
         KORTE
     }
 
+
     @Data
     public static class Keyword
     {
         private final String name;
         private final String value;
     }
+
 
     @Data
     public static class ContentStream
@@ -62,6 +64,7 @@ class ThingTest
         private String fileName = "";
         private InputStream stream = new ByteArrayInputStream("alma".getBytes());
     }
+
 
     @Data
     public static class CreateDocumentRequest
@@ -301,6 +304,209 @@ class ThingTest
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         log.debug(objectMapper.writeValueAsString(thing));
     }
+
+
+    @Test
+    void testNullValue()
+    {
+        // Test creating a Thing from a null value
+        Thing thing = Thing.from(null);
+        assertThat(thing).isInstanceOf(Value.class);
+        assertThat(((Value) thing).getValue()).isNull();
+
+        // Test isEmpty() method
+        assertThat(thing.isEmpty()).isTrue();
+
+        // Test JSON representation
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("null");
+    }
+
+
+    @Test
+    void testPrimitiveTypes()
+    {
+        // Test with integer
+        Thing intThing = Thing.from(42);
+        assertThat(intThing).isInstanceOf(Value.class);
+        assertThat(((Value) intThing).getValue()).isEqualTo(42);
+        assertThat(dump(intThing)).isEqualTo("\"42\"");
+
+        // Test with boolean
+        Thing boolThing = Thing.from(true);
+        assertThat(boolThing).isInstanceOf(Value.class);
+        assertThat(((Value) boolThing).getValue()).isEqualTo(true);
+        assertThat(dump(boolThing)).isEqualTo("\"true\"");
+
+        // Test with double
+        Thing doubleThing = Thing.from(3.14);
+        assertThat(doubleThing).isInstanceOf(Value.class);
+        assertThat(((Value) doubleThing).getValue()).isEqualTo(3.14);
+        assertThat(dump(doubleThing)).isEqualTo("\"3.14\"");
+    }
+
+
+    @Test
+    void testEmptyCollections()
+    {
+        // Test with empty list
+        List<String> emptyList = List.of();
+        Thing emptyListThing = Thing.from(emptyList);
+        assertThat(emptyListThing).isInstanceOf(ValueList.class);
+        assertThat(((ValueList) emptyListThing).getElements()).isEmpty();
+        assertThat(emptyListThing.isEmpty()).isTrue();
+        assertThat(dump(emptyListThing)).isEqualTo("[]");
+
+        // Test with empty map
+        Map<String, String> emptyMap = Map.of();
+        Thing emptyMapThing = Thing.from(emptyMap);
+        assertThat(emptyMapThing).isInstanceOf(ValueMap.class);
+        assertThat(((ValueMap) emptyMapThing).getProperties()).isEmpty();
+        assertThat(emptyMapThing.isEmpty()).isTrue();
+        assertThat(dump(emptyMapThing)).isEqualTo("{}");
+    }
+
+
+    @Test
+    void testArray()
+    {
+        // Test with string array
+        String[] stringArray = {"apple", "banana", "cherry"};
+        Thing arrayThing = Thing.from(stringArray);
+        assertThat(arrayThing).isInstanceOf(ValueList.class);
+        assertThat(((ValueList) arrayThing).getElements()).hasSize(3);
+        assertThat(dump(arrayThing)).isEqualTo("""
+                [
+                  "apple",
+                  "banana",
+                  "cherry"
+                ]""");
+
+        // Test with int array
+        int[] intArray = {1, 2, 3};
+        Thing intArrayThing = Thing.from(intArray);
+        assertThat(intArrayThing).isInstanceOf(ValueList.class);
+        assertThat(((ValueList) intArrayThing).getElements()).hasSize(3);
+        assertThat(dump(intArrayThing)).isEqualTo("""
+                [
+                  "1",
+                  "2",
+                  "3"
+                ]""");
+    }
+
+
+    @Test
+    void testNestedStructures()
+    {
+        // Create a complex nested structure
+        Map<String, Object> nestedMap = new LinkedHashMap<>();
+        nestedMap.put("name", "John");
+        nestedMap.put("age", 30);
+        nestedMap.put("hobbies", List.of("reading", "swimming", "coding"));
+
+        Map<String, Object> address = new LinkedHashMap<>();
+        address.put("street", "123 Main St");
+        address.put("city", "Anytown");
+        address.put("zipCode", "12345");
+
+        nestedMap.put("address", address);
+
+        // Convert to Thing
+        Thing thing = Thing.from(nestedMap);
+        assertThat(thing).isInstanceOf(ValueMap.class);
+        assertThat(((ValueMap) thing).getProperties()).hasSize(4);
+
+        // Check JSON representation
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("""
+                {
+                  "name":"John",
+                  "age":"30",
+                  "hobbies":[
+                    "reading",
+                    "swimming",
+                    "coding"
+                  ],
+                  "address":{
+                    "street":"123 Main St",
+                    "city":"Anytown",
+                    "zipCode":"12345"
+                  }
+                }""");
+    }
+
+
+    @Test
+    void testPrinterVisitorOptions()
+    {
+        // Create a test object
+        CreateDocumentRequest request = getCreateDocumentRequest();
+        Thing thing = Thing.from(request);
+
+        // Test with hidePasswords=false
+        PrinterVisitor printerVisitor = new PrinterVisitor(PrinterVisitor.Options.builder()
+                .prettyPrint(true)
+                .hidePasswords(false)
+                .build());
+        thing.accept(printerVisitor);
+        String json = printerVisitor.getJson();
+
+        // Passwords should be visible
+        assertThat(json).contains("\"password\":\"my secret password\"");
+        assertThat(json).contains("\"alma\"");
+        assertThat(json).contains("\"körte\"");
+    }
+
+
+    @Test
+    void testSpecialCharacters()
+    {
+        // Test with string containing special characters
+        String specialChars = "Special chars: \n \r\n \t \" \\ ";
+        Thing thing = Thing.from(specialChars);
+
+        // Check that special characters are properly escaped in JSON
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("\"Special chars: \\n \\r\\n \\t \\\" \\\\ \"");
+    }
+
+
+    @Test
+    void testLongString()
+    {
+        // Create a very long string
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            sb.append("Long string test. ");
+        }
+        String longString = sb.toString();
+
+        // Convert to Thing
+        Thing thing = Thing.from(longString);
+
+        // Check that the string is abbreviated in the JSON
+        String dump = dump(thing);
+        assertThat(dump).startsWith("\"String of size");
+        assertThat(dump).contains("beginning with:");
+    }
+
+
+    @Test
+    void testEnum()
+    {
+        // Test with enum value
+        Thing thing = Thing.from(Types.KORTE);
+
+        // Check type and value
+        assertThat(thing).isInstanceOf(Value.class);
+        assertThat(((Value) thing).getValue()).isEqualTo(Types.KORTE);
+
+        // Check JSON representation
+        String dump = dump(thing);
+        assertThat(dump).isEqualTo("\"KORTE\"");
+    }
+
 
     private static String dump(Thing thing)
     {
