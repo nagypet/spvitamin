@@ -85,6 +85,7 @@ dependencyManagement {
 ## Release history
 
 ### 3.4.3-1-RELEASE not yet released
+
 - Java21, SpringBoot 3.4.3
 - AuthorizationToken extended with roles and preferred_username. Admin-Gui shows the preferred_username if available.
 - LdapAuthenticationProvider improved to change the NetBIOS form domain\username into `user principal name`.
@@ -106,7 +107,7 @@ dependencyManagement {
 - Property improved
 - ReflectionUtils: getAnnotationRecursive
 - Thing ignores properties annotated with `@JsonIgnore`
-- PessimisticJpaRepository: findByIdWithWriteLock 
+- PessimisticJpaRepository: findByIdWithWriteLock
 - ResponseEntityUtils: MediaType can be defined
 - Resources: getResourceAsInputStream() can handle absolute paths too
 - Support for encrypted oracle connection
@@ -118,32 +119,35 @@ dependencyManagement {
 - Small NPE fix in RoleMapperServiceImpl
 - HttpLoggingFilter improved to shorten long Base64 strings.
 
-
 ### 3.3.3-2-RELEASE not yet released
 
 - Thing refactored
 - OffsetDateTimeUtils to parse an OffsetDateTime from string
-- @AutoregisterJsonType and @EnableJsonSubtypeAutoconfiguration annotations. The ObjectMapper is configured to automatically register subtypes of abstract classes
+- @AutoregisterJsonType and @EnableJsonSubtypeAutoconfiguration annotations. The ObjectMapper is configured to
+  automatically register subtypes of abstract classes
 - SizeUtils for converting and parsing file sizes to and from human-readable forms
-- ParallelRunner: a simple solution for running jobs parallely and propagating the ThreadContext and the SecurityContext 
+- ParallelRunner: a simple solution for running jobs parallely and propagating the ThreadContext and the SecurityContext
 - json-time module handles the form yyyy.MM.dd
 - ConnectionParams handles socket-timeout in the PostgreSQL syntax
 - FileNameUtils improved
 - MapUtils for creating a Map from a Collection
 - Profile loading at startup fixed
 - pwdtool added feature --keygen for AES encryption
-- ReflectionUtils.gettersOf() fixed: methods annotated with @JsonIgnore will not be returned. getClass() is not returned.
-- Thing fixed: using ReflectionUtils.allPropertiesOf() instead of ReflectionUtils.propertiesOf() to get base class properties too
+- ReflectionUtils.gettersOf() fixed: methods annotated with @JsonIgnore will not be returned. getClass() is not
+  returned.
+- Thing fixed: using ReflectionUtils.allPropertiesOf() instead of ReflectionUtils.propertiesOf() to get base class
+  properties too
 - LdapAuthenticationProviderConfigurer logging with INFO level
 - SimpleFeignClientBuilder: logging
 - ForwardingAuthRequestInterceptor: forwards incoming token
 - JwtPropertiesPublic for special validation for the public key only
 - spring-cloud-eureka removed
 - LdapAuthenticationProvider only accepts username with domain
-- AuthorizationService uses the canonical form of domain usernames, e.g. admin@perit 
+- AuthorizationService uses the canonical form of domain usernames, e.g. admin@perit
 - spvitamin-spring-security-oauth2
 - admin-gui-2
-- RequestInfoService returnes the real parameters of a HTTP request, even if the server is running behind a reverse proxy
+- RequestInfoService returnes the real parameters of a HTTP request, even if the server is running behind a reverse
+  proxy
 - role mapping fixed
 
 ### 3.3.3-1-RELEASE not yet released
@@ -289,6 +293,7 @@ dependencyManagement {
 @Configuration
 @EnableSwagger3WithSpringBoot2_7 <==
 
+
 public class SwaggerConfig
 {
   ...
@@ -423,7 +428,7 @@ public class SwaggerConfig
 - HttpLogger logs request and response details
   ```xml
   logback.xml
-  
+
   <logger name="hu.perit.spvitamin.spring.httplogging" level="DEBUG" additivity="false">
       <appender-ref ref="application-message"/>
   </logger>
@@ -482,10 +487,12 @@ public class RepodbDbConfig
 
     private final ConnectionParam connectionParam;
 
+
     public RepodbDbConfig(DatasourceCollectionProperties dbProperties)
     {
         this.connectionParam = new ConnectionParam(dbProperties.getDatasource().get(PERSISTENCE_UNIT));
     }
+
 
     @Primary
     @Bean(name = DATASOURCE)
@@ -496,6 +503,7 @@ public class RepodbDbConfig
     SpvitaminSpringContext from
     version 1.3.0
     and above
+
 
     public DataSource dataSource()
     {
@@ -563,31 +571,47 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 ### spvitamin-core
 
 * batchprocessing
+* cache
 * connectablecontext
 * crypto
 * domainuser
 * event
 * exception
+* filename
+* filesize
+* html
 * invoker
 * jobexecutor
+* reflection
+* softenum
+* statemachine
+* thing
+* timeformatter
+* timeoutlatch
 * took
+* typehelpers
 * InitParams
 * NpCollections
 * StackTracer
 
 ### spvitamin-spring-general
 
-* admin (serverparameter)
+* autoconfiguration
 * config (xxxProperties)
 * connectablecontext
 * environment
 * exception
 * exceptionhandler
+* http
+* info
 * json
 * keystore
 * manifest (ManifestReader.java, ResourceUrlDecoder.java)
 * metrics
+* multipart
+* resource
 * security
+* sysproperty
 * time
 
 ### spvitamin-spring-server
@@ -599,91 +623,95 @@ rolemap.ROLE_PUBLIC=BACKEND_READ_ACCESS
 
 ### spvitamin-spring-admin
 
-* admin (ShutdownManager.java)
-* rest (AdminApi.java, Bearer, /admin; AuthApi.java, Basic, /authenticate; KeystoreApi.java, Bearer, /keystore,
-  /truststore;)
-
-### spvitamin-spring-admin-api
-
-* rest (AuthClient.java; /authenticate)
+* admin (ShutdownManager.java, serverparameter)
+* rest (AdminApi.java, Bearer, /api/spvitamin/admin; KeystoreApi.java, Bearer, /api/spvitamin/keystore,
+  /api/spvitamin/truststore)
 
 ### spvitamin-spring-security
 
 * auth
-* resttemplate
+* authprovider
+* config
+* rest (AuthApi.java, Basic, /api/spvitamin/authenticate; AuthenticationRepositoryApi.java)
 
 ## ConfigProperties
 
 | Name                                        | Type    | Default         | Sample                                       | Description                                                                                                                                                                                     |
 |---------------------------------------------|---------|-----------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| system.time-zone                            | string  | Europe/Budapest |                                              |                                                                                                                                                                                                 |
-| crypto.secret                               | string  | secret          |                                              |                                                                                                                                                                                                 |
-| admin.default-site-url                      | string  | /admin-gui      |                                              | If the webservice serves a frontend other than the AdminGUI                                                                                                                                     |
-| admin.admin-gui-root-file-name              | string  |                 |                                              |                                                                                                                                                                                                 |
+| admin.admin-gui-root-file-name              | string  | /admin-gui      |                                              | The root file name for the AdminGui                                                                                                                                                             |
 | admin.admin-gui-url                         | string  | /admin-gui      |                                              | The path where the AdminGUI is served                                                                                                                                                           |
-| admin.admin-gui-root-file-name              | string  | index.html      |                                              |                                                                                                                                                                                                 |
 | admin.copyright                             | string  | Peter Nagy ...  |                                              | This text will be shown on the footer of the Admin GUI                                                                                                                                          |
+| admin.default-site-root-file-name           | string  |                 | index.html                                   | The root file name for the default site                                                                                                                                                         |
+| admin.default-site-static-contents-path     | string  |                 | /static/admin-gui                            | The path to static contents for the default site                                                                                                                                                |
+| admin.default-site-url                      | string  | /admin-gui      |                                              | If the webservice serves a frontend other than the AdminGUI                                                                                                                                     |
 | admin.keystore-admin-enabled                | boolean | TRUE            |                                              | If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of a Kubernetes or Openshift deployment, where certificates are not managed by the app. |
-| datasource.xyz.db-type                      | string  |                 | oracle, sqlserver, mysql, etc...             |                                                                                                                                                                                                 |
-| datasource.xyz.host                         | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.instance                     | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.port                         | string  | db dependent    | e.g. at oracle: 1521, etc.                   |                                                                                                                                                                                                 |
-| datasource.xyz.host2                        | string  |                 |                                              | optional alternative host                                                                                                                                                                       |
-| datasource.xyz.port2                        | string  |                 |                                              | optional alternative port                                                                                                                                                                       |
-| datasource.xyz.db-name                      | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.username                     | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.encrypted-password           | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.password                     | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.dialect                      | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.max-pool-size                | int     | 10              |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.connection-timeout           | long    | 90.000 ms       |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.leak-detection-threashold    | long    | 0               |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.socket-timeout               | long    | 100.000 ms      |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.ddl-auto                     | string  | none            | update, validate                             |                                                                                                                                                                                                 |
-| datasource.xyz.options                      | string  |                 |                                              |                                                                                                                                                                                                 |
-| datasource.xyz.jdbc-url                     | string  | -               |                                              | If specified, it will be user directly                                                                                                                                                          |
-| jwt.private-key-alias                       | string  | -               | templatekey                                  |                                                                                                                                                                                                 |
-| jwt.private-key-encryptedPassword           | string  | -               | jdP5CKDIu5v2VUafF33pPQ==                     |                                                                                                                                                                                                 |
-| jwt.public-key-alias                        | string  | -               | templatekey                                  |                                                                                                                                                                                                 |
-| jwt.expiration-in-minutes                   | string  | -               | 60                                           |                                                                                                                                                                                                 |
-| metrics.performance-itemcount               | int     | 50              |                                              |                                                                                                                                                                                                 |
-| metrics.timeout-millis                      | long    | 2.000           |                                              |                                                                                                                                                                                                 |
-| metrics.metrics-gathering-hysteresis-millis | long    | 30.000          |                                              |                                                                                                                                                                                                 |
-| security.admin-user-name                    | string  | -               | admin                                        |                                                                                                                                                                                                 |
-| security.admin-user-encryptedPassword       | string  | -               | 7MmoozfTexI=                                 |                                                                                                                                                                                                 |
-| security.allowed-origins                    | string  | -               |                                              |                                                                                                                                                                                                 |
-| security.allowed-headers                    | string  | -               |                                              |                                                                                                                                                                                                 |
-| security.allowed-methods                    | string  | -               |                                              |                                                                                                                                                                                                 |
-| security.swagger-access                     | string  | *               |                                              |                                                                                                                                                                                                 |
-| security.management-endpoints-access        | string  | *               |                                              |                                                                                                                                                                                                 |
-| security.admin-gui-access                   | string  | *               |                                              |                                                                                                                                                                                                 |
-| security.admin-endpoints-access             | string  | *               |                                              |                                                                                                                                                                                                 |
-| server.fqdn                                 | string  | localhost       |                                              |                                                                                                                                                                                                 |
-| server.port                                 | int     | 8080            |                                              |                                                                                                                                                                                                 |
-| server.external-url                         | string  | -               | http://${APP_NAME}.${K8S_DOMAIN}             |                                                                                                                                                                                                 |
-| server.ssl.enabled                          | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
-| server.ssl.key-store                        | string  | -               | classpath:jks/server-keystore.jks            |                                                                                                                                                                                                 |
-| server.ssl.key-store-password               | string  | -               | changeit                                     |                                                                                                                                                                                                 |
-| server.ssl.key-alias                        | string  | -               | templatekey                                  |                                                                                                                                                                                                 |
-| server.ssl.key-password                     | string  | -               | changeit                                     |                                                                                                                                                                                                 |
-| server.ssl.trust-store                      | string  | -               | classpath:jks/client-truststore.jks          |                                                                                                                                                                                                 |
-| server.ssl.trust-store-password             | string  | -               | changeit                                     |                                                                                                                                                                                                 |
-| server.ssl.ignore-certificate-validation    | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
-| server.error.includeException               | boolean | TRUE            |                                              |                                                                                                                                                                                                 |
-| server.error.includeStacktrace              | string  | ALWAYS          | ALWAYS, NEVER                                |                                                                                                                                                                                                 |
-| server.error.includeMessage                 | string  | ALWAYS          | ALWAYS, NEVER                                | The message part is only displayed if exception is not enabled                                                                                                                                  |
-| ldaps.ad\<i\>.enabled                       | boolean | TRUE            |                                              |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.url                           | string  |                 | ldap://192.168.62.150:10389                  |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.root-dn                       | string  |                 | OU=Users,DC=perit,DC=hu                      |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.filter                        | string  |                 | (&(objectClass=user)(userPrincipalName={0})) |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.userprincipal-with-domain     | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.domain                        | string  |                 | perit.hu                                     |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.connect-timeout-ms            | int     | 1000            |                                              |                                                                                                                                                                                                 |
-| ldaps.ad\<i\>.bind-user-pattern             | string  |                 | uid={0},ou=Users,dc=perit,dc=hu              |                                                                                                                                                                                                 |
 | async.core-pool-size                        | int     | 10              |                                              |                                                                                                                                                                                                 |
 | async.max-pool-size                         | int     | 100             |                                              |                                                                                                                                                                                                 |
 | async.queue-capacity                        | int     | 1000            |                                              |                                                                                                                                                                                                 |
 | async.thread-name-prefix                    | string  | async-          |                                              |                                                                                                                                                                                                 |
+| crypto.secret                               | string  | secret          | my-secure-key                                | Secret key used for encrypting and decrypting sensitive data like passwords                                                                                                                     |
+| datasource.xyz.connection-timeout           | long    | 90.000 ms       | 30000                                        | The maximum time in milliseconds to wait for a connection from the pool                                                                                                                         |
+| datasource.xyz.db-name                      | string  |                 | mydb                                         | The name of the database to connect to                                                                                                                                                          |
+| datasource.xyz.db-type                      | string  |                 | oracle, sqlserver, mysql, etc...             |                                                                                                                                                                                                 |
+| datasource.xyz.ddl-auto                     | string  | none            | update, validate                             | Hibernate schema generation strategy (none, validate, update, create, create-drop)                                                                                                              |
+| datasource.xyz.dialect                      | string  |                 | org.hibernate.dialect.Oracle12cDialect       | The Hibernate dialect for the database                                                                                                                                                          |
+| datasource.xyz.encrypted-password           | string  |                 | LiCBRVVpyts=                                 | The encrypted password for database authentication (use either this or password)                                                                                                                |
+| datasource.xyz.host                         | string  |                 | db-server.example.com                        | The hostname or IP address of the database server                                                                                                                                               |
+| datasource.xyz.host2                        | string  |                 |                                              | optional alternative host                                                                                                                                                                       |
+| datasource.xyz.instance                     | string  |                 | inst1                                        | The database instance name (used for SQL Server)                                                                                                                                                |
+| datasource.xyz.jdbc-url                     | string  | -               |                                              | If specified, it will be used directly                                                                                                                                                          |
+| datasource.xyz.leak-detection-threashold    | long    | 0               | 2000                                         | The amount of time in milliseconds that a connection can be out of the pool before a message is logged indicating a possible connection leak                                                    |
+| datasource.xyz.max-pool-size                | int     | 10              | 20                                           | The maximum number of connections in the connection pool                                                                                                                                        |
+| datasource.xyz.options                      | string  |                 | encrypt=true;trustServerCertificate=true     | Additional connection options for the database (used for SQL Server and H2)                                                                                                                     |
+| datasource.xyz.password                     | string  |                 | mypassword                                   | The plain text password for database authentication (use either this or encrypted-password)                                                                                                     |
+| datasource.xyz.port                         | string  | db dependent    | e.g. at oracle: 1521, etc.                   |                                                                                                                                                                                                 |
+| datasource.xyz.port2                        | string  |                 |                                              | optional alternative port                                                                                                                                                                       |
+| datasource.xyz.socket-timeout               | long    | 100.000 ms      | 60000                                        | The socket timeout in milliseconds for database connections                                                                                                                                     |
+| datasource.xyz.username                     | string  |                 | dbuser                                       | The username for database authentication                                                                                                                                                        |
+| jwt.expiration-in-minutes                   | string  | -               | 60                                           |                                                                                                                                                                                                 |
+| jwt.private-key-alias                       | string  | -               | templatekey                                  | The alias for the private key in the keystore used for JWT token signing                                                                                                                        |
+| jwt.private-key-encryptedPassword           | string  | -               | jdP5CKDIu5v2VUafF33pPQ==                     |                                                                                                                                                                                                 |
+| jwt.public-key-alias                        | string  | -               | templatekey                                  |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.bind-user-pattern             | string  |                 | uid={0},ou=Users,dc=perit,dc=hu              |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.connect-timeout-ms            | int     | 1000            |                                              |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.domain                        | string  |                 | perit.hu                                     |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.enabled                       | boolean | TRUE            |                                              |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.filter                        | string  |                 | (&(objectClass=user)(userPrincipalName={0})) |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.root-dn                       | string  |                 | OU=Users,DC=perit,DC=hu                      |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.url                           | string  |                 | ldap://192.168.62.150:10389                  |                                                                                                                                                                                                 |
+| ldaps.ad\<i\>.userprincipal-with-domain     | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
+| metrics.metrics-gathering-hysteresis-millis | long    | 30.000          |                                              |                                                                                                                                                                                                 |
+| metrics.performance-itemcount               | int     | 50              |                                              |                                                                                                                                                                                                 |
+| metrics.timeout-millis                      | long    | 2.000           |                                              |                                                                                                                                                                                                 |
+| microservice.xyz.api-key                    | string  | -               |                                              | API key for authentication with the microservice                                                                                                                                                |
+| security.admin-endpoints-access             | string  | *               |                                              |                                                                                                                                                                                                 |
+| security.admin-gui-access                   | string  | *               |                                              |                                                                                                                                                                                                 |
+| security.admin-user-encryptedPassword       | string  | -               | 7MmoozfTexI=                                 |                                                                                                                                                                                                 |
+| security.admin-user-name                    | string  | -               | admin                                        |                                                                                                                                                                                                 |
+| security.allowed-headers                    | string  | -               |                                              |                                                                                                                                                                                                 |
+| security.allowed-methods                    | string  | -               |                                              |                                                                                                                                                                                                 |
+| security.allowed-origins                    | string  | -               |                                              |                                                                                                                                                                                                 |
+| security.management-endpoints-access        | string  | *               |                                              |                                                                                                                                                                                                 |
+| security.swagger-access                     | string  | *               |                                              |                                                                                                                                                                                                 |
+| server.error.includeException               | boolean | TRUE            |                                              |                                                                                                                                                                                                 |
+| server.error.includeMessage                 | string  | ALWAYS          | ALWAYS, NEVER                                | The message part is only displayed if exception is not enabled                                                                                                                                  |
+| server.error.includeStacktrace              | string  | ALWAYS          | ALWAYS, NEVER                                |                                                                                                                                                                                                 |
+| server.external-url                         | string  | -               | http://${APP_NAME}.${K8S_DOMAIN}             |                                                                                                                                                                                                 |
+| server.fqdn                                 | string  | localhost       |                                              |                                                                                                                                                                                                 |
+| server.port                                 | int     | 8080            |                                              |                                                                                                                                                                                                 |
+| server.ssl.enabled                          | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
+| server.ssl.ignore-certificate-validation    | boolean | FALSE           |                                              |                                                                                                                                                                                                 |
+| server.ssl.key-alias                        | string  | -               | templatekey                                  |                                                                                                                                                                                                 |
+| server.ssl.key-password                     | string  | -               | changeit                                     |                                                                                                                                                                                                 |
+| server.ssl.key-store                        | string  | -               | classpath:jks/server-keystore.jks            |                                                                                                                                                                                                 |
+| server.ssl.key-store-password               | string  | -               | changeit                                     |                                                                                                                                                                                                 |
+| server.ssl.trust-store                      | string  | -               | classpath:jks/client-truststore.jks          |                                                                                                                                                                                                 |
+| server.ssl.trust-store-password             | string  | -               | changeit                                     |                                                                                                                                                                                                 |
+| spvitamin.feign.logger-level                | string  | BASIC           | NONE, BASIC, HEADERS, FULL                   | Controls the level of logging for Feign clients                                                                                                                                                 |
+| spvitamin.feign.retry.max-attempts          | int     | 3               | 5                                            | Maximum number of retry attempts for Feign client requests                                                                                                                                      |
+| spvitamin.feign.retry.max-period            | int     | 2000            | 5000                                         | Maximum backoff period in milliseconds for Feign client retries                                                                                                                                 |
+| spvitamin.feign.retry.period                | int     | 500             | 1000                                         | Initial backoff period in milliseconds for Feign client retries                                                                                                                                 |
+| system.time-zone                            | string  | Europe/Budapest | UTC, America/New_York                        | Sets the default time zone for the application                                                                                                                                                  |
 
 ## SpringBoot defaults:
 
