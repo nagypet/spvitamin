@@ -116,6 +116,7 @@ dependencyManagement {
 - ApiKeyRequestInterceptor
 - SimpleFeignClientBuilder: errorDecoder can be customized
 - Small NPE fix in RoleMapperServiceImpl
+- HttpLoggingFilter improved to shorten long Base64 strings.
 
 
 ### 3.3.3-2-RELEASE not yet released

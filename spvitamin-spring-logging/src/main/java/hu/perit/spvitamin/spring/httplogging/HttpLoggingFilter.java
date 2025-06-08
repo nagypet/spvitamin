@@ -17,6 +17,10 @@
 package hu.perit.spvitamin.spring.httplogging;
 
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.thing.PrinterVisitor;
+import hu.perit.spvitamin.core.thing.Thing;
+import hu.perit.spvitamin.spring.json.JSonSerializer;
+import hu.perit.spvitamin.spring.logging.RequestLoggerVisitor;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -116,6 +120,14 @@ public class HttpLoggingFilter implements Filter
         if (bufferedRequest instanceof HttpLoggingFilter.BufferedRequestWrapper requestWrapper)
         {
             body = requestWrapper.getRequestBody();
+
+            // Check if content type is JSON and body is not empty
+            String contentType = bufferedRequest.getContentType();
+            if (contentType != null && contentType.startsWith("application/json") && !body.isEmpty())
+            {
+                // Shorten JSON body if it's too long or contains byte arrays
+                body = shortenJsonBody(body);
+            }
         }
         else
         {
@@ -123,12 +135,12 @@ public class HttpLoggingFilter implements Filter
         }
 
         logMessage
-            .append("==> HTTP REQUEST - ")
-            .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-            .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-            .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-            .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
-            .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
+                .append("==> HTTP REQUEST - ")
+                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+                .append("[REQUEST HEADERS: ").append(this.getRequestHeaderAsString(bufferedRequest)).append("] ")
+                .append("[REQUEST PARAMETERS: ").append(this.getParameterAsString(bufferedRequest)).append("] ");
 
         if (log.isDebugEnabled())
         {
@@ -137,19 +149,59 @@ public class HttpLoggingFilter implements Filter
     }
 
 
+    /**
+     * Shortens JSON body by abbreviating long strings and replacing byte arrays with a description of their length.
+     *
+     * @param jsonBody The JSON body to shorten
+     * @return The shortened JSON body
+     */
+    private String shortenJsonBody(String jsonBody)
+    {
+        // If the body is already short, return it as is
+        try
+        {
+            Object body = JSonSerializer.fromJson(jsonBody, Object.class);
+            Thing thing = Thing.from(body);
+            RequestLoggerVisitor visitor = new RequestLoggerVisitor(PrinterVisitor.Options.builder().hidePasswords(true).ignoreNulls(true).build());
+            thing.accept(visitor);
+            return visitor.getJson();
+        }
+        catch (IOException e)
+        {
+            return jsonBody;
+        }
+    }
+
+
     private void prepareLogMessageResponse(StringBuilder logMessage, HttpServletRequest bufferedRequest, BufferedResponseWrapper bufferedResponse)
     {
         String contenttype = bufferedResponse.getContentType();
-        String body = contenttype != null && !contenttype.startsWith("application/json") ? "Non JSON Data" : bufferedResponse.getContent();
+        String body;
+
+        if (contenttype != null && contenttype.startsWith("application/json"))
+        {
+            body = bufferedResponse.getContent();
+
+            // Shorten JSON body if it's not empty
+            if (body != null && !body.isEmpty())
+            {
+                body = shortenJsonBody(body);
+            }
+        }
+        else
+        {
+            body = "Non JSON Data";
+        }
+
         int httpStatus = bufferedResponse.getStatus();
 
         logMessage
-            .append("<== HTTP RESPONSE - ")
-            .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
-            .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
-            .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
-            .append("[RESPONSE STATUS: ").append(httpStatus).append("] ")
-            .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ");
+                .append("<== HTTP RESPONSE - ")
+                .append("[REMOTE ADDRESS: ").append(bufferedRequest.getRemoteAddr()).append("] ")
+                .append("[HTTP METHOD: ").append(bufferedRequest.getMethod()).append("] ")
+                .append("[REQUEST URL: ").append(bufferedRequest.getRequestURL()).append("] ")
+                .append("[RESPONSE STATUS: ").append(httpStatus).append("] ")
+                .append("[RESPONSE HEADERS: ").append(this.getResponseHeaderAsString(bufferedResponse)).append("] ");
 
         if (log.isDebugEnabled())
         {
