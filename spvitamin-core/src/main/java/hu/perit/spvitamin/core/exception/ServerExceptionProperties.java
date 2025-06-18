@@ -51,10 +51,12 @@ public class ServerExceptionProperties
     private StackTraceElement[] stackTrace;
     private ServerExceptionProperties cause;
 
+
     public static void setStackTraceEnabled(boolean stackTraceEnabled)
     {
         myStackTraceEnabled = stackTraceEnabled;
     }
+
 
     public ServerExceptionProperties(Throwable exception)
     {
@@ -97,10 +99,16 @@ public class ServerExceptionProperties
     }
 
 
-    // This one is called from RestExceptionResponseDecoder
     public Exception toException()
     {
-        ServerException serverException = new ServerException(this);
+        return this.toException(null);
+    }
+
+
+    // This one is called from RestExceptionResponseDecoder and from other decoders
+    public Exception toException(String traceId)
+    {
+        ServerException serverException = new ServerException(this, traceId);
         try
         {
             if (serverException.instanceOf(Exception.class))

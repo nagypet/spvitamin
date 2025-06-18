@@ -53,6 +53,12 @@ public final class ListUtils
     }
 
 
+    public static <T> T first(List<T> list)
+    {
+        return list == null || list.isEmpty() ? null : list.get(0);
+    }
+
+
     public static int size(List<?> list)
     {
         if (list == null)

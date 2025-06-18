@@ -67,7 +67,7 @@ public class RestExceptionResponseDecoder implements ErrorDecoder
     {
         if (exceptionResponse != null && exceptionResponse.getException() != null)
         {
-            return exceptionResponse.getException().toException();
+            return exceptionResponse.getException().toException(exceptionResponse.getTraceId());
         }
         return null;
     }

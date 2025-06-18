@@ -18,6 +18,7 @@ package hu.perit.spvitamin.core.exception;
 
 import lombok.Getter;
 
+import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
@@ -39,40 +40,53 @@ import java.util.Objects;
 
 
 @Getter
-public class ServerException extends RuntimeException implements ServerExceptionInterface
+public class ServerException extends TraceableException implements ServerExceptionInterface
 {
-
+    @Serial
     private static final long serialVersionUID = 2272746029581472203L;
 
     private final String className;
     private final List<String> superClassNames;
+
 
     public static <T> T throwFrom(Throwable ex)
     {
         throw new ServerException(ex);
     }
 
+
     // This is for converting a checked exception into a ServerException
     ServerException(Throwable ex)
     {
-        super(ex.getMessage(), ex.getCause());
+        super(ex.getMessage(), ex.getCause(), null);
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
         this.className = exceptionWrapper.getClassName();
         this.superClassNames = exceptionWrapper.getSuperClassNames();
         this.safeSetStackTrace(ex.getStackTrace());
     }
 
+
     ServerException(ServerExceptionProperties exceptionProperties)
     {
-        super(exceptionProperties.getMessage(), convertCauses(exceptionProperties.getCause()));
+        super(exceptionProperties.getMessage(), convertCauses(exceptionProperties.getCause()), null);
         this.className = exceptionProperties.getExceptionClass();
         this.superClassNames = exceptionProperties.getSuperClasses();
         this.safeSetStackTrace(exceptionProperties.getStackTrace());
     }
 
+
+    ServerException(ServerExceptionProperties exceptionProperties, String traceId)
+    {
+        super(exceptionProperties.getMessage(), convertCauses(exceptionProperties.getCause()), traceId);
+        this.className = exceptionProperties.getExceptionClass();
+        this.superClassNames = exceptionProperties.getSuperClasses();
+        this.safeSetStackTrace(exceptionProperties.getStackTrace());
+    }
+
+
     private ServerException(ServerExceptionProperties exceptionProperties, ServerException cause)
     {
-        super(exceptionProperties.getMessage(), cause);
+        super(exceptionProperties.getMessage(), cause, null);
         this.className = exceptionProperties.getExceptionClass();
         this.superClassNames = exceptionProperties.getSuperClasses();
         this.safeSetStackTrace(exceptionProperties.getStackTrace());
@@ -81,9 +95,9 @@ public class ServerException extends RuntimeException implements ServerException
 
     // For Backward compatibility
     @Deprecated
-    public ServerException(String exceptionClass, String message, Throwable cause)
+    public ServerException(String exceptionClass, String message, Throwable cause, String traceId)
     {
-        super(message, cause);
+        super(message, cause, traceId);
         this.className = exceptionClass;
         this.superClassNames = null;
     }
