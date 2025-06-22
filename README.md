@@ -115,7 +115,7 @@ dependencyManagement {
 - SoftEnum
 - MicroserviceProperties extended by apiKey
 - ApiKeyRequestInterceptor
-- SimpleFeignClientBuilder: errorDecoder can be customized
+- SimpleFeignClientBuilder: errorDecoder, retryer can be customized
 - Small NPE fix in RoleMapperServiceImpl
 - HttpLoggingFilter improved to shorten long Base64 strings.
 - TraceId stored in ServerException

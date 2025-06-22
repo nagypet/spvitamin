@@ -56,7 +56,7 @@ public class SimpleFeignClientBuilder
     private Encoder encoder;
     private Decoder decoder;
     private ErrorDecoder errorDecoder = new RestExceptionResponseDecoder();
-
+    private Retryer retryer;
 
     public static SimpleFeignClientBuilder newInstance()
     {
@@ -72,8 +72,10 @@ public class SimpleFeignClientBuilder
         ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
         FeignProperties feignProperties = SysConfig.getFeignProperties();
 
+        // Encoder
         this.encoder = new JacksonEncoder(objectMapper); // default encoder
 
+        // Decoder
         ObjectFactory<HttpMessageConverters> messageConverters = () -> new HttpMessageConverters(new ByteArrayHttpMessageConverter());
         this.decoder = new OptionalDecoder(
                 new ResponseEntityDecoder(
@@ -81,11 +83,16 @@ public class SimpleFeignClientBuilder
                 )
         );
 
+        // Retryer
+        this.retryer = new Retryer.Default(
+                feignProperties.getRetry().getPeriod(),
+                feignProperties.getRetry().getMaxPeriod(),
+                feignProperties.getRetry().getMaxAttempts()
+        );
+
         this.builder = Feign.builder()
                 .contract(new SpringMvcContract())
                 .requestInterceptor(this.requestInterceptorAdapter)
-                .retryer(new Retryer.Default(feignProperties.getRetry().getPeriod(), feignProperties.getRetry().getMaxPeriod(), feignProperties.getRetry().getMaxAttempts()))
-                //.retryer(Retryer.NEVER_RETRY)
                 .logger(new Slf4jLogger(getClass()))
                 .logLevel(getLevel(feignProperties.getLoggerLevel()));
     }
@@ -123,6 +130,13 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder retryer(Retryer retryer)
+    {
+        this.retryer = retryer;
+        return this;
+    }
+
+
     private static Logger.Level getLevel(String level)
     {
         return Logger.Level.valueOf(level.toUpperCase());
@@ -141,6 +155,7 @@ public class SimpleFeignClientBuilder
         this.builder.encoder(this.encoder);
         this.builder.decoder(this.decoder);
         this.builder.errorDecoder(this.errorDecoder);
+        this.builder.retryer(this.retryer);
 
         return this.builder.target(apiType, url);
     }
