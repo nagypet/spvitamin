@@ -135,7 +135,7 @@ public class PrinterVisitor implements ThingVisitor
         }
 
         // if this is a password
-        if (options.hidePasswords && StringUtils.contains(name, PASSWORD))
+        if (options.hidePasswords && StringUtils.containsIgnoreCase(name, PASSWORD))
         {
             return "*** [hidden]";
         }
