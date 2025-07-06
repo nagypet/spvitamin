@@ -19,6 +19,8 @@ package hu.perit.spvitamin.core.exception;
 import hu.perit.spvitamin.core.StackTracer;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.Callable;
+
 @Slf4j
 public class ExceptionGuard
 {
@@ -32,5 +34,19 @@ public class ExceptionGuard
         {
             log.error(StackTracer.toStringCompact(e));
         }
+    }
+
+
+    public static <T> T withTryCatchReturning(Callable<T> r)
+    {
+        try
+        {
+            return r.call();
+        }
+        catch (Exception e)
+        {
+            log.error(StackTracer.toStringCompact(e));
+        }
+        return null;
     }
 }

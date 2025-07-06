@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,7 +39,7 @@ public final class SpringContextMock
 
     private static void init(ApplicationContext applicationContext, Map<Class<?>, Object> beanMap)
     {
-        when(applicationContext.getBean((Class<?>) any(Class.class))).thenAnswer(invocation -> {
+        lenient().when(applicationContext.getBean((Class<?>) any(Class.class))).thenAnswer(invocation -> {
             Class<?> requestedBean = invocation.getArgument(0);
             if (beanMap.containsKey(requestedBean))
             {

@@ -50,11 +50,10 @@ class ProjectConfigurer {
 	 */
 	private void discoverProjects(File root) {
 		root.eachDir(){ dir ->
-			if (this.isDirRelevant(dir)) {
-				if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin")) {
+			if (isDirRelevant(dir)) {
+           		if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin") && !dir.name.equals("ngface") && !dir.name.equals("nputil")) {
 					this.projectMap.put(dir.name, dir)
-				}
-				else {
+				} else {
 					this.discoverProjects(dir)
 				}
 			}
@@ -62,8 +61,8 @@ class ProjectConfigurer {
 	}
 
 
-	private boolean isDirRelevant(File dir) {
-		return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out"))
+	private static boolean isDirRelevant(File dir) {
+		return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out") || dir.name.equals("Logstash") || dir.name.equals("src"))
 	}
 	
 
@@ -72,7 +71,13 @@ class ProjectConfigurer {
 		File buildGradleFile = new File(root, "build.gradle")
 		if (buildGradleFile.exists()) {
 			buildGradleFile.eachLine {line ->
-				if (!(line =~ /^\s*\/\//) && (line =~ /^\s*compile\s*project/) || line =~ /^\s*api\s*project/ || line =~ /^\s*runtime\s*project/ || line =~ /^\s*runtimeOnly\s*project/ || line =~ /^\s*implementation\s*project/) {
+				if (!(line =~ /^\s*\/\//) &&
+						(line =~ /compile\s*project/
+						|| line =~ /testCompile\s*project/
+						|| line =~ /runtimeOnly\s*project/
+						|| line =~ /implementation\s*project/
+						|| line =~ /testImplementation\s*project/
+						|| line =~ /api\s*project/)) {
 					def matcher = line =~ /:[a-z-A-Z0-9]*/
 					if (matcher.size() == 1) {
 						def projName = matcher[0].substring(1)

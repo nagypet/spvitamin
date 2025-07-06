@@ -120,6 +120,8 @@ dependencyManagement {
 - HttpLoggingFilter improved to shorten long Base64 strings.
 - TraceId stored in ServerException
 - PrinterVisitor fixed to compare password field ignoring the letter case.
+- ThreadContextDecorator
+- ExceptionGuard extended by a new method for returning values
 
 
 ### 3.3.3-2-RELEASE not yet released
