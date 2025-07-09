@@ -122,6 +122,8 @@ dependencyManagement {
 - PrinterVisitor fixed to compare password field ignoring the letter case.
 - ThreadContextDecorator
 - ExceptionGuard extended by a new method for returning values
+- Utility classes: CurrencyConverter, PostalAddress
+- JsonSerializer new method added: listFromJson() for easy deserialization of an array
 
 
 ### 3.3.3-2-RELEASE not yet released

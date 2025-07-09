@@ -46,6 +46,8 @@ dependencies {
     implementation libs.jackson.annotations
     implementation libs.jackson.databind
 
+    implementation libs.nv.i18n
+
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies

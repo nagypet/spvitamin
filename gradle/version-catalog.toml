@@ -15,6 +15,7 @@ habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
 org-springframework-boot = { id = 'org.springframework.boot', version = '3.4.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
+
 [libraries]
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
@@ -44,6 +45,7 @@ logback-core = { module = 'ch.qos.logback:logback-core', version.ref = 'logback'
 lombok = 'org.projectlombok:lombok:1.18.34'
 mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
+nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 reflections = 'org.reflections:reflections:0.10.2'

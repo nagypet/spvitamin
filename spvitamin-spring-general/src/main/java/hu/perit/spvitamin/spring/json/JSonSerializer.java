@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -47,6 +48,13 @@ public final class JSonSerializer
     {
         ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
+    }
+
+
+    public static <T> List<T> listFromJson(String jsonString, Class<T> elementType) throws IOException
+    {
+        ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        return mapper.readValue(jsonString, mapper.getTypeFactory().constructCollectionType(List.class, elementType));
     }
 
 
