@@ -124,6 +124,7 @@ dependencyManagement {
 - ExceptionGuard extended by a new method for returning values
 - Utility classes: CurrencyConverter, PostalAddress
 - JsonSerializer new method added: listFromJson() for easy deserialization of an array
+- NumberConverter
 
 
 ### 3.3.3-2-RELEASE not yet released
