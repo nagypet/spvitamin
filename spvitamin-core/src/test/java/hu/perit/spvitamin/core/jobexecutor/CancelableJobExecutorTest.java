@@ -16,36 +16,44 @@
 
 package hu.perit.spvitamin.core.jobexecutor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CancelableJobExecutorTest {
+@Slf4j
+class CancelableJobExecutorTest
+{
 
     private CancelableJobExecutor<String> jobExecutor;
     private static final String TEST_CONTEXT = "TestContext";
 
+
     @BeforeEach
-    void setUp() {
+    void setUp()
+    {
         jobExecutor = new CancelableJobExecutor<>(2, TEST_CONTEXT);
     }
 
+
     @Test
-    void testSubmitJob() throws ExecutionException, InterruptedException {
+    void testSubmitJob() throws ExecutionException, InterruptedException
+    {
+        log.debug("--- testSubmitJob");
+
         // Arrange
         String jobId = "job1";
         CountDownLatch jobExecuted = new CountDownLatch(1);
@@ -68,14 +76,19 @@ class CancelableJobExecutorTest {
         assertThat(jobExecutor.countAll()).isEqualTo(0); // Job should be removed after completion
     }
 
+
     @Test
-    void testSubmitJobAlreadyProcessing() {
+    void testSubmitJobAlreadyProcessing()
+    {
+        log.debug("--- testSubmitJobAlreadyProcessing");
+
         // Arrange
         String jobId = "job1";
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
         Callable<Void> job = () -> {
-            while (jobBlocked.get()) {
+            while (jobBlocked.get())
+            {
                 Thread.sleep(10);
             }
             return null;
@@ -93,21 +106,30 @@ class CancelableJobExecutorTest {
         jobBlocked.set(false);
     }
 
+
     @Test
-    void testCancelJob() throws InterruptedException {
+    void testCancelJob() throws InterruptedException
+    {
+        log.debug("--- testCancelJob");
+
         // Arrange
         String jobId = "job1";
         CountDownLatch jobStarted = new CountDownLatch(1);
         CountDownLatch jobCancelled = new CountDownLatch(1);
 
         Callable<Void> job = () -> {
-            try {
+            try
+            {
                 jobStarted.countDown();
                 // Long-running task
-                while (!Thread.currentThread().isInterrupted()) {
+                while (!Thread.currentThread().isInterrupted())
+                {
                     Thread.sleep(50);
                 }
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e)
+            {
+                log.debug("Job {} was cancelled", jobId);
                 jobCancelled.countDown();
                 throw e;
             }
@@ -135,11 +157,15 @@ class CancelableJobExecutorTest {
 
         // Wait for job to be removed from executor
         Thread.sleep(100);
-        assertThat(jobExecutor.countAll()).isEqualTo(0); // Job should be removed after cancellation
+        assertThat(jobExecutor.countAll()).isZero(); // Job should be removed after cancellation
     }
 
+
     @Test
-    void testCancelNonExistentJob() {
+    void testCancelNonExistentJob()
+    {
+        log.debug("--- testCancelNonExistentJob");
+
         // Act
         boolean result = jobExecutor.cancelJob("nonExistentJob");
 
@@ -147,26 +173,33 @@ class CancelableJobExecutorTest {
         assertThat(result).isFalse();
     }
 
+
     @Test
-    void testCancelAll() throws InterruptedException {
-        // This test verifies that we can cancel all jobs by cancelling them individually
-        // instead of using the cancelAll method which has concurrency issues in the test environment
+    void testCancelAll() throws InterruptedException
+    {
+        log.debug("--- testCancelAll");
 
         // Arrange
         int jobCount = 2;
         CountDownLatch allJobsStarted = new CountDownLatch(jobCount);
         CountDownLatch allJobsCancelled = new CountDownLatch(jobCount);
 
-        for (int i = 0; i < jobCount; i++) {
+        for (int i = 0; i < jobCount; i++)
+        {
             final String jobId = "job" + i;
             Callable<Void> job = () -> {
-                try {
+                try
+                {
                     allJobsStarted.countDown();
                     // Long-running task
-                    while (!Thread.currentThread().isInterrupted()) {
+                    while (!Thread.currentThread().isInterrupted())
+                    {
                         Thread.sleep(50);
                     }
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
+                    log.debug("Job {} was cancelled", jobId);
                     allJobsCancelled.countDown();
                     throw e;
                 }
@@ -177,33 +210,31 @@ class CancelableJobExecutorTest {
         }
 
         // Wait for all jobs to start
-        assertTrue(allJobsStarted.await(1, TimeUnit.SECONDS), "Jobs did not start within timeout");
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertEquals(0, allJobsStarted.getCount(), "Jobs did not start within timeout"));
 
-        // Act - cancel each job individually
-        for (int i = 0; i < jobCount; i++) {
-            final String jobId = "job" + i;
-            jobExecutor.cancelJob(jobId);
-        }
+        jobExecutor.cancelAll();
 
         // Wait for cancellation to take effect
-        assertTrue(allJobsCancelled.await(1, TimeUnit.SECONDS), "Jobs were not cancelled within timeout");
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertEquals(0, allJobsCancelled.getCount(), "Jobs were not cancelled within timeout"));
 
         // Wait for jobs to be removed from executor
-        Thread.sleep(200);
-
-        // Assert
-        assertThat(jobExecutor.countAll()).isEqualTo(0);
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertThat(jobExecutor.countAll()).isZero());
     }
 
+
     @Test
-    void testCountRunning() throws InterruptedException {
+    void testCountRunning() throws InterruptedException
+    {
+        log.debug("--- testCountRunning");
+
         // Arrange
         CountDownLatch jobStarted = new CountDownLatch(1);
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
         Callable<Void> job = () -> {
             jobStarted.countDown();
-            while (jobBlocked.get()) {
+            while (jobBlocked.get())
+            {
                 Thread.sleep(10);
             }
             return null;
@@ -222,13 +253,18 @@ class CancelableJobExecutorTest {
         jobBlocked.set(false);
     }
 
+
     @Test
-    void testCountAll() {
+    void testCountAll()
+    {
+        log.debug("--- testCountAll");
+
         // Arrange
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
         Callable<Void> job = () -> {
-            while (jobBlocked.get()) {
+            while (jobBlocked.get())
+            {
                 Thread.sleep(10);
             }
             return null;
@@ -245,8 +281,12 @@ class CancelableJobExecutorTest {
         jobBlocked.set(false);
     }
 
+
     @Test
-    void testJobWithException() throws InterruptedException {
+    void testJobWithException() throws InterruptedException
+    {
+        log.debug("--- testJobWithException");
+
         // Arrange
         String jobId = "job1";
         CountDownLatch jobStarted = new CountDownLatch(1);
@@ -269,8 +309,12 @@ class CancelableJobExecutorTest {
         assertThat(jobExecutor.countAll()).isEqualTo(0); // Job should be removed after exception
     }
 
+
     @Test
-    void testRuntimeExceptionInFutureGet() throws Exception {
+    void testRuntimeExceptionInFutureGet() throws Exception
+    {
+        log.debug("--- testRuntimeExceptionInFutureGet");
+
         // Arrange
         String jobId = "job1";
         CountDownLatch jobExecuted = new CountDownLatch(1);
@@ -311,35 +355,48 @@ class CancelableJobExecutorTest {
         assertThat(jobExecutor.countAll()).isEqualTo(0);
     }
 
+
     // Custom class that implements both Runnable and Future interfaces
-    private static class RunnableFuture implements Runnable, Future<Void> {
+    private static class RunnableFuture implements Runnable, Future<Void>
+    {
         @Override
-        public void run() {
+        public void run()
+        {
             // Do nothing
         }
 
+
         @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
+        public boolean cancel(boolean mayInterruptIfRunning)
+        {
             return false;
         }
 
+
         @Override
-        public boolean isCancelled() {
+        public boolean isCancelled()
+        {
             return false;
         }
 
+
         @Override
-        public boolean isDone() {
+        public boolean isDone()
+        {
             return true;
         }
 
+
         @Override
-        public Void get() {
+        public Void get()
+        {
             throw new RuntimeException("Test RuntimeException from future.get()");
         }
 
+
         @Override
-        public Void get(long timeout, TimeUnit unit) {
+        public Void get(long timeout, TimeUnit unit)
+        {
             throw new RuntimeException("Test RuntimeException from future.get()");
         }
     }

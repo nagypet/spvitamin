@@ -20,6 +20,7 @@ sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
 assertj = 'org.assertj:assertj-core:3.26.3'
+awaitility = 'org.awaitility:awaitility:4.2.2'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
 commons-lang3 = 'org.apache.commons:commons-lang3:3.16.0'

@@ -18,11 +18,15 @@ package hu.perit.spvitamin.json;
 
 import hu.perit.spvitamin.core.took.Took;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.time.*;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,9 +37,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class JsonSerializableTest
 {
-    @Test
-    void toJsonRoundtrip() throws IOException
+    private TimeZone originalTimeZone;
+
+    @AfterEach
+    void tearDown() {
+        if (originalTimeZone != null) {
+            TimeZone.setDefault(originalTimeZone);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Europe/Budapest", "UTC"})
+    void toJsonRoundtrip(String timezone) throws IOException
     {
+        log.debug("Testing with timezone: {}", timezone);
+        originalTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+
         ExampleClass originalObject = getExampleClass();
 
         String originalObjectJson = originalObject.toJson();
@@ -48,9 +66,14 @@ class JsonSerializableTest
     }
 
 
-    @Test
-    void perfTestToJSon() throws IOException
+    @ParameterizedTest
+    @ValueSource(strings = {"Europe/Budapest", "UTC"})
+    void perfTestToJSon(String timezone) throws IOException
     {
+        log.debug("Testing with timezone: {}", timezone);
+        originalTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+
         ExampleClass originalObject = getExampleClass();
 
         try (Took took = new Took())
@@ -64,9 +87,14 @@ class JsonSerializableTest
     }
 
 
-    @Test
-    void perfTestFromJSon() throws IOException
+    @ParameterizedTest
+    @ValueSource(strings = {"Europe/Budapest", "UTC"})
+    void perfTestFromJSon(String timezone) throws IOException
     {
+        log.debug("Testing with timezone: {}", timezone);
+        originalTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+
         ExampleClass originalObject = getExampleClass();
         String originalObjectJson = originalObject.toJson();
 

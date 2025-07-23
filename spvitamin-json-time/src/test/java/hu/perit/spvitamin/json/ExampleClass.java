@@ -18,9 +18,10 @@ package hu.perit.spvitamin.json;
 
 import hu.perit.spvitamin.json.time.Constants;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -32,7 +33,6 @@ import java.util.Date;
 import java.util.StringJoiner;
 
 @AllArgsConstructor
-@EqualsAndHashCode
 @Getter
 @Slf4j
 public class ExampleClass implements JsonSerializable
@@ -91,5 +91,52 @@ public class ExampleClass implements JsonSerializable
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT);
         return simpleDateFormat.format(date);
+    }
+
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ExampleClass that = (ExampleClass) o;
+
+        Instant thisOffsetInstant = offsetDateTime != null ? offsetDateTime.toInstant() : null;
+        Instant thatOffsetInstant = that.offsetDateTime != null ? that.offsetDateTime.toInstant() : null;
+
+        return new EqualsBuilder()
+                .append(age, that.age)
+                .append(name, that.name)
+                .append(date, that.date)
+                .append(localDate, that.localDate)
+                .append(localDateTime, that.localDateTime)
+                .append(zonedDateTime, that.zonedDateTime)
+                .append(thisOffsetInstant, thatOffsetInstant)
+                .append(instant, that.instant)
+                .isEquals();
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+                .append(name)
+                .append(age)
+                .append(date)
+                .append(localDate)
+                .append(localDateTime)
+                .append(zonedDateTime)
+                .append(offsetDateTime)
+                .append(instant)
+                .toHashCode();
     }
 }

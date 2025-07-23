@@ -21,9 +21,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -40,8 +40,8 @@ public class FutureMap<T>
         STOPPING
     }
 
-    private Map<T, FutureHolder> itemsMapById = new HashMap<>();
-    private Map<Future<?>, T> itemsMapByFuture = new HashMap<>();
+    private Map<T, FutureHolder> itemsMapById = new ConcurrentHashMap<>();
+    private Map<Future<?>, T> itemsMapByFuture = new ConcurrentHashMap<>();
 
     public synchronized void put(T id, Future<?> future)
     {

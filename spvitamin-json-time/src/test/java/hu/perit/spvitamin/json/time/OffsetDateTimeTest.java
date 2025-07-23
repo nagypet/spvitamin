@@ -19,12 +19,10 @@ package hu.perit.spvitamin.json.time;
 import hu.perit.spvitamin.json.ExampleClass;
 import hu.perit.spvitamin.json.JsonSerializable;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.TimeZone;
 
@@ -33,10 +31,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class OffsetDateTimeTest
 {
-    @BeforeEach
-    void setUp()
+    @Test
+    void testTimezones() throws IOException
     {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Budapest"));
+        try
+        {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Budapest"));
+            testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 5, 1, 8, 11, 12, 0, "+2"));
+
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+            testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 5, 1, 6, 11, 12, 0, "Z"));
+
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Moscow"));
+            testDeserialization("2020-05-01 10:11:12+0400", refTime(2020, 5, 1, 9, 11, 12, 0, "+3"));
+        }
+        finally
+        {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Budapest"));
+        }
     }
 
 
