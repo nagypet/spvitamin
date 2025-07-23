@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.core.util;
 
 import com.neovisionaries.i18n.CountryCode;
+import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +66,7 @@ public class PostalAddress
         List<CountryCode> byName = CountryCode.findByName(countryCode);
         if (!byName.isEmpty())
         {
-            return byName.getFirst().name();
+            return ListUtils.first(byName).name();
         }
 
         if (countryCode.length() == 2)
