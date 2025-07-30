@@ -215,10 +215,12 @@ class CancelableJobExecutorTest
         jobExecutor.cancelAll();
 
         // Wait for cancellation to take effect
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertEquals(0, allJobsCancelled.getCount(), "Jobs were not cancelled within timeout"));
+        await().atMost(10, TimeUnit.SECONDS).until(() -> allJobsCancelled.getCount() == 0);
+        assertThat(allJobsCancelled.getCount()).isZero();
 
         // Wait for jobs to be removed from executor
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertThat(jobExecutor.countAll()).isZero());
+        await().atMost(10, TimeUnit.SECONDS).until(() -> jobExecutor.countAll() == 0);
+        assertThat(jobExecutor.countAll()).isZero();
     }
 
 
