@@ -17,36 +17,38 @@
 
 @use '@angular/material' as mat;
 @use '../../ngface/src/lib/styles/theme' as ngface;
+
+// Change here the currently used theme for development
+@use '../public/themes/theme' as theme;
+
 @include mat.core();
 
-@import 'ngx-toastr/toastr';
-@import 'open-iconic/font/css/open-iconic-bootstrap.css';
-@import "constants";
+// Material theming
+@include mat.all-component-themes(theme.$my-theme);
 
+// Ngface theming
+@include ngface.set-palette(theme.$my-primary, primary);
+@include ngface.set-palette(theme.$my-warn, warn);
 
-$my-primary: mat.m2-define-palette(mat.$m2-light-blue-palette);
-$my-accent: mat.m2-define-palette(mat.$m2-deep-purple-palette);
-$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '../../ngface/src/lib/ngface.scss';
 
-$my-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $my-primary,
-    accent: $my-accent,
-    warn: $my-warn
-  )
-));
-
-@include mat.all-component-themes($my-theme);
-
-@include ngface.set-palette($my-primary, primary);
-@include ngface.set-palette($my-warn, warn);
-
-@import '../../ngface/src/lib/styles/material-design-icons';
 @import '../../ngface/src/lib/styles/ngface-button';
 @import '../../ngface/src/lib/styles/ngface-dialog';
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+html, body {
+  //  height: 100%;
+}
+
+body {
+  margin: 0;
+  letter-spacing: 0.25px;
+  //background-color: var(--app-primary-palette-50);
+  color: var(--color-font);
+  font-family: var(--global-font), sans-serif;
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+}
 
 hr {
   color: var(--app-primary-palette-default);
@@ -78,10 +80,6 @@ button {
   opacity: 1;
   transition: opacity ease 0.2s;
   cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
 }
 
 
@@ -97,4 +95,13 @@ button {
 .login-panel .ngface-input-field {
   width: 100%;
   max-width: unset;
+}
+
+.mat-mdc-snack-bar-container {
+  button {
+    //color: var(--app-primary-contrast-500, white)!important;
+    margin-right: 0;
+    margin-bottom: 0;
+    border: none!important;
+  }
 }

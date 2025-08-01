@@ -38,16 +38,18 @@ $element-phone-height: 40px;
 .ngface-header-button.desktop {
   border-radius: 5px;
   font-size: 16px;
-  padding: 0 20px 0 20px!important;
+  padding: 0 20px 0 20px !important;
 
   &:hover {
     //background-color: var(--app-primary-palette-700);
   }
 }
+
 .ngface-header-button.tablet,
 .ngface-header-button.desktop {
   height: $element-regular-height;
 }
+
 .ngface-header-button.phone {
   height: $element-phone-height;
 }
@@ -58,9 +60,16 @@ $element-phone-height: 40px;
 
 // Main menu
 .titlebar-main-menu {
-  flex-shrink: 0;
-  flex-grow: 0;
-  padding-bottom: 6px;
+  //flex-shrink: 0;
+  //flex-grow: 0;
+  mat-icon {
+    line-height: 30px;
+    font-size: 24px;
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 .logo {
@@ -68,11 +77,9 @@ $element-phone-height: 40px;
   height: 50px;
   padding: 0;
 }
+
 .logo.phone {
   height: $element-phone-height;
-}
-.logo.phone.portrait {
-  display: none;
 }
 
 
@@ -103,9 +110,11 @@ $element-phone-height: 40px;
   height: $element-regular-height;
   //border: 1px solid rgba(white, 0.8);
 }
+
 .session-timeout.phone {
   height: $element-phone-height;
 }
+
 .session-timeout.phone:not(.session-timeout-warning) {
   display: none;
 }
@@ -125,16 +134,17 @@ $element-phone-height: 40px;
   animation: flash-red 1s infinite; // Az animáció 1 mp-enként ismétlődik
 }
 
-
 // Actions
 .titlebar-actions {
 }
 
-.titlebar-actions .mat-icon {
-  font-size: 24px;
-  height: 24px;
-  width: 24px;
-  margin: 0;
+.titlebar-actions {
+  mat-icon {
+    line-height: 30px;
+    font-size: 24px;
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    margin: 0;
+  }
 }
-
-

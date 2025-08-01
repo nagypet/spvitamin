@@ -19,13 +19,12 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {Ngface} from '../../ngface-models';
-import {NgClass, NgFor} from '@angular/common';
+import {NgClass} from '@angular/common';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatBadgeModule} from '@angular/material/badge';
 import {DeviceTypeService} from '../../services/device-type.service';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
 import {MatTooltip} from '@angular/material/tooltip';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'ngface-titlebar',
@@ -35,7 +34,6 @@ import {Router} from '@angular/router';
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
-    NgFor,
     MatMenuModule,
     MatBadgeModule,
     ResponsiveClassDirective,
@@ -53,7 +51,7 @@ export class NgfaceTitlebarComponent implements OnChanges
   widgetid = '';
 
   @Input()
-  private selectedMenuItemId?: string;
+  public selectedMenuItemId?: string;
 
   @Input()
   logo?: string;
@@ -74,7 +72,6 @@ export class NgfaceTitlebarComponent implements OnChanges
 
   constructor(
     public deviceTypeService: DeviceTypeService,
-    private router: Router,
   )
   {
   }
@@ -84,7 +81,11 @@ export class NgfaceTitlebarComponent implements OnChanges
   {
     if (changes['formdata'] || changes['widgetid'])
     {
-      this.selectedMenuItemId = this.getData().menu.defaultItemId;
+      if (!this.selectedMenuItemId)
+      {
+        console.log('selectedMenuItemId is not set, using defaultItemId');
+        this.selectedMenuItemId = this.getData().menu.defaultItemId;
+      }
       const item = this.getData().menu.items.find(i => i.id === this.selectedMenuItemId);
       if (item)
       {
@@ -146,7 +147,7 @@ export class NgfaceTitlebarComponent implements OnChanges
 
   isMobileDesign(): boolean
   {
-    return (this.deviceTypeService.deviceType === 'Phone' && this.deviceTypeService.orientation === 'Portrait');
+    return (this.deviceTypeService.deviceType === 'Phone' || this.deviceTypeService.orientation === 'Portrait');
   }
 
   getSessionTimeoutAdditionalClasses(): string

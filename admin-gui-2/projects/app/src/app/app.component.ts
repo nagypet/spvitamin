@@ -18,6 +18,7 @@ import {Component, HostListener} from '@angular/core';
 import {LayoutComponent} from './ui/layout/layout.component';
 import {DeviceTypeService} from './core/services/device-type.service';
 import {AuthService} from './core/services/auth/auth.service';
+import {environment} from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -28,8 +29,10 @@ import {AuthService} from './core/services/auth/auth.service';
   ],
   standalone: true
 })
-export class AppComponent {
+export class AppComponent
+{
   title = 'admingui';
+
 
   constructor(
     private deviceTypeService: DeviceTypeService,
@@ -38,10 +41,12 @@ export class AppComponent {
   {
   }
 
+
   ngOnInit(): void
   {
     this.authService.getProfile().subscribe();
     this.onWindowResize();
+    this.loadStylesheet(`themes/${environment.theme}/microdms-theme.css`);
   }
 
 
@@ -49,5 +54,14 @@ export class AppComponent {
   onWindowResize(): void
   {
     this.deviceTypeService.calculateDeviceType();
+  }
+
+
+  loadStylesheet(path: string): void
+  {
+    const linkEl = document.createElement('link');
+    linkEl.rel = 'stylesheet';
+    linkEl.href = path;
+    document.head.appendChild(linkEl);
   }
 }

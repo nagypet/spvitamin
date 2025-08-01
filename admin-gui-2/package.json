@@ -27,7 +27,6 @@
     "js-sha256": "^0.9.0",
     "nav-panel": "^3.0.1",
     "ngx-cookie-service": "^18.0.0",
-    "ngx-toastr": "^16.2.0",
     "open-iconic": "^1.1.1",
     "ngx-scrollbar": "^13.0.3"
   },

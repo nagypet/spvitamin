@@ -23,6 +23,7 @@
 export const environment = {
   production: false,
   baseURL: '/backend',
+  theme: 'active'
 };
 
 /*

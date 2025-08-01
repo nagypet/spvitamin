@@ -29,12 +29,16 @@
 
 
 // Title
+.ngface-dialog-title {
+  display: flex!important;
+  align-items: center;
+}
 .ngface-dialog-title.mobile {
   flex-grow: 0;
   flex-shrink: 0;
 }
 .ngface-dialog-title.phone.landscape {
-  padding-top: 10px!important;
+  padding-top: 10px !important;
   max-height: 50px;
 }
 
@@ -48,7 +52,7 @@
   flex-shrink: 1;
   overflow: auto;
   margin-bottom: auto;
-  max-height: unset!important;
+  max-height: unset !important;
   display: flex;
   flex-direction: column;
 }
@@ -56,6 +60,7 @@
 .ngface-dialog-main.tablet {
   min-height: 100px;
 }
+
 .ngface-dialog-main.desktop {
   min-height: 100px;
 }
@@ -67,21 +72,24 @@
 //}
 
 .ngface-dialog-actions {
-  align-items: unset!important;
+  align-items: unset !important;
+
   .ngface-button {
     margin-right: 20px;
   }
 }
+
 .ngface-dialog-actions.mobile {
-  display: inline!important;
+  display: inline !important;
   flex-grow: 0;
   flex-shrink: 0;
   flex-direction: row;
   flex-wrap: wrap;
 }
+
 .ngface-dialog-actions.phone.landscape {
-  padding-top: 10px!important;
-  padding-bottom: 0!important;
+  padding-top: 10px !important;
+  padding-bottom: 0 !important;
   //max-height: 70px;
 }
 
@@ -89,14 +97,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 // ngface modal dialog styles
 //----------------------------------------------------------------------------------------------------------------------
+@media (max-width: 899px) {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: 0;
+  }
+}
+@media (min-width: 900px) {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: 10px;
+  }
+}
+
+
 .ngface-modal-dialog-backdrop {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(5px);
-}
-
-.mat-dialog-container {
-  border: var(--app-primary-palette-default, #0d6efd) 1px solid;
-  border-radius: 5px !important;
 }
 
 
@@ -124,7 +139,7 @@
 .mdc-dialog__title {
   background-color: var(--app-primary-palette-100, #f5f5f5);
   color: var(--app-primary-contrast-100, black);
-  padding: 24px !important;
+  padding: 15px 0 15px 20px !important;
   font-size: 20px !important;
   border-bottom: var(--app-primary-palette-default, rgba(0, 0, 0, .12)) solid 1px !important;
 }

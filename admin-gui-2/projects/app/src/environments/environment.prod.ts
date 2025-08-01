@@ -17,4 +17,5 @@
 export const environment = {
   production: true,
   baseURL: '',
+  theme: 'active'
 };

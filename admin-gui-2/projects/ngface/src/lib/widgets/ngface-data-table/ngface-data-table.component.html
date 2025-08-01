@@ -40,7 +40,8 @@
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? onRowClick(row) : null"
-                            [checked]="isChecked(row)">
+                            [checked]="isChecked(row)"
+                            [disabled]="row.disabled">
               </mat-checkbox>
             </td>
           } @else {
@@ -65,15 +66,16 @@
             >
               @if (isActionCell(row, column)) {
                 <!-- ActionCell -->
-                <div>
+                <div class="action-cell">
                   @for (action of getActions(row, column); track action) {
-                    <button mat-icon-button
-                            [disabled]="!action.enabled"
-                            [matTooltip]="action.enabled ? action.label : ''"
+                    <button mat-icon-button class="action-button"
+                            [disabled]="!action.enabled || row.disabled"
+                            [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
                             matTooltipPosition="above"
+                            hideTooltipOnClick
                             (click)="$event.stopPropagation(); actionClick(row, action)"
                     >
-                      <mat-icon class="material-icons-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}
+                      <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}
                       </mat-icon>
                     </button>
                   }
@@ -81,7 +83,7 @@
                 </div>
               } @else {
                 <!-- Non-action cell -->
-                <div [innerHTML]="getCellText(row, column) | safeHtml"></div>
+                <p [innerHTML]="getCellText(row, column) | safeHtml"></p>
               }
 
             </td>
@@ -111,7 +113,7 @@
       }
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-          (click)="onRowClick(row)"
+          (click)="!row.disabled && onRowClick(row)"
           [ngClass]="getRowClasses(row)"
       ></tr>
       <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true" [hidden]="!isTotalRow()"></tr>

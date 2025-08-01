@@ -1,22 +1,6 @@
-/*
- * Copyright 2020-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-02-05 05:21:52.
+// Generated using typescript-generator version 3.2.1263 on 2025-07-31 08:21:29.
 
 export namespace Ngface {
 
@@ -237,6 +221,7 @@ export namespace Ngface {
         label: string;
         icon: string;
         enabled: boolean;
+        badge: string;
     }
 
     export interface Column {
@@ -257,6 +242,7 @@ export namespace Ngface {
 
     export interface Filterer {
         column: string;
+        operator: ComparisonOperator;
         valueSet: ValueSet;
         searchText: string;
         active: boolean;
@@ -289,6 +275,7 @@ export namespace Ngface {
         idType: string;
         cells: { [index: string]: Cell<any, any> };
         selected: boolean;
+        disabled: boolean;
     }
 
     export interface Sorter {
@@ -304,7 +291,7 @@ export namespace Ngface {
         rows: Row<T>[];
         totalRow: Row<T> | null;
         selectMode: Table.SelectMode;
-        notification: string;
+        notification: string | null;
     }
 
     export namespace Table {
@@ -393,6 +380,7 @@ export namespace Ngface {
 
         export interface Filter {
             column: string;
+            operator: ComparisonOperator;
             valueSet: DataRetrievalParams.Filter.Item[];
         }
 
@@ -419,7 +407,7 @@ export namespace Ngface {
     }
 
     export interface WidgetData {
-        type: "WidgetData" | "WidgetList.Data" | "DateRangeInput.Data" | "Select.Data" | "Table.Data" | "VoidWidgetData" | "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "NumericInput.Data" | "TextInput.Data" | any;
+        type: any | "WidgetList.Data" | "DateRangeInput.Data" | "Select.Data" | "Table.Data" | "VoidWidgetData" | "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "NumericInput.Data" | "TextInput.Data";
     }
 
     export interface VoidWidgetData extends WidgetData {
@@ -427,7 +415,7 @@ export namespace Ngface {
     }
 
     export interface Widget<WD, SUB> {
-        type: "Button" | "WidgetList" | "FormattedText" | "Table" | "Titlebar" | "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "NumericInput" | "Select" | "TextInput" | any;
+        type: any | "Button" | "WidgetList" | "FormattedText" | "Table" | "Titlebar" | "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "NumericInput" | "Select" | "TextInput";
         id: string;
         label: string;
         hint: string;
@@ -472,6 +460,8 @@ export namespace Ngface {
     export interface AbstractFormat {
         validators: Validator[];
     }
+
+    export type ComparisonOperator = "=" | "<>" | ">" | ">=" | "<" | "<=" | "IN" | "BETWEEN" | "LIKE";
 
     export type Direction = "ASC" | "DESC" | "UNDEFINED";
 

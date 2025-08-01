@@ -15,202 +15,203 @@
  */
 
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {FormControl, ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {ValueSetProvider} from './value-set-provider';
 import {Ngface} from '../../../ngface-models';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { NgFor, NgIf } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { DebounceInputDirective } from '../../../directives/debounce-input-directive';
-import { A11yModule } from '@angular/cdk/a11y';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {NgFor, NgIf} from '@angular/common';
+import {MatIconModule} from '@angular/material/icon';
+import {DebounceInputDirective} from '../../../directives/debounce-input-directive';
+import {A11yModule} from '@angular/cdk/a11y';
 
 export interface ValueSetItem
 {
-    masterSelect: boolean;
-    text: string;
-    selected: boolean;
-    selectable: boolean;
+  masterSelect: boolean;
+  text: string;
+  selected: boolean;
+  selectable: boolean;
 }
 
 
 export interface ValueSetSearchEvent
 {
-    searchText: string;
-    valueSetProvider: ValueSetProvider;
+  searchText: string;
+  valueSetProvider: ValueSetProvider;
 }
 
 
 export interface FilterChangeEvent
 {
-    filterer?: Ngface.Filterer;
-    changed: boolean;
+  filterer?: Ngface.Filterer;
+  changed: boolean;
 }
 
 @Component({
-    // tslint:disable-next-line:component-selector
-    selector: 'ngface-excel-filter',
-    templateUrl: './excel-filter.component.html',
-    styleUrls: ['./excel-filter.component.scss'],
-    standalone: true,
-    imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, NgFor, NgIf, MatCheckboxModule, FormsModule, MatButtonModule]
+  // tslint:disable-next-line:component-selector
+  selector: 'ngface-excel-filter',
+  templateUrl: './excel-filter.component.html',
+  styleUrls: ['./excel-filter.component.scss'],
+  standalone: true,
+  imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, NgFor, NgIf, MatCheckboxModule, FormsModule, MatButtonModule]
 })
 export class ExcelFilterComponent implements OnInit
 {
-    formControlSearch: FormControl<string> = new FormControl<string>('', {nonNullable: true});
+  formControlSearch: FormControl<string> = new FormControl<string>('', {nonNullable: true});
 
-    @Input()
-    filterer?: Ngface.Filterer;
+  @Input()
+  filterer?: Ngface.Filterer;
 
-    @Output()
-    valueSetSearchEvent: EventEmitter<ValueSetSearchEvent> = new EventEmitter();
+  @Output()
+  valueSetSearchEvent: EventEmitter<ValueSetSearchEvent> = new EventEmitter();
 
-    @Output()
-    filtererChangeEvent: EventEmitter<FilterChangeEvent> = new EventEmitter();
+  @Output()
+  filtererChangeEvent: EventEmitter<FilterChangeEvent> = new EventEmitter();
 
-    // tslint:disable-next-line:no-output-on-prefix
-    @Output()
-    onCloseEvent: EventEmitter<void> = new EventEmitter();
+  // tslint:disable-next-line:no-output-on-prefix
+  @Output()
+  onCloseEvent: EventEmitter<void> = new EventEmitter();
 
-    valueSetProvider: ValueSetProvider = new ValueSetProvider();
+  valueSetProvider: ValueSetProvider = new ValueSetProvider();
 
-    constructor()
+  constructor()
+  {
+  }
+
+  ngOnInit(): void
+  {
+    if (this.filterer?.active)
     {
+      this.formControlSearch.setValue(this.filterer?.searchText);
+      this.valueSetProvider = new ValueSetProvider(this.filterer);
+    }
+    else
+    {
+      this.formControlSearch.setValue('');
+      this.valueSetProvider = new ValueSetProvider(this.filterer);
+      this.valueSetProvider.clearFilter();
+      this.reloadValueSetFromServer('');
+    }
+  }
+
+
+  onItemSelected(choice: ValueSetItem, b?: boolean): void
+  {
+    const newValue = b ?? !choice.selected;
+    if (choice.masterSelect)
+    {
+      this.valueSetProvider.selectAll(newValue);
+    }
+    else
+    {
+      choice.selected = newValue;
+    }
+  }
+
+  onCheckBoxClicked(choice: ValueSetItem, $event: boolean): void
+  {
+    this.onItemSelected(choice, $event);
+  }
+
+  onCancel(): void
+  {
+    this.onCloseEvent.emit();
+  }
+
+  onOk(): void
+  {
+    if (this.filterer)
+    {
+      const newFilterer = this.getNewFilterer();
+      this.filtererChangeEvent.emit({filterer: newFilterer, changed: this.valueSetProvider.isChanged()});
+      if (!this.filterer.valueSet.remote)
+      {
+        this.filterer = newFilterer;
+      }
+    }
+  }
+
+
+  private getNewFilterer(): Ngface.Filterer | undefined
+  {
+    if (this.filterer)
+    {
+      const newFilterer: Ngface.Filterer = {
+        active: this.filterer.active,
+        column: this.filterer.column,
+        operator: 'IN',
+        searchText: this.formControlSearch.value ?? '',
+        valueSet: {
+          values: this.valueSetProvider.valueSetItems.filter(i => !i.masterSelect && i.selectable),
+          truncated: this.valueSetProvider.truncated,
+          remote: this.filterer.valueSet.remote
+        }
+      };
+      return newFilterer;
     }
 
-    ngOnInit(): void
+    return undefined;
+  }
+
+
+  onSearchTextChange($event: string): void
+  {
+    this.valueSetProvider.searchText = $event;
+    this.reloadValueSetFromServer($event);
+  }
+
+  isAnySelected(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
     {
-        if (this.filterer?.active)
-        {
-            this.formControlSearch.setValue(this.filterer?.searchText);
-            this.valueSetProvider = new ValueSetProvider(this.filterer);
-        }
-        else
-        {
-            this.formControlSearch.setValue('');
-            this.valueSetProvider = new ValueSetProvider(this.filterer);
-            this.valueSetProvider.clearFilter();
-            this.reloadValueSetFromServer('');
-        }
+      return valueSetItem.selected;
     }
-
-
-    onItemSelected(choice: ValueSetItem, b?: boolean): void
+    else
     {
-        const newValue = b ?? !choice.selected;
-        if (choice.masterSelect)
-        {
-            this.valueSetProvider.selectAll(newValue);
-        }
-        else
-        {
-            choice.selected = newValue;
-        }
+      return this.valueSetProvider.isAnySelected();
     }
+  }
 
-    onCheckBoxClicked(choice: ValueSetItem, $event: boolean): void
+  isAllSelected(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
     {
-        this.onItemSelected(choice, $event);
+      return valueSetItem.selected;
     }
-
-    onCancel(): void
+    else
     {
-        this.onCloseEvent.emit();
+      return this.valueSetProvider.isAllSelected();
     }
+  }
 
-    onOk(): void
+  isCheckBoxEnabled(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
     {
-        if (this.filterer)
-        {
-            const newFilterer = this.getNewFilterer();
-            this.filtererChangeEvent.emit({filterer: newFilterer, changed: this.valueSetProvider.isChanged()});
-            if (!this.filterer.valueSet.remote)
-            {
-                this.filterer = newFilterer;
-            }
-        }
+      return true;
     }
-
-
-    private getNewFilterer(): Ngface.Filterer | undefined
+    else
     {
-        if (this.filterer)
-        {
-            const newFilterer: Ngface.Filterer = {
-                active: this.filterer.active,
-                column: this.filterer.column,
-                searchText: this.formControlSearch.value ?? '',
-                valueSet: {
-                    values: this.valueSetProvider.valueSetItems.filter(i => !i.masterSelect && i.selectable),
-                    truncated: this.valueSetProvider.truncated,
-                    remote: this.filterer.valueSet.remote
-                }
-            };
-            return newFilterer;
-        }
-
-        return undefined;
+      return !!this.valueSetProvider.getVisibleItems().find(c => !c.masterSelect);
     }
+  }
 
-
-    onSearchTextChange($event: string): void
+  onClearFilter(): void
+  {
+    if (this.filterer)
     {
-        this.valueSetProvider.searchText = $event;
-        this.reloadValueSetFromServer($event);
+      this.formControlSearch.setValue('');
+      this.valueSetProvider.clearFilter();
+      this.onOk();
     }
+  }
 
-    isAnySelected(valueSetItem: ValueSetItem): boolean
+
+  private reloadValueSetFromServer(searchText: string): void
+  {
+    if (this.filterer?.valueSet.remote)
     {
-        if (!valueSetItem.masterSelect)
-        {
-            return valueSetItem.selected;
-        }
-        else
-        {
-            return this.valueSetProvider.isAnySelected();
-        }
+      this.valueSetSearchEvent.emit({searchText, valueSetProvider: this.valueSetProvider});
     }
-
-    isAllSelected(valueSetItem: ValueSetItem): boolean
-    {
-        if (!valueSetItem.masterSelect)
-        {
-            return valueSetItem.selected;
-        }
-        else
-        {
-            return this.valueSetProvider.isAllSelected();
-        }
-    }
-
-    isCheckBoxEnabled(valueSetItem: ValueSetItem): boolean
-    {
-        if (!valueSetItem.masterSelect)
-        {
-            return true;
-        }
-        else
-        {
-            return !!this.valueSetProvider.getVisibleItems().find(c => !c.masterSelect);
-        }
-    }
-
-    onClearFilter(): void
-    {
-        if (this.filterer)
-        {
-            this.formControlSearch.setValue('');
-            this.valueSetProvider.clearFilter();
-            this.onOk();
-        }
-    }
-
-
-    private reloadValueSetFromServer(searchText: string): void
-    {
-        if (this.filterer?.valueSet.remote)
-        {
-            this.valueSetSearchEvent.emit({searchText, valueSetProvider: this.valueSetProvider});
-        }
-    }
+  }
 }

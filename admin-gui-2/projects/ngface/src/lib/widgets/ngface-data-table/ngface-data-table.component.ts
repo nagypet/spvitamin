@@ -48,6 +48,7 @@ import ActionCell = Ngface.ActionCell;
 import NumericCell = Ngface.NumericCell;
 import DataRetrievalParams = Ngface.DataRetrievalParams;
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
+import {HideTooltipOnClickDirective} from '../../directives/hide-tooltip-on-click-directive';
 
 export interface TableReloadEvent
 {
@@ -86,7 +87,7 @@ export interface TableMasterToggleEvent
   templateUrl: './ngface-data-table.component.html',
   styleUrls: ['./ngface-data-table.component.scss'],
   standalone: true,
-  imports: [NgClass, NgIf, NgScrollbarModule, MatTableModule, MatSortModule, NgFor, MatCheckboxModule, SortFilterHeaderComponent, MatTooltipModule, MatButtonModule, MatIconModule, MatPaginatorModule, SafeHtmlPipe, ResponsiveClassDirective]
+  imports: [NgClass, NgIf, NgScrollbarModule, MatTableModule, MatSortModule, NgFor, MatCheckboxModule, SortFilterHeaderComponent, MatTooltipModule, MatButtonModule, MatIconModule, MatPaginatorModule, SafeHtmlPipe, ResponsiveClassDirective, HideTooltipOnClickDirective]
 })
 export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterViewInit
 {
@@ -130,10 +131,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
 
   private subscriptions = new Array<Subscription | undefined>();
 
+
   constructor(@Inject(LOCALE_ID) public locale: string,
               private el: ElementRef)
   {
   }
+
 
   ngOnDestroy(): void
   {
@@ -194,10 +197,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
   }
 
+
   private getScrollableAreaElement(): HTMLElement | undefined
   {
     return this.findHtmlElementByName(this.el.nativeElement, 'NG-SCROLLBAR');
   }
+
 
   private setHeightScrollbarY(): void
   {
@@ -219,10 +224,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
   }
 
+
   private findHtmlElementByName(rootNode: ChildNode, name: string): HTMLElement | undefined
   {
     return this.findChildNodeByName(rootNode, name) as HTMLElement;
   }
+
 
   private findChildNodeByName(rootNode: ChildNode, name: string): ChildNode | undefined
   {
@@ -256,6 +263,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return children;
   }
 
+
   ngAfterViewInit(): void
   {
     this.matTable.dataSource = this.dataSource;
@@ -268,6 +276,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
 
     setTimeout(() => this.setHeightScrollbarY(), 500);
   }
+
 
   reloadTable(pageIndex?: number): void
   {
@@ -292,6 +301,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     setTimeout(() => this.tableReloadEvent.emit(reloadEvent), 100);
   }
 
+
   convertActiveFilterersToFilterList(): Ngface.DataRetrievalParams.Filter[]
   {
     const c: Ngface.DataRetrievalParams.Filter[] = [];
@@ -299,6 +309,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     {
       c.push({
         column: filterer.column,
+        operator: filterer.operator,
         valueSet: filterer.valueSet.values.filter(v => v.selected).map(v => this.getText(v))
       });
     });
@@ -319,10 +330,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
   }
 
+
   getText(v: Ngface.ValueSet.Item): DataRetrievalParams.Filter.Item
   {
     return v.text !== '(Blanks)' ? {text: v.text} : {text: null};
   }
+
 
   getHeaderText(column: string): string
   {
@@ -330,11 +343,13 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return headerText ? headerText : column;
   }
 
+
   getCellText(row: Ngface.Row<any>, column: string): string
   {
     const cell = row.cells[column];
     return this.formatCell(cell) ?? 'NULL';
   }
+
 
   private formatCell(cell: Ngface.Cell<any, any> | undefined): string | undefined
   {
@@ -358,6 +373,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
     return '';
   }
+
 
   getTotalRowCellText(column: string): string
   {
@@ -406,10 +422,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return this.formdata?.widgets[this.widgetid] as Ngface.Table<any>;
   }
 
+
   public isPaginatorEnabled(): boolean
   {
     return !!this.dataSource.paginator;
   }
+
 
   getPaginator(): Ngface.Paginator
   {
@@ -421,11 +439,13 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return this.dataSource.paginator;
   }
 
+
   isColumnSortable(column: string): boolean
   {
     const sortable = this.getData().columns[column]?.sortable;
     return sortable !== undefined ? sortable : false;
   }
+
 
   getColumnSorter(column: string): Ngface.Sorter | undefined
   {
@@ -433,11 +453,13 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return (sorter?.column === column) ? sorter : undefined;
   }
 
+
   isColumnFilterable(column: string): boolean
   {
     const filterable = !!this.getData().data.filtererMap[column];
     return filterable ?? false;
   }
+
 
   getColumnFilterer(column: string): Ngface.Filterer | undefined
   {
@@ -453,6 +475,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
     return filterer;
   }
+
 
   getThClass(column: string): string | null
   {
@@ -484,16 +507,19 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return null;
   }
 
+
   getTdClass(row: Ngface.Row<any>, column: string): string | null
   {
     const cell = row.cells[column];
+    const vertical = 'align-top ';
     if (cell?.value == null)
     {
-      return 'cellvalue-null ' + this.getCellClass(column);
+      return vertical + 'cellvalue-null ' + this.getCellClass(column);
     }
 
-    return this.getCellClass(column);
+    return vertical + this.getCellClass(column);
   }
+
 
   private getCellClass(column: string): string | null
   {
@@ -510,6 +536,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return null;
   }
 
+
   getTdClassFooter(column: string): string | null
   {
     return this.getCellClass(column);
@@ -521,6 +548,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     const cell = row.cells[column];
     return cell.type === 'ActionCell';
   }
+
 
   getOptionalClasses(): string
   {
@@ -537,11 +565,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return '';
   }
 
+
   onRowClick(row: Ngface.Row<any>): void
   {
-    if (this.getData().selectMode === 'NONE')
+    if (this.getData().selectMode === 'NONE' || row.disabled)
     {
-      return
+      return;
     }
 
     if (this.getData().selectMode === 'SINGLE')
@@ -557,41 +586,62 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     this.rowClickEvent.emit(row);
   }
 
+
   getRowClasses(row: Ngface.Row<any>): string
   {
+    let classes = '';
+
     if (row.selected)
     {
-      return 'ngface-row-selected';
+      classes += 'ngface-row-selected';
     }
 
-    return '';
+    if (row.disabled)
+    {
+      classes += (classes ? ' ' : '') + 'ngface-row-disabled';
+    }
+
+    return classes;
   }
+
 
   masterToggle($event: MatCheckboxChange): void
   {
-    this.dataSource.getRows().forEach(r => r.selected = $event.checked);
+    this.dataSource.getRows().forEach(r => {
+      if (!r.disabled) {
+        r.selected = $event.checked;
+      }
+    });
     this.masterToggleEvent.emit({checked: $event.checked});
   }
+
 
   isChecked(row: Ngface.Row<any>): boolean
   {
     return row.selected;
   }
 
+
   isAnySelected(): boolean
   {
-    return !!this.dataSource.getRows().find(r => r.selected);
+    // Only consider non-disabled rows
+    return !!this.dataSource.getRows().find(r => !r.disabled && r.selected);
   }
+
 
   isAllSelected(): boolean
   {
-    return !this.dataSource.getRows().find(r => !r.selected);
+    // Only consider non-disabled rows
+    const selectableRows = this.dataSource.getRows().filter(r => !r.disabled);
+    return selectableRows.length > 0 && !selectableRows.find(r => !r.selected);
   }
+
 
   actionClick(row: Ngface.Row<any>, action: Ngface.Action): void
   {
     this.actionClickEvent.emit({row, actionId: action.id});
   }
+
 
   getActions(row: Ngface.Row<any>, column: string): Ngface.Action[] | null
   {
@@ -601,6 +651,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
     return null;
   }
+
 
   getActionClass(action: Ngface.Action): string
   {
@@ -617,6 +668,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
   {
     this.tableValueSetSearchEvent.emit({column, searchEvent: $event});
   }
+
 
   onFiltererChange($event: Ngface.Filterer): void
   {
@@ -640,11 +692,13 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return this.getData().notification ?? '';
   }
 
+
   getSortColumn(): string | null
   {
     const sorter = this.getData().data.sorter;
     return sorter ? sorter.column : null;
   }
+
 
   getSortDirection(): SortDirection
   {
@@ -661,10 +715,12 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     }
   }
 
+
   isTotalRow(): boolean
   {
     return !!this.getData().totalRow;
   }
+
 
   getColGroupText(columnGroup: string): string
   {
@@ -672,11 +728,13 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return columnGroupText ? columnGroupText : '';
   }
 
+
   getColGroupColSpan(columnGroup: string): number
   {
     const colSpan = this.getData().columnGroups[columnGroup]?.colSpan;
     return colSpan ? colSpan : 1;
   }
+
 
   getColGroupClass(column: string): string | null
   {
@@ -693,8 +751,9 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
     return null;
   }
 
+
   hidePageSize(): boolean
   {
-    return this.el.nativeElement.offsetWidth < 1000 && this.getData().notification.length > 0;
+    return this.el.nativeElement.offsetWidth < 1000 && this.getNotification().length > 0;
   }
 }

@@ -33,7 +33,7 @@
     </div>
   }
 
-  @if (logo) {
+  @if (logo && !isMobileDesign()) {
     <img responsiveClass="logo" src="{{logo}}">
   }
 
@@ -66,7 +66,10 @@
     <div responsiveClass="titlebar-actions">
       @for (action of getData().actions; track action.id) {
         <button responsiveClass="ngface-header-button" mat-button (click)="onActionClick(action)">
-          <mat-icon responsiveClass="material-icons-outlined" [matTooltip]="action.label">{{ action.icon }}</mat-icon>
+          <mat-icon responsiveClass="material-icons-outlined"
+                    [matTooltip]="action.label"
+                    matTooltipClass="multiline-tooltip"
+                    [matBadge]="action.badge">{{ action.icon }}</mat-icon>
         </button>
       }
     </div>

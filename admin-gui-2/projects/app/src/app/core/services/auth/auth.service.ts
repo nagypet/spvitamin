@@ -18,9 +18,9 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, mapTo, Observable, of, switchMap, throwError} from 'rxjs';
 import {CookieService} from 'ngx-cookie-service';
-import {ToastrService} from 'ngx-toastr';
-import {environment} from '../../../../environments/environment';
 import {catchError, finalize, map, tap} from 'rxjs/operators';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {environment} from '../../../../environments/environment';
 import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
 
 @Injectable({
@@ -31,20 +31,7 @@ export class AuthService
   private loginSubject$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loggedIn$ = this.loginSubject$.asObservable();
 
-  private loginPageVisibleSubject$ = new BehaviorSubject<boolean>(false);
-  public loginPageVisible$ = this.loginPageVisibleSubject$.asObservable();
-
   public isRefreshing = false;
-
-  setLoginPageVisible(value: boolean)
-  {
-    this.loginPageVisibleSubject$.next(value);
-  }
-
-  get isLoginPageVisible(): boolean
-  {
-    return this.loginPageVisibleSubject$.value;
-  }
 
 
   get isLoggedIn(): boolean
@@ -55,7 +42,7 @@ export class AuthService
 
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
-              private toastrService: ToastrService
+              private snackBar: MatSnackBar,
   )
   {
     this.checkToken().subscribe();
@@ -122,20 +109,6 @@ export class AuthService
   }
 
 
-  loginFrontendAnonym(): Observable<void>
-  {
-    console.log('loginFrontendAnonym()');
-    return this.login('frontend-anonym', 'an0n1m', false).pipe(
-      catchError(err =>
-      {
-        console.error('loginFrontendAnonym() failed', err);
-        return throwError(() => err);
-      }),
-      mapTo(void 0)
-    );
-  }
-
-
   /**
    * logout
    */
@@ -156,7 +129,9 @@ export class AuthService
       {
         if (withWarning)
         {
-          this.toastrService.warning('Please login again!', 'Session expired!');
+          this.snackBar.open('Session expired, please login again!', 'OK', {
+            panelClass: 'snackbar-warning'
+          });
         }
       }),
       mapTo(void 0), // típus: Observable<void>
@@ -174,6 +149,7 @@ export class AuthService
     sessionStorage.removeItem('token');
     this.cookieService.deleteAll();
   }
+
 
   /**
    * Handle authorization errors from error interceptor
@@ -224,7 +200,9 @@ export class AuthService
       console.log('time until expire', tokenValidSeconds);
       if (withInfo)
       {
-        this.toastrService.success(`Session validity: ${tokenValidMinutes} minutes`, `Welcome ${this.getDisplayName()}`);
+        this.snackBar.open(`Welcome ${this.getDisplayName()}! Session validity: ${tokenValidMinutes} minutes`, 'OK', {
+          duration: 5000
+        });
       }
     }
     this.loginSubject$.next(true);

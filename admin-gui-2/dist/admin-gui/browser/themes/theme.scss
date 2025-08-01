@@ -1,0 +1,105 @@
+/*!
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@use '@angular/material' as mat;
+@use "sass:map";
+
+@include mat.core();
+
+$microdms-palette: (
+  50: var(--palette-50),
+  100: var(--palette-100),
+  200: var(--palette-200),
+  300: var(--palette-300),
+  400: var(--palette-400),
+  500: var(--palette-500),
+  600: var(--palette-600),
+  700: var(--palette-700),
+  800: var(--palette-800),
+  900: var(--palette-900),
+  A100: var(--palette-A100),
+  A200: var(--palette-A200),
+  A400: var(--palette-A400),
+  A700: var(--palette-A700),
+  contrast: (
+    50: var(--dark-primary-text),
+    100: var(--dark-primary-text),
+    200: var(--dark-primary-text),
+    300: var(--dark-primary-text),
+    400: var(--dark-primary-text),
+    500: var(--light-primary-text),
+    600: var(--light-primary-text),
+    700: var(--light-primary-text),
+    800: var(--light-primary-text),
+    900: var(--light-primary-text),
+    A100: var(--dark-primary-text),
+    A200: var(--dark-primary-text),
+    A400: var(--dark-primary-text),
+    A700: var(--light-primary-text),
+  )
+);
+
+
+// Color palette
+$my-primary: mat.m2-define-palette($microdms-palette, 500, 300, 700);
+$my-accent: mat.m2-define-palette($microdms-palette, 500, 300, 700);
+$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$my-foreground: map.merge(
+    mat.$m2-light-theme-foreground-palette,
+    (
+      base: blue,
+      secondary-text: rgba(0, 0, 0, .1),
+      hint-text : rgba(0, 0, 0, .1)
+    )
+);
+
+
+// Typography
+// $font-size, $line-height, $font-weight, $font-family, $letter-spacing
+$my-typography: mat.m2-define-typography-config(
+  $font-family: var(--global-font),
+  $body-1: mat.m2-define-typography-level(var(--font-size), 24px, var(--font-weight-material), null, 0),
+    // table cell
+  $body-2: mat.m2-define-typography-level(var(--table-font-size), 14px, var(--font-weight-table-cell), null, 0),
+  $caption: mat.m2-define-typography-level(var(--table-font-size), 14px, var(--font-weight-caption), null, 0),
+  $button: mat.m2-define-typography-level(var(--button-font-size), 20px, var(--font-weight-button), null, 0),
+  // table header
+  $subtitle-2: mat.m2-define-typography-level(var(--table-font-size), 20px, var(--font-weight-table-header), null, 0),
+  //$font-family: 'Lexend',
+  //$font-family: 'Roboto',
+);
+
+// Height of material inputs
+:root {
+  @include mat.form-field-density(-3);
+
+  /*  a leszármazó ikon‑gomb (datepicker‑toggle) is -3  */
+  @include mat.icon-button-density(-3);
+}
+
+
+// The theme
+$my-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: $my-warn
+  ),
+  foreground: $my-foreground,
+  //density: -3,
+  typography: $my-typography
+));

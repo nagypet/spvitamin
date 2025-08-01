@@ -27,10 +27,6 @@
   opacity: 1;
   transition: opacity ease 0.2s;
   cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
 }
 
 .ngface-button.phone {

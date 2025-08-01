@@ -1,0 +1,13 @@
+/**
+ * These constants may be redefined in the application to create custom theming
+ */
+
+:root {
+  /* Colors */
+  --color-disabled: rgba(0, 0, 0, .12);
+  --color-font: #232323;
+
+  /* NgfaceDataTable */
+  --ngface-data-table-row-height: 30px;
+}
+

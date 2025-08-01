@@ -15,6 +15,7 @@
  */
 
 .ngface-paginator-container.desktop {
+  margin-top: 10px;
   display: flex;
 
   .ngface-notification {
@@ -52,15 +53,15 @@ table tr:last-child td /*To remove the last border*/
 
 tr.mat-mdc-header-row {
   height: 36px;
-  background-color: var(--app-primary-palette-200, #f5f5f5);
+  background-color: var(--app-primary-palette-50, #f5f5f5);
 }
 
 tr.mat-mdc-row, tr.mat-mdc-footer-row {
-  height: 30px;
+  height: var(--ngface-data-table-row-height, 30px);
 }
 
 tr.mat-mdc-footer-row {
-  background-color: var(--app-primary-palette-100, #f5f5f5);
+  background-color: var(--app-primary-palette-50, #f5f5f5);
 }
 
 .mat-mdc-row .mat-mdc-cell {
@@ -80,7 +81,12 @@ tr.mat-mdc-footer-row {
   }
 
   .ngface-row-selected {
-    background-color: var(--app-primary-palette-50, rgba(0, 0, 0, .02));
+    background-color: var(--app-primary-palette-100, rgba(0, 0, 0, .02));
+  }
+
+  .ngface-row-disabled .mat-mdc-cell {
+    color: var(--color-disabled, rgba(0, 0, 0, .12));
+    cursor: default;
   }
 }
 
@@ -97,40 +103,51 @@ td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  vertical-align: middle!important;
+}
 
-  .mat-mdc-icon-button {
+
+//th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
+th.mat-mdc-header-cell:not(:first-of-type) {
+  //border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-cell:not(:first-of-type) {
+  border-left: var(--app-primary-palette-50, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-footer-cell:not(:first-of-type) {
+  border-left: var(--app-primary-palette-50, whitesmoke) solid 1px;
+}
+
+td.mat-mdc-footer-cell {
+  border-top: var(--app-primary-palette-50, rgba(0, 0, 0, .12)) solid 1px!important;
+}
+
+.action-cell {
+  display: flex;
+  align-items: center;
+
+  mat-icon {
+    line-height: 30px;
+  }
+
+  .action-button {
+    border-radius: 5px;
     width: 30px;
     height: 30px;
-    padding: 0;
+    padding: unset;
+    margin: unset;
 
-    // does not work! :-(
+    &:hover {
+      border: var(--app-primary-palette-100) 1px solid;
+      background-color: var(--app-primary-palette-50, lightblue);
+    }
+
+      // does not work! :-(
     .mat-mdc-button-touch-target {
       width: 30px;
       height: 30px;
     }
   }
-}
-
-
-th.mat-mdc-header-cell {
-  font-size: 12px;
-  line-height: normal;
-  color: var(--app-primary-contrast-200, #0000008a);
-}
-
-//th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
-th.mat-mdc-header-cell:not(:first-of-type) {
-  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
-}
-
-td.mat-mdc-cell:not(:first-of-type) {
-  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
-}
-
-td.mat-mdc-footer-cell:not(:first-of-type) {
-  border-left: var(--app-primary-palette-300, whitesmoke) solid 1px;
-}
-
-td.mat-mdc-footer-cell {
-  border-top: var(--app-primary-palette-100, rgba(0, 0, 0, .12)) solid 1px!important;
 }

@@ -58,6 +58,7 @@ import {NgfaceTitlebarComponent} from './titlebar/ngface-titlebar/ngface-titleba
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {ResponsiveClassDirective} from './directives/responsive-class-directive';
 import {NgfaceFileUploadComponent} from './components/ngface-fileupload/ngface-file-upload.component';
+import {NgfaceDialogCloseDirective} from './directives/ngface-dialog-close-directive';
 
 
 @NgModule({
@@ -103,7 +104,8 @@ import {NgfaceFileUploadComponent} from './components/ngface-fileupload/ngface-f
     MatToolbarModule,
     NgfaceTitlebarComponent,
     ResponsiveClassDirective,
-    NgfaceFileUploadComponent
+    NgfaceFileUploadComponent,
+    NgfaceDialogCloseDirective
   ],
   exports: [
     NgfaceButtonComponent,
@@ -117,7 +119,8 @@ import {NgfaceFileUploadComponent} from './components/ngface-fileupload/ngface-f
     NgfaceAutocompleteComponent,
     SafeHtmlPipe,
     ResponsiveClassDirective,
-    NgfaceFileUploadComponent
+    NgfaceFileUploadComponent,
+    NgfaceDialogCloseDirective
   ],
   providers: [
     {

@@ -82,6 +82,8 @@ export class NgfaceFileUploadComponent implements OnChanges
 
   @Output() onUpload: EventEmitter<IUploadEvent> = new EventEmitter<IUploadEvent>();
 
+  @Output() onQueued: EventEmitter<File | undefined> = new EventEmitter<File | undefined>();
+
 
   public files: Array<FileStatus> = [];
 
@@ -105,6 +107,7 @@ export class NgfaceFileUploadComponent implements OnChanges
       {
         this.files.push({file: target.files[i], uploaded: false});
         console.log(`${i}: ${target.files[i].name}`);
+        this.onQueued.emit(target.files[i]);
       }
       console.log(`Added ${this.files.length} files to the queue`);
     }
@@ -123,6 +126,7 @@ export class NgfaceFileUploadComponent implements OnChanges
 
   removeAll(): void
   {
+    this.onQueued.emit(undefined);
     for (let i = 0; i < this.files.length; i++)
     {
       if (!this.files[i].uploaded)
@@ -135,6 +139,7 @@ export class NgfaceFileUploadComponent implements OnChanges
 
   removeItem($event: UploadItemComponent): void
   {
+    this.onQueued.emit(undefined);
     for (let i = 0; i < this.files.length; i++)
     {
       if ($event.file === this.files[i].file)
