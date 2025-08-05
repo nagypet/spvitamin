@@ -125,6 +125,7 @@ dependencyManagement {
 - Utility classes: CurrencyConverter, PostalAddress
 - JsonSerializer new method added: listFromJson() for easy deserialization of an array
 - NumberConverter
+- ResponseEntityUtils.createFileDownloadResponse() fixed in case of UTF-8 encoded file names 
 
 
 ### 3.3.3-2-RELEASE not yet released

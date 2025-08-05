@@ -21,6 +21,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.*;
 
+import java.nio.charset.StandardCharsets;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResponseEntityUtils
 {
@@ -35,7 +37,7 @@ public final class ResponseEntityUtils
         headers.setContentType(mediaType != null ? mediaType : MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(
                 ContentDisposition.attachment()
-                        .filename(FileNameUtils.sanitizeFileName(fileName))
+                        .filename(FileNameUtils.sanitizeFileName(fileName), StandardCharsets.UTF_8)
                         .build()
         );
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
