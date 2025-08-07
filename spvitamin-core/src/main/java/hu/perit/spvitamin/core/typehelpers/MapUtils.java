@@ -78,7 +78,7 @@ public final class MapUtils
     }
 
 
-    public static <K, V, V2> Map<K, Set<V2>> groupBy(Collection<V> collection, Function<V, K> keySupplier, Function<V, V2> valueSupplier)
+    public static <T, K, V> Map<K, Set<V>> groupBy(Collection<T> collection, Function<T, K> keySupplier, Function<T, V> valueSupplier)
     {
         if (collection == null)
         {
