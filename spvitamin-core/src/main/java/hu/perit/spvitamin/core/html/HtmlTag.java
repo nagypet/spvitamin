@@ -111,7 +111,7 @@ public class HtmlTag
         {
             if (!this.content.isSimpleContent())
             {
-                sb.append(System.lineSeparator());
+                sb.append("\n");
                 sb.append(String.join("", Collections.nCopies(level, "  ")));
             }
             sb.append("</").append(this.tag).append(">");

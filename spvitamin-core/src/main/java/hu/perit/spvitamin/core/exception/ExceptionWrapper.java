@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Handles regular exceptions and ServerException transparently
@@ -37,6 +36,7 @@ public class ExceptionWrapper implements ServerExceptionInterface
 {
 
     private final Throwable exception;
+
 
     public static ExceptionWrapper of(Throwable exception)
     {
@@ -97,6 +97,7 @@ public class ExceptionWrapper implements ServerExceptionInterface
         }
         return sb.toString();
     }
+
 
     static String removeLineSeparators(String text)
     {
@@ -283,6 +284,7 @@ public class ExceptionWrapper implements ServerExceptionInterface
     {
         return getSuperClassNames(this.exception);
     }
+
 
     @Override
     public Annotation[] getAnnotations()

@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import io.jsonwebtoken.Claims;
@@ -45,7 +46,6 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider
 {
-
     private final JwtProperties jwtProperties;
 
 
@@ -62,7 +62,8 @@ public class JwtTokenProvider
 
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
-            TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource());
+            String sessionId = RequestQuery.isFromBrowser() ? RequestQuery.getSessionId() : null;
+            TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource(), sessionId);
             claims.setPreferredUsername(authenticatedUser.getDisplayName());
 
             // Put the additional claims into the token
@@ -85,6 +86,7 @@ public class JwtTokenProvider
                     .uid(authenticatedUser.getUserId())
                     .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
                     .source(authenticatedUser.getSource())
+                    .jsid(sessionId)
                     .additionalClaims(authenticatedUser.getAdditionalClaims())
                     .build();
         }

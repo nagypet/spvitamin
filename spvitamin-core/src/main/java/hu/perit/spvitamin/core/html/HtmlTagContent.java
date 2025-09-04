@@ -65,7 +65,7 @@ public class HtmlTagContent
 
             for (HtmlTag tag : this.tags)
             {
-                sb.append(System.lineSeparator());
+                sb.append("\n");
                 tag.print(sb, level + 1);
             }
         }

@@ -16,7 +16,11 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import hu.perit.spvitamin.spring.config.*;
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SwaggerProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthenticationRepositoryApi;
 import hu.perit.spvitamin.spring.security.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -55,13 +59,8 @@ public class SpvitaminWebSecurityConfig
 
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope(new AntPathRequestMatcher(logoutUrl, "POST"))
-                .authorizeRequests(i -> i.anyRequest().permitAll()).and()
-                .logout(logout -> logout
-                        .logoutUrl(logoutUrl)
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
-                );
+                .authorizeRequests(i -> i.anyRequest().permitAll())
+                .logout(logoutUrl);
 
         return http.build();
     }
@@ -85,10 +84,8 @@ public class SpvitaminWebSecurityConfig
                 .scope(
                         Constants.BASE_URL_ADMIN + "/**",
                         Constants.BASE_URL_KEYSTORE + "/**",
-                        Constants.BASE_URL_TRUSTSTORE + "/**",
-                        AuthenticationRepositoryApi.BASE_URL + "/**"
+                        Constants.BASE_URL_TRUSTSTORE + "/**"
                 )
-                .authorizeRequests(i -> i.requestMatchers(AuthenticationRepositoryApi.BASE_URL + "/**").permitAll())
                 // /admin/** endpoints
                 .authorizeRequests(i -> authAdminRestEndpoints(i, mvc))
                 // any other requests
@@ -139,9 +136,9 @@ public class SpvitaminWebSecurityConfig
     {
         SimpleHttpSecurityBuilder.newInstance(http)
                 .defaults()
-                .logout()
                 // h2 console uses frames
                 .allowFrames()
+                .authorizeRequests(i -> i.requestMatchers(AuthenticationRepositoryApi.BASE_URL + "/**").permitAll())
                 .authorizeRequests(i -> authorizeSwagger(i, mvc))
                 .authorizeRequests(i -> authorizeActuator(i, mvc))
                 .authorizeRequests(i -> authorizeAdminGui(i, mvc))

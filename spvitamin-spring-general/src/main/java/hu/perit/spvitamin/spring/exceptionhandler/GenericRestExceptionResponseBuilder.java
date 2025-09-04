@@ -17,7 +17,12 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.*;
+import hu.perit.spvitamin.core.exception.ApplicationException;
+import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
+import hu.perit.spvitamin.core.exception.ApplicationSpecificException;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.exception.InputException;
+import hu.perit.spvitamin.core.exception.LogLevel;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +49,9 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
 
         // ========== UNAUTHORIZED (401) ===============================================================================
         if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
-                || exception.instanceOf("io.jsonwebtoken.JwtException"))
+                || exception.instanceOf("io.jsonwebtoken.JwtException")
+                || exception.causedBy(IllegalStateException.class, "Session was invalidated")
+        )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.UNAUTHORIZED, ex, path, traceId));

@@ -52,6 +52,7 @@ public class AuthorizationToken implements AbstractAuthorizationToken
     private String uid;
     private Set<String> rls;
     private String source;
+    private String jsid;
     @Singular("additionalClaim")
     private Map<String, Object> additionalClaims;
 }

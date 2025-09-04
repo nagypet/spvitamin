@@ -27,11 +27,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -56,18 +56,27 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             {
                 String jwt = token.getJwt();
 
-                if (StringUtils.hasText(jwt))
+                if (StringUtils.isNotBlank(jwt))
                 {
                     JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
+
+                    // Checking sessionId
+                    String sessionIdInToken = claims.getSessionId();
+                    String sessionId = request.getSession().getId();
+                    if (StringUtils.isNotBlank(sessionIdInToken) && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionId))
+                    {
+                        // The token has been issued for another session
+                        throw new FilterAuthenticationException("Invalid session id in JWT token!");
+                    }
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
                     UsernamePasswordAuthenticationToken authentication;
                     Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
-                    if (StringUtils.hasText(authenticatedUser.getSource()))
+                    if (StringUtils.isNotBlank(authenticatedUser.getSource()))
                     {
                         authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getSource(), claims.getPreferredUsername());
                     }

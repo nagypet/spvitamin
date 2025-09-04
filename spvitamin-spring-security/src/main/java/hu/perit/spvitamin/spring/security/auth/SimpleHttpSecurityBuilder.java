@@ -31,11 +31,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -86,7 +86,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-        AccessDeniedHandler accessDeniedHandler) throws Exception
+                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
     {
         http.exceptionHandling(i -> i.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
         return this;
@@ -99,10 +99,10 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         return this
-            .defaultCors()
-            .defaultCsrf()
-            .allowAdditionalSecurityHeaders()
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
+                .defaultCors()
+                .defaultCsrf()
+                .allowAdditionalSecurityHeaders()
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
     }
 
 
@@ -142,7 +142,24 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder createSession() throws Exception
     {
-        this.http.sessionManagement(i -> i.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
+        this.http.sessionManagement(i -> i
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(10)
+                .maxSessionsPreventsLogin(true)
+        );
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder createSession(int maximumSessions, SessionRegistry sessionRegistry) throws Exception
+    {
+        this.http.sessionManagement(i -> i
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(maximumSessions)
+                .sessionRegistry(sessionRegistry)
+                .maxSessionsPreventsLogin(true)
+        );
 
         return this;
     }
@@ -196,7 +213,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder authorizeRequests(
-        Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
+            Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
     {
         this.http.authorizeHttpRequests(authorizeHttpRequestsCustomizer);
 
@@ -210,9 +227,16 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder logout() throws Exception
+    public SimpleHttpSecurityBuilder logout(String logoutUrl) throws Exception
     {
-        this.http.logout(i -> i.invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true));
+        this.http.logout(i -> i
+                .logoutUrl(logoutUrl)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true)
+                .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
+        );
+
         return this;
     }
 

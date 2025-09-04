@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,7 +42,7 @@ public interface AuthApi
     /*
      * ============== authenticate ===================================================================================
      */
-    @GetMapping(BASE_URL_AUTHENTICATE)
+    @GetMapping(value = BASE_URL_AUTHENTICATE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "authenticate() - User authenticate",
             security = {
                     @SecurityRequirement(name = "basic"),

@@ -55,6 +55,8 @@ dependencies {
         api project(":spvitamin-spring-security-keycloak")
         api project(":spvitamin-spring-security-ldap")
         api project(":spvitamin-spring-server")
+        api project(":spvitamin-file-storage")
+        api project(":spvitamin-file-storage-spring-sftp")
         api project(":spvitamin-test")
     }
 }

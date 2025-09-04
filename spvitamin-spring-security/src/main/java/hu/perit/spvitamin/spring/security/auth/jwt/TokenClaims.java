@@ -36,6 +36,7 @@ public class TokenClaims extends DefaultClaims
     public static final String USERID = "uid";
     public static final String SRC = "src";
     public static final String PREFERRED_USERNAME = "preferred_username";
+    public static final String JSID = "jsid";
 
 
     public TokenClaims(Claims claims)
@@ -44,11 +45,12 @@ public class TokenClaims extends DefaultClaims
     }
 
 
-    public TokenClaims(String userId, Collection<? extends GrantedAuthority> authorities, String source)
+    public TokenClaims(String userId, Collection<? extends GrantedAuthority> authorities, String source, String sessionId)
     {
         this.setUserId(userId);
         this.setAuthorities(authorities);
         this.setSource(source);
+        this.setSessionId(sessionId);
     }
 
 
@@ -100,13 +102,27 @@ public class TokenClaims extends DefaultClaims
         this.put(ROLES, new ArrayList<>(AuthorityUtils.authorityListToSet(authorities)));
     }
 
+
     public String getSource()
     {
         return this.get(SRC, String.class);
     }
 
+
     public void setSource(String source)
     {
         this.put(SRC, source);
+    }
+
+
+    public String getSessionId()
+    {
+        return this.get(JSID, String.class);
+    }
+
+
+    public void setSessionId(String sessionId)
+    {
+        this.put(JSID, sessionId);
     }
 }

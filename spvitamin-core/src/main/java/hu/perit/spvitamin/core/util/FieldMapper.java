@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.data.nativequery;
+package hu.perit.spvitamin.core.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 
@@ -82,6 +83,33 @@ public final class FieldMapper
         else if (field instanceof Number)
         {
             return Long.parseLong(field.toString());
+        }
+        throw new ClassCastException(MessageFormat.format("Cannot cast {0} to {1}!", field.getClass(), Long.class.getName()));
+    }
+
+
+    public static BigDecimal toBigDecimal(Object field)
+    {
+        if (field == null)
+        {
+            return BigDecimal.ZERO;
+        }
+
+        if (field instanceof BigDecimal bigDecimalValue)
+        {
+            return bigDecimalValue;
+        }
+        if (field instanceof Long longValue)
+        {
+            return BigDecimal.valueOf(longValue);
+        }
+        if (field instanceof BigInteger bigInteger)
+        {
+            return BigDecimal.valueOf(bigInteger.longValue());
+        }
+        else if (field instanceof Number number)
+        {
+            return BigDecimal.valueOf(number.doubleValue());
         }
         throw new ClassCastException(MessageFormat.format("Cannot cast {0} to {1}!", field.getClass(), Long.class.getName()));
     }
