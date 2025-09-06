@@ -39,7 +39,6 @@ import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpringContext implements ApplicationContextAware
 {
-
     private static ApplicationContext context;
 
     @Override

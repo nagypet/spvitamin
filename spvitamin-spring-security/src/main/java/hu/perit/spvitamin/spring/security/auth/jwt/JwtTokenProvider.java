@@ -19,9 +19,11 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -61,6 +63,10 @@ public class JwtTokenProvider
             Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
+
+            // Updating session-registry
+            AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
+            sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser);
 
             String sessionId = RequestQuery.isFromBrowser() ? RequestQuery.getSessionId() : null;
             TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource(), sessionId);

@@ -16,11 +16,14 @@
 
 package hu.perit.spvitamin.spring.session.local;
 
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 
 import java.time.Duration;
+import java.util.Objects;
 
 @Slf4j
 public class SpvitaminSessionRegistry extends SessionRegistryImpl implements AdvancedSessionRegistry
@@ -29,5 +32,18 @@ public class SpvitaminSessionRegistry extends SessionRegistryImpl implements Adv
     public void setMaxInactiveInterval(HttpSession httpSession, Duration duration)
     {
         httpSession.setMaxInactiveInterval((int) duration.toSeconds());
+    }
+
+
+    @Override
+    public void updatePrincipal(String sessionId, AuthenticatedUser principal)
+    {
+        SessionInformation sessionInformation = this.getSessionInformation(sessionId);
+        if (sessionInformation == null || !Objects.equals(sessionInformation.getPrincipal(), principal))
+        {
+            log.debug("updatePrincipal: sessionId={}, principal={}", sessionId, principal);
+            removeSessionInformation(sessionId);
+            registerNewSession(sessionId, principal);
+        }
     }
 }

@@ -54,7 +54,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.3.3-2-RELEASE')
+    set('spvitaminVersion', '3.4.3-1-RELEASE')
 }
 
 dependencies {
@@ -73,6 +73,10 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
     implementation 'hu.perit.spvitamin:spvitamin-spring-server'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage-spring-sftp'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-session-redis'
+    implementation 'hu.perit.spvitamin:spvitamin-test'
 }	
 
 dependencyManagement {
@@ -136,6 +140,7 @@ dependencyManagement {
 - AuthorizationToken: jsid added
 - If the /authenticate request comes from a browser, the sessionId will be stored in the generated token, and in subsequent calls the token is only valid within the same session
 - TookWithMetrics can now count only if the request was successful
+- New modul: spvitamin-spring-session-redis
 
 
 ### 3.3.3-2-RELEASE not yet released

@@ -38,6 +38,17 @@ public final class RequestQuery
     }
 
 
+    public static HttpSession getSession()
+    {
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (httpServletRequest != null)
+        {
+            return httpServletRequest.getSession(false);
+        }
+        return null;
+    }
+
+
     public static String getSessionId()
     {
         HttpServletRequest httpServletRequest = getHttpServletRequest();

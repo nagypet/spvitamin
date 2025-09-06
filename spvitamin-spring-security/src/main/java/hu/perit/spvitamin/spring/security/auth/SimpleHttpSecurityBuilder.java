@@ -31,10 +31,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
@@ -142,24 +142,12 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder createSession() throws Exception
     {
-        this.http.sessionManagement(i -> i
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .maximumSessions(10)
-                .maxSessionsPreventsLogin(true)
-        );
-
-        return this;
-    }
-
-
-    public SimpleHttpSecurityBuilder createSession(int maximumSessions, SessionRegistry sessionRegistry) throws Exception
-    {
-        this.http.sessionManagement(i -> i
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .maximumSessions(maximumSessions)
-                .sessionRegistry(sessionRegistry)
-                .maxSessionsPreventsLogin(true)
-        );
+        SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
+        this.http
+                .sessionManagement(i -> i
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionAuthenticationStrategy(authenticationStrategy)
+                );
 
         return this;
     }
@@ -173,7 +161,7 @@ public class SimpleHttpSecurityBuilder
 
         if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
         {
-            this.http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+            this.http.addFilterBefore(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
         }
 
         return this;

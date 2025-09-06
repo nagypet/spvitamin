@@ -89,7 +89,7 @@ public class RoleMapperServiceImpl implements RoleMapperService
     }
 
 
-    private String prefixWithRole(String roleName)
+    private static String prefixWithRole(String roleName)
     {
         if (roleName == null)
         {

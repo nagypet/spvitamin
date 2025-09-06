@@ -57,6 +57,7 @@ dependencies {
         api project(":spvitamin-spring-server")
         api project(":spvitamin-file-storage")
         api project(":spvitamin-file-storage-spring-sftp")
+        api project(":spvitamin-spring-session-redis")
         api project(":spvitamin-test")
     }
 }

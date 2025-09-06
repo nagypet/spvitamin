@@ -37,4 +37,5 @@ copyTo spvitamin-spring-security-authservice
 copyTo spvitamin-spring-security-keycloak
 copyTo spvitamin-spring-security-ldap
 copyTo spvitamin-spring-server
+copyTo spvitamin-spring-session-redis
 copyTo spvitamin-test

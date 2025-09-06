@@ -17,28 +17,24 @@
 package hu.perit.spvitamin.spring.session.local;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+
+import java.util.List;
 
 @Configuration
-@ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "caffein", matchIfMissing = true)
 @Slf4j
-public class SessionRegistryConfigLocal
+public class SessionRegistryConfig
 {
     @Bean
-    public AdvancedSessionRegistry sessionRegistry()
+    public SessionAuthenticationStrategy sessionAuthenticationStrategy(AdvancedSessionRegistry sessionRegistry)
     {
-        log.info("SpvitaminSessionRegistry created");
-        return new SpvitaminSessionRegistry();
-    }
-
-
-    @Bean
-    HttpSessionEventPublisher sessionEventPublisher()
-    {
-        log.info("HttpSessionEventPublisher created");
-        return new HttpSessionEventPublisher();
+        var concurrent = new PerUserTypeConcurrentSessionControlStrategy(sessionRegistry);
+        var register = new RegisterSessionAuthenticationStrategy(sessionRegistry);
+        return new CompositeSessionAuthenticationStrategy(List.of(concurrent, register));
     }
 }

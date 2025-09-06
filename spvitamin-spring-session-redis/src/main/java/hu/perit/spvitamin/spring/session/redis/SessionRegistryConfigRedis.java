@@ -14,31 +14,39 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.session.redis;
 
+import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession;
 
 @Configuration
-@ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "caffein", matchIfMissing = true)
+@EnableRedisIndexedHttpSession
+@ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "redis", matchIfMissing = false)
 @Slf4j
-public class SessionRegistryConfigLocal
+public class SessionRegistryConfigRedis
 {
     @Bean
-    public AdvancedSessionRegistry sessionRegistry()
+    public AdvancedSessionRegistry sessionRegistry(
+            FindByIndexNameSessionRepository<? extends Session> sessionRepository,
+            StringRedisTemplate redisTemplate
+    )
     {
-        log.info("SpvitaminSessionRegistry created");
-        return new SpvitaminSessionRegistry();
+        log.info("SpvitaminSpringSessionBackedSessionRegistry created");
+        return new SpvitaminSpringSessionBackedSessionRegistry<>(sessionRepository, redisTemplate);
     }
 
 
     @Bean
     HttpSessionEventPublisher sessionEventPublisher()
     {
-        log.info("HttpSessionEventPublisher created");
         return new HttpSessionEventPublisher();
     }
 }

@@ -22,6 +22,7 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
+import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,17 +33,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Collection;
 
+
 @Slf4j
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
 {
 
     protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request);
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
@@ -64,12 +68,8 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     // Checking sessionId
                     String sessionIdInToken = claims.getSessionId();
-                    String sessionId = request.getSession().getId();
-                    if (StringUtils.isNotBlank(sessionIdInToken) && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionId))
-                    {
-                        // The token has been issued for another session
-                        throw new FilterAuthenticationException("Invalid session id in JWT token!");
-                    }
+                    String sessionIdInRequest = request.getSession().getId();
+                    checkSessionValidity(sessionIdInToken, sessionIdInRequest);
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
@@ -112,6 +112,27 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         finally
         {
             SecurityContextHolder.clearContext();
+        }
+    }
+
+
+    private static void checkSessionValidity(String sessionIdInToken, String sessionId)
+    {
+        if (StringUtils.isNotBlank(sessionIdInToken))
+        {
+            if (!StringUtils.equalsIgnoreCase(sessionIdInToken, sessionId))
+            {
+                // The token has been issued for another session
+                throw new FilterAuthenticationException("Invalid session id in JWT token!");
+            }
+
+            // Checking session validity
+            AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
+            SessionInformation sessionInformation = sessionRegistry.getSessionInformation(sessionId);
+            if (sessionInformation != null && sessionInformation.isExpired())
+            {
+                throw new FilterAuthenticationException("Session expired!");
+            }
         }
     }
 }

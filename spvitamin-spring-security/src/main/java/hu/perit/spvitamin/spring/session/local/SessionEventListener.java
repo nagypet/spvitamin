@@ -17,10 +17,13 @@
 package hu.perit.spvitamin.spring.session.local;
 
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.Constants;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -39,8 +42,22 @@ public class SessionEventListener implements HttpSessionListener
     {
         long expirationInMinutes = jwtProperties.getExpirationInMinutes() + 5;
         sessionRegistry.setMaxInactiveInterval(se.getSession(), Duration.ofMinutes(expirationInMinutes));
+        String principalName = getPrincipalNameFromSession(se);
 
-        log.debug("Session created: {}, maxInactiveInterval: {} minutes", se.getSession().getId(), expirationInMinutes);
+        log.debug("Session created: {}, principal: {}, maxInactiveInterval: {} minutes", se.getSession().getId(), principalName, expirationInMinutes);
+    }
+
+
+    private static String getPrincipalNameFromSession(HttpSessionEvent se)
+    {
+        Object attribute = se.getSession().getAttribute(Constants.SPRING_SECURITY_CONTEXT);
+        if (attribute instanceof SecurityContext securityContext
+                && securityContext.getAuthentication() != null
+                && securityContext.getAuthentication().getPrincipal() instanceof AuthenticatedUser authenticatedUser)
+        {
+            return authenticatedUser.getUsername();
+        }
+        return null;
     }
 
 
