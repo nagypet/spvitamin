@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.session.local;
 
+import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +39,19 @@ public class SpvitaminSessionRegistry extends SessionRegistryImpl implements Adv
     @Override
     public void updatePrincipal(String sessionId, AuthenticatedUser principal)
     {
-        SessionInformation sessionInformation = this.getSessionInformation(sessionId);
-        if (sessionInformation == null || !Objects.equals(sessionInformation.getPrincipal(), principal))
+        try
         {
-            log.debug("updatePrincipal: sessionId={}, principal={}", sessionId, principal);
-            removeSessionInformation(sessionId);
-            registerNewSession(sessionId, principal);
+            SessionInformation sessionInformation = this.getSessionInformation(sessionId);
+            if (sessionInformation == null || !Objects.equals(sessionInformation.getPrincipal(), principal))
+            {
+                log.debug("updatePrincipal: sessionId={}, principal={}", sessionId, principal);
+                removeSessionInformation(sessionId);
+                registerNewSession(sessionId, principal);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error(StackTracer.toString(e));
         }
     }
 }
