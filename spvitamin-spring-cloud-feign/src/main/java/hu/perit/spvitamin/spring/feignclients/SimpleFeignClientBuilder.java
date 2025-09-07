@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.feignclients;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Client;
 import feign.Feign;
 import feign.Logger;
 import feign.RequestInterceptor;
@@ -57,6 +58,8 @@ public class SimpleFeignClientBuilder
     private Decoder decoder;
     private ErrorDecoder errorDecoder = new RestExceptionResponseDecoder();
     private Retryer retryer;
+    private Client client;
+
 
     public static SimpleFeignClientBuilder newInstance()
     {
@@ -89,6 +92,9 @@ public class SimpleFeignClientBuilder
                 feignProperties.getRetry().getMaxPeriod(),
                 feignProperties.getRetry().getMaxAttempts()
         );
+
+        // Base client
+        this.client = new Client.Default(null, null);
 
         this.builder = Feign.builder()
                 .contract(new SpringMvcContract())
@@ -137,6 +143,13 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder client(Client client)
+    {
+        this.client = client;
+        return this;
+    }
+
+
     private static Logger.Level getLevel(String level)
     {
         return Logger.Level.valueOf(level.toUpperCase());
@@ -156,6 +169,7 @@ public class SimpleFeignClientBuilder
         this.builder.decoder(this.decoder);
         this.builder.errorDecoder(this.errorDecoder);
         this.builder.retryer(this.retryer);
+        this.builder.client(new HeaderFilterFeignClient(this.client));
 
         return this.builder.target(apiType, url);
     }
