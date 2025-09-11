@@ -19,11 +19,11 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.local.SpvitaminCompositeSessionAuthenticationStrategy;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,6 +31,8 @@ import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -49,6 +51,8 @@ import java.util.Date;
 public class JwtTokenProvider
 {
     private final JwtProperties jwtProperties;
+    private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
+    private final AdvancedSessionRegistry sessionRegistry;
 
 
     public AuthorizationToken generateToken(AuthenticatedUser authenticatedUser)
@@ -65,10 +69,19 @@ public class JwtTokenProvider
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
             // Updating session-registry
-            AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
-            sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser);
+            if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)
+            {
+                // Checking if the current user exceeded the max. session count to cover the cases when the session has been created for another user
+                this.sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser,
+                        () -> authenticationStrategy.onSessionPrincipalChanged(SecurityContextHolder.getContext().getAuthentication(), RequestQuery.getHttpServletRequest(), null));
+            }
+            else
+            {
+                this.sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser, null);
+            }
 
-            String sessionId = RequestQuery.isFromBrowser() ? RequestQuery.getSessionId() : null;
+            // Putting the sessionId into the token
+            String sessionId = RequestQuery.getSessionId();
             TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource(), sessionId);
             claims.setPreferredUsername(authenticatedUser.getDisplayName());
 

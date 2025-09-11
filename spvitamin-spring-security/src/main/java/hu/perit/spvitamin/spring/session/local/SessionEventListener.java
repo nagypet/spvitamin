@@ -17,13 +17,12 @@
 package hu.perit.spvitamin.spring.session.local;
 
 import hu.perit.spvitamin.spring.config.JwtProperties;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.security.Constants;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.context.event.EventListener;
+import org.springframework.session.events.SessionCreatedEvent;
+import org.springframework.session.events.SessionDeletedEvent;
+import org.springframework.session.events.SessionExpiredEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -31,39 +30,32 @@ import java.time.Duration;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SessionEventListener implements HttpSessionListener
+public class SessionEventListener
 {
     private final JwtProperties jwtProperties;
     private final AdvancedSessionRegistry sessionRegistry;
 
 
-    @Override
-    public void sessionCreated(HttpSessionEvent se)
+    @EventListener
+    public void onSessionCreated(SessionCreatedEvent event)
     {
         long expirationInMinutes = jwtProperties.getExpirationInMinutes() + 5;
-        sessionRegistry.setMaxInactiveInterval(se.getSession(), Duration.ofMinutes(expirationInMinutes));
-        String principalName = getPrincipalNameFromSession(se);
+        sessionRegistry.setMaxInactiveInterval(event.getSessionId(), Duration.ofMinutes(expirationInMinutes));
 
-        log.debug("Session created: {}, principal: {}, maxInactiveInterval: {} minutes", se.getSession().getId(), principalName, expirationInMinutes);
+        log.debug("Session created: {}, maxInactiveInterval: {} minutes", event.getSessionId(), expirationInMinutes);
     }
 
 
-    private static String getPrincipalNameFromSession(HttpSessionEvent se)
+    @EventListener
+    public void onSessionDeleted(SessionDeletedEvent event)
     {
-        Object attribute = se.getSession().getAttribute(Constants.SPRING_SECURITY_CONTEXT);
-        if (attribute instanceof SecurityContext securityContext
-                && securityContext.getAuthentication() != null
-                && securityContext.getAuthentication().getPrincipal() instanceof AuthenticatedUser authenticatedUser)
-        {
-            return authenticatedUser.getUsername();
-        }
-        return null;
+        log.debug("Session deleted: {}", event.getSessionId());
     }
 
 
-    @Override
-    public void sessionDestroyed(HttpSessionEvent se)
+    @EventListener
+    public void onSessionExpired(SessionExpiredEvent event)
     {
-        log.debug("Session destroyed: {}", se.getSession().getId());
+        log.debug("Session expired: {}", event.getSessionId());
     }
 }

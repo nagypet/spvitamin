@@ -19,8 +19,7 @@ package hu.perit.spvitamin.spring.session.local;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
@@ -28,6 +27,7 @@ import java.util.List;
 
 @Configuration
 @Slf4j
+@DependsOn("SpvitaminSpringContext")
 public class SessionRegistryConfig
 {
     @Bean
@@ -35,6 +35,6 @@ public class SessionRegistryConfig
     {
         var concurrent = new PerUserTypeConcurrentSessionControlStrategy(sessionRegistry);
         var register = new RegisterSessionAuthenticationStrategy(sessionRegistry);
-        return new CompositeSessionAuthenticationStrategy(List.of(concurrent, register));
+        return new SpvitaminCompositeSessionAuthenticationStrategy(List.of(concurrent, register));
     }
 }

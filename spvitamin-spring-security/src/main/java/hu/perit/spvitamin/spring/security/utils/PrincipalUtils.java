@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.security.utils;
 
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import org.springframework.security.core.session.SessionRegistry;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Duration;
-
-public interface AdvancedSessionRegistry extends SessionRegistry
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PrincipalUtils
 {
-    void setMaxInactiveInterval(String sessionId, Duration duration);
-
-    boolean updatePrincipal(String sessionId, AuthenticatedUser principal, Runnable actionBeforeUpdate);
+    public static String getPrincipalName(Object principal)
+    {
+       if (principal instanceof UserDetails userDetails)
+       {
+           return userDetails.getUsername();
+       }
+       return principal.toString();
+    }
 }

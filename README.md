@@ -142,6 +142,7 @@ dependencyManagement {
 - TookWithMetrics can now count only if the request was successful
 - New modul: spvitamin-spring-session-redis
 - SimpleFeignClientBuilder removes set-cookie headers from downstream services
+- SpvitaminSessionRepository for more reliable session handling
 
 
 ### 3.3.3-2-RELEASE not yet released

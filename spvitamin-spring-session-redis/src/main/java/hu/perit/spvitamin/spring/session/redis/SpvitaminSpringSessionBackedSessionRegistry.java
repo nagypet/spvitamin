@@ -18,9 +18,11 @@ package hu.perit.spvitamin.spring.session.redis;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.Constants;
+import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
+import hu.perit.spvitamin.spring.session.SessionUtils;
 import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,8 +35,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,7 +72,7 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
     @Override
     public List<Object> getAllPrincipals()
     {
-        List<Object> retval = new ArrayList<>();
+        Set<AuthenticatedUser> retval = new HashSet<>();
         Set<String> keys = redisTemplate.keys("spring:session:sessions:*");
         List<String> sessionKeys = extractSessionKeys(keys);
         for (String sessionKey : sessionKeys)
@@ -87,7 +89,7 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
                 }
             }
         }
-        return retval;
+        return retval.stream().map(i -> (Object) i).toList();
     }
 
 
@@ -124,9 +126,9 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
 
 
     @Override
-    public void setMaxInactiveInterval(HttpSession httpSession, Duration duration)
+    public void setMaxInactiveInterval(String sessionId, Duration duration)
     {
-        S session = sessionRepository.findById(httpSession.getId());
+        S session = sessionRepository.findById(sessionId);
         if (session != null)
         {
             session.setMaxInactiveInterval(duration);
@@ -136,23 +138,33 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
 
 
     @Override
-    public void updatePrincipal(String sessionId, AuthenticatedUser principal)
+    public boolean updatePrincipal(String sessionId, AuthenticatedUser principal, Runnable actionBeforeUpdate)
     {
-        SessionInformation sessionInformation = this.getSessionInformation(sessionId);
-        if (sessionInformation == null || !Objects.equals(sessionInformation.getPrincipal(), principal))
+        S session = sessionRepository.findById(sessionId);
+        if (SessionUtils.isSessionAuthenticated(session))
         {
-            S session = sessionRepository.findById(sessionId);
-            if (session != null)
+            Object sessionPrincipal = SessionUtils.resolvePrincipal(session);
+            String sessionPrincipalName = PrincipalUtils.getPrincipalName(sessionPrincipal);
+            if (!principalNamesEqual(sessionPrincipalName, principal))
             {
-                log.debug("updatePrincipal: sessionId={}, principal={}", sessionId, principal);
-                session.setAttribute(
-                        org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME,
-                        principal.getUsername()
-                );
+                log.debug("updatePrincipal: sessionId={}, {} => {}", sessionId, sessionPrincipalName, principal.getUsername());
+                if (actionBeforeUpdate != null)
+                {
+                    actionBeforeUpdate.run();
+                }
+                session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, principal.getUsername());
                 session.setAttribute(Constants.SPRING_SECURITY_CONTEXT, SecurityContextHolder.getContext());
                 sessionRepository.save(session);
+                return true;
             }
         }
+        return false;
+    }
+
+
+    private static boolean principalNamesEqual(String sessionPrincipalName, AuthenticatedUser authenticatedUser)
+    {
+        return StringUtils.equalsAnyIgnoreCase(sessionPrincipalName, authenticatedUser.getUsername());
     }
 
 

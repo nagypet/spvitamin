@@ -145,7 +145,7 @@ public class SimpleHttpSecurityBuilder
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
                 .sessionManagement(i -> i
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .sessionAuthenticationStrategy(authenticationStrategy)
                 );
 
@@ -220,7 +220,7 @@ public class SimpleHttpSecurityBuilder
         this.http.logout(i -> i
                 .logoutUrl(logoutUrl)
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID", "SESSION")
                 .clearAuthentication(true)
                 .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
         );

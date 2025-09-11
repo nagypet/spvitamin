@@ -55,7 +55,7 @@ class JwtTokenProviderTest
     @Configuration
     @ComponentScan(basePackages = {
             "hu.perit.spvitamin.spring.security.auth.jwt",
-            "hu.perit.spvitamin.spring.session.local",
+            "hu.perit.spvitamin.spring.session",
             "hu.perit.spvitamin.spring.config"
     })
     public static class ContextConfiguration

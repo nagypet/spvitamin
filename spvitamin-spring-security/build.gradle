@@ -51,6 +51,7 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.session:spring-session-core'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     // apache.commons

@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.session.local;
 
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.session.SessionInformation;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 public class PerUserTypeConcurrentSessionControlStrategy extends ConcurrentSessionControlAuthenticationStrategy
 {
     private final SessionProperties sessionProperties = SpringContext.getBean(SessionProperties.class);
@@ -59,12 +61,14 @@ public class PerUserTypeConcurrentSessionControlStrategy extends ConcurrentSessi
     {
         // Determine the least recently used sessions and mark them for invalidation
         sessions.sort(Comparator.comparing(SessionInformation::getLastRequest));
-        int maximumSessionsExceededBy = sessions.size() - allowableSessions + 1;
-        List<SessionInformation> sessionsToBeExpired = sessions.subList(0, maximumSessionsExceededBy);
-        for (SessionInformation session : sessionsToBeExpired)
+        int countSessionsToBeExpired = sessions.size() - allowableSessions + 1;
+        log.info("Max allowed sessions: {}, all user sessions: {}, {} sessions will be invalidated", allowableSessions, sessions.size(), countSessionsToBeExpired);
+        for (int i = 0; i < countSessionsToBeExpired; i++)
         {
-            session.expireNow();
-            registry.removeSessionInformation(session.getSessionId());
+            SessionInformation sessionInformation = sessions.get(i);
+            log.info("Session will be invalidated: {}, {}", sessionInformation.getSessionId(), sessionInformation.getPrincipal());
+            sessionInformation.expireNow();
+            registry.removeSessionInformation(sessionInformation.getSessionId());
         }
     }
 }

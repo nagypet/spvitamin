@@ -16,19 +16,21 @@
 
 package hu.perit.spvitamin.spring.session.redis;
 
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.security.Constants;
+import hu.perit.spvitamin.spring.session.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 
+import java.io.Serial;
 import java.util.Date;
 
 @Slf4j
 class SpvitaminSpringSessionBackedSessionInformation<S extends Session> extends SessionInformation
 {
+    @Serial
+    private static final long serialVersionUID = 3883329052076853578L;
+
     static final String EXPIRED_ATTR = SpvitaminSpringSessionBackedSessionInformation.class.getName() + ".EXPIRED";
 
     private final SessionRepository<S> sessionRepository;
@@ -36,32 +38,13 @@ class SpvitaminSpringSessionBackedSessionInformation<S extends Session> extends 
 
     SpvitaminSpringSessionBackedSessionInformation(S session, SessionRepository<S> sessionRepository)
     {
-        super(resolvePrincipal(session), session.getId(), Date.from(session.getLastAccessedTime()));
+        super(SessionUtils.resolvePrincipal(session), session.getId(), Date.from(session.getLastAccessedTime()));
         this.sessionRepository = sessionRepository;
         Boolean expired = session.getAttribute(EXPIRED_ATTR);
         if (Boolean.TRUE.equals(expired))
         {
             super.expireNow();
         }
-    }
-
-
-    /**
-     * Tries to determine the principal's name from the given Session.
-     *
-     * @param session the session
-     * @return the principal's name, or empty String if it couldn't be determined
-     */
-    private static Object resolvePrincipal(Session session)
-    {
-        SecurityContext securityContext = session.getAttribute(Constants.SPRING_SECURITY_CONTEXT);
-        if (securityContext != null
-                && securityContext.getAuthentication() != null
-                && securityContext.getAuthentication().getPrincipal() instanceof AuthenticatedUser authenticatedUser)
-        {
-            return authenticatedUser;
-        }
-        return "unknown";
     }
 
 

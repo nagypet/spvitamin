@@ -44,6 +44,7 @@ public class SecurityProperties
     private String managementEndpointsAccess = "*";
     private String adminGuiAccess = "*";
     private String adminEndpointsAccess = "*";
+    private boolean sessionValidationEnabled = true;
 
     @NestedConfigurationProperty
     private OAuth2Configuration oauth2;

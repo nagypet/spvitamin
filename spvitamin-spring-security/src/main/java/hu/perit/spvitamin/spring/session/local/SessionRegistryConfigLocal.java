@@ -16,29 +16,49 @@
 
 package hu.perit.spvitamin.spring.session.local;
 
+import hu.perit.spvitamin.spring.config.JwtProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.MapSession;
+import org.springframework.session.MapSessionRepository;
+import org.springframework.session.SessionRepository;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
+
+import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
-@ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "caffein", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "none", matchIfMissing = true)
 @Slf4j
+@EnableSpringHttpSession
+@RequiredArgsConstructor
+@EnableScheduling
 public class SessionRegistryConfigLocal
 {
+    private final JwtProperties jwtProperties;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     @Bean
-    public AdvancedSessionRegistry sessionRegistry()
+    public SessionRepository<MapSession> sessionRepository()
     {
-        log.info("SpvitaminSessionRegistry created");
-        return new SpvitaminSessionRegistry();
+        MapSessionRepository mapSessionRepository = new SpvitaminSessionRepository(new ConcurrentHashMap<>(), applicationEventPublisher);
+        long expirationInMinutes = jwtProperties.getExpirationInMinutes() + 5;
+        log.info("SpvitaminSessionRepository created, maxInactiveInterval: {} minutes", expirationInMinutes);
+        mapSessionRepository.setDefaultMaxInactiveInterval(Duration.ofMinutes(expirationInMinutes));
+
+        return mapSessionRepository;
     }
 
 
     @Bean
-    HttpSessionEventPublisher sessionEventPublisher()
+    public AdvancedSessionRegistry sessionRegistry(SessionRepository<?> sessionRepository)
     {
-        log.info("HttpSessionEventPublisher created");
-        return new HttpSessionEventPublisher();
+        log.info("SpvitaminSessionRegistry created");
+        return new SpvitaminSessionRegistry(sessionRepository);
     }
 }
