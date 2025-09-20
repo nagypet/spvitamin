@@ -27,6 +27,7 @@ import hu.perit.spvitamin.spring.config.SpringContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Optional;
 
@@ -66,7 +67,8 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
 
         // ========== BAD_REQUEST (400) ================================================================================
         else if (exception.instanceOf(jakarta.validation.ValidationException.class)
-                || exception.instanceOf(InputException.class))
+                || exception.instanceOf(InputException.class)
+                || exception.causedBy(MethodArgumentNotValidException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.BAD_REQUEST, ex, path, traceId));
