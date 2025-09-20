@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth.filter;
 import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
@@ -41,6 +42,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -110,7 +112,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             CookieHelper.clearSessionCookie(request, response);
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            if (resolver.resolveException(request, response, null, new InvalidTokenException("Authentication failed!", ex)) == null)
             {
                 throw ex;
             }
@@ -136,7 +138,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         if (sessionInformation == null || sessionInformation.isExpired())
         {
             log.info("Session {} expired!", sessionIdInToken);
-            throw new FilterAuthenticationException("Session expired!");
+            throw new InvalidTokenException(MessageFormat.format("Session {0} expired!", sessionIdInToken));
         }
 
         // Additionally, if the request comes from a browser, then the token must match with the request too
@@ -144,7 +146,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         {
             // The token has been issued for another session
             log.info("sessionIdInToken: {}, sessionIdInRequest: {}", sessionIdInToken, sessionIdInRequest);
-            throw new FilterAuthenticationException("Invalid session id in JWT token!");
+            throw new InvalidTokenException("Invalid session id in JWT token!");
         }
     }
 }

@@ -143,6 +143,7 @@ dependencyManagement {
 - New modul: spvitamin-spring-session-redis
 - SimpleFeignClientBuilder removes set-cookie headers from downstream services
 - SpvitaminSessionRepository for more reliable session handling
+- Hardening security
 
 
 ### 3.3.3-2-RELEASE not yet released

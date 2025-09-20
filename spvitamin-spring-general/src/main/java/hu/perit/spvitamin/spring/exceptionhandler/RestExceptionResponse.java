@@ -22,6 +22,7 @@ import hu.perit.spvitamin.core.exception.ApplicationException;
 import hu.perit.spvitamin.core.exception.ApplicationRuntimeException;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
+import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -120,13 +121,18 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
         this.status = statusCode.value();
         this.path = path;
         this.traceId = traceId;
-        if (myExceptionEnabled)
+        // If the request is coming from a browser, we do not expose any further information
+        boolean fromBrowser = RequestQuery.isFromBrowser();
+        if (!fromBrowser)
         {
-            this.exception = new ServerExceptionProperties(ex);
-        }
-        else if (myMessageEnabled)
-        {
-            this.message = ex.getMessage();
+            if (myExceptionEnabled)
+            {
+                this.exception = new ServerExceptionProperties(ex);
+            }
+            else if (myMessageEnabled)
+            {
+                this.message = ex.getMessage();
+            }
         }
 
         ExceptionWrapper exception = ExceptionWrapper.of(ex);

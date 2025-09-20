@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.filter;
+package hu.perit.spvitamin.spring.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
-public class FilterAuthenticationException extends AuthenticationException {
+import java.io.Serial;
 
-    public FilterAuthenticationException(String msg, Throwable t) {
+public class InvalidTokenException extends AuthenticationException
+{
+
+    @Serial
+    private static final long serialVersionUID = 4357982974622912896L;
+
+
+    public InvalidTokenException(String msg, Throwable t)
+    {
         super(msg, t);
     }
 
-    public FilterAuthenticationException(String msg) {
+
+    public InvalidTokenException(String msg)
+    {
         super(msg);
     }
 }

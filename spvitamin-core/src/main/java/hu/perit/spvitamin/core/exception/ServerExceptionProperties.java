@@ -42,8 +42,15 @@ import java.util.List;
 @ToString
 public class ServerExceptionProperties
 {
+    public enum StackTraceEnabled
+    {
+        ALWAYS,
+        NEVER,
+        ROOT_ONLY
+    }
 
-    private static boolean myStackTraceEnabled = true;
+
+    private static StackTraceEnabled myStackTraceEnabled = StackTraceEnabled.ALWAYS;
 
     private String message;
     private String exceptionClass;
@@ -52,7 +59,7 @@ public class ServerExceptionProperties
     private ServerExceptionProperties cause;
 
 
-    public static void setStackTraceEnabled(boolean stackTraceEnabled)
+    public static void setStackTraceEnabled(StackTraceEnabled stackTraceEnabled)
     {
         myStackTraceEnabled = stackTraceEnabled;
     }
@@ -80,7 +87,7 @@ public class ServerExceptionProperties
      */
     private static StackTraceElement[] limitedStackTrace(StackTraceElement[] stackTrace)
     {
-        if (isStacktraceEnabled() || stackTrace == null || stackTrace.length == 0)
+        if (myStackTraceEnabled == StackTraceEnabled.ALWAYS || stackTrace == null || stackTrace.length == 0)
         {
             if (stackTrace == null || stackTrace.length == 0)
             {
@@ -89,13 +96,12 @@ public class ServerExceptionProperties
             return Arrays.stream(stackTrace).filter(i -> StackTracer.isOwnPackage(i.getClassName())).toArray(StackTraceElement[]::new);
         }
 
-        return new StackTraceElement[]{stackTrace[0]};
-    }
+        if (myStackTraceEnabled == StackTraceEnabled.ROOT_ONLY)
+        {
+            return new StackTraceElement[]{stackTrace[0]};
+        }
 
-
-    private static boolean isStacktraceEnabled()
-    {
-        return myStackTraceEnabled;
+        return new StackTraceElement[]{};
     }
 
 

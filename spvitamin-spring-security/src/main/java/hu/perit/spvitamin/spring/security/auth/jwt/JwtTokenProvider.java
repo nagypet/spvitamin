@@ -22,9 +22,11 @@ import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
 import hu.perit.spvitamin.spring.session.local.SpvitaminCompositeSessionAuthenticationStrategy;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -127,9 +129,13 @@ public class JwtTokenProvider
                     .parseSignedClaims(jwt)
                     .getPayload());
         }
-        catch (Exception ex)
+        catch (ExpiredJwtException e)
         {
-            throw new JwtException("JWT token parse failed!", ex);
+            throw new InvalidTokenException("JWT token expired!", e);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidTokenException("JWT token parse failed!", e);
         }
     }
 }

@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.autoconfiguration;
 
 import hu.perit.spvitamin.core.exception.ServerExceptionProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import jakarta.annotation.PostConstruct;
@@ -30,15 +31,30 @@ import org.springframework.stereotype.Component;
 public class ServerErrorAutoConfiguration
 {
     private final ServerProperties serverProperties;
+    private final SecurityProperties securityProperties;
 
     @PostConstruct
     private void setUp()
     {
-        log.info("Configuring {} with: {}", RestExceptionResponse.class.getName(), this.serverProperties.getError());
-        log.info("Configuring {} with: {}", ServerExceptionProperties.class.getName(), this.serverProperties.getError());
+        ServerProperties.ErrorProperties errorProperties = this.serverProperties.getError();
+        log.info("Configuring {} with: {}", RestExceptionResponse.class.getName(), errorProperties);
+        log.info("Configuring {} with: {}", ServerExceptionProperties.class.getName(), errorProperties);
 
-        ServerExceptionProperties.setStackTraceEnabled(this.serverProperties.getError().getIncludeStacktrace() == ServerProperties.ErrorProperties.IncludeAttribute.ALWAYS);
-        RestExceptionResponse.setExceptionEnabled(this.serverProperties.getError().isIncludeException());
-        RestExceptionResponse.setMessageEnabled(this.serverProperties.getError().getIncludeMessage() == ServerProperties.ErrorProperties.IncludeAttribute.ALWAYS);
+        ServerExceptionProperties.setStackTraceEnabled(getStackTraceType());
+        RestExceptionResponse.setExceptionEnabled(errorProperties.isIncludeException());
+        RestExceptionResponse.setMessageEnabled(errorProperties.getIncludeMessage() == ServerProperties.ErrorProperties.IncludeAttribute.ALWAYS);
+    }
+
+
+    private ServerExceptionProperties.StackTraceEnabled getStackTraceType()
+    {
+        if (securityProperties.isProductionMode())
+        {
+            return ServerExceptionProperties.StackTraceEnabled.NEVER;
+        }
+
+        return this.serverProperties.getError().getIncludeStacktrace() == ServerProperties.ErrorProperties.IncludeAttribute.ALWAYS
+                ? ServerExceptionProperties.StackTraceEnabled.ALWAYS
+                : ServerExceptionProperties.StackTraceEnabled.ROOT_ONLY;
     }
 }

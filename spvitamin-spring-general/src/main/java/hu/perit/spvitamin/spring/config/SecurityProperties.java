@@ -20,7 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,7 @@ import lombok.Data;
 @Data
 @Component
 @ConfigurationProperties("security")
+@Slf4j
 public class SecurityProperties
 {
     private String[] allowedOrigins;
@@ -45,6 +48,7 @@ public class SecurityProperties
     private String adminGuiAccess = "*";
     private String adminEndpointsAccess = "*";
     private boolean sessionValidationEnabled = true;
+    private boolean productionMode = true;
 
     @NestedConfigurationProperty
     private OAuth2Configuration oauth2;
@@ -54,6 +58,22 @@ public class SecurityProperties
      * security.additional-security-headers.FP=Feature-Policy=accelerometer 'none'; ambient-light-sensor 'none'; autoplay 'none'; battery 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; usb 'none'
      */
     private Map<String, String> additionalSecurityHeaders = new HashMap<>();
+
+
+    @PostConstruct
+    void init()
+    {
+        log.debug(this.toString());
+        if (productionMode
+                && ("*".equals(this.adminGuiAccess)
+                || "*".equals(this.adminEndpointsAccess)
+                || "*".equals(this.swaggerAccess)
+                || "*".equals(this.managementEndpointsAccess))
+        )
+        {
+            throw new IllegalStateException("Production mode is enabled, but either adminGuiAccess, adminEndpointsAccess, swaggerAccess or managementEndpointsAccess is set to '*'!");
+        }
+    }
 
     @Data
     public static class OAuth2Configuration

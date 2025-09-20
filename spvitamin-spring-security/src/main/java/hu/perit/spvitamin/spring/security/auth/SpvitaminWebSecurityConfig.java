@@ -225,6 +225,11 @@ public class SpvitaminWebSecurityConfig
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = registry
                 .requestMatchers(mvc.pattern("/actuator/**"));
 
+        if (securityProperties.isProductionMode())
+        {
+            actuatorUrls.denyAll();
+        }
+
         if ("*".equals(securityProperties.getManagementEndpointsAccess()))
         {
             actuatorUrls.permitAll();

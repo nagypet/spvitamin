@@ -19,6 +19,7 @@ package hu.perit.spvitamin.core.typehelpers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -66,5 +67,15 @@ public final class ListUtils
             return 0;
         }
         return list.size();
+    }
+
+
+    public static <T> List<T> firstNItems(List<T> list, int count)
+    {
+        if (list == null)
+        {
+            return Collections.emptyList();
+        }
+        return list.subList(0, Math.min(count, list.size()));
     }
 }

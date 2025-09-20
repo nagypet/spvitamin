@@ -29,6 +29,8 @@ class PostalAddressTest
                 .isEqualTo("1012 Budapest, Árnyas u. 12");
         assertThat(PostalAddress.fromAddressParts(null, "1012", "Budapest", "Árnyas u. 12", "2. em. 3.").getFullAddress())
                 .isEqualTo("1012 Budapest, Árnyas u. 12, 2. em. 3.");
+        assertThat(PostalAddress.fromAddressParts("HU", "1012", "Budapest", "Árnyas u. 12", "2. em. 3.").getFullAddress())
+                .isEqualTo("1012 Budapest, Árnyas u. 12, 2. em. 3.");
 
         assertThat(PostalAddress.fromAddressParts("NY", "10001", "New York", "123 Main Street", null).getFullAddress())
                 .isEqualTo("10001 New York (NY), 123 Main Street");

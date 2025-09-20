@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security.auth.filter;
 
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.rolemapper.RoleMapperService;
 import hu.perit.spvitamin.spring.rolemapper.RoleMapperServiceImpl;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
@@ -79,7 +80,7 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
             if (resolver.resolveException(request, response, null,
-                    new FilterAuthenticationException("Authentication failed!", ex)) == null)
+                    new InvalidTokenException("Authentication failed!", ex)) == null)
             {
                 throw ex;
             }
