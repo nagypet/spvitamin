@@ -19,8 +19,8 @@ import {Injectable} from '@angular/core';
 import { HttpBackend, HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
-import {CertificateFile} from '../../model/keystore';
-import {SpvitaminAdmin} from '../../model/spvitamin-admin-models';
+import {CertificateFile} from '../model/keystore';
+import {SpvitaminAdmin} from '../model/spvitamin-admin-models';
 
 
 @Injectable({

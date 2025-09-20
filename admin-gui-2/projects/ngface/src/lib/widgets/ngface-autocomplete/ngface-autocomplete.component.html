@@ -28,12 +28,27 @@
          (click)="onClick($event)"
   >
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
-    @for (option of valueSetProvider.filteredOptions | async;track option) {
-      <mat-option [value]="option">
-        {{ option }}
-      </mat-option>
+    @if (!multiselect) {
+      @for (valueSetItem of valueSetProvider.filteredOptions$ | async; track valueSetItem.text) {
+        <mat-option [value]="valueSetItem.text">
+          {{ valueSetItem.text }}
+        </mat-option>
+      }
+    } @else {
+      @for (valueSetItem of valueSetProvider.filteredOptions$ | async; track valueSetItem.text) {
+        <mat-option [value]="valueSetItem.text">
+          <mat-checkbox
+            [checked]="valueSetItem.masterSelect ? isAllSelected(valueSetItem): valueSetItem.selected"
+            [disabled]="!isCheckBoxEnabled(valueSetItem)"
+            [indeterminate]="isAnySelected(valueSetItem) && !isAllSelected(valueSetItem)"
+            (change)="onCheckBoxClicked(valueSetItem, $event.checked)"
+            (click)="$event.stopPropagation()">{{ valueSetItem.text }}
+          </mat-checkbox>
+        </mat-option>
+      }
     }
   </mat-autocomplete>
+
   <mat-hint>{{ getData().hint }}</mat-hint>
   @if (formControl.errors) {
     <mat-error>{{ getValidationErrors() }}</mat-error>

@@ -54,15 +54,19 @@ export class NgfaceWidgetFactory
   public static createRemoteAutocomplete(input: Partial<{
     id: string;
     label: string;
+    placeholder: string;
     value: string;
     validators: Ngface.Validator[];
+    valueSet: Ngface.ValueSet;
   }> = {}): Ngface.Autocomplete
   {
     const defaults = {
       id: '',
       label: 'undefined label',
+      placeholder: '',
       value: '',
       validators: [],
+      valueSet: {remote: true, truncated: false, values: []}
     };
 
     const params = {...defaults, ...input};
@@ -71,16 +75,16 @@ export class NgfaceWidgetFactory
       id: params.id,
       type: 'Autocomplete',
       label: params.label,
-      placeholder: params.label,
+      placeholder: params.placeholder,
       hint: '',
-      data: {type: 'Autocomplete.Data', value: params.value, extendedReadOnlyData: {valueSet: {remote: true, truncated: false, values: []}}},
+      data: {type: 'Autocomplete.Data', value: params.value, extendedReadOnlyData: {valueSet: params.valueSet}},
       enabled: true,
       validators: params.validators
     } as Ngface.Autocomplete;
   }
 
 
-  public static createButton(input: Partial<{ id: string, label: string, style: Ngface.Style, enabled: boolean }> = {}): Ngface.Button
+  public static createButton(input: Partial<{ id: string, label: string, style: Ngface.Button.Style, enabled: boolean }> = {}): Ngface.Button
   {
     const defaults = {
       id: '',

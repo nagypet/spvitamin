@@ -22,7 +22,7 @@ import {NgIf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
-import {CertificateFile, KeystoreEntry} from '../../model/keystore';
+import {CertificateFile, KeystoreEntry} from '../../core/model/keystore';
 import {AdminService} from '../../core/services/admin.service';
 import {AuthService} from '../../core/services/auth/auth.service';
 

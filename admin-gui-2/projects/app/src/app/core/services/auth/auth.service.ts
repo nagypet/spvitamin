@@ -21,7 +21,8 @@ import {CookieService} from 'ngx-cookie-service';
 import {catchError, finalize, map, tap} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {environment} from '../../../../environments/environment';
-import {SpvitaminSecurity} from '../../../model/spvitamin-security-models';
+import {SpvitaminSecurity} from '../../model/spvitamin-security-models';
+import {TokenStoreService} from './token-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,9 +44,9 @@ export class AuthService
   constructor(private httpClient: HttpClient,
               private cookieService: CookieService,
               private snackBar: MatSnackBar,
+              private tokenHolderService: TokenStoreService
   )
   {
-    this.checkToken().subscribe();
   }
 
 
@@ -146,7 +147,7 @@ export class AuthService
 
   private cleanUpSessionStorage(): void
   {
-    sessionStorage.removeItem('token');
+    this.tokenHolderService.clear();
     this.cookieService.deleteAll();
   }
 
@@ -192,7 +193,7 @@ export class AuthService
   {
     console.log(`loginSuccess for ${token.sub}`);
 
-    sessionStorage.setItem('token', JSON.stringify(token));
+    this.tokenHolderService.setToken(token);
     if (token)
     {
       const tokenValidSeconds = this.getTokenValidSeconds(token);
@@ -245,12 +246,8 @@ export class AuthService
 
   public getToken(): SpvitaminSecurity.AuthorizationToken | undefined
   {
-    const tokenString = sessionStorage.getItem('token');
-    if (tokenString === null)
-    {
-      return undefined;
-    }
-    return JSON.parse(tokenString);
+    let token = this.tokenHolderService.getToken();
+    return token ?? undefined;
   }
 
 

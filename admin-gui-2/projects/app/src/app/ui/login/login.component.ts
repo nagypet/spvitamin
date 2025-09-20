@@ -28,7 +28,7 @@ import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-
 import {AuthenticationRepositoryService} from '../../core/services/authentication-repository.service';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
-import {SpvitaminSecurity} from '../../model/spvitamin-security-models';
+import {SpvitaminSecurity} from '../../core/model/spvitamin-security-models';
 
 @Component({
   selector: 'app-login',

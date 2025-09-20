@@ -15,7 +15,7 @@
  */
 
 import {Ngface} from '../../../ngface-models';
-import {ValueSetItem} from './excel-filter.component';
+import {ValueSetItem} from '../../types';
 
 export class ValueSetProvider
 {

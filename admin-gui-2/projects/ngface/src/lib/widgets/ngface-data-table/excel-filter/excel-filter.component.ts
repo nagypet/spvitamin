@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, ReactiveFormsModule, FormsModule} from '@angular/forms';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValueSetProvider} from './value-set-provider';
 import {Ngface} from '../../../ngface-models';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {NgFor, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {DebounceInputDirective} from '../../../directives/debounce-input-directive';
 import {A11yModule} from '@angular/cdk/a11y';
-
-export interface ValueSetItem
-{
-  masterSelect: boolean;
-  text: string;
-  selected: boolean;
-  selectable: boolean;
-}
+import {ValueSetItem} from '../../types';
 
 
 export interface ValueSetSearchEvent
@@ -53,7 +45,7 @@ export interface FilterChangeEvent
   templateUrl: './excel-filter.component.html',
   styleUrls: ['./excel-filter.component.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, NgFor, NgIf, MatCheckboxModule, FormsModule, MatButtonModule]
+  imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, MatCheckboxModule, FormsModule, MatButtonModule]
 })
 export class ExcelFilterComponent implements OnInit
 {
@@ -74,9 +66,11 @@ export class ExcelFilterComponent implements OnInit
 
   valueSetProvider: ValueSetProvider = new ValueSetProvider();
 
+
   constructor()
   {
   }
+
 
   ngOnInit(): void
   {
@@ -108,15 +102,18 @@ export class ExcelFilterComponent implements OnInit
     }
   }
 
+
   onCheckBoxClicked(choice: ValueSetItem, $event: boolean): void
   {
     this.onItemSelected(choice, $event);
   }
 
+
   onCancel(): void
   {
     this.onCloseEvent.emit();
   }
+
 
   onOk(): void
   {
@@ -136,18 +133,19 @@ export class ExcelFilterComponent implements OnInit
   {
     if (this.filterer)
     {
-      const newFilterer: Ngface.Filterer = {
+      return {
         active: this.filterer.active,
         column: this.filterer.column,
-        operator: 'IN',
+        operator: this.filterer.operator,
         searchText: this.formControlSearch.value ?? '',
         valueSet: {
           values: this.valueSetProvider.valueSetItems.filter(i => !i.masterSelect && i.selectable),
           truncated: this.valueSetProvider.truncated,
           remote: this.filterer.valueSet.remote
-        }
+        },
+        type: this.filterer.type,
+        order: this.filterer.order
       };
-      return newFilterer;
     }
 
     return undefined;
@@ -159,6 +157,7 @@ export class ExcelFilterComponent implements OnInit
     this.valueSetProvider.searchText = $event;
     this.reloadValueSetFromServer($event);
   }
+
 
   isAnySelected(valueSetItem: ValueSetItem): boolean
   {
@@ -172,6 +171,7 @@ export class ExcelFilterComponent implements OnInit
     }
   }
 
+
   isAllSelected(valueSetItem: ValueSetItem): boolean
   {
     if (!valueSetItem.masterSelect)
@@ -184,6 +184,7 @@ export class ExcelFilterComponent implements OnInit
     }
   }
 
+
   isCheckBoxEnabled(valueSetItem: ValueSetItem): boolean
   {
     if (!valueSetItem.masterSelect)
@@ -195,6 +196,7 @@ export class ExcelFilterComponent implements OnInit
       return !!this.valueSetProvider.getVisibleItems().find(c => !c.masterSelect);
     }
   }
+
 
   onClearFilter(): void
   {

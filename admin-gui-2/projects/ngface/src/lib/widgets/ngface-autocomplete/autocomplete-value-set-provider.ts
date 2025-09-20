@@ -14,66 +14,193 @@
  * limitations under the License.
  */
 
-import {BehaviorSubject, Subject, Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {Ngface} from '../../ngface-models';
+import {ValueSetItem} from '../types';
+import {map} from 'rxjs/operators';
+import {DistinctBehaviorSubject} from './distinct-behavior-subject';
+
 
 export class AutocompleteValueSetProvider
 {
-  private _valueSet?: Ngface.ValueSet;
-  private _searchText: Subject<string> = new Subject<string>();
+  private _valueSetItems: Ngface.ValueSet.Item[] = [];
+  private _searchText: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  private _multiselect: boolean = false;
+  private _searchTextSubscription?: Subscription;
 
-  // BehaviorSubject for filteredOptions
-  private _filteredOptions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-  get filteredOptions(): Observable<string[]>
+
+  set setMultiselect(value: boolean)
   {
-    return this._filteredOptions.asObservable();
+    this._multiselect = value;
   }
 
-  set valueSet(value: Ngface.ValueSet)
-  {
-    this._valueSet = value;
 
-    if (!value.remote)
+  private _remote = false;
+
+
+  public isRemote(): boolean
+  {
+    return this._remote;
+  }
+
+
+  private _truncated = false;
+
+
+  // BehaviorSubject for filteredOptions: this is what we see in the list
+  private _filteredOptions$: DistinctBehaviorSubject<ValueSetItem[]> = new DistinctBehaviorSubject<ValueSetItem[]>([],
+    (a, b) => JSON.stringify(a) === JSON.stringify(b));
+  get filteredOptions$(): Observable<ValueSetItem[]>
+  {
+    return this._filteredOptions$.asObservable();
+  }
+
+
+  // This is the filtered ValueSet for send to other components
+  private _valueSet$: DistinctBehaviorSubject<Ngface.ValueSet | undefined> = new DistinctBehaviorSubject<Ngface.ValueSet | undefined>(undefined,
+    (a, b) => JSON.stringify(a) === JSON.stringify(b));
+  get valueSet$(): Observable<Ngface.ValueSet | undefined>
+  {
+    return this._valueSet$.asObservable();
+  }
+
+
+  private valueSetNext(items: Ngface.ValueSet.Item[])
+  {
+    this._valueSet$.next({remote: this._remote, truncated: this._truncated, values: items});
+    this._filteredOptions$.next(this.addMasterSelect(items ?? [], this._truncated ?? false));
+  }
+
+
+  set valueSet(valueSet: Ngface.ValueSet)
+  {
+    this._valueSetItems = valueSet.values ?? [];
+    this._truncated = valueSet?.truncated ?? false;
+    this._remote = valueSet?.remote ?? false;
+
+    if (!valueSet.remote)
     {
-      this._searchText.pipe(
-        startWith(''),
-        map(i => this.filter(i || ''))
-      ).subscribe(filtered =>
+      if (!this._searchTextSubscription)
       {
-        this._filteredOptions.next(filtered);
-      });
+        this._searchTextSubscription = this._searchText.pipe(
+          map(i => this.filter(i || ''))
+        ).subscribe(filtered =>
+        {
+          this.valueSetNext(filtered ?? []);
+        });
+      }
+      let items = this.filter(this._searchText.value);
+      this.valueSetNext(items);
     }
     else
     {
-      const items = value.values.map(i => i.text);
-      if (value.truncated)
-      {
-        items.push('...');
-      }
-      this._filteredOptions.next(items);
+      this.valueSetNext(valueSet.values ?? []);
     }
   }
+
+
+  private addMasterSelect(items: Ngface.ValueSet.Item[], truncated: boolean): ValueSetItem[]
+  {
+    var valueSetItems: ValueSetItem[] = [];
+    // Master select
+    if (this._multiselect)
+    {
+      valueSetItems.push({masterSelect: true, text: '(Select All)', selected: true, selectable: true});
+    }
+
+    // Items
+    items.forEach(item => valueSetItems.push(({
+      masterSelect: false,
+      text: item.text ?? '(Blanks)',
+      selected: item.selected,
+      selectable: true
+    })));
+
+    // Truncated indicator
+    if (truncated && this._multiselect)
+    {
+      valueSetItems.push({
+        masterSelect: false,
+        text: 'The list is truncated...',
+        selected: false,
+        selectable: false
+      });
+    }
+    return valueSetItems;
+  }
+
+
+  get valueSet(): Ngface.ValueSet | undefined
+  {
+    return this._valueSet$.value;
+  }
+
 
   set searchText(value: string)
   {
     this._searchText.next(value);
   }
 
-  private filter(value: string): string[]
+
+  private filter(searchText: string): Ngface.ValueSet.Item[]
   {
-    const filterValue = value.toLowerCase();
-    if (!this._valueSet)
+    const filterValue = searchText.toLowerCase();
+    if (!this._valueSetItems)
     {
       return [];
     }
-    return this._valueSet.values
-      .map(i => i.text)
-      .filter(item => item.toLowerCase().includes(filterValue));
+    return this._valueSetItems
+      .filter(item => item.text.toLowerCase().includes(filterValue));
   }
 
-  public isRemote(): boolean
+
+  selectAll(value: boolean)
   {
-    return !!this._valueSet?.remote;
+    var items = this._valueSet$.value?.values;
+    if (items)
+    {
+      items.forEach(c => c.selected = value);
+      // since we are changing the values of the BehaviorSubject, the valueSetNext will not emit any change on the _valueSet$, which is
+      // the intended behavior.
+      this.valueSetNext(items);
+    }
+  }
+
+
+  select(text: string, value: boolean)
+  {
+    var items = this._valueSet$.value?.values;
+    if (items)
+    {
+      items.filter(c => c.text === text).forEach(c => c.selected = value);
+      // since we are changing the values of the BehaviorSubject, the valueSetNext will not emit any change on the _valueSet$, which is
+      // the intended behavior.
+      this.valueSetNext(items);
+    }
+  }
+
+
+  isAnySelected()
+  {
+    var items = this._valueSet$.value?.values;
+    return !!items?.find(r => r.selected);
+  }
+
+
+  isAllSelected()
+  {
+    if (this._truncated)
+    {
+      return false;
+    }
+
+    return this.isAllVisibleSelected();
+  }
+
+
+  isAllVisibleSelected()
+  {
+    var items = this._valueSet$.value?.values;
+    return !items?.find(r => !r.selected);
   }
 }

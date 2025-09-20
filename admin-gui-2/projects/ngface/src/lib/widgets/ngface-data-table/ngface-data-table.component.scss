@@ -129,7 +129,7 @@ td.mat-mdc-footer-cell {
   align-items: center;
 
   mat-icon {
-    line-height: 30px;
+    //line-height: 30px;
   }
 
   .action-button {
@@ -149,5 +149,28 @@ td.mat-mdc-footer-cell {
       width: 30px;
       height: 30px;
     }
+  }
+
+  .action-button-button {
+    background-color: var(--app-primary-palette-500);
+    color: var(--app-primary-contrast-500);
+    height: 30px;
+    padding: 1px 20px;
+    margin: unset;
+    margin-right: 10px;
+  }
+}
+
+.icon-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    //line-height: 30px;
+  }
+
+  span {
+    vertical-align: middle;
   }
 }

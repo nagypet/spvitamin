@@ -16,7 +16,7 @@
 
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-07-31 08:21:29.
+// Generated using typescript-generator version 3.2.1263 on 2025-08-13 08:18:41.
 
 export namespace Ngface {
 
@@ -50,7 +50,7 @@ export namespace Ngface {
     export interface Button extends Widget<VoidWidgetData, Button> {
         type: "Button";
         data: VoidWidgetData;
-        style: Style;
+        style: Button.Style;
         badge: string;
     }
 
@@ -238,6 +238,8 @@ export namespace Ngface {
         icon: string;
         enabled: boolean;
         badge: string;
+        style: Action.Style;
+        actions: Action[] | null;
     }
 
     export interface Column {
@@ -256,12 +258,14 @@ export namespace Ngface {
         valid: boolean;
     }
 
-    export interface Filterer {
+    export interface Filterer extends Serializable {
         column: string;
         operator: ComparisonOperator;
         valueSet: ValueSet;
         searchText: string;
         active: boolean;
+        type: Type;
+        order: number;
     }
 
     export interface FiltererFactory {
@@ -272,6 +276,8 @@ export namespace Ngface {
         column: string;
         remote: boolean;
         valueProvider: ValueProvider<string, string[]>;
+        type: Type;
+        order: number;
     }
 
     export interface Paginator {
@@ -327,7 +333,7 @@ export namespace Ngface {
     export interface ValueProvider<T, R> {
     }
 
-    export interface ValueSet {
+    export interface ValueSet extends Serializable {
         remote: boolean;
         truncated: boolean;
         values: ValueSet.Item[];
@@ -335,7 +341,7 @@ export namespace Ngface {
 
     export namespace ValueSet {
 
-        export interface Item {
+        export interface Item extends Serializable {
             text: string;
             selected: boolean;
         }
@@ -351,6 +357,14 @@ export namespace Ngface {
         type: "ActionCell" | "NumericCell" | "TextCell";
         value: V;
         label: string;
+        style: string;
+        icon: Icon;
+    }
+
+    export interface Icon {
+        code: string;
+        placement: Icon.Placement;
+        color: string;
     }
 
     export interface NumericCell extends Cell<number, NumericCell> {
@@ -451,6 +465,9 @@ export namespace Ngface {
         digitGrouping: boolean;
     }
 
+    export interface Serializable {
+    }
+
     export interface BiFunction<T, U, R> {
     }
 
@@ -481,7 +498,17 @@ export namespace Ngface {
 
     export type Direction = "ASC" | "DESC" | "UNDEFINED";
 
-    export type Style = "NONE" | "PRIMARY" | "ACCENT" | "WARN";
+    export namespace Button {
+
+        export type Style = "NONE" | "PRIMARY" | "ACCENT" | "WARN";
+
+    }
+
+    export namespace Action {
+
+        export type Style = "ICON" | "BUTTON" | "ACTION_GROUP";
+
+    }
 
     export namespace Column {
 
@@ -501,9 +528,17 @@ export namespace Ngface {
 
     }
 
+    export type Type = "TEXT" | "NUMBER" | "DATE" | "DATETIME" | "BOOLEAN";
+
     export namespace Table {
 
         export type SelectMode = "NONE" | "SINGLE" | "MULTI" | "CHECKBOX";
+
+    }
+
+    export namespace Icon {
+
+        export type Placement = "BEFORE" | "AFTER";
 
     }
 

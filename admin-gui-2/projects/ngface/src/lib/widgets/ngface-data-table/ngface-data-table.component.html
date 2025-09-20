@@ -68,22 +68,78 @@
                 <!-- ActionCell -->
                 <div class="action-cell">
                   @for (action of getActions(row, column); track action) {
-                    <button mat-icon-button class="action-button"
-                            [disabled]="!action.enabled || row.disabled"
-                            [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
-                            matTooltipPosition="above"
-                            hideTooltipOnClick
-                            (click)="$event.stopPropagation(); actionClick(row, action)"
-                    >
-                      <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}
-                      </mat-icon>
-                    </button>
+                    @if (action.actions && action.actions.length > 0) {
+                      <!-- Action with submenu (one-level). Parent opens menu; submenu items show labels only. -->
+                      @if (action.style === 'ICON') {
+                        <button mat-icon-button class="action-button"
+                                [disabled]="!action.enabled || row.disabled"
+                                [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                                matTooltipPosition="above"
+                                [matMenuTriggerFor]="menu"
+                                (click)="$event.stopPropagation()"
+                        >
+                          <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}</mat-icon>
+                        </button>
+                      } @else {
+                        <button class="action-button-button ngface-button"
+                                [disabled]="!action.enabled || row.disabled"
+                                [matMenuTriggerFor]="menu"
+                                (click)="$event.stopPropagation()"
+                        >
+                          {{ action.label }}
+                        </button>
+                      }
+                      <mat-menu #menu="matMenu">
+                        @for (sub of action.actions; track sub) {
+                          <button mat-menu-item
+                                  [disabled]="!sub.enabled || row.disabled"
+                                  (click)="$event.stopPropagation(); actionClick(row, sub)">
+                            {{ sub.label }}
+                          </button>
+                        }
+                      </mat-menu>
+                    } @else if (action.style === 'ICON') {
+                      <button mat-icon-button class="action-button"
+                              [disabled]="!action.enabled || row.disabled"
+                              [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                              matTooltipPosition="above"
+                              hideTooltipOnClick
+                              (click)="$event.stopPropagation(); actionClick(row, action)"
+                      >
+                        <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}
+                        </mat-icon>
+                      </button>
+                    } @else {
+                      <button class="action-button-button ngface-button"
+                              [disabled]="!action.enabled || row.disabled"
+                              (click)="$event.stopPropagation(); actionClick(row, action)"
+                      >
+                        {{ action.label }}
+                      </button>
+                    }
                   }
                   {{ getCellText(row, column) }}
                 </div>
+              } @else if (hasIcon(row, column)) {
+                <!-- Icon cell -->
+                <div class="icon-cell" [ngClass]="getCellStyle(row, column)">
+                  @if (getIcon(row, column)?.placement === 'BEFORE') {
+                    <mat-icon class="material-symbols-outlined"
+                              [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
+                    </mat-icon>
+                    <span [innerHTML]="getCellText(row, column) | safeHtml"></span>
+                  } @else {
+                    <span [innerHTML]="getCellText(row, column) | safeHtml"></span>
+                    <mat-icon class="material-symbols-outlined"
+                              [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
+                    </mat-icon>
+                  }
+                </div>
               } @else {
                 <!-- Non-action cell -->
-                <p [innerHTML]="getCellText(row, column) | safeHtml"></p>
+                <div [ngClass]="getCellStyle(row, column)">
+                  <p [innerHTML]="getCellText(row, column) | safeHtml"></p>
+                </div>
               }
 
             </td>

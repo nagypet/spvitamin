@@ -41,14 +41,15 @@ import {SafeHtmlPipe} from '../../directives/safe-html.pipe';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatMenuModule} from '@angular/material/menu';
 import {SortFilterHeaderComponent} from './sort-filter-header/sort-filter-header.component';
 import {NgScrollbarModule} from 'ngx-scrollbar';
-import {NgClass, NgFor, NgIf} from '@angular/common';
+import {NgClass} from '@angular/common';
+import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
+import {HideTooltipOnClickDirective} from '../../directives/hide-tooltip-on-click-directive';
 import ActionCell = Ngface.ActionCell;
 import NumericCell = Ngface.NumericCell;
 import DataRetrievalParams = Ngface.DataRetrievalParams;
-import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
-import {HideTooltipOnClickDirective} from '../../directives/hide-tooltip-on-click-directive';
 
 export interface TableReloadEvent
 {
@@ -87,7 +88,22 @@ export interface TableMasterToggleEvent
   templateUrl: './ngface-data-table.component.html',
   styleUrls: ['./ngface-data-table.component.scss'],
   standalone: true,
-  imports: [NgClass, NgIf, NgScrollbarModule, MatTableModule, MatSortModule, NgFor, MatCheckboxModule, SortFilterHeaderComponent, MatTooltipModule, MatButtonModule, MatIconModule, MatPaginatorModule, SafeHtmlPipe, ResponsiveClassDirective, HideTooltipOnClickDirective]
+  imports: [
+    NgClass,
+    NgScrollbarModule,
+    MatTableModule,
+    MatSortModule,
+    MatCheckboxModule,
+    SortFilterHeaderComponent,
+    MatTooltipModule,
+    MatButtonModule,
+    MatIconModule,
+    MatPaginatorModule,
+    SafeHtmlPipe,
+    ResponsiveClassDirective,
+    HideTooltipOnClickDirective,
+    MatMenuModule
+  ]
 })
 export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterViewInit
 {
@@ -456,7 +472,8 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
 
   isColumnFilterable(column: string): boolean
   {
-    const filterable = !!this.getData().data.filtererMap[column];
+    let filterer = this.getData().data.filtererMap[column];
+    const filterable = filterer && filterer.type === 'TEXT';
     return filterable ?? false;
   }
 
@@ -550,6 +567,35 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
   }
 
 
+  hasIcon(row: Ngface.Row<any>, column: string): boolean
+  {
+    const cell = row.cells[column];
+    return !!(cell.icon && cell.icon.code && cell.icon.code.length > 0);
+  }
+
+
+  getIcon(row: Ngface.Row<any>, column: string): Ngface.Icon | null
+  {
+    const cell = row.cells[column];
+    if (cell.icon && cell.icon.code && cell.icon.code.length > 0)
+    {
+      return cell.icon;
+    }
+    return null;
+  }
+
+
+  getCellStyle(row: Ngface.Row<any>, column: string): string | null
+  {
+    const cell = row.cells[column];
+    if (cell.style)
+    {
+      return cell.style;
+    }
+    return null;
+  }
+
+
   getOptionalClasses(): string
   {
     switch (this.getData().selectMode)
@@ -607,8 +653,10 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
 
   masterToggle($event: MatCheckboxChange): void
   {
-    this.dataSource.getRows().forEach(r => {
-      if (!r.disabled) {
+    this.dataSource.getRows().forEach(r =>
+    {
+      if (!r.disabled)
+      {
         r.selected = $event.checked;
       }
     });

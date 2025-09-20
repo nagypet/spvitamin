@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import {Component, EventEmitter, OnChanges, Output, SimpleChange} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChange} from '@angular/core';
 import {InputBaseComponent} from '../input-base.component';
 import {Ngface} from '../../ngface-models';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
@@ -28,7 +28,9 @@ import {DebounceInputDirective} from '../../directives/debounce-input-directive'
 import {A11yModule} from '@angular/cdk/a11y';
 import {AutocompleteValueSetProvider} from './autocomplete-value-set-provider';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
-import {colors} from 'ng-packagr/lib/utils/color';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {ValueSetItem} from '../types';
+import {Subscription} from 'rxjs';
 
 export interface AutocompleteRequest
 {
@@ -44,6 +46,15 @@ export interface AutocompleteValueChangeEvent
 }
 
 
+export interface AutocompleteValueSetChangeEvent
+{
+  widgetId: string;
+  searchText: string;
+  valueSet: Ngface.ValueSet;
+  selectionChanged: boolean;
+}
+
+
 @Component({
   selector: 'ngface-autocomplete',
   templateUrl: './ngface-autocomplete.component.html',
@@ -51,40 +62,60 @@ export interface AutocompleteValueChangeEvent
     MatFormFieldModule,
     MatOptionModule,
     MatSelectModule,
-    NgForOf,
-    NgIf,
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatInputModule,
     AsyncPipe,
     DebounceInputDirective,
     A11yModule,
-    ResponsiveClassDirective
+    ResponsiveClassDirective,
+    MatCheckboxModule,
   ],
   standalone: true
 })
-export class NgfaceAutocompleteComponent extends InputBaseComponent implements OnChanges
+export class NgfaceAutocompleteComponent extends InputBaseComponent implements OnChanges, OnDestroy
 {
+  @Input()
+  multiselect = false;
+
   @Output()
   onAutocompleteRequest: EventEmitter<AutocompleteRequest> = new EventEmitter();
 
+  // Only in single-select mode
   @Output()
   onValueChange: EventEmitter<AutocompleteValueChangeEvent> = new EventEmitter();
+
+  // Only in multi-select mode
+  @Output()
+  onValueSetChange: EventEmitter<AutocompleteValueSetChangeEvent> = new EventEmitter();
+
 
   protected valueSetProvider = new AutocompleteValueSetProvider();
 
   private isValueSetEmpty = true;
+
+  private subscriptions = new Array<Subscription | undefined>();
 
 
   constructor()
   {
     super();
 
-    this.valueSetProvider.filteredOptions.subscribe(values =>
+    this.subscriptions.push(this.valueSetProvider.valueSet$.subscribe(valueSet =>
     {
-      this.isValueSetEmpty = values.length === 0;
-      //console.log(`Autocomplete response for ${this.widgetid}:`, values);
-    });
+      //console.log(`Autocomplete filtered options for ${this.widgetid}: ${values.length}`);
+      this.isValueSetEmpty = valueSet?.values.length === 0;
+
+      if (this.multiselect && valueSet)
+      {
+        this.onValueSetChange.emit({
+          widgetId: this.widgetid,
+          searchText: this.formControl.value ?? '',
+          valueSet: valueSet,
+          selectionChanged: false
+        });
+      }
+    }));
   }
 
 
@@ -92,6 +123,19 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
   {
     super.ngOnChanges(changes);
     this.valueSetProvider.valueSet = this.getData().data.extendedReadOnlyData.valueSet;
+    this.valueSetProvider.setMultiselect = this.multiselect;
+  }
+
+
+  ngOnDestroy(): void
+  {
+    this.subscriptions.forEach(i =>
+    {
+      if (i)
+      {
+        i.unsubscribe();
+      }
+    });
   }
 
 
@@ -121,7 +165,7 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
 
   onSearchTextChange($event: string): void
   {
-    if (this.isValueSetEmpty)
+    if (this.isValueSetEmpty && !this.multiselect)
     {
       this.onValueChange.emit({widgetId: this.widgetid, value: $event});
     }
@@ -140,7 +184,10 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
 
   onOptionSelected($event: MatAutocompleteSelectedEvent)
   {
-    this.onValueChange.emit({widgetId: this.widgetid, value: $event.option.value});
+    if (!this.multiselect)
+    {
+      this.onValueChange.emit({widgetId: this.widgetid, value: $event.option.value});
+    }
   }
 
 
@@ -148,8 +195,82 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
   {
     if (this.valueSetProvider.isRemote())
     {
-      //console.log(`Autocomplete request for ${this.widgetid}: ''`);
-      this.onAutocompleteRequest.emit({widgetId: this.widgetid, searchText: '', valueSetProvider: this.valueSetProvider});
+      //console.log(`Autocomplete request for ${this.widgetid}, search text: ${this.formControl.value}`);
+      this.onAutocompleteRequest.emit({
+        widgetId: this.widgetid,
+        searchText: this.formControl.value,
+        valueSetProvider: this.valueSetProvider
+      });
+    }
+  }
+
+
+  isAnySelected(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
+    {
+      return valueSetItem.selected;
+    }
+    else
+    {
+      return this.valueSetProvider.isAnySelected();
+    }
+  }
+
+
+  isAllSelected(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
+    {
+      return valueSetItem.selected;
+    }
+    else
+    {
+      return this.valueSetProvider.isAllSelected();
+    }
+  }
+
+
+  isCheckBoxEnabled(valueSetItem: ValueSetItem): boolean
+  {
+    if (!valueSetItem.masterSelect)
+    {
+      return true;
+    }
+    else
+    {
+      return !!this.valueSetProvider.filteredOptions$.subscribe(options => options.find(c => !c.masterSelect));
+    }
+  }
+
+
+  onCheckBoxClicked(choice: ValueSetItem, $event: boolean): void
+  {
+    this.onItemSelected(choice, $event);
+  }
+
+
+  onItemSelected(choice: ValueSetItem, b?: boolean): void
+  {
+    const newValue = b ?? !choice.selected;
+    if (choice.masterSelect)
+    {
+      this.valueSetProvider.selectAll(newValue);
+    }
+    else
+    {
+      this.valueSetProvider.select(choice.text, newValue);
+    }
+
+    var valueSet = this.valueSetProvider.valueSet;
+    if (this.multiselect && valueSet)
+    {
+      this.onValueSetChange.emit({
+        widgetId: this.widgetid,
+        searchText: this.formControl.value ?? '',
+        valueSet: valueSet,
+        selectionChanged: true
+      });
     }
   }
 }

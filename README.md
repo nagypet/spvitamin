@@ -144,6 +144,7 @@ dependencyManagement {
 - SimpleFeignClientBuilder removes set-cookie headers from downstream services
 - SpvitaminSessionRepository for more reliable session handling
 - Hardening security
+- admin-gui updated
 
 
 ### 3.3.3-2-RELEASE not yet released

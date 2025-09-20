@@ -70,6 +70,7 @@ export class NgfaceTitlebarComponent implements OnChanges
   @Output()
   ready = new EventEmitter<void>();
 
+
   constructor(
     public deviceTypeService: DeviceTypeService,
   )
@@ -81,12 +82,13 @@ export class NgfaceTitlebarComponent implements OnChanges
   {
     if (changes['formdata'] || changes['widgetid'])
     {
-      if (!this.selectedMenuItemId)
+      let item = this.getData().menu.items.find(i => i.id === this.selectedMenuItemId);
+      if (!item)
       {
-        console.log('selectedMenuItemId is not set, using defaultItemId');
-        this.selectedMenuItemId = this.getData().menu.defaultItemId;
+        console.log('selectedMenuItemId is not found, using defaultItemId');
+        let defaultItemId = this.getData().menu.defaultItemId || this.getData().menu.items.length > 0 && this.getData().menu.items[0].id;
+        item = this.getData().menu.items.find(i => i.id === defaultItemId);
       }
-      const item = this.getData().menu.items.find(i => i.id === this.selectedMenuItemId);
       if (item)
       {
         this.onMenuClick(item);
@@ -124,16 +126,19 @@ export class NgfaceTitlebarComponent implements OnChanges
     return this.formdata?.widgets[this.widgetid] as Ngface.Titlebar;
   }
 
+
   onActionClick(action: Ngface.Action): void
   {
     this.actionClick.emit(action);
   }
 
+
   onMenuClick(menuItem: Ngface.Menu.Item): void
   {
-    this.selectedMenuItemId = menuItem.id;
-    this.menuItemClick.emit(menuItem);
+      this.selectedMenuItemId = menuItem.id;
+      this.menuItemClick.emit(menuItem);
   }
+
 
   getClass(menuItem: Ngface.Menu.Item): string
   {
@@ -145,10 +150,12 @@ export class NgfaceTitlebarComponent implements OnChanges
     return '';
   }
 
+
   isMobileDesign(): boolean
   {
     return (this.deviceTypeService.deviceType === 'Phone' || this.deviceTypeService.orientation === 'Portrait');
   }
+
 
   getSessionTimeoutAdditionalClasses(): string
   {
@@ -176,6 +183,7 @@ export class NgfaceTitlebarComponent implements OnChanges
     }
     return '';
   }
+
 
   private n(n: number): string
   {

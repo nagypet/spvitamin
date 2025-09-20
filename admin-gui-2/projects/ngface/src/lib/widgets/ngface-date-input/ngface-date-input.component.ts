@@ -14,36 +14,68 @@
  * limitations under the License.
  */
 
-import {Component} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {InputBaseComponent} from '../input-base.component';
 import {Ngface} from '../../ngface-models';
-import {NgIf} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
+import {debounceTime, Subscription} from 'rxjs';
+
+export interface DateValueChangeEvent
+{
+  widgetId: string;
+  value: Date;
+}
 
 @Component({
-    selector: 'ngface-date-input',
-    templateUrl: './ngface-date-input.component.html',
-    standalone: true,
-    imports: [
-      MatFormFieldModule,
-      MatInputModule,
-      MatDatepickerModule,
-      ReactiveFormsModule,
-      NgIf,
-      ResponsiveClassDirective
-    ]
+  selector: 'ngface-date-input',
+  templateUrl: './ngface-date-input.component.html',
+  standalone: true,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    ReactiveFormsModule,
+    ResponsiveClassDirective
+  ]
 })
-export class NgfaceDateInputComponent extends InputBaseComponent
+export class NgfaceDateInputComponent extends InputBaseComponent implements OnInit
 {
+  @Output()
+  onValueChange: EventEmitter<DateValueChangeEvent> = new EventEmitter();
+
+  private lastEmittedEvent: DateValueChangeEvent | undefined;
+
+  private subscriptions = new Array<Subscription | undefined>();
+
 
   constructor()
   {
     super();
   }
+
+
+  ngOnInit(): void
+  {
+    this.subscriptions.push(this.formControl.valueChanges
+      .pipe(debounceTime(1000))
+      .subscribe(value =>
+      {
+        if (this.formControl.valid)
+        {
+          let event = {widgetId: this.widgetid, value: value} as DateValueChangeEvent;
+          if (this.lastEmittedEvent?.value !== event.value)
+          {
+            this.lastEmittedEvent = event;
+            this.onValueChange.emit(event);
+          }
+        }
+      }));
+  }
+
 
   getData(): Ngface.DateInput
   {

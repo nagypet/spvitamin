@@ -22,7 +22,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {MatCardModule} from '@angular/material/card';
 import {AdminService} from '../../core/services/admin.service';
 import {AuthService} from '../../core/services/auth/auth.service';
-import {SpvitaminAdmin} from '../../model/spvitamin-admin-models';
+import {SpvitaminAdmin} from '../../core/model/spvitamin-admin-models';
 
 
 @Component({

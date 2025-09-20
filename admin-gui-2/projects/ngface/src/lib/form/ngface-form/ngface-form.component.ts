@@ -57,9 +57,11 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
     return this.formgroup;
   }
 
+
   constructor(private el: ElementRef)
   {
   }
+
 
   @Input()
   formdata?: Ngface.Form;
@@ -82,7 +84,8 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
 
   private subscriptions = new Array<Subscription | undefined>();
 
-  private static getLocalDateTime(date: Date): Date | null
+
+  private static getLocalDateTime(date: Date): string | null
   {
     if (!date)
     {
@@ -92,16 +95,28 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
     if (date instanceof Date)
     {
       const offset = date.getTimezoneOffset();
-      const convertedDate: Date = new Date();
+      const convertedDate = new Date();
       convertedDate.setTime(date.getTime() - (offset * 60 * 1000));
-      return convertedDate;
+
+      const year = convertedDate.getFullYear();
+      // getMonth() 0-tól indexel, ezért +1
+      const month = (convertedDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = convertedDate.getDate().toString().padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
     }
-    return new Date(date);
+
+    const newDate = new Date(date);
+    return !isNaN(newDate.getTime())
+      ? this.getLocalDateTime(newDate)
+      : null;
   }
+
 
   ngOnInit(): void
   {
   }
+
 
   ngOnDestroy(): void
   {
@@ -114,10 +129,12 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
     });
   }
 
+
   ngOnChanges(): void
   {
     this.onDataChange.emit({data: this.getSubmitData()});
   }
+
 
   ngAfterViewInit(): void
   {
@@ -215,7 +232,7 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
           submitData[controlName] = {
             type: widgetType + '.Data',
             value: this.formGroup.controls[controlName]?.value
-          } as Ngface.Value<any>;
+          } as Ngface.Value<string>;
           break;
 
         case 'DateInput':
@@ -223,9 +240,8 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
           const myDate = this.formGroup.controls[controlName]?.value;
           submitData[controlName] = {
             type: widgetType + '.Data',
-            //value: NgfaceFormComponent.getLocalDateTime(myDate)
-            value: myDate
-          } as Ngface.Value<any>;
+            value: NgfaceFormComponent.getLocalDateTime(myDate)
+          } as Ngface.Value<Date>;
           break;
 
         case 'DateTimeInput':
@@ -233,7 +249,7 @@ export class NgfaceFormComponent implements OnInit, OnChanges, OnDestroy, AfterV
           submitData[controlName] = {
             type: widgetType + '.Data',
             value: myDateTime
-          } as Ngface.Value<any>;
+          } as Ngface.Value<Date>;
           break;
 
         case 'DateRangeInput':

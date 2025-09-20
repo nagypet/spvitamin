@@ -78,6 +78,7 @@ export abstract class InputBaseComponent implements OnChanges
   ngOnChanges(changes: { [propName: string]: SimpleChange }): void
   {
     const value = this.getData().data?.value;
+    //console.log('ngOnChanges: ' + value);
 
     // Setting the value
     this.formControl.setValue(value);
