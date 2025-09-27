@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.session.redis;
 
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

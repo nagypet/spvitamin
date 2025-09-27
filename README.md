@@ -59,6 +59,8 @@ ext {
 
 dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-core'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage-spring-sftp'
     implementation 'hu.perit.spvitamin:spvitamin-json-time'
     implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
@@ -72,9 +74,9 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-oauth2'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-oauth2-idp'
     implementation 'hu.perit.spvitamin:spvitamin-spring-server'
-    implementation 'hu.perit.spvitamin:spvitamin-file-storage'
-    implementation 'hu.perit.spvitamin:spvitamin-file-storage-spring-sftp'
     implementation 'hu.perit.spvitamin:spvitamin-spring-session-redis'
     implementation 'hu.perit.spvitamin:spvitamin-test'
 }	
@@ -140,11 +142,12 @@ dependencyManagement {
 - AuthorizationToken: jsid added
 - If the /authenticate request comes from a browser, the sessionId will be stored in the generated token, and in subsequent calls the token is only valid within the same session
 - TookWithMetrics can now count only if the request was successful
-- New modul: spvitamin-spring-session-redis
+- New module: spvitamin-spring-session-redis
 - SimpleFeignClientBuilder removes set-cookie headers from downstream services
 - SpvitaminSessionRepository for more reliable session handling
 - Hardening security
-- admin-gui updated
+- New module: spvitamin-spring-security-oauth2-idp added
+- admin-gui switched to oauth2 authentication
 
 
 ### 3.3.3-2-RELEASE not yet released

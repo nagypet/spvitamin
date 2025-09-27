@@ -48,6 +48,7 @@ logback-core = { module = 'ch.qos.logback:logback-core', version.ref = 'logback'
 lombok = 'org.projectlombok:lombok:1.18.34'
 mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
+nimbus-jose-jwt = 'com.nimbusds:nimbus-jose-jwt:10.5'
 nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }

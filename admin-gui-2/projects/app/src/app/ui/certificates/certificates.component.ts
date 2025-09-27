@@ -18,13 +18,11 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {KeystoreComponent} from './keystore/keystore.component';
-import {NgIf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {CertificateFile, KeystoreEntry} from '../../core/model/keystore';
 import {AdminService} from '../../core/services/admin.service';
-import {AuthService} from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-certificates',
@@ -32,7 +30,6 @@ import {AuthService} from '../../core/services/auth/auth.service';
   styleUrls: ['./certificates.component.scss'],
   imports: [
     KeystoreComponent,
-    NgIf,
     MatButtonModule,
     MatFormField,
     MatInput,
@@ -59,7 +56,6 @@ export class CertificatesComponent implements OnInit
 
   constructor(
     public adminService: AdminService,
-    public authService: AuthService,
     private router: Router,
   )
   {

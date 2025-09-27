@@ -43,6 +43,8 @@ if (new File("${projectDir}/version.ver").exists()) {
 dependencies {
     constraints {
         api project(":spvitamin-core")
+        api project(":spvitamin-file-storage")
+        api project(":spvitamin-file-storage-spring-sftp")
         api project(":spvitamin-json-time")
         api project(":spvitamin-spring-admin")
         api project(":spvitamin-spring-cloud-client")
@@ -54,9 +56,9 @@ dependencies {
         api project(":spvitamin-spring-security-authservice")
         api project(":spvitamin-spring-security-keycloak")
         api project(":spvitamin-spring-security-ldap")
+        api project(":spvitamin-spring-security-oauth2")
+        api project(":spvitamin-spring-security-oauth2-idp")
         api project(":spvitamin-spring-server")
-        api project(":spvitamin-file-storage")
-        api project(":spvitamin-file-storage-spring-sftp")
         api project(":spvitamin-spring-session-redis")
         api project(":spvitamin-test")
     }

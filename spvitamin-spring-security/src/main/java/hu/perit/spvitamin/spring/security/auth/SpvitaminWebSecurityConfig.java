@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.EnableSpvitaminOAuth2Idp;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SwaggerProperties;
@@ -24,6 +25,7 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthenticationRepositoryApi;
 import hu.perit.spvitamin.spring.security.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -45,6 +47,57 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @Slf4j
 public class SpvitaminWebSecurityConfig
 {
+    @ConditionalOnBean(annotation = EnableSpvitaminOAuth2Idp.class)
+    @Bean
+    @Order(1)
+    public SecurityFilterChain configureOAuth2Idp1(HttpSecurity http) throws Exception
+    {
+        // http://localhost:8410/api/spvitamin/oauth2/token
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope("/api/spvitamin/oauth2/token")
+                .authorizeRequests(r -> r.anyRequest().permitAll())
+                .createSession();
+
+        return http.build();
+    }
+
+
+    @ConditionalOnBean(annotation = EnableSpvitaminOAuth2Idp.class)
+    @Bean
+    @Order(1)
+    public SecurityFilterChain configureOAuth2Idp2(HttpSecurity http) throws Exception
+    {
+        // http://localhost:8410/api/spvitamin/oauth2/refresh
+        // http://localhost:8410/.well-known/openid-configuration
+        // http://localhost:8410/.well-known/jwks.json
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(
+                        "/api/spvitamin/oauth2/refresh",
+                        "/.well-known/**")
+                .authorizeRequests(r -> r.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+
+    @ConditionalOnBean(annotation = EnableSpvitaminOAuth2Idp.class)
+    @Bean
+    @Order(1)
+    public SecurityFilterChain configureOAuth2Idp3(HttpSecurity http) throws Exception
+    {
+        // http://localhost:8410/.well-known/userinfo
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope("/api/spvitamin/oauth2/userinfo")
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .jwtAuth();
+
+        return http.build();
+    }
+
+
     /*
      * ============== Config for the logout endpoint ===================================================================
      */

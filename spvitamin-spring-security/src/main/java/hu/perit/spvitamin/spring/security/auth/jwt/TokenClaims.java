@@ -18,39 +18,41 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
  */
 
+@NoArgsConstructor
 public class TokenClaims extends DefaultClaims
 {
     public static final String ROLES = "rls";
+    public static final String SCOPE = "scope";
     public static final String USERID = "uid";
+    public static final String CLIENTID = "client_id";
     public static final String SRC = "src";
     public static final String PREFERRED_USERNAME = "preferred_username";
-    public static final String JSID = "jsid";
+    public static final String SID = "sid";
+    public static final String ADD = "add";
 
 
     public TokenClaims(Claims claims)
     {
         super(claims);
-    }
-
-
-    public TokenClaims(String userId, Collection<? extends GrantedAuthority> authorities, String source, String sessionId)
-    {
-        this.setUserId(userId);
-        this.setAuthorities(authorities);
-        this.setSource(source);
-        this.setSessionId(sessionId);
     }
 
 
@@ -63,6 +65,18 @@ public class TokenClaims extends DefaultClaims
     public void setUserId(String userId)
     {
         this.put(USERID, userId);
+    }
+
+
+    public String getClientId()
+    {
+        return this.get(CLIENTID, String.class);
+    }
+
+
+    public void setClientId(String clientId)
+    {
+        this.put(CLIENTID, clientId);
     }
 
 
@@ -103,6 +117,40 @@ public class TokenClaims extends DefaultClaims
     }
 
 
+    public Set<String> getRoles()
+    {
+        List<?> authorities = this.get(ROLES, List.class);
+        return authorities.stream().map(String::valueOf).collect(Collectors.toSet());
+    }
+
+
+    public void setRoles(Set<String> roles)
+    {
+        this.put(ROLES, new ArrayList<>(roles));
+    }
+
+
+    public Set<String> getScope()
+    {
+        String scope = this.get(SCOPE, String.class);
+        if (StringUtils.isNotBlank(scope))
+        {
+            String[] split = scope.split(" ");
+            return Arrays.stream(split).map(String::strip).collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
+    }
+
+
+    public void setScope(Set<String> scopes)
+    {
+        if (scopes != null && !scopes.isEmpty())
+        {
+            this.put(SCOPE, String.join(" ", scopes));
+        }
+    }
+
+
     public String getSource()
     {
         return this.get(SRC, String.class);
@@ -117,12 +165,27 @@ public class TokenClaims extends DefaultClaims
 
     public String getSessionId()
     {
-        return this.get(JSID, String.class);
+        return this.get(SID, String.class);
     }
 
 
     public void setSessionId(String sessionId)
     {
-        this.put(JSID, sessionId);
+        this.put(SID, sessionId);
+    }
+
+
+    public Map<String, Object> getAdditionalClaims()
+    {
+        return (Map<String, Object>) this.get(ADD, Map.class);
+    }
+
+
+    public void setAdditionalClaims(Map<String, Object> additionalClaims)
+    {
+        if (additionalClaims != null && !additionalClaims.isEmpty())
+        {
+            this.put(ADD, additionalClaims);
+        }
     }
 }

@@ -20,8 +20,8 @@ import hu.perit.spvitamin.spring.exception.BadTokenException;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -51,27 +53,30 @@ public class AuthenticatedUser implements UserDetails
     @Builder.Default
     private boolean anonymous = true;
     private String source;
-    @Singular("additionalClaim")
+    //@Singular("additionalClaim")
     private Map<String, Object> additionalClaims;
 
 
     public static AuthenticatedUser fromClaims(TokenClaims claims)
     {
+        Collection<GrantedAuthority> authoritiesAndScopes = claims.getAuthorities();
+        Set<String> scopes = claims.getScope().stream().map(s -> "SCOPE_" + s).collect(Collectors.toSet());
+        authoritiesAndScopes.addAll(AuthorityUtils.createAuthorityList(scopes));
         return AuthenticatedUser.builder()
                 .username(claims.getSubject())
                 .displayName(claims.getPreferredUsername())
-                .authorities(claims.getAuthorities())
+                .authorities(authoritiesAndScopes)
                 .userId(claims.getUserId())
                 .anonymous(false)
                 .source(claims.getSource())
-                .additionalClaims((Map<? extends String, ?>) claims.get("add"))
+                .additionalClaims(claims.getAdditionalClaims())
                 .build();
     }
 
 
     public <T> T getAdditionalClaimThrow(String name, Class<T> clazz)
     {
-        if (!additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
+        if (additionalClaims == null || !additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
         {
             throw new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''{1}''", this.username, name));
         }
@@ -81,7 +86,7 @@ public class AuthenticatedUser implements UserDetails
 
     public <T> Optional<T> getAdditionalClaim(String name, Class<T> clazz)
     {
-        if ("null".equals(additionalClaims.get(name)))
+        if (additionalClaims == null || "null".equals(additionalClaims.get(name)))
         {
             return Optional.empty();
         }

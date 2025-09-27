@@ -43,7 +43,7 @@ public class OAuthProxyController implements OAuthProxyApi
     private final RequestInfoService requestInfoService;
 
     @Override
-    @LoggedRestMethod(eventId = 1, subsystem = "hu.perit.spvitamin.spring.security.oauth2")
+    @LoggedRestMethod(eventId = 20, module = "oauth2")
     public void authorization(String provider) throws ResourceNotFoundException, IOException
     {
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);

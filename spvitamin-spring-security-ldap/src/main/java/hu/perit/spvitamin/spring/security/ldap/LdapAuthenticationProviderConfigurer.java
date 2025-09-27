@@ -17,13 +17,14 @@
 package hu.perit.spvitamin.spring.security.ldap;
 
 import hu.perit.spvitamin.spring.security.ldap.config.LdapCollectionProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,32 +38,65 @@ public class LdapAuthenticationProviderConfigurer
     public static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
     private final LdapCollectionProperties ldapCollectionProperties;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final ConfigurableListableBeanFactory beanFactory;
+
+
+    @PostConstruct
+    public void registerLdapAuthenticationProviders()
+    {
+        for (Map.Entry<String, LdapCollectionProperties.LdapProperties> entry : this.ldapCollectionProperties.getLdaps().entrySet())
+        {
+            String id = entry.getKey();
+            LdapCollectionProperties.LdapProperties props = entry.getValue();
+
+            if (props.isEnabled())
+            {
+                String beanName = "ldapAuthenticationProvider_" + toSafeBeanName(id);
+                if (this.beanFactory.containsSingleton(beanName))
+                {
+                    log.debug("LDAP provider bean '{}' already exists, skipping.", beanName);
+                    continue;
+                }
+
+                Map<String, Object> ctxEnvironmentProps = new HashMap<>();
+                ctxEnvironmentProps.put(LDAP_CONNECT_TIMEOUT_KEY, String.valueOf(props.getConnectTimeoutMs()));
+
+                LdapAuthenticationProvider provider = this.createProvider(
+                        id,
+                        props.getUrl(),
+                        props.getDomain(),
+                        props.getFilter(),
+                        props.isUserprincipalWithDomain(),
+                        props.getRootDN(),
+                        props.getBindUserPattern()
+                );
+
+                provider.setContextEnvironmentProperties(ctxEnvironmentProps);
+
+                // Dinamikus regisztráció a Spring konténerben
+                this.beanFactory.registerSingleton(beanName, provider);
+                log.info("LDAP AuthenticationProvider bean has been registered: {}", beanName);
+            }
+        }
+    }
+
+
+    private static String toSafeBeanName(String name)
+    {
+        // Bean-névhez barátságos alak
+        return name.replaceAll("[^A-Za-z0-9_\\-]", "_");
+    }
 
 
     public void configure(HttpSecurity http)
     {
-        for (Map.Entry<String, LdapCollectionProperties.LdapProperties> entry : this.ldapCollectionProperties.getLdaps().entrySet()) {
-
-            LdapCollectionProperties.LdapProperties ldapProperties = entry.getValue();
-
-            Map<String, Object> ctxEnvironmentProps = new HashMap<>();
-            ctxEnvironmentProps.put(LDAP_CONNECT_TIMEOUT_KEY, String.valueOf(ldapProperties.getConnectTimeoutMs()));
-
-            if (ldapProperties.isEnabled()) {
-                LdapAuthenticationProvider provider = this.createProvider(
-                        entry.getKey(),
-                        ldapProperties.getUrl(),
-                        ldapProperties.getDomain(),
-                        ldapProperties.getFilter(),
-                        ldapProperties.isUserprincipalWithDomain(),
-                        ldapProperties.getRootDN(),
-                        ldapProperties.getBindUserPattern());
-
-                provider.setContextEnvironmentProperties(ctxEnvironmentProps);
-
-                http.authenticationProvider(provider);
-                this.authenticationManagerBuilder.authenticationProvider(provider);
-            }
+        Map<String, LdapAuthenticationProvider> providers = this.beanFactory.getBeansOfType(LdapAuthenticationProvider.class);
+        for (Map.Entry<String, LdapAuthenticationProvider> entry : providers.entrySet())
+        {
+            LdapAuthenticationProvider provider = entry.getValue();
+            http.authenticationProvider(provider);
+            this.authenticationManagerBuilder.authenticationProvider(provider);
+            log.debug("LDAP AuthenticationProvider '{}' applied to the security.", entry.getKey());
         }
     }
 

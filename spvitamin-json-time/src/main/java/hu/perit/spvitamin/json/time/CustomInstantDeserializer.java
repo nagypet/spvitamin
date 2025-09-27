@@ -20,15 +20,18 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 public class CustomInstantDeserializer extends JsonDeserializer<Instant>
 {
     @Override
@@ -64,7 +67,20 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
         }
 
         // Failed with custom formats, try default
-        return InstantDeserializer.INSTANT.deserialize(jp, ctxt);
+        try
+        {
+            return InstantDeserializer.INSTANT.deserialize(jp, ctxt);
+        }
+        catch (Exception ex)
+        {
+            // falling back to LocalDateTime
+        }
+
+        // Legacy: timestamp in LocalDateTime format (ex. 2025-09-25T05:39:59.802)
+        LocalDateTime ldt = LocalDateTime.parse(jp.getText(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        Instant instant = ldt.atZone(ZoneId.systemDefault()).toInstant();
+        log.warn("Deserializing Instant from json timestamp without time zone! {} => {}", jp.getText(), instant.toString());
+        return instant;
     }
 
 

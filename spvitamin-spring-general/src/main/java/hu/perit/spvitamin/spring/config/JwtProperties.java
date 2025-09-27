@@ -16,10 +16,13 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,8 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "jwt")
 @Valid
+@DependsOn(value = "securityProperties")
+@Slf4j
 public class JwtProperties
 {
+    private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+
     @NotNull
     private String privateKeyAlias;
     @NotNull
@@ -42,4 +49,17 @@ public class JwtProperties
     private String publicKeyAlias;
     @NotNull
     private long expirationInMinutes;
+
+
+    @PostConstruct
+    private void init()
+    {
+        log.debug("SpvitaminOAuth2Properties: {}", this);
+        if (securityProperties.isProductionMode() && this.expirationInMinutes > 10)
+        {
+            log.warn("!!! WARNING !!!");
+            log.warn("!!! The expirationInMinutes is set to {} minutes in production mode. This is not recommended !!!", this.expirationInMinutes);
+            log.warn("!!! The expirationInMinutes should not be greater then 10 minutes in production mode !!!");
+        }
+    }
 }

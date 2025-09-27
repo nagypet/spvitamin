@@ -18,7 +18,6 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {NgForOf, NgIf} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../dialogs/confirmation-dialog/confirmation-dialog.component';
-import {AuthService} from '../../../core/services/auth/auth.service';
 import {CertInfo, KeystoreEntry} from '../../../core/model/keystore';
 
 
@@ -42,7 +41,6 @@ export class KeystoreComponent implements OnInit, OnChanges
   selected?: KeystoreEntry;
 
   constructor(
-    public authService: AuthService,
     public dialog: MatDialog
   )
   {

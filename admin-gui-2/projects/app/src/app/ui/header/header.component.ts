@@ -15,46 +15,41 @@
  */
 
 /* tslint:disable:one-line */
-import {Component, OnInit} from '@angular/core';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
-import {NgIf} from '@angular/common';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import {MatToolbar} from '@angular/material/toolbar';
-import {MatIcon} from '@angular/material/icon';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatBadge} from '@angular/material/badge';
 import {AdminService} from '../../core/services/admin.service';
-import {AuthService} from '../../core/services/auth/auth.service';
 import {NgfaceButtonComponent} from '../../../../../ngface/src/lib/widgets/ngface-button/ngface-button.component';
 import {FormBaseComponent} from '../../../../../ngface/src/lib/form/form-base.component';
 import {Ngface} from '../../../../../ngface/src/lib/ngface-models';
 import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-widget-factory';
+import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   imports: [
-    NgIf,
     RouterLink,
     MatToolbar,
-    RouterLinkActive,
-    MatIcon,
-    MatIconButton,
-    MatButton,
-    MatBadge,
     NgfaceButtonComponent
   ],
   standalone: true
 })
-export class HeaderComponent  extends FormBaseComponent implements OnInit
+export class HeaderComponent extends FormBaseComponent implements OnInit, OnDestroy
 {
   public title = '';
   public version = '';
+  public displayName?: string;
+
+  private subscriptions = new Array<Subscription | undefined>();
+
 
   constructor
   (
     private adminService: AdminService,
-    public authService: AuthService,
+    public oAuthService: OAuthService,
     private router: Router,
   )
   {
@@ -62,11 +57,14 @@ export class HeaderComponent  extends FormBaseComponent implements OnInit
 
     // Initializing ngface widgets
     let form = {widgets: {}} as Ngface.Form;
-    form.widgets['button-login'] = NgfaceWidgetFactory.createButton({id: 'button-login', label: 'Login', style:'NONE'});
-    form.widgets['button-logout'] = NgfaceWidgetFactory.createButton({id: 'button-logout', label: 'Logout', style:'NONE'});
-    form.widgets['button-about'] = NgfaceWidgetFactory.createButton({id: 'button-about', label: 'About', style:'PRIMARY'});
+    form.widgets['button-login'] = NgfaceWidgetFactory.createButton({id: 'button-login', label: 'Login', style: 'NONE'});
+    form.widgets['button-logout'] = NgfaceWidgetFactory.createButton({id: 'button-logout', label: 'Logout', style: 'NONE'});
+    form.widgets['button-about'] = NgfaceWidgetFactory.createButton({id: 'button-about', label: 'About', style: 'PRIMARY'});
     this.formData = form;
+
+    this.subscriptions.push(this.oAuthService.displayName$.subscribe(value => this.displayName = value));
   }
+
 
   ngOnInit()
   {
@@ -78,8 +76,21 @@ export class HeaderComponent  extends FormBaseComponent implements OnInit
     });
   }
 
+
+  ngOnDestroy(): void
+  {
+    this.subscriptions.forEach(i =>
+    {
+      if (i)
+      {
+        i.unsubscribe();
+      }
+    });
+  }
+
+
   onLogout()
   {
-    this.authService.logout().subscribe(() => this.router.navigateByUrl('/'));
+    this.oAuthService.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 }

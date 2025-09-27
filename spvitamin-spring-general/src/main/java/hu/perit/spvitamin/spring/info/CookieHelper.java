@@ -16,10 +16,12 @@
 
 package hu.perit.spvitamin.spring.info;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CookieHelper
@@ -33,8 +35,8 @@ public final class CookieHelper
 
 
     private static void clearCookie(String cookieName,
-                                           HttpServletRequest request,
-                                           HttpServletResponse response)
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
@@ -45,5 +47,29 @@ public final class CookieHelper
         cookie.setHttpOnly(true);
         cookie.setSecure(request.isSecure());
         response.addCookie(cookie);
+    }
+
+
+    public static String getCookie(String cookieName, HttpServletRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0)
+        {
+            return null;
+        }
+
+        for (Cookie cookie : cookies)
+        {
+            if (StringUtils.equalsIgnoreCase(cookieName, cookie.getName()))
+            {
+                String value = StringUtils.trimToNull(cookie.getValue());
+                if (value != null)
+                {
+                    return value;
+                }
+            }
+        }
+
+        return null;
     }
 }

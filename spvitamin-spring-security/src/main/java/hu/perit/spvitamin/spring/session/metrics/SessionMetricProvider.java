@@ -17,7 +17,7 @@
 package hu.perit.spvitamin.spring.session.metrics;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;

@@ -33,6 +33,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -49,6 +50,7 @@ public class LoggedRestMethodAspect
     private final AuthorizationService authorizationService;
     private final HttpServletRequest httpRequest;
     private final ApplicationEventPublisher publisher;
+    private final Environment environment;
 
 
     @Pointcut("@annotation(hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod)")
@@ -86,15 +88,20 @@ public class LoggedRestMethodAspect
         }
 
         String username = getUsername(annotation, arguments);
+        String subsystem = StringUtils.isNotBlank(annotation.subsystem()) ? annotation.subsystem() : environment.getProperty("spring.application.name");
+        if (StringUtils.isNotBlank(annotation.module()))
+        {
+            subsystem = subsystem + "." + annotation.module();
+        }
 
         try (Took took = new Took(method, !annotation.muted()))
         {
-            callIn(arguments.getString(annotation.externalTraceId()), annotation.subsystem(), username, method.getName(), annotation.eventId(), arguments, annotation.muted());
+            callIn(arguments.getString(annotation.externalTraceId()), subsystem, username, method.getName(), annotation.eventId(), arguments, annotation.muted());
             return proceedingJoinPoint.proceed();
         }
         catch (Throwable ex)
         {
-            callOut(arguments.getString(annotation.externalTraceId()), annotation.subsystem(), username, method.getName(), annotation.eventId(), ex, annotation.muted());
+            callOut(arguments.getString(annotation.externalTraceId()), subsystem, username, method.getName(), annotation.eventId(), ex, annotation.muted());
             throw ex;
         }
     }

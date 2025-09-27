@@ -16,22 +16,27 @@
 
 package hu.perit.spvitamin.spring.security.auth.jwt;
 
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.exception.InvalidTokenException;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
-import hu.perit.spvitamin.spring.session.local.SpvitaminCompositeSessionAuthenticationStrategy;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -39,9 +44,15 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -52,6 +63,24 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider
 {
+    @RequiredArgsConstructor
+    @Getter
+    public enum Type
+    {
+        JWT("jwt"),
+        ACCESS("at+jwt"),
+        REFRESH("rt+jwt");
+
+        private final String value;
+
+
+        public static Optional<Type> fromValue(String value)
+        {
+            return Arrays.stream(Type.values()).filter(i -> i.getValue().equals(value)).findFirst();
+        }
+    }
+
+
     private final JwtProperties jwtProperties;
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private final AdvancedSessionRegistry sessionRegistry;
@@ -59,16 +88,22 @@ public class JwtTokenProvider
 
     public AuthorizationToken generateToken(AuthenticatedUser authenticatedUser)
     {
+        Instant issuedAt = Instant.now();
+        Duration ttl = Duration.ofMinutes(jwtProperties.getExpirationInMinutes());
+
+        return this.generateToken(Type.JWT, authenticatedUser, null, Collections.emptySet(), issuedAt, ttl);
+    }
+
+
+    public AuthorizationToken generateToken(Type type, AuthenticatedUser authenticatedUser, String clientId, Set<String> scopes, Instant issuedAt, Duration ttl)
+    {
         try
         {
-            LocalDateTime issuedAt = LocalDateTime.now();
-            LocalDateTime expiryDate = issuedAt.plusMinutes(jwtProperties.getExpirationInMinutes());
-            Key privateKey = KeystoreUtils.getPrivateKey();
-
-            Date iat = Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant());
-            Date exp = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
-
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
+
+            // Update session timeout
+            setSessionTimeout(type, ttl);
+            touchSession(type);
 
             // Updating session-registry
             if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)
@@ -82,39 +117,126 @@ public class JwtTokenProvider
                 this.sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser, null);
             }
 
-            // Putting the sessionId into the token
-            String sessionId = RequestQuery.getSessionId();
-            TokenClaims claims = new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getSource(), sessionId);
-            claims.setPreferredUsername(authenticatedUser.getDisplayName());
-
-            // Put the additional claims into the token
-            claims.put("add", authenticatedUser.getAdditionalClaims());
-
-            String jwt = Jwts.builder()
-                    .subject(domainUser.getCanonicalName())
-                    .issuedAt(iat)
-                    .expiration(exp)
-                    .claims(claims)
-                    .signWith(privateKey)
-                    .compact();
-
-            return AuthorizationToken.builder()
+            AuthorizationToken authorizationToken = AuthorizationToken.builder()
+                    .type(type)
                     .sub(domainUser.getCanonicalName())
                     .preferredUsername(authenticatedUser.getDisplayName())
-                    .jwt(jwt)
                     .iat(issuedAt)
-                    .exp(expiryDate)
+                    .exp(issuedAt.plus(ttl))
                     .uid(authenticatedUser.getUserId())
-                    .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
+                    .clientId(type == Type.REFRESH ? clientId : null)
+                    .rls(filterRoles(authenticatedUser))
+                    .scope(type != Type.JWT ? filterScopes(authenticatedUser, scopes) : null)
                     .source(authenticatedUser.getSource())
-                    .jsid(sessionId)
+                    .sid(RequestQuery.getSessionId())
                     .additionalClaims(authenticatedUser.getAdditionalClaims())
                     .build();
+
+            String jwt = getJwtFromAuthorizationToken(authorizationToken);
+            authorizationToken.setJwt(jwt);
+            return authorizationToken;
         }
         catch (Exception e)
         {
             throw new JwtException("Token creation failed!", e);
         }
+    }
+
+
+    private static Set<String> filterRoles(AuthenticatedUser authenticatedUser)
+    {
+        return AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream().filter(i -> i.startsWith("ROLE_")).collect(Collectors.toSet());
+    }
+
+
+    private static Set<String> filterScopes(AuthenticatedUser authenticatedUser, Set<String> additionalRoles)
+    {
+        Set<String> filtered = AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream()
+                .filter(i -> i.startsWith("SCOPE_"))
+                .map(String::toLowerCase)
+                .map(i -> i.substring(6))
+                .collect(Collectors.toSet());
+        if (additionalRoles != null)
+        {
+            filtered.addAll(additionalRoles);
+        }
+        return filtered;
+    }
+
+
+    public void setSessionTimeout(Type type, Duration ttl)
+    {
+        if (type == Type.JWT || type == Type.REFRESH)
+        {
+            String sessionId = RequestQuery.getSessionId();
+            this.sessionRegistry.setMaxInactiveInterval(sessionId, ttl);
+        }
+    }
+
+
+    public void touchSession(Type type)
+    {
+        if (type == Type.JWT || type == Type.REFRESH)
+        {
+            String sessionId = RequestQuery.getSessionId();
+            this.sessionRegistry.refreshLastRequest(sessionId);
+        }
+    }
+
+
+    public String getJwtFromAuthorizationToken(AuthorizationToken token)
+    {
+        if (token == null)
+        {
+            return null;
+        }
+
+        TokenClaims claims = new TokenClaims();
+        claims.setUserId(token.getUid());
+        claims.setClientId(token.getClientId());
+        claims.setScope(token.getScope());
+        claims.setRoles(token.getRls());
+        claims.setPreferredUsername(token.getPreferredUsername());
+        claims.setSource(token.getSource());
+        claims.setSessionId(token.getSid());
+        claims.setAdditionalClaims(token.getAdditionalClaims());
+
+        Key privateKey = KeystoreUtils.getPrivateKey();
+        return Jwts.builder()
+                .header().add("typ", token.getType().getValue()).and()
+                .subject(token.getSub())
+                .issuedAt(Date.from(token.getIat()))
+                .expiration(Date.from(token.getExp()))
+                .claims(claims)
+                .signWith(privateKey)
+                .compact();
+    }
+
+
+    public AuthorizationToken getAuthorizationTokenFromJwt(String jwt)
+    {
+        if (StringUtils.isBlank(jwt))
+        {
+            return null;
+        }
+
+        Claims claims = getClaims(jwt);
+        TokenClaims tokenClaims = new TokenClaims(claims);
+
+        return AuthorizationToken.builder()
+                .type(getTokenType(jwt))
+                .sub(tokenClaims.get("sub", String.class))
+                .preferredUsername(tokenClaims.getPreferredUsername())
+                .iat(tokenClaims.getIssuedAt().toInstant())
+                .exp(tokenClaims.getExpiration().toInstant())
+                .uid(tokenClaims.getUserId())
+                .clientId(tokenClaims.getClientId())
+                .rls(tokenClaims.getRoles())
+                .scope(tokenClaims.getScope())
+                .source(tokenClaims.getSource())
+                .sid(tokenClaims.getSessionId())
+                .additionalClaims(tokenClaims.getAdditionalClaims())
+                .build();
     }
 
 
@@ -132,6 +254,23 @@ public class JwtTokenProvider
         catch (ExpiredJwtException e)
         {
             throw new InvalidTokenException("JWT token expired!", e);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidTokenException("JWT token parse failed!", e);
+        }
+    }
+
+
+    public Type getTokenType(String jwt)
+    {
+        try
+        {
+            JWSObject jws = JWSObject.parse(jwt);
+            JWSHeader header = jws.getHeader();
+            Map<String, Object> jsonObject = header.toJSONObject();
+            String tokenType = (String) jsonObject.get("typ");
+            return Type.fromValue(tokenType).orElseThrow(() -> new InvalidTokenException("Invalid token type: " + tokenType));
         }
         catch (Exception e)
         {

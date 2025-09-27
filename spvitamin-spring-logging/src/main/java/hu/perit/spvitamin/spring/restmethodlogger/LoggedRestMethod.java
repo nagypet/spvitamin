@@ -30,7 +30,9 @@ import java.lang.annotation.Target;
 public @interface LoggedRestMethod
 {
     int eventId();
-    String subsystem();
+
+    String subsystem() default "";
+    String module() default "";
     boolean muted() default false;
 
     /**

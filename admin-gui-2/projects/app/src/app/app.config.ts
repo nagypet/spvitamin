@@ -14,22 +14,44 @@
  * limitations under the License.
  */
 
-import {ApplicationConfig, importProvidersFrom, LOCALE_ID, provideZoneChangeDetection} from '@angular/core';
+import {APP_INITIALIZER, ApplicationConfig, importProvidersFrom, LOCALE_ID, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 
 import {routes} from './app.routes';
 import {BrowserModule} from '@angular/platform-browser';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
-import {AuthGuard} from './core/services/auth/auth.guard';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {TokenInterceptor} from './core/interceptors/token-interceptor';
 import {ErrorInterceptor} from '../../../ngface/src/lib/interceptors/error-interceptor.service';
 import {NgfaceModule} from '../../../ngface/src/lib/ngface.module';
 import {MatDialogModule} from '@angular/material/dialog';
 import {A11yModule} from '@angular/cdk/a11y';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/snack-bar';
+import {firstValueFrom, of} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {OAuthInterceptor} from '../../../ngface/src/lib/services/oauth2/oauth-token-interceptor';
+import {OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
+import {AuthGuard} from './core/services/auth.guard';
+import {environment} from '../environments/environment';
+
+
+function initOAuth(oAuthService: OAuthService)
+{
+  oAuthService.configure({
+    baseUrl: environment.baseURL,
+    tokenEndpoint: '/api/spvitamin/oauth2/token',
+    clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
+    clientSecret: '921a0a93-a98a-4111-bb67-09b05c448d3d',
+    scope: 'openid profile offline_access',
+  });
+
+  return () => firstValueFrom(
+    oAuthService.refreshToken().pipe(catchError(() => of(null)))
+  );
+}
+
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -42,9 +64,14 @@ export const appConfig: ApplicationConfig = {
     {provide: LOCALE_ID, useValue: 'de-DE'},
     AuthGuard,
     provideAnimations(),
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: TokenInterceptor,
+    //   multi: true
+    // },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: TokenInterceptor,
+      useClass: OAuthInterceptor,
       multi: true
     },
     {
@@ -53,6 +80,7 @@ export const appConfig: ApplicationConfig = {
       multi: true
     },
 
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: APP_INITIALIZER, useFactory: initOAuth, deps: [OAuthService], multi: true }
   ]
 };

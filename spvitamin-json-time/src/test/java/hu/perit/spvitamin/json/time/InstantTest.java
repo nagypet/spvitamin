@@ -100,6 +100,14 @@ class InstantTest
     }
 
 
+    @Test
+    void testDeserializationFromLocalDateTime() throws IOException
+    {
+        // with T, without time zone
+        testDeserialization("2020-05-01T10:11:12.123", refTime(2020, 5, 1, 10, 11, 12, 123, "+2"));
+    }
+
+
     void testDeserialization(String dateString, Instant expectedDate) throws IOException
     {
         String jsonString = String.format("{\"instant\":\"%s\"}", dateString);

@@ -20,7 +20,6 @@ import hu.perit.spvitamin.spring.admin.ShutdownManager;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
 import hu.perit.spvitamin.spring.config.AdminProperties;
-import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.manifest.ManifestReader;
 import hu.perit.spvitamin.spring.rest.api.AdminApi;
 import hu.perit.spvitamin.spring.rest.model.ServerSettingsResponse;
@@ -43,13 +42,15 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AdminController implements AdminApi
 {
+    private static final String MODULE_NAME = "admin-controller";
+
     private final ShutdownManager sm;
     private final ServerParameterProvider serverParameterProvider;
     private final AdminProperties adminProperties;
 
 
     @Override
-    @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
+    @LoggedRestMethod(eventId = 1, module = MODULE_NAME)
     public ServerSettingsResponse retrieveServerSettingsUsingGET()
     {
         Map<String, Set<ServerParameter>> serverParameters = this.serverParameterProvider.getServerParameters();
@@ -60,6 +61,7 @@ public class AdminController implements AdminApi
 
 
     @Override
+    @LoggedRestMethod(eventId = 2, module = MODULE_NAME)
     public Properties retrieveVersionInfoUsingGET()
     {
         Properties manifest = ManifestReader.getManifestAttributes();
@@ -89,6 +91,7 @@ public class AdminController implements AdminApi
 
 
     @Override
+    @LoggedRestMethod(eventId = 3, module = MODULE_NAME)
     public void shutdown()
     {
         this.sm.start();
@@ -96,6 +99,7 @@ public class AdminController implements AdminApi
 
 
     @Override
+    @LoggedRestMethod(eventId = 4, module = MODULE_NAME)
     public void cspViolationsUsingPOST(String request)
     {
         // do nothing

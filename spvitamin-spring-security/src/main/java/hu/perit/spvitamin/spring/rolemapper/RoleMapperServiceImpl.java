@@ -21,6 +21,7 @@ import hu.perit.spvitamin.spring.config.RoleMappingProperties;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 public class RoleMapperServiceImpl implements RoleMapperService
 {
     public static final String ROLE_PREFIX = "ROLE_";
+    public static final String SCOPE_PREFIX = "SCOPE_";
 
     private final RoleMappingProperties roleMappingProperties;
     private final Role2PermissionMappingProperties role2PermissionMappingProperties;
@@ -77,6 +79,12 @@ public class RoleMapperServiceImpl implements RoleMapperService
                     roles.add(role);
                     roles.addAll(roleMappingProperties.getIncludedRoles(role));
                 }
+                if (group.getAuthority().startsWith(SCOPE_PREFIX))
+                {
+                    // This is a SCOPE_
+                    String scope = group.getAuthority();
+                    roles.add(scope);
+                }
                 else
                 {
                     // This is an AD group
@@ -96,7 +104,7 @@ public class RoleMapperServiceImpl implements RoleMapperService
             return "";
         }
 
-        return roleName.startsWith(ROLE_PREFIX) ? roleName : ROLE_PREFIX + roleName;
+        return roleName.startsWith(ROLE_PREFIX) || roleName.startsWith(SCOPE_PREFIX) ? roleName : ROLE_PREFIX + roleName;
     }
 
 
@@ -105,9 +113,9 @@ public class RoleMapperServiceImpl implements RoleMapperService
     {
         Set<GrantedAuthority> permissions = new HashSet<>();
 
-        // filtering only ROLEs
+        // filtering only ROLEs and SCOPEs
         List<? extends GrantedAuthority> roles = authorities.stream()
-                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .filter(a -> a.getAuthority().startsWith(ROLE_PREFIX) || a.getAuthority().startsWith(SCOPE_PREFIX))
                 .toList();
         for (GrantedAuthority role : roles)
         {
@@ -117,7 +125,7 @@ public class RoleMapperServiceImpl implements RoleMapperService
             if (role2PermissionMappingProperties.getRolemap().containsKey(role.getAuthority()))
             {
                 List<String> permissionList = role2PermissionMappingProperties.getRolemap().get(role.getAuthority());
-                permissions.addAll(permissionList.stream().map(p -> new SimpleGrantedAuthority(p)).toList());
+                permissions.addAll(AuthorityUtils.createAuthorityList(permissionList));
             }
         }
 

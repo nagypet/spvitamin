@@ -28,6 +28,7 @@ public class AuthenticationRepositoryController implements AuthenticationReposit
     private final AuthenticationRepository authenticationRepository;
 
     @Override
+    //@LoggedRestMethod(eventId = 30, module = "authentication-repository")
     public AuthenticationRepository getAuthenticationRepository()
     {
         return this.authenticationRepository;

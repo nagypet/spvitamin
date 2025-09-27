@@ -17,7 +17,6 @@
 import {Component, HostListener} from '@angular/core';
 import {LayoutComponent} from './ui/layout/layout.component';
 import {DeviceTypeService} from './core/services/device-type.service';
-import {AuthService} from './core/services/auth/auth.service';
 import {environment} from '../environments/environment';
 
 @Component({
@@ -35,8 +34,7 @@ export class AppComponent
 
 
   constructor(
-    private deviceTypeService: DeviceTypeService,
-    private authService: AuthService,
+    private deviceTypeService: DeviceTypeService
   )
   {
   }
@@ -44,7 +42,6 @@ export class AppComponent
 
   ngOnInit(): void
   {
-    this.authService.getProfile().subscribe();
     this.onWindowResize();
     this.loadStylesheet(`themes/${environment.theme}/microdms-theme.css`);
   }

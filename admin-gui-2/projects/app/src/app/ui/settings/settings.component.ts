@@ -21,8 +21,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatCardModule} from '@angular/material/card';
 import {AdminService} from '../../core/services/admin.service';
-import {AuthService} from '../../core/services/auth/auth.service';
 import {SpvitaminAdmin} from '../../core/model/spvitamin-admin-models';
+import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 
 
 @Component({
@@ -45,7 +45,7 @@ export class SettingsComponent implements OnInit
 
   constructor(
     public adminService: AdminService,
-    public authService: AuthService
+    public authService: OAuthService
   )
   {
 

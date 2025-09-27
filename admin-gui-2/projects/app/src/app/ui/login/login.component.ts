@@ -17,7 +17,6 @@
 /* tslint:disable:one-line */
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AuthService} from '../../core/services/auth/auth.service';
 import {NgfaceFormComponent} from '../../../../../ngface/src/lib/form/ngface-form/ngface-form.component';
 import {NgfaceTextInputComponent} from '../../../../../ngface/src/lib/widgets/ngface-text-input/ngface-text-input.component';
 import {NgfaceButtonComponent} from '../../../../../ngface/src/lib/widgets/ngface-button/ngface-button.component';
@@ -28,7 +27,8 @@ import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-
 import {AuthenticationRepositoryService} from '../../core/services/authentication-repository.service';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
-import {SpvitaminSecurity} from '../../core/model/spvitamin-security-models';
+import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
+import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 
 @Component({
   selector: 'app-login',
@@ -55,7 +55,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService,
+    private oAuthService: OAuthService,
     private authenticationRepositoryService: AuthenticationRepositoryService
   )
   {
@@ -103,7 +103,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
       const userName = (submitData['username'] as Ngface.TextInput.Data).value!;
       const password = (submitData['password'] as Ngface.TextInput.Data).value!;
 
-      this.authService.login(userName, password).subscribe({
+      this.oAuthService.login(userName, password).subscribe({
         next: token =>
         {
           this.router.navigateByUrl(this.returnUrl);
@@ -119,7 +119,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
 
   onCancel()
   {
-    this.authService.logout().subscribe(() => this.router.navigateByUrl('/'));
+    this.oAuthService.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 
 

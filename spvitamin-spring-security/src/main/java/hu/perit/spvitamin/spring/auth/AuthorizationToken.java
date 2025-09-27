@@ -18,13 +18,15 @@ package hu.perit.spvitamin.spring.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import hu.perit.spvitamin.json.time.CustomInstantDeserializer;
+import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,16 +45,40 @@ import java.util.Set;
 @AllArgsConstructor
 public class AuthorizationToken implements AbstractAuthorizationToken
 {
+    private JwtTokenProvider.Type type;
     private String sub;
     @JsonProperty("preferred_username")
     private String preferredUsername;
     private String jwt;
-    private LocalDateTime iat;
-    private LocalDateTime exp;
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
+    private Instant iat;
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
+    private Instant exp;
     private String uid;
+    private String clientId;
     private Set<String> rls;
+    private Set<String> scope;
     private String source;
-    private String jsid;
-    @Singular("additionalClaim")
+    private String sid;
     private Map<String, Object> additionalClaims;
+
+
+    public AuthorizationToken clone()
+    {
+        return AuthorizationToken.builder()
+                .type(this.type)
+                .sub(this.sub)
+                .preferredUsername(this.preferredUsername)
+                .jwt(this.jwt)
+                .iat(this.iat)
+                .exp(this.exp)
+                .uid(this.uid)
+                .clientId(this.clientId)
+                .rls(this.rls)
+                .scope(this.scope)
+                .source(this.source)
+                .sid(this.sid)
+                .additionalClaims(this.additionalClaims)
+                .build();
+    }
 }

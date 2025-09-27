@@ -20,10 +20,10 @@
     <span><img src="sonar-quality-gate-passed.svg" style="margin-left: 10px"></span>
   </a>
   <div class="titlebar-actions">
-    @if (!authService.isLoggedIn) {
+    @if (!oAuthService.accessToken) {
       <ngface-button [formdata]="formData" widgetid="button-login" routerLink="/admin-gui/login"/>
     } @else {
-      <span class="titlebar-username text-light">Welcome {{authService.getDisplayName()}}!</span>
+      <span class="titlebar-username text-light">Welcome {{displayName}}!</span>
       <ngface-button [formdata]="formData" widgetid="button-logout" (click)="onLogout()"/>
     }
     <ngface-button [formdata]="formData" widgetid="button-about" routerLink="/admin-gui/about"/>

@@ -19,12 +19,12 @@ package hu.perit.spvitamin.spring.security.oauth2;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthenticatedUserFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFactory
 {
@@ -33,6 +33,7 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
     {
         return principal instanceof OidcUser;
     }
+
 
     @Override
     public AuthenticatedUser createAuthenticatedUser(Object principal)
@@ -51,6 +52,7 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
         return null;
     }
 
+
     private static String getAttribute(OidcUser oidcUser, String attribute)
     {
         Map<String, Object> attributes = oidcUser.getAttributes();
@@ -60,17 +62,17 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
 
     private static List<GrantedAuthority> getRoles(OidcUser oidcUser)
     {
+        Set<String> originalAuthorities = AuthorityUtils.authorityListToSet(oidcUser.getAuthorities());
         Map<String, Object> attributes = oidcUser.getAttributes();
         List<String> roles = (List<String>) attributes.get("roles");
-        List<GrantedAuthority> authorities = new ArrayList<>();
         if (roles != null)
         {
-            roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+            originalAuthorities.add("ROLE_EMPTY");
+            originalAuthorities.addAll(roles);
+            return AuthorityUtils.createAuthorityList(originalAuthorities.toArray(new String[0]));
         }
-        else
-        {
-            authorities.add(new SimpleGrantedAuthority("ROLE_EMPTY"));
-        }
-        return authorities;
+
+        originalAuthorities.add("ROLE_EMPTY");
+        return AuthorityUtils.createAuthorityList(originalAuthorities.toArray(new String[0]));
     }
 }

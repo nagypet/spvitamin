@@ -19,15 +19,20 @@ import {Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {ErrorService} from '../services/error.service';
+import {OAuthService} from '../services/oauth2/oauth.service';
 
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor
 {
 
-  constructor(private errorService: ErrorService)
+  constructor(
+    private errorService: ErrorService,
+    private oAuthService: OAuthService
+  )
   {
   }
+
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
@@ -39,7 +44,12 @@ export class ErrorInterceptor implements HttpInterceptor
 
           if (error.status !== 401 && error.status !== 404)
           {
-            this.errorService.handleError(error);
+            if (!request.url.includes('/logout') && this.oAuthService.isConfigured
+              && !request.url.includes(this.oAuthService.config.tokenEndpoint)
+            )
+            {
+              this.errorService.handleError(error);
+            }
           }
           return throwError(() => error);
         })

@@ -20,7 +20,7 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.Constants;
 import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import hu.perit.spvitamin.spring.session.SessionUtils;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
