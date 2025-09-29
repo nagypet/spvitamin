@@ -125,7 +125,7 @@ export class AuthService extends ConfigurableService<AuthConfig>
       return of(void 0); // nincs token, azonnal visszatérünk
     }
 
-    return this.httpClient.post(`${environment.baseURL}/api/spvitamin/logout`, {}).pipe(
+    return this.httpClient.post(`${this.config.baseUrl}/api/spvitamin/logout`, {}).pipe(
       tap(() =>
       {
         if (withWarning)
