@@ -24,7 +24,7 @@ import {ResponsiveClassDirective} from '../../../../../ngface/src/lib/directives
 import {FormBaseComponent} from '../../../../../ngface/src/lib/form/form-base.component';
 import {Ngface} from '../../../../../ngface/src/lib/ngface-models';
 import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-widget-factory';
-import {AuthenticationRepositoryService} from '../../core/services/authentication-repository.service';
+import {AuthenticationRepositoryService} from '../../../../../ngface/src/lib/services/authentication-repository.service';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
 import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';

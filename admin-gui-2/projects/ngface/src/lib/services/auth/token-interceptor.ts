@@ -17,8 +17,8 @@
 /* tslint:disable:one-line */
 import {Injectable, Injector} from '@angular/core';
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {AuthService} from '../services/auth/auth.service';
 import {Observable} from 'rxjs';
+import {AuthService} from './auth.service';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor

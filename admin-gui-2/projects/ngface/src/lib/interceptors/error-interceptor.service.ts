@@ -44,9 +44,13 @@ export class ErrorInterceptor implements HttpInterceptor
 
           if (error.status !== 401 && error.status !== 404)
           {
-            if (!request.url.includes('/logout') && this.oAuthService.isConfigured
-              && !request.url.includes(this.oAuthService.config.tokenEndpoint)
+            if (request.url.includes('/logout') || !this.oAuthService.isConfigured
+              || request.url.includes(this.oAuthService.config.tokenEndpoint)
             )
+            {
+              console.error('error', error);
+            }
+            else
             {
               this.errorService.handleError(error);
             }

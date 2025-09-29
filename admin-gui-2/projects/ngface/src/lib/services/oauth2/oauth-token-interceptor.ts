@@ -38,7 +38,7 @@ export class OAuthInterceptor implements HttpInterceptor
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
-    if (request.url.includes(this.cfg.tokenEndpoint))
+    if (!this.oAuthService.isConfigured || request.url.includes(this.cfg.tokenEndpoint))
     {
       return next.handle(request);
     }

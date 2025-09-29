@@ -17,8 +17,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {environment} from '../../../environments/environment';
-import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
+import {environment} from '../../../../app/src/environments/environment';
+import {SpvitaminSecurity} from './auth/spvitamin-security-models';
 
 @Injectable({
   providedIn: 'root'

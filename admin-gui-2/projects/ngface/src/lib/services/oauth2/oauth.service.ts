@@ -1,36 +1,44 @@
-/*
- * Copyright 2020-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
 import {OAuthTokenStoreService} from './oauth-token-store.service';
-import {OAuthTokenResponse, OAuthUserInfo, StoredToken} from './oauth-models';
+import {OAuthTokenResponse, OAuthUserInfo, OpenIdConfigurationResponse, StoredToken} from './oauth-models';
 import {CookieService} from 'ngx-cookie-service';
 import {ConfigurableService} from '../configurable.service';
 
 
-export interface OAuthConfig
+export interface SimpleOAuthConfig
 {
   baseUrl: string;
-  tokenEndpoint: string;
   clientId?: string;
   clientSecret?: string;
   scope?: string;
+}
+
+
+export interface OAuthConfig extends SimpleOAuthConfig
+{
+  tokenEndpoint: string;
+  userInfoEndpoint: string;
+}
+
+export function configureOAuthService(oAuthService: OAuthService, config: SimpleOAuthConfig)
+{
+  return firstValueFrom(
+    oAuthService.autoconfigure(config).pipe(
+      switchMap(() =>
+        oAuthService.refreshToken().pipe(
+          catchError(() => of(void 0))
+        )
+      ),
+      catchError((err) =>
+      {
+        console.error('OAuth init error', err);
+        return of(void 0);
+      })
+    )
+  );
 }
 
 
@@ -59,6 +67,34 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
       this.token$.next(saved);
       this.scheduleRefresh(saved);
     }
+  }
+
+
+  autoconfigure(cfg: SimpleOAuthConfig): Observable<void>
+  {
+    // getting configuration using the .well-known endpoint
+    return this.httpClient.get<OpenIdConfigurationResponse>(`${cfg.baseUrl}/.well-known/openid-configuration`).pipe(
+      tap(response =>
+      {
+        console.log(`.well-known/openid-configuration successful for ${response.issuer}`);
+        this.configure(
+          {
+            baseUrl: cfg.baseUrl,
+            clientId: cfg.clientId,
+            clientSecret: cfg.clientSecret,
+            scope: cfg.scope,
+            tokenEndpoint: response.token_endpoint,
+            userInfoEndpoint: response.userinfo_endpoint
+          }
+        );
+      }),
+      map(() => void 0),
+      catchError(err =>
+      {
+        console.log('.well-known/openid-configuration failed', err);
+        return of(void 0);
+      })
+    );
   }
 
 

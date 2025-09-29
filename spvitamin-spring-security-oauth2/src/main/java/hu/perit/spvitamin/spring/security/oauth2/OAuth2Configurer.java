@@ -35,11 +35,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -84,7 +80,26 @@ public class OAuth2Configurer
             String registrationId = entry.getKey();
 
             ClientRegistration clientRegistration = null;
-            if (StringUtils.isNotBlank(provider.getIssuerUri()))
+            if (StringUtils.equalsIgnoreCase(registrationId, "spvitamin"))
+            {
+                clientRegistration = ClientRegistrations.fromOidcConfiguration(Map.of(
+                                "issuer", provider.getIssuerUri(),
+                                "subject_types_supported", List.of("pairwise"),
+                                "authorization_endpoint", provider.getIssuerUri() + "/api/spvitamin/oauth2/authorize",
+                                "token_endpoint", provider.getIssuerUri() + "/api/spvitamin/oauth2/token",
+                                "jwks_uri", provider.getIssuerUri() + "/api/spvitamin/oauth2/jwks",
+                                "userinfo_endpoint", provider.getIssuerUri() + "/api/spvitamin/oauth2/userinfo"
+                        ))
+                        .registrationId(registrationId)
+                        .clientId(provider.getClientId())
+                        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                        .clientName(registrationId)
+                        .clientSecret(provider.getClientSecret())
+                        .scope(provider.getScopes())
+                        .build();
+            }
+            else if (StringUtils.isNotBlank(provider.getIssuerUri()))
             {
                 clientRegistration = ClientRegistrations.fromIssuerLocation(provider.getIssuerUri())
                         .registrationId(registrationId)

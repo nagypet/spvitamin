@@ -28,29 +28,22 @@ import {NgfaceModule} from '../../../ngface/src/lib/ngface.module';
 import {MatDialogModule} from '@angular/material/dialog';
 import {A11yModule} from '@angular/cdk/a11y';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/snack-bar';
-import {firstValueFrom, of} from 'rxjs';
-import {catchError} from 'rxjs/operators';
 import {OAuthInterceptor} from '../../../ngface/src/lib/services/oauth2/oauth-token-interceptor';
-import {OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
+import {configureOAuthService, OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
 import {AuthGuard} from './core/services/auth.guard';
 import {environment} from '../environments/environment';
 
 
-function initOAuth(oAuthService: OAuthService)
+export function initOAuth(oAuthService: OAuthService)
 {
-  oAuthService.configure({
-    baseUrl: environment.baseURL,
-    tokenEndpoint: '/api/spvitamin/oauth2/token',
-    clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
-    clientSecret: '921a0a93-a98a-4111-bb67-09b05c448d3d',
-    scope: 'openid profile offline_access',
-  });
-
-  return () => firstValueFrom(
-    oAuthService.refreshToken().pipe(catchError(() => of(null)))
-  );
+  return () => configureOAuthService(oAuthService,
+    {
+      baseUrl: environment.baseURL,
+      clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
+      clientSecret: '921a0a93-a98a-4111-bb67-09b05c448d3d',
+      scope: 'openid profile offline_access',
+    });
 }
-
 
 
 export const appConfig: ApplicationConfig = {
@@ -81,6 +74,6 @@ export const appConfig: ApplicationConfig = {
     },
 
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: APP_INITIALIZER, useFactory: initOAuth, deps: [OAuthService], multi: true }
+    {provide: APP_INITIALIZER, useFactory: initOAuth, deps: [OAuthService], multi: true}
   ]
 };
