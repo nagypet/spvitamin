@@ -26,7 +26,7 @@
           <div responsiveClass="ngface-dialog-actions">
             <ngface-button [formdata]="formData" widgetid="button-cancel" (click)="onCancel()"/>
           </div>
-        } @else if (selectedAuthenticationType.type === 'basic') {
+        } @else if (isSelectedAuthenticationRequiresPassword()) {
           <!-- Basic auth -->
           <ngface-text-input [formdata]="formData" [focused]=true widgetid="username"/>
           <ngface-text-input [formdata]="formData" widgetid="password"/>

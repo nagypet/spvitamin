@@ -16,9 +16,10 @@
 
 /* tslint:disable:one-line */
 import {Injectable, Injector} from '@angular/core';
-import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {AuthService} from './auth.service';
+import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
+import {Observable, switchMap, throwError} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {AuthenticationRepositoryService} from './authentication-repository.service';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor
@@ -27,25 +28,40 @@ export class TokenInterceptor implements HttpInterceptor
   {
   }
 
+
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
-    if (request.url.includes('authenticate'))
+    const repositoryService = this.injector.get(AuthenticationRepositoryService);
+    const authService = repositoryService.authService;
+    if (!authService || !authService.isConfigured || request.headers.has('Authorization') || authService.ignoreInTokenInterceptor(request.url))
     {
       return next.handle(request);
     }
 
-    const authService = this.injector.get(AuthService);
-    const token = authService.getToken();
-    if (!token)
-    {
-      return next.handle(request);
-    }
+    const token = authService.accessToken;
+    const authReq = token
+      ? request.clone({setHeaders: {Authorization: `Bearer ${token}`}})
+      : request;
 
-    request = request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token.jwt}`
-      }
-    });
-    return next.handle(request);
+    return next.handle(authReq).pipe(
+      catchError((err: HttpErrorResponse) =>
+      {
+        if (err.status === 401 && authService.accessToken)
+        {
+          return authService.refreshToken().pipe(
+            switchMap(() =>
+            {
+              const newToken = authService.accessToken;
+              const retried = newToken
+                ? request.clone({setHeaders: {Authorization: `Bearer ${newToken}`}})
+                : request;
+              return next.handle(retried);
+            }),
+            catchError(refreshErr => throwError(() => refreshErr))
+          );
+        }
+        return throwError(() => err);
+      })
+    );
   }
 }

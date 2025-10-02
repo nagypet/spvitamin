@@ -40,7 +40,7 @@ public class SecurityContextRemoverFilter extends OncePerRequestFilter
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
-        log.debug("{} called", this.getClass().getName());
+        log.debug("{} called", this.getClass().getSimpleName());
 
         // Clearing persisted security context => ignoring session handling on the basis of JSESSIONID
         SecurityContextHolder.clearContext();

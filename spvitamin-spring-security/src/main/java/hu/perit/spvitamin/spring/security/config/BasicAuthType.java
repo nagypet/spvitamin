@@ -23,6 +23,6 @@ public class BasicAuthType extends AuthenticationType
 
     public BasicAuthType()
     {
-        super(TYPE, LABEL, null);
+        super(TYPE, LABEL, null, null);
     }
 }

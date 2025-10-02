@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -133,6 +134,16 @@ public class StateMachine<S extends Enum<?>, E extends Enum<?>>
     {
         this.transactions = Collections.unmodifiableList(stateMachine.transactions);
         this.currentState = stateMachine.currentState;
+    }
+
+
+    // Returns source states where event is allowed
+    public Set<S> getStateForEvent(E event)
+    {
+        return this.transactions.stream()
+                .filter(t -> t.getEvent() == event)
+                .map(t -> t.getSource())
+                .collect(Collectors.toSet());
     }
 
 

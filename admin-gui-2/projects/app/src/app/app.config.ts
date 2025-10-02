@@ -28,15 +28,23 @@ import {NgfaceModule} from '../../../ngface/src/lib/ngface.module';
 import {MatDialogModule} from '@angular/material/dialog';
 import {A11yModule} from '@angular/cdk/a11y';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/snack-bar';
-import {OAuthInterceptor} from '../../../ngface/src/lib/services/oauth2/oauth-token-interceptor';
-import {configureOAuthService, OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
+import {OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
 import {AuthGuard} from './core/services/auth.guard';
 import {environment} from '../environments/environment';
+import {AuthService} from '../../../ngface/src/lib/services/auth/auth.service';
+import {configureSecurity} from '../../../ngface/src/lib/services/auth/configure-security';
+import {AuthenticationRepositoryService} from '../../../ngface/src/lib/services/auth/authentication-repository.service';
 
 
-export function initOAuth(oAuthService: OAuthService)
+export function initSecurity(repositoryService: AuthenticationRepositoryService, authService: AuthService, oAuthService: OAuthService)
 {
-  return () => configureOAuthService(oAuthService,
+  return () => configureSecurity(
+    repositoryService,
+    authService,
+    {
+      baseUrl: environment.baseURL
+    },
+    oAuthService,
     {
       baseUrl: environment.baseURL,
       clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
@@ -64,16 +72,11 @@ export const appConfig: ApplicationConfig = {
     // },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: OAuthInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
       useClass: ErrorInterceptor,
       multi: true
     },
 
     provideHttpClient(withInterceptorsFromDi()),
-    {provide: APP_INITIALIZER, useFactory: initOAuth, deps: [OAuthService], multi: true}
+    {provide: APP_INITIALIZER, useFactory: initSecurity, deps: [AuthenticationRepositoryService, AuthService, OAuthService], multi: true}
   ]
 };

@@ -22,6 +22,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseCookie;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CookieHelper
@@ -50,7 +55,19 @@ public final class CookieHelper
     }
 
 
-    public static String getCookie(String cookieName, HttpServletRequest request)
+    public static Optional<Cookie> getCookie(String cookieName, HttpServletRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0)
+        {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(cookies).filter(i -> StringUtils.equalsIgnoreCase(cookieName, i.getName())).findFirst();
+    }
+
+
+    public static String getCookieValue(String cookieName, HttpServletRequest request)
     {
         Cookie[] cookies = request.getCookies();
         if (cookies == null || cookies.length == 0)
@@ -58,18 +75,36 @@ public final class CookieHelper
             return null;
         }
 
-        for (Cookie cookie : cookies)
-        {
-            if (StringUtils.equalsIgnoreCase(cookieName, cookie.getName()))
-            {
-                String value = StringUtils.trimToNull(cookie.getValue());
-                if (value != null)
-                {
-                    return value;
-                }
-            }
-        }
+        return getCookie(cookieName, request).map(i -> StringUtils.trimToNull(i.getValue())).orElse(null);
+    }
 
-        return null;
+
+    public static ResponseCookie buildSetTokenCookie(HttpServletRequest request, String value, String name, Duration ttl)
+    {
+        String contextPath = request.getContextPath();
+        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+
+        return ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(request.isSecure())
+                .path(path)
+                .sameSite("Strict")
+                .maxAge(ttl.plusMinutes(1))
+                .build();
+    }
+
+
+    public static ResponseCookie buildDeleteTokenCookie(HttpServletRequest request, String name)
+    {
+        String contextPath = request.getContextPath();
+        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+
+        return ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(request.isSecure())
+                .path(path)
+                .sameSite("Strict")
+                .maxAge(0) // törlés
+                .build();
     }
 }

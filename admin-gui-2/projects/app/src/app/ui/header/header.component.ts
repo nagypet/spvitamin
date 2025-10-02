@@ -25,6 +25,7 @@ import {Ngface} from '../../../../../ngface/src/lib/ngface-models';
 import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-widget-factory';
 import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 import {Subscription} from 'rxjs';
+import {AuthenticationRepositoryService} from '../../../../../ngface/src/lib/services/auth/authentication-repository.service';
 
 @Component({
   selector: 'app-header',
@@ -49,7 +50,7 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
   constructor
   (
     private adminService: AdminService,
-    public oAuthService: OAuthService,
+    public repositoryService: AuthenticationRepositoryService,
     private router: Router,
   )
   {
@@ -62,7 +63,7 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
     form.widgets['button-about'] = NgfaceWidgetFactory.createButton({id: 'button-about', label: 'About', style: 'PRIMARY'});
     this.formData = form;
 
-    this.subscriptions.push(this.oAuthService.displayName$.subscribe(value => this.displayName = value));
+    this.subscriptions.push(this.repositoryService.authService?.displayName$.subscribe(value => this.displayName = value));
   }
 
 
@@ -91,6 +92,6 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
 
   onLogout()
   {
-    this.oAuthService.logout().subscribe(() => this.router.navigateByUrl('/'));
+    this.repositoryService.authService?.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 }

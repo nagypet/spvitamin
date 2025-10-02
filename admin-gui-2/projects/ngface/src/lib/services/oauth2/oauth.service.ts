@@ -2,10 +2,9 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
-import {OAuthTokenStoreService} from './oauth-token-store.service';
 import {OAuthTokenResponse, OAuthUserInfo, OpenIdConfigurationResponse, StoredToken} from './oauth-models';
-import {CookieService} from 'ngx-cookie-service';
-import {ConfigurableService} from '../configurable.service';
+import {ConfigurableService} from '../auth/configurable.service';
+import {AbstractAuthService} from '../auth/abstract-auth.service';
 
 
 export interface SimpleOAuthConfig
@@ -43,7 +42,7 @@ export function configureOAuthService(oAuthService: OAuthService, config: Simple
 
 
 @Injectable({providedIn: 'root'})
-export class OAuthService extends ConfigurableService<OAuthConfig>
+export class OAuthService extends ConfigurableService<OAuthConfig> implements AbstractAuthService
 {
   private token$ = new BehaviorSubject<StoredToken | null>(null);
   private userInfo$ = new BehaviorSubject<OAuthUserInfo | null>(null);
@@ -51,22 +50,16 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
   private refreshQueue$ = new Subject<void>();
   private refreshTimerSub: any;
 
-  displayName$ = this.userInfo$.pipe(map(u => u?.preferred_username ?? u?.name));
+  private _displayName$ = this.userInfo$.pipe(map(u => u?.preferred_username ?? u?.name));
+  public get displayName$(): Observable<string | undefined>
+  {
+    return this._displayName$;
+  }
 
 
-  constructor(
-    private httpClient: HttpClient,
-    private tokenStoreService: OAuthTokenStoreService,
-    private cookieService: CookieService
-  )
+  constructor(private httpClient: HttpClient)
   {
     super();
-    const saved = this.tokenStoreService.getToken();
-    if (saved)
-    {
-      this.token$.next(saved);
-      this.scheduleRefresh(saved);
-    }
   }
 
 
@@ -125,9 +118,9 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
     return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
-      tap(res =>
+      tap(response =>
       {
-        this.onTokenResponse(res);
+        this.onTokenResponse(response);
         this.getProfile().subscribe();
       }),
       map(() => void 0)
@@ -154,9 +147,9 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
     return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
-      tap(res =>
+      tap(response =>
       {
-        this.onTokenResponse(res);
+        this.onTokenResponse(response);
         this.getProfile().subscribe();
       }),
       finalize(() =>
@@ -230,21 +223,19 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
   {
     console.log('cleanUpSessionStorage()');
     this.clearRefreshTimer();
-    this.tokenStoreService.clear();
-    this.cookieService.deleteAll();
     this.token$.next(null);
     this.userInfo$.next(null);
   }
 
 
-  private onTokenResponse(res: OAuthTokenResponse): void
+  private onTokenResponse(response: OAuthTokenResponse): void
   {
-    const expiresAt = Date.now() + (res.expires_in - 30) * 1000; // 30 mp ráhagyás
+    console.log(`token expires in: ${response.expires_in} seconds`);
+    const expiresAt = Date.now() + response.expires_in * 1000;
     const stored: StoredToken = {
-      accessToken: res.access_token,
+      accessToken: response.access_token,
       expiresAt
     };
-    this.tokenStoreService.setToken(stored);
     this.token$.next(stored);
     this.scheduleRefresh(stored);
   }
@@ -253,7 +244,7 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
   private scheduleRefresh(tokens: StoredToken): void
   {
     this.clearRefreshTimer();
-    const delayMs = Math.max(0, tokens.expiresAt - Date.now() - 5000); // még 5 mp ráhagyás
+    const delayMs = Math.max(0, tokens.expiresAt - Date.now() - 30000); // 30 mp ráhagyás
     this.refreshTimerSub = timer(delayMs).pipe(
       switchMap(() => this.refreshToken())
     ).subscribe({
@@ -283,5 +274,11 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
       }
     });
     return form;
+  }
+
+
+  ignoreInTokenInterceptor(url: string): boolean
+  {
+    return this.isConfigured ? url.includes(this.config.tokenEndpoint) : false;
   }
 }

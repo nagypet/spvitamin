@@ -24,11 +24,10 @@ import {ResponsiveClassDirective} from '../../../../../ngface/src/lib/directives
 import {FormBaseComponent} from '../../../../../ngface/src/lib/form/form-base.component';
 import {Ngface} from '../../../../../ngface/src/lib/ngface-models';
 import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-widget-factory';
-import {AuthenticationRepositoryService} from '../../../../../ngface/src/lib/services/authentication-repository.service';
+import {AuthenticationRepositoryService} from '../../../../../ngface/src/lib/services/auth/authentication-repository.service';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
 import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
-import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 
 @Component({
   selector: 'app-login',
@@ -55,7 +54,6 @@ export class LoginComponent extends FormBaseComponent implements OnInit
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private oAuthService: OAuthService,
     private authenticationRepositoryService: AuthenticationRepositoryService
   )
   {
@@ -69,6 +67,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
     form.widgets['button-cancel'] = NgfaceWidgetFactory.createButton({id: 'button-cancel', label: 'Cancel', style: 'NONE'});
     this.formData = form;
   }
+
 
   private createTextInputWidget(id: string, label: string, password = false): Ngface.TextInput
   {
@@ -103,7 +102,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
       const userName = (submitData['username'] as Ngface.TextInput.Data).value!;
       const password = (submitData['password'] as Ngface.TextInput.Data).value!;
 
-      this.oAuthService.login(userName, password).subscribe({
+      this.authenticationRepositoryService.authService?.login(userName, password).subscribe({
         next: token =>
         {
           this.router.navigateByUrl(this.returnUrl);
@@ -119,7 +118,7 @@ export class LoginComponent extends FormBaseComponent implements OnInit
 
   onCancel()
   {
-    this.oAuthService.logout().subscribe(() => this.router.navigateByUrl('/'));
+    this.authenticationRepositoryService.authService?.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 
 
@@ -137,12 +136,24 @@ export class LoginComponent extends FormBaseComponent implements OnInit
   }
 
 
+  isSelectedAuthenticationRequiresPassword(): boolean
+  {
+    if (!this.selectedAuthenticationType)
+    {
+      return false;
+    }
+    const authType = this.selectedAuthenticationType;
+    return authType.type === 'basic'
+      || authType.grantTypes.includes('password') && authType.grantTypes.length == 1;
+  }
+
+
   onAuthenticationSelect(type: SpvitaminSecurity.AuthenticationType)
   {
     console.log(`Selected authentication type: ${type.label}`);
     this.selectedAuthenticationType = type;
 
-    if (type.type === 'oauth2')
+    if (type.type === 'oauth2' && type.grantTypes.includes('authorization_code'))
     {
       //window.location.href = 'http://localhost:8410/oauth2/authorization/microsoft';
       //window.location.href = 'http://localhost:8410/api/spvitamin/oauth2/authorization?provider=microsoft';

@@ -16,18 +16,17 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Peter Nagy
@@ -51,6 +50,9 @@ public class SecurityProperties
     private boolean productionMode = true;
 
     @NestedConfigurationProperty
+    private AuthConfiguration auth;
+
+    @NestedConfigurationProperty
     private OAuth2Configuration oauth2;
 
     /**
@@ -65,8 +67,7 @@ public class SecurityProperties
     {
         log.debug(this.toString());
         if (productionMode
-                && ("*".equals(this.adminGuiAccess)
-                || "*".equals(this.adminEndpointsAccess)
+                && ("*".equals(this.adminEndpointsAccess)
                 || "*".equals(this.swaggerAccess)
                 || "*".equals(this.managementEndpointsAccess))
         )
@@ -75,12 +76,14 @@ public class SecurityProperties
         }
     }
 
+
     @Data
     public static class OAuth2Configuration
     {
         private Map<String, OAuth2Provider> providers = new HashMap<>();
         private Map<String, WellKnownEndpoints> wellKnownEndpoints = new HashMap<>();
     }
+
 
     @Data
     public static class OAuth2Provider
@@ -94,7 +97,9 @@ public class SecurityProperties
         @NotNull
         private String clientSecret;
         private List<String> scopes = List.of("openid", "profile", "email");
+        private List<String> grantTypes = List.of("authorization_code");
     }
+
 
     @Data
     public static class WellKnownEndpoints
@@ -104,5 +109,18 @@ public class SecurityProperties
         private String jwkSetUri;
         private String userInfoUri;
         private String userNameAttributeName;
+    }
+
+
+    @Data
+    public static class AuthConfiguration
+    {
+        @NotNull
+        private String clientId;
+        // If this is set to false, the AuthorizationToken class will not contain a jwt field if the request comes from a browser,
+        // but instead the token will be put into a cookie
+        private boolean allowTokenInResponse = false;
+        private String accessTokenCookieName;
+        private String refreshTokenCookieName;
     }
 }

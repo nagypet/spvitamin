@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -59,15 +58,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -156,7 +147,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
 
         if (isError)
         {
-            headers.add(HttpHeaders.SET_COOKIE, buildDeleteRefreshTokenCookie(clientProps).toString());
+            headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, clientProps.getClientId()).toString());
             return new ResponseEntity<>(body, headers, original.getStatusCode());
         }
 
@@ -165,7 +156,8 @@ public class OAuth2ServiceImpl implements OAuth2Service
             Object rt = body.get(Constants.REFRESH_TOKEN);
             if (rt instanceof String refreshToken && !refreshToken.isBlank())
             {
-                headers.add(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(refreshToken, clientProps).toString());
+                Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
+                headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken, clientProps.getClientId(), refreshTtl).toString());
                 if (!clientProps.isAllowRefreshTokenInResponse())
                 {
                     body.remove(Constants.REFRESH_TOKEN);
@@ -176,38 +168,6 @@ public class OAuth2ServiceImpl implements OAuth2Service
 
         // Sikeres, de nincs refresh_token a body-ban -> nem nyúlunk a cookie-hoz
         return original;
-    }
-
-
-    private ResponseCookie buildRefreshTokenCookie(String value, SpvitaminOAuth2Properties.ClientProps clientProps)
-    {
-        String contextPath = request.getContextPath();
-        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
-
-        Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
-
-        return ResponseCookie.from(clientProps.getClientId(), value)
-                .httpOnly(true)
-                .secure(request.isSecure())
-                .path(path)
-                .sameSite("Strict")
-                .maxAge(refreshTtl.plusMinutes(1))
-                .build();
-    }
-
-
-    private ResponseCookie buildDeleteRefreshTokenCookie(SpvitaminOAuth2Properties.ClientProps clientProps)
-    {
-        String contextPath = request.getContextPath();
-        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
-
-        return ResponseCookie.from(clientProps.getClientId(), "")
-                .httpOnly(true)
-                .secure(request.isSecure())
-                .path(path)
-                .sameSite("Strict")
-                .maxAge(0) // törlés
-                .build();
     }
 
 
@@ -393,7 +353,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
                 // 2) Ha nincs form-ban, próbáljuk cookie-ból
                 if (refreshToken == null)
                 {
-                    refreshToken = CookieHelper.getCookie(clientProps.getClientId(), request);
+                    refreshToken = CookieHelper.getCookieValue(clientProps.getClientId(), request);
                 }
 
                 // 3) Ha továbbra sincs, hiba

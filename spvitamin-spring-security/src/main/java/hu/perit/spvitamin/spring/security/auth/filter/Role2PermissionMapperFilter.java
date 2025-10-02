@@ -50,7 +50,7 @@ public class Role2PermissionMapperFilter extends OncePerRequestFilter
 
         try
         {
-            log.debug("{} called", this.getClass().getName());
+            log.debug("{} called", this.getClass().getSimpleName());
 
             AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
 

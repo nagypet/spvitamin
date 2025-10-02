@@ -217,10 +217,12 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder logout(String logoutUrl) throws Exception
     {
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        List<String> cookieNames = List.of(securityProperties.getAuth().getAccessTokenCookieName(), securityProperties.getAuth().getRefreshTokenCookieName(), "JSESSIONID", "SESSION");
         this.http.logout(i -> i
                 .logoutUrl(logoutUrl)
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "SESSION")
+                .deleteCookies(cookieNames.toArray(new String[0]))
                 .clearAuthentication(true)
                 .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
         );

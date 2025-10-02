@@ -17,8 +17,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {environment} from '../../../../app/src/environments/environment';
-import {SpvitaminSecurity} from './auth/spvitamin-security-models';
+import {environment} from '../../../../../app/src/environments/environment';
+import {SpvitaminSecurity} from './spvitamin-security-models';
+import {AbstractAuthService} from './abstract-auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,15 @@ import {SpvitaminSecurity} from './auth/spvitamin-security-models';
 export class AuthenticationRepositoryService
 {
   private readonly serviceUrl = '/api/spvitamin/authentication-repository';
+  private _authService?: AbstractAuthService;
+  public set authService(authService: AbstractAuthService)
+  {
+    this._authService = authService;
+  }
+  public get authService(): AbstractAuthService | undefined
+  {
+    return this._authService;
+  }
 
   constructor(private httpClient: HttpClient)
   {

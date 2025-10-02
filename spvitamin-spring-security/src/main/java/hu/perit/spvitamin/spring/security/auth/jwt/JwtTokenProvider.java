@@ -21,7 +21,9 @@ import com.nimbusds.jose.JWSObject;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.exception.InvalidTokenException;
+import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
@@ -32,7 +34,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,15 +57,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+
 /**
  * @author Peter Nagy
  */
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class JwtTokenProvider
 {
+    public static final String HIDDEN = "hidden";
+
+    private final SecurityProperties securityProperties;
+
+
     @RequiredArgsConstructor
     @Getter
     public enum Type
@@ -84,14 +94,35 @@ public class JwtTokenProvider
     private final JwtProperties jwtProperties;
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private final AdvancedSessionRegistry sessionRegistry;
+    private final HttpServletRequest request;
+    private final HttpServletResponse response;
 
 
     public AuthorizationToken generateToken(AuthenticatedUser authenticatedUser)
     {
         Instant issuedAt = Instant.now();
-        Duration ttl = Duration.ofMinutes(jwtProperties.getExpirationInMinutes());
+        Duration ttl = jwtProperties.getExpiration();
+        Duration refreshTtl = jwtProperties.getRefreshExpiration();
 
-        return this.generateToken(Type.JWT, authenticatedUser, null, Collections.emptySet(), issuedAt, ttl);
+        SecurityProperties.AuthConfiguration auth = this.securityProperties.getAuth();
+
+        // Creating the jwt token
+        AuthorizationToken jwtToken = this.generateToken(Type.JWT, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, ttl);
+
+        // Creating the refresh token
+        AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, refreshTtl);
+
+        jwtToken.setExt(Map.of("rtiat", refreshToken.getIat(), "rtexp", refreshToken.getExp()));
+
+        // Putting tokens into the cookie
+        if (!auth.isAllowTokenInResponse() && RequestQuery.isFromBrowser())
+        {
+            this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
+            jwtToken.setJwt(HIDDEN);
+        }
+        this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
+
+        return jwtToken;
     }
 
 
@@ -101,9 +132,12 @@ public class JwtTokenProvider
         {
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
-            // Update session timeout
-            setSessionTimeout(type, ttl);
-            touchSession(type);
+            if (type == Type.REFRESH)
+            {
+                // Update session timeout
+                setSessionTimeout(type, ttl);
+                touchSession(type, ttl);
+            }
 
             // Updating session-registry
             if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)
@@ -174,12 +208,19 @@ public class JwtTokenProvider
     }
 
 
-    public void touchSession(Type type)
+    public void touchSession(Type type, Duration ttl)
     {
         if (type == Type.JWT || type == Type.REFRESH)
         {
             String sessionId = RequestQuery.getSessionId();
             this.sessionRegistry.refreshLastRequest(sessionId);
+
+            // If a SESSION cookie is available, resend it with updated Max-Age/Expires
+            String sessionCookieValue = CookieHelper.getCookieValue("SESSION", this.request);
+            if (StringUtils.isNotBlank(sessionCookieValue))
+            {
+                this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(this.request, sessionCookieValue, "SESSION", ttl).toString());
+            }
         }
     }
 
@@ -275,6 +316,20 @@ public class JwtTokenProvider
         catch (Exception e)
         {
             throw new InvalidTokenException("JWT token parse failed!", e);
+        }
+    }
+
+
+    public boolean isExpired(String jwt)
+    {
+        try
+        {
+            Claims claims = getClaims(jwt);
+            return claims.getExpiration() == null || claims.getExpiration().before(new Date());
+        }
+        catch (Exception e)
+        {
+            return true;
         }
     }
 }

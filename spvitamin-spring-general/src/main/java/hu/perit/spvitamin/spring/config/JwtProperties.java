@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 /**
  * @author Peter Nagy
@@ -47,19 +50,41 @@ public class JwtProperties
     private String privateKeyEncryptedPassword;
     @NotNull
     private String publicKeyAlias;
-    @NotNull
-    private long expirationInMinutes;
+
+    @JsonIgnore
+    private long expirationInMinutes = 5;
+    private Duration expiration;
+    private Duration refreshExpiration = Duration.ofHours(24);
 
 
     @PostConstruct
     private void init()
     {
         log.debug("SpvitaminOAuth2Properties: {}", this);
-        if (securityProperties.isProductionMode() && this.expirationInMinutes > 10)
+        if (securityProperties.isProductionMode() && getExpirationInMinutes() > 10)
         {
             log.warn("!!! WARNING !!!");
             log.warn("!!! The expirationInMinutes is set to {} minutes in production mode. This is not recommended !!!", this.expirationInMinutes);
             log.warn("!!! The expirationInMinutes should not be greater then 10 minutes in production mode !!!");
         }
+    }
+
+    public long getExpirationInMinutes()
+    {
+        if (this.expiration != null)
+        {
+            return this.expiration.toMinutes();
+        }
+        return this.expirationInMinutes;
+    }
+
+
+    public Duration getExpiration()
+    {
+        if (this.expiration != null)
+        {
+            return this.expiration;
+        }
+        return Duration.ofMinutes(this.expirationInMinutes);
     }
 }

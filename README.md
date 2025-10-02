@@ -148,6 +148,8 @@ dependencyManagement {
 - Hardening security
 - New module: spvitamin-spring-security-oauth2-idp added
 - admin-gui switched to oauth2 authentication
+- admin-gui can work either with the classic AuthService as well as with the OAuthService
+- /authenticate endpoint puts a refresh token in the cookie
 
 
 ### 3.3.3-2-RELEASE not yet released

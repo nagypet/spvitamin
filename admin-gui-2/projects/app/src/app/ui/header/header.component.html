@@ -20,7 +20,7 @@
     <span><img src="sonar-quality-gate-passed.svg" style="margin-left: 10px"></span>
   </a>
   <div class="titlebar-actions">
-    @if (!oAuthService.accessToken) {
+    @if (!repositoryService.authService?.isLoggedIn) {
       <ngface-button [formdata]="formData" widgetid="button-login" routerLink="/admin-gui/login"/>
     } @else {
       <span class="titlebar-username text-light">Welcome {{displayName}}!</span>

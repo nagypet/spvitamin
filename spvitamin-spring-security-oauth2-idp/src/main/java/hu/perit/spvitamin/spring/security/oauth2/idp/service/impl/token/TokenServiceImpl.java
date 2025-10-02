@@ -91,7 +91,7 @@ public class TokenServiceImpl implements TokenService
         Instant exp = Instant.now().plus(ttl);
         authorizationToken.setExp(exp);
         String jwt = this.jwtTokenProvider.getJwtFromAuthorizationToken(authorizationToken);
-        this.jwtTokenProvider.touchSession(type);
+        this.jwtTokenProvider.touchSession(type, ttl);
         return new TokenResult(jwt, exp);
     }
 

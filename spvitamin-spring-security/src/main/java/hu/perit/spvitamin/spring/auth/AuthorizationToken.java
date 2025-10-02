@@ -61,6 +61,7 @@ public class AuthorizationToken implements AbstractAuthorizationToken
     private String source;
     private String sid;
     private Map<String, Object> additionalClaims;
+    private Map<String, Object> ext;
 
 
     public AuthorizationToken clone()

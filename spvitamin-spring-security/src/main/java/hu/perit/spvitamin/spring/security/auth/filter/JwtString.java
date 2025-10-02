@@ -20,11 +20,14 @@ import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
 import lombok.Getter;
 
 @Getter
-public class JwtString implements AbstractAuthorizationToken {
+public class JwtString implements AbstractAuthorizationToken
+{
 
     private final String jwt;
 
-    public JwtString(String jwt) {
+
+    public JwtString(String jwt)
+    {
         this.jwt = jwt;
     }
 }

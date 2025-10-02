@@ -16,12 +16,17 @@
 
 package hu.perit.spvitamin.spring.security.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class AuthenticationType
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class AuthenticationType
 {
-    private final String type;
-    private final String label;
-    private final String provider;
+    protected final String type;
+    protected final String label;
+    protected final String provider;
+    protected final List<String> grantTypes;
 }

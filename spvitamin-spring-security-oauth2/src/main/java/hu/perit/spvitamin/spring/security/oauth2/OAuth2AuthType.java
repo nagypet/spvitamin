@@ -20,14 +20,16 @@ import hu.perit.spvitamin.spring.security.config.AuthenticationType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class OAuth2AuthType extends AuthenticationType
 {
     public static final String TYPE = "oauth2";
 
-    public OAuth2AuthType(String provider, String displayName)
+    public OAuth2AuthType(String provider, String displayName, List<String> grantTypes)
     {
-        super(TYPE, displayName, provider);
+        super(TYPE, displayName, provider, grantTypes);
     }
 }

@@ -57,8 +57,11 @@ public class OAuth2Configurer
         if (!providerMap.isEmpty())
         {
             providerMap.forEach((key, value) -> {
-                log.info("Configuring OAuth2 provider '{}'.", key);
-                this.authenticationRepository.registerAuthenticationType(new OAuth2AuthType(key, value.getDisplayName()));
+                if (!value.getGrantTypes().isEmpty())
+                {
+                    log.info("Configuring OAuth2 provider '{}'.", key);
+                    this.authenticationRepository.registerAuthenticationType(new OAuth2AuthType(key, value.getDisplayName(), value.getGrantTypes()));
+                }
             });
         }
     }
