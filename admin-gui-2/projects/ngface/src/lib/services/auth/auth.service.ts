@@ -25,6 +25,7 @@ import {AbstractAuthService} from './abstract-auth.service';
 export interface AuthConfig
 {
   baseUrl: string;
+  autoRenew: boolean;
 }
 
 
@@ -42,7 +43,7 @@ export function configureAuthService(authService: AuthService, config: AuthConfi
 })
 export class AuthService extends ConfigurableService<AuthConfig> implements AbstractAuthService
 {
-  private token$ = new BehaviorSubject<SpvitaminSecurity.AuthorizationToken | null>(null);
+  protected token$ = new BehaviorSubject<SpvitaminSecurity.AuthorizationToken | null>(null);
   private refreshing = false;
   private refreshQueue$ = new Subject<void>();
   private refreshTimerSub: any;
@@ -212,7 +213,7 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   }
 
 
-  private loginSuccess(token: SpvitaminSecurity.AuthorizationToken): void
+  protected loginSuccess(token: SpvitaminSecurity.AuthorizationToken): void
   {
     console.log(`loginSuccess for ${token.sub}`);
 
@@ -239,6 +240,10 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
 
   private scheduleRefresh(token: SpvitaminSecurity.AuthorizationToken): void
   {
+    if (!this.config.autoRenew)
+    {
+      return;
+    }
     this.clearRefreshTimer();
     var validSeconds = this.getTokenValidSeconds(token);
     const delayMs = Math.max(0, validSeconds * 1000 - 30000); // 30 mp ráhagyás
@@ -262,6 +267,7 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
 
   ignoreInTokenInterceptor(url: string): boolean
   {
-    return url.includes('authenticate');
+    const authMarkers = ['/authenticate', '/logout'];
+    return authMarkers.some(m => url.includes(m));
   }
 }

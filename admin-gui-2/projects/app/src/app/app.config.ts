@@ -42,7 +42,8 @@ export function initSecurity(repositoryService: AuthenticationRepositoryService,
     repositoryService,
     authService,
     {
-      baseUrl: environment.baseURL
+      baseUrl: environment.baseURL,
+      autoRenew: true,
     },
     oAuthService,
     {
