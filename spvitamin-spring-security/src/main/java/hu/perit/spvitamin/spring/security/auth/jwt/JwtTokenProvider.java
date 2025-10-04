@@ -135,7 +135,7 @@ public class JwtTokenProvider
             if (type == Type.REFRESH)
             {
                 // Update session timeout
-                setSessionTimeout(type, ttl);
+                setSessionTimeout(ttl);
                 touchSession(type, ttl);
             }
 
@@ -198,13 +198,10 @@ public class JwtTokenProvider
     }
 
 
-    public void setSessionTimeout(Type type, Duration ttl)
+    public void setSessionTimeout(Duration ttl)
     {
-        if (type == Type.JWT || type == Type.REFRESH)
-        {
-            String sessionId = RequestQuery.getSessionId();
-            this.sessionRegistry.setMaxInactiveInterval(sessionId, ttl);
-        }
+        String sessionId = RequestQuery.getSessionId();
+        this.sessionRegistry.setMaxInactiveInterval(sessionId, ttl);
     }
 
 

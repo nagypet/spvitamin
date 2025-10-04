@@ -44,6 +44,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -218,7 +219,14 @@ public class SimpleHttpSecurityBuilder
     public SimpleHttpSecurityBuilder logout(String logoutUrl) throws Exception
     {
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        List<String> cookieNames = List.of(securityProperties.getAuth().getAccessTokenCookieName(), securityProperties.getAuth().getRefreshTokenCookieName(), "JSESSIONID", "SESSION");
+        SecurityProperties.AuthConfiguration auth = securityProperties.getAuth();
+        List<String> cookieNames = new ArrayList<>();
+        if (auth != null)
+        {
+            cookieNames.add(auth.getAccessTokenCookieName());
+            cookieNames.add(auth.getRefreshTokenCookieName());
+        }
+        cookieNames.addAll(List.of("JSESSIONID", "SESSION"));
         this.http.logout(i -> i
                 .logoutUrl(logoutUrl)
                 .invalidateHttpSession(true)

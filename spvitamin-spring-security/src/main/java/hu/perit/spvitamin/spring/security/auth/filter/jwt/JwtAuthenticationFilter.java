@@ -48,12 +48,15 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
 
         // Then, check if there is a cookie
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        String tokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
-        if (StringUtils.isNotBlank(tokenInCookie))
+        if (securityProperties.getAuth() != null)
         {
-            // Returning only if valid to allow checking if the session is authenticated
-            JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
-            return !tokenProvider.isExpired(tokenInCookie) ? new JwtString(tokenInCookie) : null;
+            String tokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
+            if (StringUtils.isNotBlank(tokenInCookie))
+            {
+                // Returning only if valid to allow checking if the session is authenticated
+                JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
+                return !tokenProvider.isExpired(tokenInCookie) ? new JwtString(tokenInCookie) : null;
+            }
         }
 
         // Finally, try to get the token from the authorization header

@@ -16,20 +16,19 @@
 
 package hu.perit.spvitamin.spring.security.authservice.provider;
 
-import java.util.Collection;
-
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+
+import java.time.Duration;
+import java.util.Date;
 
 @Slf4j
 public abstract class AuthServiceAuthenticationProvider implements AuthenticationProvider
@@ -53,18 +52,15 @@ public abstract class AuthServiceAuthenticationProvider implements Authenticatio
             JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
             TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
-            Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
+            AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
 
-            AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
-                    .username(claims.getSubject())
-                    .displayName(claims.getPreferredUsername())
-                    .authorities(authorities)
-                    .userId(claims.getUserId())
-                    .source(claims.getSource())
-                    .build();
-
-            UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authorities);
+            UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
             newAuthentication.setDetails(token);
+
+            // Update session timeout to match the token expiry time
+            Date date = new Date();
+            Duration ttl = Duration.ofMillis(claims.getExpiration().getTime() - date.getTime());
+            tokenProvider.setSessionTimeout(ttl);
 
             return newAuthentication;
         }
@@ -75,11 +71,13 @@ public abstract class AuthServiceAuthenticationProvider implements Authenticatio
         }
     }
 
+
     @Override
     public boolean supports(Class<?> aClass)
     {
         return aClass.equals(UsernamePasswordAuthenticationToken.class);
     }
+
 
     protected abstract AuthorizationToken getAuthorizationToken(String userName, String password);
 }

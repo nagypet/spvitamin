@@ -59,6 +59,7 @@ public class SimpleFeignClientBuilder
     private ErrorDecoder errorDecoder = new RestExceptionResponseDecoder();
     private Retryer retryer;
     private Client client;
+    private boolean allowCookies = false;
 
 
     public static SimpleFeignClientBuilder newInstance()
@@ -163,13 +164,27 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder allowCookies(boolean allowCookies)
+    {
+        this.allowCookies = allowCookies;
+        return this;
+    }
+
+
     public <T> T build(Class<T> apiType, String url)
     {
         this.builder.encoder(this.encoder);
         this.builder.decoder(this.decoder);
         this.builder.errorDecoder(this.errorDecoder);
         this.builder.retryer(this.retryer);
-        this.builder.client(new HeaderFilterFeignClient(this.client));
+        if (this.allowCookies)
+        {
+            this.builder.client(this.client);
+        }
+        else
+        {
+            this.builder.client(new HeaderFilterFeignClient(this.client));
+        }
 
         return this.builder.target(apiType, url);
     }
