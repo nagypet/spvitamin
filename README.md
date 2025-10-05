@@ -151,6 +151,7 @@ dependencyManagement {
 - admin-gui can work either with the classic AuthService as well as with the OAuthService
 - /authenticate endpoint puts a refresh token in the cookie
 - AuthServiceAuthenticationProvider fixed
+- PersonName improved, PojoToJsonConverter
 
 
 ### 3.3.3-2-RELEASE not yet released

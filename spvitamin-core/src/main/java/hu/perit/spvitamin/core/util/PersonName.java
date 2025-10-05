@@ -16,7 +16,10 @@
 
 package hu.perit.spvitamin.core.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import jakarta.annotation.Nullable;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.StringJoiner;
@@ -28,22 +31,26 @@ import java.util.StringJoiner;
  */
 
 @Data
+@RequiredArgsConstructor
 public class PersonName
 {
     public enum NameOrder
     {
         WESTERN,
-        EASTERN;
+        EASTERN
     }
 
 
     // Tracks the original name order used when parsing
     private final NameOrder nameOrder;
     // Family name (surname/last name)
+    @Nullable
     private String familyName;
     // Given name (first name)
+    @Nullable
     private String givenName;
     // Additional given names (middle names)
+    @Nullable
     private String additionalGivenNames;
 
 
@@ -55,11 +62,29 @@ public class PersonName
 
     public static PersonName from(String fullName, NameOrder nameOrder)
     {
-        PersonName personName = new PersonName(nameOrder);
+        return new PersonName(fullName, nameOrder);
+    }
 
+
+    @JsonCreator
+    private PersonName()
+    {
+        this.nameOrder = NameOrder.WESTERN;
+    }
+
+
+    public PersonName(String fullName, NameOrder nameOrder)
+    {
+        this.nameOrder = nameOrder;
+        setName(fullName);
+    }
+
+
+    public void setName(String fullName)
+    {
         if (StringUtils.isBlank(fullName))
         {
-            return personName;
+            return;
         }
 
         String[] nameParts = fullName.trim().split("\\s+");
@@ -67,21 +92,21 @@ public class PersonName
         if (nameParts.length == 1)
         {
             // Only one name part, assume it's the given name
-            personName.setGivenName(nameParts[0]);
+            setGivenName(nameParts[0]);
         }
         else if (nameParts.length == 2)
         {
             if (nameOrder == NameOrder.WESTERN)
             {
                 // Two name parts in Western order: given name, family name
-                personName.setGivenName(nameParts[0]);
-                personName.setFamilyName(nameParts[1]);
+                setGivenName(nameParts[0]);
+                setFamilyName(nameParts[1]);
             }
             else // EASTERN
             {
                 // Two name parts in Eastern order: family name, given name
-                personName.setFamilyName(nameParts[0]);
-                personName.setGivenName(nameParts[1]);
+                setFamilyName(nameParts[0]);
+                setGivenName(nameParts[1]);
             }
         }
         else
@@ -89,8 +114,8 @@ public class PersonName
             if (nameOrder == NameOrder.WESTERN)
             {
                 // More than two name parts in Western order: given name, additional given name(s), family name
-                personName.setGivenName(nameParts[0]);
-                personName.setFamilyName(nameParts[nameParts.length - 1]);
+                setGivenName(nameParts[0]);
+                setFamilyName(nameParts[nameParts.length - 1]);
 
                 // Combine all middle parts into additional given names
                 StringBuilder additionalNames = new StringBuilder();
@@ -102,13 +127,13 @@ public class PersonName
                     }
                     additionalNames.append(nameParts[i]);
                 }
-                personName.setAdditionalGivenNames(additionalNames.toString());
+                setAdditionalGivenNames(additionalNames.toString());
             }
             else // EASTERN
             {
                 // More than two name parts in Eastern order: family name, given name, additional given names
-                personName.setFamilyName(nameParts[0]);
-                personName.setGivenName(nameParts[1]);
+                setFamilyName(nameParts[0]);
+                setGivenName(nameParts[1]);
 
                 // Combine all remaining parts into additional given names
                 StringBuilder additionalNames = new StringBuilder();
@@ -120,14 +145,13 @@ public class PersonName
                     }
                     additionalNames.append(nameParts[i]);
                 }
-                personName.setAdditionalGivenNames(additionalNames.toString());
+                setAdditionalGivenNames(additionalNames.toString());
             }
         }
-
-        return personName;
     }
 
 
+    @Nullable
     public String getName()
     {
         return getName(this.nameOrder);

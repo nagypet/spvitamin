@@ -37,6 +37,8 @@ dependencies {
     annotationProcessor libs.lombok
     testAnnotationProcessor libs.lombok
 
+    implementation libs.jakarta.annotation.api
+
     // apache.commons
     implementation libs.commons.io
     implementation libs.commons.lang3
@@ -52,6 +54,8 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
     // -----------------------------------------------------------------------------------------------------------------
+    testImplementation project(':spvitamin-json-time')
+
     // JUnit
     testImplementation libs.junit.jupiter.api
     testImplementation libs.junit.jupiter.engine

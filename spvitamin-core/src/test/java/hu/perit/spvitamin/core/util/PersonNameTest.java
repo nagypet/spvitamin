@@ -16,10 +16,15 @@
 
 package hu.perit.spvitamin.core.util;
 
+import hu.perit.spvitamin.json.JSonSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 class PersonNameTest
 {
     @Test
@@ -270,5 +275,40 @@ class PersonNameTest
         assertThat(personName.getName()).isEqualTo("Kovács-Nagy Béla János");
         assertThat(personName.getName(PersonName.NameOrder.WESTERN)).isEqualTo("Béla János Kovács-Nagy");
         assertThat(personName.getName(PersonName.NameOrder.EASTERN)).isEqualTo("Kovács-Nagy Béla János");
+    }
+
+
+    @Test
+    void testToJsonRoundtrip() throws IOException
+    {
+        PersonName expected = PersonName.from("Kovács-Nagy Béla János", PersonName.NameOrder.EASTERN);
+        String json = JSonSerializer.toJson(expected);
+        log.debug(json);
+        PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);
+        assertThat(deserialized).isEqualTo(expected);
+    }
+
+
+    @Test
+    void testFromJson() throws IOException
+    {
+        String json = "{\"nameOrder\":\"EASTERN\",\"name\":\"Kovács-Nagy Béla János\"}";
+        PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);
+        assertThat(deserialized.getName()).isEqualTo("Kovács-Nagy Béla János");
+        assertThat(deserialized.getFamilyName()).isEqualTo("Kovács-Nagy");
+        assertThat(deserialized.getGivenName()).isEqualTo("Béla");
+        assertThat(deserialized.getAdditionalGivenNames()).isEqualTo("János");
+    }
+
+
+    @Test
+    void testFromJson2() throws IOException
+    {
+        String json = "{\"nameOrder\":\"EASTERN\",\"familyName\":\"Kovács-Nagy\",\"givenName\":\"Béla\",\"additionalGivenNames\":\"János\"}";
+        PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);
+        assertThat(deserialized.getName()).isEqualTo("Kovács-Nagy Béla János");
+        assertThat(deserialized.getFamilyName()).isEqualTo("Kovács-Nagy");
+        assertThat(deserialized.getGivenName()).isEqualTo("Béla");
+        assertThat(deserialized.getAdditionalGivenNames()).isEqualTo("János");
     }
 }

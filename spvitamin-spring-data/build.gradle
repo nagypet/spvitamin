@@ -40,6 +40,7 @@ dependencies {
     // Compile dependencies
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
+    implementation project(':spvitamin-json-time')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-admin')
 
@@ -67,6 +68,8 @@ dependencies {
     // Mapstruct
     implementation libs.mapstruct
     annotationProcessor libs.mapstruct.processor
+
+    implementation libs.jackson.core
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies

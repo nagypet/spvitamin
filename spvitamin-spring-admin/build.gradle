@@ -91,7 +91,8 @@ generateTypeScript {
     //disableTaggedUnions = true
     optionalProperties = 'useSpecifiedAnnotations'
     optionalAnnotations = [
-            'javax.annotation.Nullable'
+            'javax.annotation.Nullable',
+            'jakarta.annotation.Nullable'
     ]
     optionalPropertiesDeclaration = 'nullableType'
 }
