@@ -21,6 +21,7 @@ import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
+import hu.perit.spvitamin.spring.http.ResponseEntityUtils;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthe
                 .allowCookies(true)
                 .build(AuthApi.class, getServiceUrl());
 
-        return templateAuthClient.authenticateUsingGET(null);
+        return ResponseEntityUtils.get(templateAuthClient.authenticateUsingGET(null));
     }
 
 

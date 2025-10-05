@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.core.util;
+package hu.perit.spvitamin.spring.feignclients;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.util.MultiValueMap;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Case
+@RequiredArgsConstructor
+public class MirroringRequestInterceptor implements RequestInterceptor
 {
-    public static String toLower(String input)
+    private final MultiValueMap<String, String> headers;
+
+
+    @Override
+    public void apply(RequestTemplate template)
     {
-        return input == null ? null : input.toLowerCase().strip();
+        if (this.headers != null)
+        {
+            this.headers.forEach((key, value) -> template.header(key, value.toArray(new String[0])));
+        }
     }
 }

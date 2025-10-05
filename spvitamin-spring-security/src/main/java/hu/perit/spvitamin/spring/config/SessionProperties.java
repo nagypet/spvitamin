@@ -26,6 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,8 @@ import java.util.Map;
 @Slf4j
 public class SessionProperties
 {
+    private Duration sessionMaxAge = Duration.ofDays(30);
+
     @NestedConfigurationProperty
     private Limits limits = new Limits();
 

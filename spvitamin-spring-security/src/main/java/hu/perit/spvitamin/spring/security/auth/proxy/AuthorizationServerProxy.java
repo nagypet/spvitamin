@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.core.util;
+package hu.perit.spvitamin.spring.security.auth.proxy;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Case
+public interface AuthorizationServerProxy
 {
-    public static String toLower(String input)
-    {
-        return input == null ? null : input.toLowerCase().strip();
-    }
+    ResponseEntity<AuthorizationToken> authenticate(HttpServletRequest request);
+    ResponseEntity<Void> logout(HttpServletRequest request);
 }

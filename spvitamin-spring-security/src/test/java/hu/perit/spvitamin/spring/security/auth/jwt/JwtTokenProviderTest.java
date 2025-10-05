@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security.auth.jwt;
 
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.http.ResponseEntityUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -62,8 +63,10 @@ class JwtTokenProviderTest
     {
     }
 
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
 
     @Test
     void testValidToken()
@@ -77,7 +80,7 @@ class JwtTokenProviderTest
                 .source("ldapUrl")
                 .userId("12")
                 .build();
-        final AuthorizationToken token = this.jwtTokenProvider.generateToken(authenticatedUser);
+        final AuthorizationToken token = ResponseEntityUtils.get(this.jwtTokenProvider.generateToken(authenticatedUser));
 
         TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
 

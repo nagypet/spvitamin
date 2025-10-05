@@ -39,6 +39,14 @@ import java.util.Map;
 @Slf4j
 public class SecurityProperties
 {
+    public enum Mode
+    {
+        RESOURCE_SERVER,
+        AUTHORIZATION_SERVER,
+        NONE;
+    }
+
+
     private String[] allowedOrigins;
     private String[] allowedHeaders;
     private String[] allowedMethods;
@@ -46,8 +54,9 @@ public class SecurityProperties
     private String managementEndpointsAccess = "*";
     private String adminGuiAccess = "*";
     private String adminEndpointsAccess = "*";
-    private boolean sessionValidationEnabled = true;
     private boolean productionMode = true;
+    private Mode mode = Mode.AUTHORIZATION_SERVER;
+
 
     @NestedConfigurationProperty
     private AuthConfiguration auth;
@@ -73,6 +82,14 @@ public class SecurityProperties
         )
         {
             throw new IllegalStateException("Production mode is enabled, but either adminGuiAccess, adminEndpointsAccess, swaggerAccess or managementEndpointsAccess is set to '*'!");
+        }
+
+        if (this.mode == Mode.AUTHORIZATION_SERVER)
+        {
+            if (this.auth == null && this.oauth2 == null)
+            {
+                throw new IllegalStateException("auth or oauth2 must be set!");
+            }
         }
     }
 
@@ -120,7 +137,7 @@ public class SecurityProperties
         // If this is set to false, the AuthorizationToken class will not contain a jwt field if the request comes from a browser,
         // but instead the token will be put into a cookie
         private boolean allowTokenInResponse = false;
-        private String accessTokenCookieName;
-        private String refreshTokenCookieName;
+        private String accessTokenCookieName = "spvitamin-auth-at";
+        private String refreshTokenCookieName = "spvitamin-auth-rt";
     }
 }

@@ -37,7 +37,7 @@ import java.time.Duration;
 @Component
 @ConfigurationProperties(prefix = "jwt")
 @Valid
-@DependsOn(value = "securityProperties")
+@DependsOn(value = "SpvitaminSpringContext")
 @Slf4j
 public class JwtProperties
 {

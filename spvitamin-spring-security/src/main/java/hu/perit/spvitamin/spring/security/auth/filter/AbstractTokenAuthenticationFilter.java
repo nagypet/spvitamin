@@ -75,10 +75,14 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
 
-                    // Checking sessionId
-                    String sessionIdInToken = claims.getSessionId();
-                    String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(HttpSession::getId).orElse(null);
-                    checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
+                    // Checking token validity only in AUTHORIZATION_SERVER mode
+                    SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+                    if (securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
+                    {
+                        String sessionIdInToken = claims.getSessionId();
+                        String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(HttpSession::getId).orElse(null);
+                        checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
+                    }
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
@@ -130,10 +134,6 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     private static void checkTokenValidity(String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser, JwtTokenProvider.Type tokenType)
     {
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        if (!securityProperties.isSessionValidationEnabled())
-        {
-            return;
-        }
 
         // Checking session validity (not for access- and refresh tokens)
         if ((tokenType == JwtTokenProvider.Type.JWT && isAuthenticateEndpoint()))

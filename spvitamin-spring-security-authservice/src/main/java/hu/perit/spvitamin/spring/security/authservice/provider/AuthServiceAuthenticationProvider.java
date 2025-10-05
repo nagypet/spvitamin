@@ -27,9 +27,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import java.time.Duration;
-import java.util.Date;
-
 @Slf4j
 public abstract class AuthServiceAuthenticationProvider implements AuthenticationProvider
 {
@@ -56,11 +53,6 @@ public abstract class AuthServiceAuthenticationProvider implements Authenticatio
 
             UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
             newAuthentication.setDetails(token);
-
-            // Update session timeout to match the token expiry time
-            Date date = new Date();
-            Duration ttl = Duration.ofMillis(claims.getExpiration().getTime() - date.getTime());
-            tokenProvider.setSessionTimeout(ttl);
 
             return newAuthentication;
         }

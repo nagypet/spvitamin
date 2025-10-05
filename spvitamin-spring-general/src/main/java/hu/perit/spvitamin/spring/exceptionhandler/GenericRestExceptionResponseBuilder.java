@@ -52,6 +52,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
                 || exception.instanceOf("io.jsonwebtoken.JwtException")
                 || exception.causedBy(IllegalStateException.class, "Session was invalidated")
+                || exception.causedBy("feign.FeignException$Unauthorized")
         )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);

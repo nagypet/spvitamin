@@ -40,6 +40,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -98,7 +101,7 @@ public class JwtTokenProvider
     private final HttpServletResponse response;
 
 
-    public AuthorizationToken generateToken(AuthenticatedUser authenticatedUser)
+    public ResponseEntity<AuthorizationToken> generateToken(AuthenticatedUser authenticatedUser)
     {
         Instant issuedAt = Instant.now();
         Duration ttl = jwtProperties.getExpiration();
@@ -115,14 +118,15 @@ public class JwtTokenProvider
         jwtToken.setExt(Map.of("rtiat", refreshToken.getIat(), "rtexp", refreshToken.getExp()));
 
         // Putting tokens into the cookie
+        HttpHeaders headers = new HttpHeaders();
         if (!auth.isAllowTokenInResponse() && RequestQuery.isFromBrowser())
         {
-            this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
+            headers.add(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
             jwtToken.setJwt(HIDDEN);
         }
-        this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
+        headers.add(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
 
-        return jwtToken;
+        return new ResponseEntity<>(jwtToken, headers, HttpStatus.OK);
     }
 
 
@@ -136,7 +140,7 @@ public class JwtTokenProvider
             {
                 // Update session timeout
                 setSessionTimeout(ttl);
-                touchSession(type, ttl);
+                touchSession(type);
             }
 
             // Updating session-registry
@@ -205,19 +209,12 @@ public class JwtTokenProvider
     }
 
 
-    public void touchSession(Type type, Duration ttl)
+    public void touchSession(Type type)
     {
         if (type == Type.JWT || type == Type.REFRESH)
         {
             String sessionId = RequestQuery.getSessionId();
             this.sessionRegistry.refreshLastRequest(sessionId);
-
-            // If a SESSION cookie is available, resend it with updated Max-Age/Expires
-            String sessionCookieValue = CookieHelper.getCookieValue("SESSION", this.request);
-            if (StringUtils.isNotBlank(sessionCookieValue))
-            {
-                this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(this.request, sessionCookieValue, "SESSION", ttl).toString());
-            }
         }
     }
 

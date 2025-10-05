@@ -16,22 +16,39 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
 @Component
 @ConfigurationProperties
+@DependsOn(value = "SpvitaminSpringContext")
 public class MicroserviceCollectionProperties
 {
+    private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+
     private Map<String, MicroserviceProperties> microservices = new HashMap<>();
+
 
     public MicroserviceProperties get(String name)
     {
         return this.microservices.get(name);
+    }
+
+
+    @PostConstruct
+    private void init()
+    {
+        if (securityProperties.getMode() == SecurityProperties.Mode.RESOURCE_SERVER && !this.microservices.containsKey("auth-service"))
+        {
+            throw new IllegalStateException(MessageFormat.format("The 'auth-service' microservice is required for the {0} mode!", SecurityProperties.Mode.RESOURCE_SERVER));
+        }
     }
 }

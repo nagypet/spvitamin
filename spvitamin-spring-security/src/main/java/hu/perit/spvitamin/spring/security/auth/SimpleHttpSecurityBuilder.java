@@ -24,8 +24,11 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
+import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
 import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -226,13 +229,31 @@ public class SimpleHttpSecurityBuilder
             cookieNames.add(auth.getAccessTokenCookieName());
             cookieNames.add(auth.getRefreshTokenCookieName());
         }
-        cookieNames.addAll(List.of("JSESSIONID", "SESSION"));
+        cookieNames.addAll(List.of("JSESSIONID", "SESSION", "IDP_SESSION"));
         this.http.logout(i -> i
                 .logoutUrl(logoutUrl)
                 .invalidateHttpSession(true)
                 .deleteCookies(cookieNames.toArray(new String[0]))
                 .clearAuthentication(true)
-                .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    try
+                    {
+                        AuthorizationServerProxy proxy = SpringContext.getBean(AuthorizationServerProxy.class);
+                        proxy.logout(request);
+
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        log.info("logout success (forwarded to auth-service)");
+                    }
+                    catch (NoSuchBeanDefinitionException e)
+                    {
+                        // Just do nothing
+                    }
+                    catch (Exception ex)
+                    {
+                        log.warn("logout forward to auth-service failed: {}", ex.getMessage());
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                    }
+                })
         );
 
         return this;

@@ -40,6 +40,7 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     // Compile dependencies
     // -----------------------------------------------------------------------------------------------------------------
+    implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
     implementation project(':spvitamin-spring-cloud-feign')
@@ -51,6 +52,8 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation libs.commons.lang3
 
     // JJWT
     implementation libs.bundles.jsonwebtoken
