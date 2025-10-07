@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Optional;
 
@@ -48,8 +49,17 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
         RestExceptionLogger exceptionLogger = getLogger();
 
+        // ========== BAD_REQUEST (400) ================================================================================
+        if (exception.instanceOf(jakarta.validation.ValidationException.class)
+                || exception.instanceOf(InputException.class)
+                || exception.causedBy(MethodArgumentNotValidException.class))
+        {
+            exceptionLogger.log(path, ex, LogLevel.WARN);
+            return Optional.of(this.supplier.get(HttpStatus.BAD_REQUEST, ex, path, traceId));
+        }
+
         // ========== UNAUTHORIZED (401) ===============================================================================
-        if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
+        else if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
                 || exception.instanceOf("io.jsonwebtoken.JwtException")
                 || exception.causedBy(IllegalStateException.class, "Session was invalidated")
                 || exception.causedBy("feign.FeignException$Unauthorized")
@@ -66,13 +76,11 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
             return Optional.of(this.supplier.get(HttpStatus.FORBIDDEN, ex, path, traceId));
         }
 
-        // ========== BAD_REQUEST (400) ================================================================================
-        else if (exception.instanceOf(jakarta.validation.ValidationException.class)
-                || exception.instanceOf(InputException.class)
-                || exception.causedBy(MethodArgumentNotValidException.class))
+        // ========== NOT_FOUND (404) ==================================================================================
+        else if (exception.causedBy(NoResourceFoundException.class, "No static resource"))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
-            return Optional.of(this.supplier.get(HttpStatus.BAD_REQUEST, ex, path, traceId));
+            return Optional.of(this.supplier.get(HttpStatus.NOT_FOUND, ex, path, traceId));
         }
 
         // ========== NOT_IMPLEMENTED (501) ============================================================================

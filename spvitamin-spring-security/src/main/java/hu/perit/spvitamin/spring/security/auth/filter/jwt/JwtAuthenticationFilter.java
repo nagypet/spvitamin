@@ -36,6 +36,13 @@ import org.springframework.http.HttpHeaders;
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
 {
+    /**
+     * Extracts a JWT (JSON Web Token) from the provided HTTP request by checking various possible sources,
+     * including the Authorization header and cookies.
+     *
+     * @param request the HttpServletRequest object from which the JWT is to be extracted.
+     * @return a JwtString object containing the extracted JWT if available; otherwise, returns null.
+     */
     @Override
     protected JwtString getJwtFromRequest(HttpServletRequest request)
     {
@@ -46,25 +53,41 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
             return null;
         }
 
-        // Then, check if there is a cookie
-        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        if (securityProperties.getAuth() != null)
-        {
-            String tokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
-            if (StringUtils.isNotBlank(tokenInCookie))
-            {
-                // Returning only if valid to allow checking if the session is authenticated
-                JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
-                return !tokenProvider.isExpired(tokenInCookie) ? new JwtString(tokenInCookie) : null;
-            }
-        }
-
-        // Finally, try to get the token from the authorization header
+        // Then, try to get the token from the authorization header
         if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer ") && authorization.length() > 7)
         {
             String tokenInHeader = authorization.substring(7);
             boolean dummyToken = StringUtils.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
-            return !dummyToken ? new JwtString(tokenInHeader) : null;
+            if (!dummyToken)
+            {
+                return new JwtString(tokenInHeader);
+            }
+        }
+
+        // After that, check if there is an access-token cookie
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        if (securityProperties.getAuth() != null)
+        {
+            String accessTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
+            if (StringUtils.isNotBlank(accessTokenInCookie))
+            {
+                // Returning only if valid
+                JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
+                if (!tokenProvider.isExpired(accessTokenInCookie))
+                {
+                    return new JwtString(accessTokenInCookie);
+                }
+            }
+        }
+
+        // Finally, check if there is a refresh-token cookie
+        if (securityProperties.getAuth() != null)
+        {
+            String refreshTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getRefreshTokenCookieName(), request);
+            if (StringUtils.isNotBlank(refreshTokenInCookie))
+            {
+                return new JwtString(refreshTokenInCookie);
+            }
         }
         return null;
     }

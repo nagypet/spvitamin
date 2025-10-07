@@ -21,6 +21,7 @@ import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
@@ -285,6 +286,31 @@ public class SimpleHttpSecurityBuilder
         {
             log.warn("{} has already been applied!", SecurityContextRemoverFilter.class.getName());
         }
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder configureAuthorizatonServer() throws Exception
+    {
+        this
+                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
+                .ignorePersistedSecurity()
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .basicAuth()
+                .jwtAuth()
+                .createSession();
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder configureResourceServer() throws Exception
+    {
+        this
+                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
+                .authorizeRequests(r -> r.anyRequest().permitAll())
+                .createSession();
+
         return this;
     }
 

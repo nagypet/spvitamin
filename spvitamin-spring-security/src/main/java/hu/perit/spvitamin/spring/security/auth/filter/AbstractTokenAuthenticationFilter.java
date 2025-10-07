@@ -75,6 +75,18 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
 
+                    // Checking token type
+                    if (!isAuthenticateEndpoint())
+                    {
+                        // Refresh tokens are only accepted within the /authenticate endpoint
+                        JwtTokenProvider.Type tokenType = tokenProvider.getTokenType(jwt);
+                        if (tokenType != JwtTokenProvider.Type.ACCESS && tokenType != JwtTokenProvider.Type.JWT)
+                        {
+                            log.warn("Token type mismatch in JWT token!");
+                            throw new InvalidTokenException(MessageFormat.format("Invalid token type: {0}!", tokenType));
+                        }
+                    }
+
                     // Checking token validity only in AUTHORIZATION_SERVER mode
                     SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
                     if (securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
@@ -181,7 +193,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     }
 
 
-    private static boolean isAuthenticateEndpoint()
+    protected static boolean isAuthenticateEndpoint()
     {
         String servletPath = Optional.ofNullable(RequestQuery.getHttpServletRequest()).map(i -> i.getServletPath()).orElse(null);
         return StringUtils.equalsIgnoreCase(servletPath, AuthApi.BASE_URL_AUTHENTICATE);
