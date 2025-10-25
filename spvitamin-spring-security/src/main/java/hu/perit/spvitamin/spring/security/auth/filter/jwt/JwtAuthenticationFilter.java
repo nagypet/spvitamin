@@ -23,9 +23,12 @@ import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticatio
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 /**
  * This class is intentionally no container. It should be invoked only for Jwt endpoints.
@@ -44,7 +47,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
      * @return a JwtString object containing the extracted JWT if available; otherwise, returns null.
      */
     @Override
-    protected JwtString getJwtFromRequest(HttpServletRequest request)
+    protected JwtString getJwtFromRequest(HttpServletRequest request, HttpServletResponse response)
     {
         // If there is a Basic auth header, we do nothing
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -64,29 +67,43 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
             }
         }
 
-        // After that, check if there is an access-token cookie
+        // After that, check if there is a valid access-token cookie
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
         if (securityProperties.getAuth() != null)
         {
             String accessTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
             if (StringUtils.isNotBlank(accessTokenInCookie))
             {
                 // Returning only if valid
-                JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
                 if (!tokenProvider.isExpired(accessTokenInCookie))
                 {
                     return new JwtString(accessTokenInCookie);
                 }
+                else
+                {
+                    log.debug("Access token in cookie is expired!");
+                    response.addHeader(SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, securityProperties.getAuth().getAccessTokenCookieName()).toString());
+                }
             }
         }
 
-        // Finally, check if there is a refresh-token cookie
-        if (securityProperties.getAuth() != null)
+        // Finally, in case of the /authenticate endpoint, check if there is a valid refresh-token cookie
+        if (securityProperties.getAuth() != null && isAuthenticateEndpoint())
         {
             String refreshTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getRefreshTokenCookieName(), request);
             if (StringUtils.isNotBlank(refreshTokenInCookie))
             {
-                return new JwtString(refreshTokenInCookie);
+                // Returning only if valid
+                if (!tokenProvider.isExpired(refreshTokenInCookie))
+                {
+                    return new JwtString(refreshTokenInCookie);
+                }
+                else
+                {
+                    log.debug("Refresh token in cookie is expired!");
+                    response.addHeader(SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, securityProperties.getAuth().getRefreshTokenCookieName()).toString());
+                }
             }
         }
         return null;

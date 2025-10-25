@@ -249,4 +249,16 @@ public final class FilePath implements Comparable<FilePath>
 
         return this.path.startsWith("/") || hasDriveLetter(this.path);
     }
+
+
+    public boolean isEmpty()
+    {
+        return StringUtils.isBlank(this.path);
+    }
+
+
+    public String plus(String path)
+    {
+        return FilePath.of(this.path, path).getPath();
+    }
 }

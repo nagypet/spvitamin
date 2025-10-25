@@ -77,7 +77,9 @@ public class AuthorizationServerProxyImpl implements AuthorizationServerProxy
         HttpHeaders proxiedHeaders = alterSetCookieHeader(authResponse.getHeaders());
         AuthorizationToken authorizationToken = ResponseEntityUtils.get(authResponse);
         // Update session timeout to match the token expiry time
-        Duration ttl = Duration.ofMillis(authorizationToken.getExp().minusSeconds(Instant.now().getEpochSecond()).getEpochSecond());
+        log.debug("Successfully got token, valid before {}", authorizationToken.getExp());
+        // We use here the iat and not the 'now' because the other computers clock may not be synchronized
+        Duration ttl = Duration.ofSeconds(authorizationToken.getExp().minusSeconds(authorizationToken.getIat().getEpochSecond()).getEpochSecond());
         tokenProvider.setSessionTimeout(ttl);
         return new ResponseEntity<>(authorizationToken, proxiedHeaders, authResponse.getStatusCode());
     }

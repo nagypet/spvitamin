@@ -153,6 +153,8 @@ dependencyManagement {
 - AuthServiceAuthenticationProvider fixed
 - PersonName improved, PojoToJsonConverter
 - 2 security modes: AUTHORIZATION_SERVER and RESOURCE_SERVER
+- SingletonFactory
+- Handling token-cookies fixed
 
 
 ### 3.3.3-2-RELEASE not yet released

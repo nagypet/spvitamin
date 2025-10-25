@@ -27,7 +27,6 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpringContextMock
@@ -47,7 +46,7 @@ public final class SpringContextMock
             }
             else
             {
-                throw new RuntimeException("Type is not mocked: " + requestedBean.getSimpleName());
+                throw new RuntimeException("Type is not mocked: " + requestedBean.getName());
             }
         });
 

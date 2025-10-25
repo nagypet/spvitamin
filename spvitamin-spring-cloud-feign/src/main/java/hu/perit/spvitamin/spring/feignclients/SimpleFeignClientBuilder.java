@@ -95,13 +95,19 @@ public class SimpleFeignClientBuilder
         );
 
         // Base client
-        this.client = new Client.Default(null, null);
+        this.client = getClient();
 
         this.builder = Feign.builder()
                 .contract(new SpringMvcContract())
                 .requestInterceptor(this.requestInterceptorAdapter)
                 .logger(new Slf4jLogger(getClass()))
                 .logLevel(getLevel(feignProperties.getLoggerLevel()));
+    }
+
+
+    Client getClient()
+    {
+        return new Client.Default(null, null);
     }
 
 

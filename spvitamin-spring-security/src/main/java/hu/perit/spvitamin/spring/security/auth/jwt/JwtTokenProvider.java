@@ -35,7 +35,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,7 +97,6 @@ public class JwtTokenProvider
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private final AdvancedSessionRegistry sessionRegistry;
     private final HttpServletRequest request;
-    private final HttpServletResponse response;
 
 
     public ResponseEntity<AuthorizationToken> generateToken(AuthenticatedUser authenticatedUser)

@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security;
 
 import hu.perit.spvitamin.spring.exception.BadTokenException;
+import hu.perit.spvitamin.spring.json.JSonSerializer;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -76,21 +78,35 @@ public class AuthenticatedUser implements UserDetails
 
     public <T> T getAdditionalClaimThrow(String name, Class<T> clazz)
     {
-        if (additionalClaims == null || !additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
-        {
-            throw new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''{1}''", this.username, name));
-        }
-        return (T) additionalClaims.get(name);
+        return getAdditionalClaim(name, clazz)
+                .orElseThrow(() -> new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''{1}''", this.username, name)));
     }
 
 
     public <T> Optional<T> getAdditionalClaim(String name, Class<T> clazz)
     {
-        if (additionalClaims == null || "null".equals(additionalClaims.get(name)))
+        if (additionalClaims == null || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
         {
             return Optional.empty();
         }
-        return (Optional<T>) Optional.ofNullable(additionalClaims.get(name));
+        Object value = additionalClaims.get(name);
+        if (value.getClass().isAssignableFrom(clazz))
+        {
+            return Optional.ofNullable((T) value); // NOSONAR
+        }
+        else
+        {
+            // Couldn't be cast, let's try to convert with Json
+            try
+            {
+                String json = JSonSerializer.toJson(this.additionalClaims.get(name));
+                return Optional.ofNullable(JSonSerializer.fromJson(json, clazz));
+            }
+            catch (IOException ex)
+            {
+                return Optional.empty();
+            }
+        }
     }
 
 

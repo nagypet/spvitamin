@@ -54,7 +54,7 @@ import java.util.Optional;
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
 {
 
-    protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request);
+    protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request, HttpServletResponse response);
 
 
     @Override
@@ -64,7 +64,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         {
             log.debug("{} called", this.getClass().getSimpleName());
 
-            AbstractAuthorizationToken token = getJwtFromRequest(request);
+            AbstractAuthorizationToken token = getJwtFromRequest(request, response);
             if (token != null)
             {
                 String jwt = token.getJwt();

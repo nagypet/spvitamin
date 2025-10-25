@@ -55,7 +55,7 @@ public class SpvitaminSessionRegistry<S extends Session> extends SessionRegistry
         HttpSession httpSession = RequestQuery.getSession();
         if (httpSession != null && httpSession.getMaxInactiveInterval() != duration.toSeconds())
         {
-            log.debug("Updating session timeout for session '{}' to {} minutes", sessionId, duration.toMinutes());
+            log.debug("Updating session timeout for session '{}' to {} seconds", sessionId, duration.toSeconds());
             httpSession.setMaxInactiveInterval((int) duration.toSeconds());
         }
     }
