@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth;
+package hu.perit.spvitamin.spring.info;
 
-import hu.perit.spvitamin.spring.info.SessionUserService;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-
-public interface AuthorizationService extends SessionUserService
+public interface SessionUserService
 {
-    void registerAuthenticatedUserFactory(AuthenticatedUserFactory authenticatedUserFactory);
-
-    void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
-
-    AuthenticatedUser getAuthenticatedUser();
+    String getSessionUserName();
 }

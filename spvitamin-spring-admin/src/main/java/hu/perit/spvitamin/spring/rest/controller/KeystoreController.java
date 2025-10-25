@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.rest.controller;
 import com.google.common.reflect.AbstractInvocationHandler;
 import hu.perit.spvitamin.core.connectablecontext.StringContextKey;
 import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.info.SessionInfo;
 import hu.perit.spvitamin.spring.keystore.KeystoreEntry;
 import hu.perit.spvitamin.spring.rest.api.KeystoreApi;
 import hu.perit.spvitamin.spring.rest.model.CertificateFile;
@@ -26,10 +27,8 @@ import hu.perit.spvitamin.spring.rest.model.ImportCertificateRequest;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSession;
 import hu.perit.spvitamin.spring.rest.session.KeystoreSessionHolder;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -56,12 +55,12 @@ public class KeystoreController implements KeystoreApi
 
 
     // Injecting dependencies
-    public KeystoreController(KeystoreSessionHolder userContextHolder, AuthorizationService authorizationService)
+    public KeystoreController(KeystoreSessionHolder userContextHolder)
     {
         proxy = (KeystoreApi) Proxy.newProxyInstance(
                 KeystoreApi.class.getClassLoader(),
                 new Class[]{KeystoreApi.class},
-                new ProxyImpl(userContextHolder, authorizationService));
+                new ProxyImpl(userContextHolder));
     }
 
 
@@ -130,13 +129,11 @@ public class KeystoreController implements KeystoreApi
     private static class ProxyImpl extends AbstractInvocationHandler
     {
         private final KeystoreSessionHolder userContextHolder;
-        private final AuthorizationService authorizationService;
 
 
-        public ProxyImpl(KeystoreSessionHolder userContextHolder, AuthorizationService authorizationService)
+        public ProxyImpl(KeystoreSessionHolder userContextHolder)
         {
             this.userContextHolder = userContextHolder;
-            this.authorizationService = authorizationService;
         }
 
 
@@ -149,10 +146,10 @@ public class KeystoreController implements KeystoreApi
 
         private Object invokeWithExtras(Method method, Object[] args) throws Throwable
         {
-            UserDetails user = this.authorizationService.getAuthenticatedUser();
+            String username = SessionInfo.getSessionUserName();
             try (Took took = new Took(method))
             {
-                KeystoreSession userContext = this.userContextHolder.getContext(new StringContextKey(user.getUsername()));
+                KeystoreSession userContext = this.userContextHolder.getContext(new StringContextKey(username));
                 return method.invoke(userContext, args);
             }
             catch (IllegalAccessException ex)

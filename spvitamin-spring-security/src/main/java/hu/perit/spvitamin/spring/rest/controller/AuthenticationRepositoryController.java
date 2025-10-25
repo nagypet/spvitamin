@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.rest.controller;
 
 import hu.perit.spvitamin.spring.rest.api.AuthenticationRepositoryApi;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.config.AuthenticationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class AuthenticationRepositoryController implements AuthenticationReposit
     private final AuthenticationRepository authenticationRepository;
 
     @Override
-    //@LoggedRestMethod(eventId = 30, module = "authentication-repository")
+    @LoggedRestMethod(eventId = 30)
     public AuthenticationRepository getAuthenticationRepository()
     {
         return this.authenticationRepository;

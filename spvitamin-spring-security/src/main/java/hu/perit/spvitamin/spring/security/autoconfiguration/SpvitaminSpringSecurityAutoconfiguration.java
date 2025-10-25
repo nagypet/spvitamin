@@ -16,9 +16,12 @@
 
 package hu.perit.spvitamin.spring.security.autoconfiguration;
 
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import hu.perit.spvitamin.spring.session.strategy.PerUserTypeConcurrentSessionControlStrategy;
 import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -35,6 +38,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpvitaminSpringSecurityAutoconfiguration
 {
+    private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+
+
+    @PostConstruct
+    void init()
+    {
+        if (this.securityProperties.isProductionMode()
+                && ("*".equals(this.securityProperties.getAdminEndpointsAccess())
+                || "*".equals(this.securityProperties.getSwaggerAccess())
+                || "*".equals(this.securityProperties.getManagementEndpointsAccess()))
+        )
+        {
+            throw new IllegalStateException("Production mode is enabled, but either adminGuiAccess, adminEndpointsAccess, swaggerAccess or managementEndpointsAccess is set to '*'!");
+        }
+
+        if (this.securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
+        {
+            if (this.securityProperties.getAuth() == null && this.securityProperties.getOauth2() == null)
+            {
+                throw new IllegalStateException("auth or oauth2 must be set!");
+            }
+        }
+    }
+
+
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy(AdvancedSessionRegistry sessionRegistry)
     {

@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth;
+package hu.perit.spvitamin.spring.info;
 
-import hu.perit.spvitamin.spring.info.SessionUserService;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public interface AuthorizationService extends SessionUserService
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class SessionInfo
 {
-    void registerAuthenticatedUserFactory(AuthenticatedUserFactory authenticatedUserFactory);
-
-    void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
-
-    AuthenticatedUser getAuthenticatedUser();
+    public static String getSessionUserName()
+    {
+        try
+        {
+            return SpringContext.getBean(SessionUserService.class).getSessionUserName();
+        }
+        catch (Exception e)
+        {
+            return "Anonymous";
+        }
+    }
 }

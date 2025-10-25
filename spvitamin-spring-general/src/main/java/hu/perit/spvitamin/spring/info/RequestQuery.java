@@ -51,10 +51,16 @@ public final class RequestQuery
 
     public static String getSessionId()
     {
+        return getSessionId(false);
+    }
+
+
+    public static String getSessionId(boolean createIfNotExist)
+    {
         HttpServletRequest httpServletRequest = getHttpServletRequest();
         if (httpServletRequest != null)
         {
-            HttpSession session = httpServletRequest.getSession(false);
+            HttpSession session = httpServletRequest.getSession(createIfNotExist);
             if (session != null)
             {
                 return session.getId();

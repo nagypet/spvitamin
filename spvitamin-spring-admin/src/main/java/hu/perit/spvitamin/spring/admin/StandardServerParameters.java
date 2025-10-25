@@ -23,12 +23,9 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.AdminProperties;
 import hu.perit.spvitamin.spring.config.CryptoProperties;
 import hu.perit.spvitamin.spring.config.JwtProperties;
-import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.MetricsProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceProperties;
-import hu.perit.spvitamin.spring.config.Role2PermissionMappingProperties;
-import hu.perit.spvitamin.spring.config.RoleMappingProperties;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -49,7 +46,6 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -75,9 +71,6 @@ class StandardServerParameters
     private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final SwaggerProperties swaggerProperties;
     private final AdminProperties adminProperties;
-    private final LocalUserProperties localUserProperties;
-    private final RoleMappingProperties roleMappingProperties;
-    private final Role2PermissionMappingProperties role2PermissionMappingProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -101,17 +94,6 @@ class StandardServerParameters
         params.add(ServerParameterListBuilder.of(this.serverProperties));
         params.add(ServerParameterListBuilder.of(this.jacksonProperties));
         params.add(ServerParameterListBuilder.of(this.adminProperties));
-        params.add(ServerParameterListBuilder.of(this.role2PermissionMappingProperties));
-
-        for (Map.Entry<String, LocalUserProperties.User> entry : this.localUserProperties.getLocaluser().entrySet())
-        {
-            params.add("Local users", new ServerParameter(entry.getKey(), "", false));
-        }
-
-        for (Map.Entry<String, RoleMappingProperties.RoleMapping> entry : this.roleMappingProperties.getRoles().entrySet())
-        {
-            params.add(getRoleMappingGroupName(entry.getKey()), ServerParameterListBuilder.of(entry.getValue()));
-        }
 
         if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
         {
@@ -159,11 +141,6 @@ class StandardServerParameters
         {
             return null;
         }
-    }
-
-    private static String getRoleMappingGroupName(String role)
-    {
-        return MessageFormat.format("{0}: {1}", RoleMappingProperties.RoleMapping.class.getSimpleName(), role);
     }
 
     private static boolean isSecret(String propName)

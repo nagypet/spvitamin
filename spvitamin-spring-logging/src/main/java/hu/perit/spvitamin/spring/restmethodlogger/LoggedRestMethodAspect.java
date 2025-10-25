@@ -18,10 +18,10 @@ package hu.perit.spvitamin.spring.restmethodlogger;
 
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
+import hu.perit.spvitamin.spring.info.SessionInfo;
 import hu.perit.spvitamin.spring.logging.Constants;
 import hu.perit.spvitamin.spring.logging.LogEvent;
 import hu.perit.spvitamin.spring.logging.RequestLogger;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LoggedRestMethodAspect
 {
-    private final AuthorizationService authorizationService;
     private final HttpServletRequest httpRequest;
     private final ApplicationEventPublisher publisher;
     private final Environment environment;
@@ -57,6 +56,7 @@ public class LoggedRestMethodAspect
     public void loggedRestMethod()
     {
     }
+
 
     @Around("loggedRestMethod()")
     public Object logRestMethod(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable
@@ -114,8 +114,9 @@ public class LoggedRestMethodAspect
             return arguments.getString(annotation.user());
         }
 
-        return this.authorizationService.getAuthenticatedUser().getUsername();
+        return SessionInfo.getSessionUserName();
     }
+
 
     private void callIn(String traceId, String subsystem, String username, String method, int eventId, Arguments arguments, boolean muted)
     {

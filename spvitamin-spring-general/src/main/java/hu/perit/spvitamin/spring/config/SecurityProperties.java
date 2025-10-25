@@ -75,22 +75,6 @@ public class SecurityProperties
     void init()
     {
         log.debug(this.toString());
-        if (productionMode
-                && ("*".equals(this.adminEndpointsAccess)
-                || "*".equals(this.swaggerAccess)
-                || "*".equals(this.managementEndpointsAccess))
-        )
-        {
-            throw new IllegalStateException("Production mode is enabled, but either adminGuiAccess, adminEndpointsAccess, swaggerAccess or managementEndpointsAccess is set to '*'!");
-        }
-
-        if (this.mode == Mode.AUTHORIZATION_SERVER)
-        {
-            if (this.auth == null && this.oauth2 == null)
-            {
-                throw new IllegalStateException("auth or oauth2 must be set!");
-            }
-        }
     }
 
 
