@@ -23,9 +23,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -89,9 +91,29 @@ public class ServerParameterListImpl implements ServerParameterList
 
     private void getProperties(String group, Object object, String namePrefix)
     {
+        if (object == null)
+        {
+            add(group, new ServerParameter(namePrefix, "null", false));
+            return;
+        }
+
+        if (object instanceof Collection<?> list)
+        {
+            getCollection(group, list, namePrefix);
+            return;
+        }
+        else if (object instanceof Map<?, ?> map)
+        {
+            getMap(group, map, namePrefix);
+            return;
+        }
+        else if (object.getClass().isArray())
+        {
+            getArray(group, object, namePrefix);
+            return;
+        }
 
         Class<?> objectClass = object.getClass();
-
         List<Property> properties = ReflectionUtils.allPropertiesOf(objectClass, false);
         for (Property property : properties)
         {
@@ -135,14 +157,68 @@ public class ServerParameterListImpl implements ServerParameterList
     }
 
 
-    private static String getPropertyName(String namePrefix, String propertyName)
+    private void getCollection(String group, Collection<?> collection, String namePrefix)
     {
-        if (StringUtils.isNotBlank(namePrefix))
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Object item : collection)
         {
-            return String.format("%s.%s", namePrefix, propertyName);
+            if (item != null)
+            {
+                joiner.add(item.toString());
+            }
         }
 
-        return propertyName;
+        add(group, new ServerParameter(namePrefix, joiner.toString(), false));
+    }
+
+
+    private void getMap(String group, Map<?, ?> map, String namePrefix)
+    {
+        for (Map.Entry<?, ?> entry : map.entrySet())
+        {
+            if (entry.getValue() != null)
+            {
+                String propertyName = entry.getKey().toString();
+                if (entry.getValue() instanceof Collection<?> list)
+                {
+                    getProperties(group, list, getPropertyName(namePrefix, propertyName));
+                }
+                else
+                {
+                    getProperties(getPropertyName(group, namePrefix, propertyName), entry.getValue(), null);
+                }
+            }
+        }
+    }
+
+
+    private void getArray(String group, Object array, String namePrefix)
+    {
+        StringJoiner joiner = new StringJoiner(", ");
+        int length = java.lang.reflect.Array.getLength(array);
+        for (int i = 0; i < length; i++)
+        {
+            Object item = java.lang.reflect.Array.get(array, i);
+            if (item != null)
+            {
+                joiner.add(item.toString());
+            }
+        }
+        add(group, new ServerParameter(namePrefix, joiner.toString(), false));
+    }
+
+
+    private static String getPropertyName(String... parts)
+    {
+        StringJoiner joiner = new StringJoiner(".");
+        for (String part : parts)
+        {
+            if (StringUtils.isNotBlank(part))
+            {
+                joiner.add(part);
+            }
+        }
+        return joiner.toString();
     }
 
 

@@ -43,6 +43,7 @@ import java.time.Duration;
 @Slf4j
 public class JwtProperties
 {
+    @Getter(AccessLevel.NONE)
     private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
 
     @NotNull

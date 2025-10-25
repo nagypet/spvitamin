@@ -17,7 +17,9 @@
 package hu.perit.spvitamin.spring.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,7 @@ import java.util.Map;
 @DependsOn(value = "SpvitaminSpringContext")
 public class MicroserviceCollectionProperties
 {
+    @Getter(AccessLevel.NONE)
     private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
 
     private Map<String, MicroserviceProperties> microservices = new HashMap<>();

@@ -19,7 +19,9 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.config;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,7 @@ import java.util.Set;
 @DependsOn("securityProperties")
 public class SpvitaminOAuth2Properties
 {
+    @Getter(AccessLevel.NONE)
     private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
 
     private String issuer;

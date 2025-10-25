@@ -22,6 +22,8 @@ import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import hu.perit.spvitamin.spring.session.strategy.PerUserTypeConcurrentSessionControlStrategy;
 import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -38,6 +40,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpvitaminSpringSecurityAutoconfiguration
 {
+    @Getter(AccessLevel.NONE)
     private final SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
 
 
