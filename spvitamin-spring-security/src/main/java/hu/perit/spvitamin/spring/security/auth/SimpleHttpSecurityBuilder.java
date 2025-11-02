@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth;
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
@@ -223,6 +224,7 @@ public class SimpleHttpSecurityBuilder
     public SimpleHttpSecurityBuilder logout(String logoutUrl) throws Exception
     {
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        SessionProperties sessionProperties = SpringContext.getBean(SessionProperties.class);
         SecurityProperties.AuthConfiguration auth = securityProperties.getAuth();
         List<String> cookieNames = new ArrayList<>();
         if (auth != null)
@@ -230,7 +232,7 @@ public class SimpleHttpSecurityBuilder
             cookieNames.add(auth.getAccessTokenCookieName());
             cookieNames.add(auth.getRefreshTokenCookieName());
         }
-        cookieNames.addAll(List.of("JSESSIONID", "SESSION", "IDP_SESSION"));
+        cookieNames.addAll(List.of("JSESSIONID", sessionProperties.getCookieName(), "IDP_SESSION"));
         this.http.logout(i -> i
                 .logoutUrl(logoutUrl)
                 .invalidateHttpSession(true)

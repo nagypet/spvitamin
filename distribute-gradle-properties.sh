@@ -22,6 +22,8 @@ copyTo() {
 
 copyTo pwdtool
 copyTo spvitamin-core
+copyTo spvitamin-file-storage
+copyTo spvitamin-file-storage-spring-sftp
 copyTo spvitamin-json-time
 copyTo spvitamin-spring-admin
 copyTo spvitamin-spring-cloud-client
@@ -34,6 +36,7 @@ copyTo spvitamin-spring-security-authservice
 copyTo spvitamin-spring-security-keycloak
 copyTo spvitamin-spring-security-ldap
 copyTo spvitamin-spring-security-oauth2
+copyTo spvitamin-spring-security-oauth2-idp
 copyTo spvitamin-spring-server
 copyTo spvitamin-spring-session-redis
 copyTo spvitamin-test

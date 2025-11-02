@@ -155,6 +155,7 @@ dependencyManagement {
 - 2 security modes: AUTHORIZATION_SERVER and RESOURCE_SERVER
 - SingletonFactory
 - Handling token-cookies fixed
+- Session cookie name is configurable
 
 
 ### 3.3.3-2-RELEASE not yet released

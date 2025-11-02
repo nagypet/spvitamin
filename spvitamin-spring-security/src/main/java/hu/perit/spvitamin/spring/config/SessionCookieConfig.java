@@ -35,7 +35,7 @@ public class SessionCookieConfig
     public CookieSerializer cookieSerializer()
     {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("SESSION");
+        serializer.setCookieName(this.sessionProperties.getCookieName());
         serializer.setSameSite("Lax");
         serializer.setUseHttpOnlyCookie(true);
         serializer.setUseSecureCookie(false);

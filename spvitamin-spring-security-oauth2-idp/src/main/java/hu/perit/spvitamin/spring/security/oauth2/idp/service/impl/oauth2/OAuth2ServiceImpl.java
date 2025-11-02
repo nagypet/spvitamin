@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.security.oauth2.idp.service.impl.oauth2;
 
+import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.CookieHelper;
@@ -433,7 +434,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
     private static String one(MultiValueMap<String, String> form, String key)
     {
         List<String> vals = form.get(key);
-        return (vals == null || vals.isEmpty()) ? null : vals.getFirst();
+        return (vals == null || vals.isEmpty()) ? null : ListUtils.first(vals);
     }
 
 

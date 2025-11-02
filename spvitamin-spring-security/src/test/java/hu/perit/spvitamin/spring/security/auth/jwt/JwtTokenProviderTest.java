@@ -18,9 +18,11 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.http.ResponseEntityUtils;
+import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -50,13 +52,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class JwtTokenProviderTest
 {
-
     @Profile("unittest")
     @EnableConfigurationProperties
     @Configuration
     @ComponentScan(basePackages = {
             "hu.perit.spvitamin.spring.security.auth.jwt",
             "hu.perit.spvitamin.spring.session",
+            "hu.perit.spvitamin.spring.security.autoconfiguration",
             "hu.perit.spvitamin.spring.config"
     })
     public static class ContextConfiguration
@@ -74,19 +76,24 @@ class JwtTokenProviderTest
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testValidToken()");
 
-        AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
-                .username("nagy_peter")
-                .authorities(List.of(new SimpleGrantedAuthority("ADMIN")))
-                .source("ldapUrl")
-                .userId("12")
-                .build();
-        final AuthorizationToken token = ResponseEntityUtils.get(this.jwtTokenProvider.generateToken(authenticatedUser));
+        try (var requestQuery = Mockito.mockStatic(RequestQuery.class))
+        {
+            requestQuery.when(RequestQuery::getSessionId).thenReturn("123");
 
-        TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
+            AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
+                    .username("nagy_peter")
+                    .authorities(List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                    .source("ldapUrl")
+                    .userId("12")
+                    .build();
+            final AuthorizationToken token = ResponseEntityUtils.get(this.jwtTokenProvider.generateToken(authenticatedUser));
 
-        assertThat(claims.getSubject()).isEqualTo("nagy_peter");
-        Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
-        assertThat(authorities).hasSize(1);
-        assertThat(authorities.iterator().next().getAuthority()).isEqualTo("ADMIN");
+            TokenClaims claims = new TokenClaims(this.jwtTokenProvider.getClaims(token.getJwt()));
+
+            assertThat(claims.getSubject()).isEqualTo("nagy_peter");
+            Collection<? extends GrantedAuthority> authorities = claims.getAuthorities();
+            assertThat(authorities).hasSize(1);
+            assertThat(authorities.iterator().next().getAuthority()).isEqualTo("ROLE_ADMIN");
+        }
     }
 }

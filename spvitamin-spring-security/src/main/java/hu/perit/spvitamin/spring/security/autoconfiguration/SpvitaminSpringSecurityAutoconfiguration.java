@@ -58,7 +58,7 @@ public class SpvitaminSpringSecurityAutoconfiguration
 
         if (this.securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
         {
-            if (this.securityProperties.getAuth() == null && this.securityProperties.getOauth2() == null)
+            if (this.securityProperties.getAuth() == null && (this.securityProperties.getOauth2() == null || this.securityProperties.getOauth2().getProviders().isEmpty()))
             {
                 throw new IllegalStateException("auth or oauth2 must be set!");
             }

@@ -44,6 +44,8 @@ public class SessionProperties
 {
     private Duration sessionMaxAge = Duration.ofDays(30);
 
+    private String cookieName = "SESSION";
+
     @NestedConfigurationProperty
     private Limits limits = new Limits();
 

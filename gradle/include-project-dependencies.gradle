@@ -17,90 +17,93 @@
 new ProjectConfigurer(settings).doIt()
 
 class ProjectConfigurer {
-	Map<String, File> projectMap = [:]
-	File rootDir
-	Settings settings
+    Map<String, File> projectMap = [:]
+    File rootDir
+    Settings settings
 
-	ProjectConfigurer(Settings settings) {
-		this.rootDir = settings.getRootDir()
-		this.settings = settings
-	}
-	
-	
-	void doIt() {
-		long startTime = System.currentTimeMillis()
-		println "Included projects:"
-		
-		// Step 1.
-		this.discoverProjects(this.rootDir.getParentFile())
-		
-		// Step 2.
-		Set<String> deps = this.getDependendentProjects(this.rootDir, 0)
-		
-		// Step 3.
-		this.includeDependentProjects(deps)		
-		
-		println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
-	}
+    ProjectConfigurer(Settings settings) {
+        this.rootDir = settings.getRootDir()
+        this.settings = settings
+    }
 
 
-	/**
-	 * Recursively searches folders starting with '../' containing a build.gradle file.
-	 * @return
-	 */
-	private void discoverProjects(File root) {
-		root.eachDir(){ dir ->
-			if (isDirRelevant(dir)) {
-           		if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin") && !dir.name.equals("ngface") && !dir.name.equals("nputil")) {
-					this.projectMap.put(dir.name, dir)
-				} else {
-					this.discoverProjects(dir)
-				}
-			}
-		}
-	}
+    void doIt() {
+        long startTime = System.currentTimeMillis()
+        println "Included projects:"
+
+        // Step 1.
+        this.discoverProjects(this.rootDir.getParentFile())
+
+        // Step 2.
+        Set<String> deps = [] as Set
+        this.getDependendentProjects(this.rootDir, 0, deps)
+
+        // Step 3.
+        this.includeDependentProjects(deps)
+
+        println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
+    }
 
 
-	private static boolean isDirRelevant(File dir) {
-		return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out") || dir.name.equals("Logstash") || dir.name.equals("src"))
-	}
-	
-
-	private Set<String> getDependendentProjects(File root, int level) {
-		Set<String> deps = [] as Set
-		File buildGradleFile = new File(root, "build.gradle")
-		if (buildGradleFile.exists()) {
-			buildGradleFile.eachLine {line ->
-				if (!(line =~ /^\s*\/\//) &&
-						(line =~ /compile\s*project/
-						|| line =~ /testCompile\s*project/
-						|| line =~ /runtimeOnly\s*project/
-						|| line =~ /implementation\s*project/
-						|| line =~ /testImplementation\s*project/
-						|| line =~ /api\s*project/)) {
-					def matcher = line =~ /:[a-z-A-Z0-9]*/
-					if (matcher.size() == 1) {
-						def projName = matcher[0].substring(1)
-						deps += projName
-						//println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
-						if (this.projectMap[projName] == null) {
-							println 'Project does not exist: ' + projName
-						}
-						deps += this.getDependendentProjects(this.projectMap[projName], level + 1)
-					}
-				}
-			}
-		}
-		return deps
-	}
+    /**
+     * Recursively searches folders starting with '../' containing a build.gradle file.
+     * @return
+     */
+    private void discoverProjects(File root) {
+        root.eachDir() { dir ->
+            if (isDirRelevant(dir)) {
+                if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin") && !dir.name.equals("ngface") && !dir.name.equals("nputil")) {
+                    this.projectMap.put(dir.name, dir)
+                } else {
+                    this.discoverProjects(dir)
+                }
+            }
+        }
+    }
 
 
-	private void includeDependentProjects(Set<String> deps) {
-		deps.each { projName ->
-			settings.include "${projName}"
-			def projDir = new File("${projectMap[projName]}")
-			settings.project(":${projName}").projectDir = projDir
-			println "  :${projName} => ${projDir}"
-		}
-	}
+    private static boolean isDirRelevant(File dir) {
+        return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out") || dir.name.equals("Logstash") || dir.name.equals("src"))
+    }
+
+
+    private void getDependendentProjects(File root, int level, Set<String> deps) {
+        File buildGradleFile = new File(root, "build.gradle")
+        if (buildGradleFile.exists()) {
+            buildGradleFile.eachLine { line ->
+                if (!(line =~ /^\s*\/\//) &&
+                        (line =~ /compile\s*project/
+                                || line =~ /testCompile\s*project/
+                                || line =~ /runtimeOnly\s*project/
+                                || line =~ /implementation\s*project/
+                                || line =~ /testImplementation\s*project/
+                                || line =~ /api\s*project/)) {
+                    def matcher = line =~ /:[a-z-A-Z0-9]*/
+                    if (matcher.size() == 1) {
+                        def projName = matcher[0].substring(1).strip()
+                        if (deps.contains(projName)) {
+                            return
+                        }
+                        println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
+                        deps.add(projName)
+                        if (this.projectMap[projName] == null) {
+                            println 'Project does not exist: ' + projName
+                        } else {
+                            this.getDependendentProjects(this.projectMap[projName], level + 1, deps)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void includeDependentProjects(Set<String> deps) {
+        deps.each { projName ->
+            settings.include "${projName}"
+            def projDir = new File("${projectMap[projName]}")
+            settings.project(":${projName}").projectDir = projDir
+            println "  :${projName} => ${projDir}"
+        }
+    }
 }

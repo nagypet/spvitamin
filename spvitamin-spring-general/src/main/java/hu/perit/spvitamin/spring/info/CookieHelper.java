@@ -16,6 +16,8 @@
 
 package hu.perit.spvitamin.spring.info;
 
+import hu.perit.spvitamin.spring.config.SessionProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,8 +36,9 @@ public final class CookieHelper
     public static void clearSessionCookie(HttpServletRequest request,
                                           HttpServletResponse response)
     {
+        SessionProperties sessionProperties = SpringContext.getBean(SessionProperties.class);
         clearCookie("JSESSIONID", request, response);
-        clearCookie("SESSION", request, response);
+        clearCookie(sessionProperties.getCookieName(), request, response);
     }
 
 
