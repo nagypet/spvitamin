@@ -117,7 +117,7 @@ public class ServerExceptionProperties
         ServerException serverException = new ServerException(this, traceId);
         try
         {
-            if (serverException.instanceOf(Exception.class))
+            if (serverException.instanceOf(RuntimeException.class))
             {
                 // Try to regenerate the original exception
                 Exception retval;
