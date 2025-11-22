@@ -157,6 +157,7 @@ dependencyManagement {
 - Handling token-cookies fixed
 - Session cookie name is configurable
 - ServerExceptionProperties.toException fixed: only unchecked exceptions will be reconstructed on the client side
+- Bitfield, ServiceUnavailableException
 
 
 ### 3.3.3-2-RELEASE not yet released
