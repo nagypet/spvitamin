@@ -68,7 +68,8 @@ public class LdapAuthenticationProviderConfigurer
                         props.getFilter(),
                         props.isUserprincipalWithDomain(),
                         props.getRootDN(),
-                        props.getBindUserPattern()
+                        props.getBindUserPattern(),
+                        props.isEnableAccessWithoutDomain()
                 );
 
                 provider.setContextEnvironmentProperties(ctxEnvironmentProps);
@@ -101,7 +102,7 @@ public class LdapAuthenticationProviderConfigurer
     }
 
 
-    private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN, String bindUserPattern)
+    private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN, String bindUserPattern, boolean enableAccessWithoutDomain)
     {
         log.info(String.format("'%s' url: '%s', rootDN: '%s', filter: '%s', domain: '%s', with domain: '%b'", name, url, rootDN, filter, domain, withDomain));
 
@@ -111,6 +112,7 @@ public class LdapAuthenticationProviderConfigurer
         provider.setUseAuthenticationRequestCredentials(true);
         provider.setUserprincipalwithdomain(withDomain);
         provider.setBindUserPattern(bindUserPattern);
+        provider.setEnableAccessWithoutDomain(enableAccessWithoutDomain);
 
         return provider;
     }

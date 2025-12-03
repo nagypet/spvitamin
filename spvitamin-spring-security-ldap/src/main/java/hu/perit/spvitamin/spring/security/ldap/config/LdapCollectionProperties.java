@@ -44,5 +44,6 @@ public class LdapCollectionProperties {
         private String domain;
         private int connectTimeoutMs = 1000;
         private String bindUserPattern;
+        private boolean enableAccessWithoutDomain = false;
     }
 }

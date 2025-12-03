@@ -19,6 +19,8 @@ package hu.perit.spvitamin.spring.security.ldap;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.core.log.LogMessage;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
@@ -104,6 +106,8 @@ import java.util.regex.Pattern;
  * @author Peter Nagy
  * @since 3.1
  */
+@Getter
+@Setter
 public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvider
 {
 
@@ -127,6 +131,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
     private String searchFilter = "(&(objectClass=user)(userPrincipalName={0}))";
     private Map<String, Object> contextEnvironmentProperties = new HashMap<>();
     private String bindUserPattern = null;
+    private boolean enableAccessWithoutDomain = false;
 
 
     // Only used to allow tests to substitute a mock LdapContext
@@ -146,17 +151,6 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         this.rootDn = StringUtils.hasText(rootDn) ? rootDn.toLowerCase() : null;
     }
 
-    /**
-     * @param domain the domain name (may be null or empty)
-     * @param url    an LDAP url (or multiple URLs)
-     */
-    public LdapAuthenticationProvider(String domain, String url)
-    {
-        Assert.isTrue(StringUtils.hasText(url), "Url cannot be empty");
-        this.domain = StringUtils.hasText(domain) ? domain.toLowerCase() : null;
-        this.url = url;
-        rootDn = this.domain == null ? null : rootDnFromDomain(this.domain);
-    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws org.springframework.security.core.AuthenticationException
@@ -167,7 +161,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         // authenticationName is the name which the user typed in. E.g. perit\nagypet or nagypet@perit.hu
         String authenticationName = authentication.getName();
         DomainUser domainUser = DomainUser.newInstance(authenticationName);
-        if (domainUser.getDomain() == null || !this.domain.contains(domainUser.getDomain()))
+        if (!this.enableAccessWithoutDomain && (domainUser.getDomain() == null || !this.domain.contains(domainUser.getDomain())))
         {
             return null;
         }
@@ -199,10 +193,12 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         return createSuccessfulAuthentication(userToken, user, userData);
     }
 
+
     private String getUserPrincipalName(String username)
     {
         return username + "@" + this.domain;
     }
+
 
     protected Authentication createSuccessfulAuthentication(UsernamePasswordAuthenticationToken authentication,
                                                             UserDetails user,
@@ -217,6 +213,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         result.setDetails(authentication.getDetails());
         return result;
     }
+
 
     @Override
     protected DirContextOperations doAuthentication(UsernamePasswordAuthenticationToken auth)
@@ -308,6 +305,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         return authorities;
     }
 
+
     private DirContext bindAsUser(String username, String password)
     {
         // TODO. add DNS lookup based on domain
@@ -338,6 +336,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         }
     }
 
+
     private void handleBindException(String bindPrincipal, NamingException exception)
     {
         if (logger.isDebugEnabled())
@@ -364,6 +363,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         }
     }
 
+
     private void handleResolveObj(NamingException exception)
     {
         Object resolvedObj = exception.getResolvedObj();
@@ -373,6 +373,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
             exception.setResolvedObj(null);
         }
     }
+
 
     private int parseSubErrorCode(String message)
     {
@@ -385,6 +386,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
 
         return -1;
     }
+
 
     private void raiseExceptionForErrorCode(int code, NamingException exception)
     {
@@ -412,30 +414,23 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         }
     }
 
+
     private String subCodeToLogMessage(int code)
     {
-        switch (code)
+        return switch (code)
         {
-            case USERNAME_NOT_FOUND:
-                return "User was not found in directory";
-            case INVALID_PASSWORD:
-                return "Supplied password was invalid";
-            case NOT_PERMITTED:
-                return "User not permitted to logon at this time";
-            case PASSWORD_EXPIRED:
-                return "Password has expired";
-            case ACCOUNT_DISABLED:
-                return "Account is disabled";
-            case ACCOUNT_EXPIRED:
-                return "Account expired";
-            case PASSWORD_NEEDS_RESET:
-                return "User must reset password";
-            case ACCOUNT_LOCKED:
-                return "Account locked";
-            default:
-                return "Unknown (error code " + Integer.toHexString(code) + ")";
-        }
+            case USERNAME_NOT_FOUND -> "User was not found in directory";
+            case INVALID_PASSWORD -> "Supplied password was invalid";
+            case NOT_PERMITTED -> "User not permitted to logon at this time";
+            case PASSWORD_EXPIRED -> "Password has expired";
+            case ACCOUNT_DISABLED -> "Account is disabled";
+            case ACCOUNT_EXPIRED -> "Account expired";
+            case PASSWORD_NEEDS_RESET -> "User must reset password";
+            case ACCOUNT_LOCKED -> "Account locked";
+            default -> "Unknown (error code " + Integer.toHexString(code) + ")";
+        };
     }
+
 
     private BadCredentialsException badCredentials()
     {
@@ -443,10 +438,12 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
                 "LdapAuthenticationProvider.badCredentials", "Bad credentials"));
     }
 
+
     private BadCredentialsException badCredentials(Throwable cause)
     {
         return (BadCredentialsException) badCredentials().initCause(cause);
     }
+
 
     private DirContextOperations searchForUser(DirContext context, String username)
             throws NamingException
@@ -479,6 +476,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         }
     }
 
+
     private String searchRootFromPrincipal(String bindPrincipal)
     {
         int atChar = bindPrincipal.lastIndexOf('@');
@@ -493,6 +491,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         return rootDnFromDomain(bindPrincipal.substring(atChar + 1,
                 bindPrincipal.length()));
     }
+
 
     private String rootDnFromDomain(String domain)
     {
@@ -533,6 +532,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         return username + "@" + domain;
     }
 
+
     /**
      * By default, a failed authentication (LDAP error 49) will result in a
      * {@code BadCredentialsException}.
@@ -553,6 +553,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         this.convertSubErrorCodesToExceptions = convertSubErrorCodesToExceptions;
     }
 
+
     /**
      * The LDAP filter string to search for the user being authenticated. Occurrences of
      * {0} are replaced with the {@code username@domain}. Occurrences of {1} are replaced
@@ -571,16 +572,6 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
     }
 
 
-    public void setUserprincipalwithdomain(boolean userprincipalwithdomain)
-    {
-        this.userprincipalwithdomain = userprincipalwithdomain;
-    }
-
-    public void setBindUserPattern(String bindUserPattern)
-    {
-        this.bindUserPattern = bindUserPattern;
-    }
-
     /**
      * Allows a custom environment properties to be used to create initial LDAP context.
      *
@@ -591,6 +582,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
         Assert.notEmpty(environment, "environment must not be empty");
         this.contextEnvironmentProperties = new Hashtable<>(environment);
     }
+
 
     static class ContextFactory
     {
