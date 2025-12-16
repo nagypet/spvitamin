@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -58,9 +57,14 @@ class CancelableJobExecutorTest
         String jobId = "job1";
         CountDownLatch jobExecuted = new CountDownLatch(1);
 
-        Callable<Void> job = () -> {
-            jobExecuted.countDown();
-            return null;
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
+            {
+                jobExecuted.countDown();
+                return null;
+            }
         };
 
         // Act
@@ -86,12 +90,17 @@ class CancelableJobExecutorTest
         String jobId = "job1";
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
-        Callable<Void> job = () -> {
-            while (jobBlocked.get())
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
             {
-                Thread.sleep(10);
+                while (jobBlocked.get())
+                {
+                    Thread.sleep(10);
+                }
+                return null;
             }
-            return null;
         };
 
         // Act & Assert
@@ -99,7 +108,7 @@ class CancelableJobExecutorTest
 
         // Try to submit the same job ID again
         assertThrows(JobAlreadyProcessingException.class, () -> {
-            jobExecutor.submitJob(jobId, () -> null);
+            jobExecutor.submitJob(jobId, job);
         });
 
         // Cleanup
@@ -117,23 +126,28 @@ class CancelableJobExecutorTest
         CountDownLatch jobStarted = new CountDownLatch(1);
         CountDownLatch jobCancelled = new CountDownLatch(1);
 
-        Callable<Void> job = () -> {
-            try
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
             {
-                jobStarted.countDown();
-                // Long-running task
-                while (!Thread.currentThread().isInterrupted())
+                try
                 {
-                    Thread.sleep(50);
+                    jobStarted.countDown();
+                    // Long-running task
+                    while (!Thread.currentThread().isInterrupted())
+                    {
+                        Thread.sleep(50);
+                    }
                 }
+                catch (InterruptedException e)
+                {
+                    log.debug("Job {} was cancelled", jobId);
+                    jobCancelled.countDown();
+                    throw e;
+                }
+                return null;
             }
-            catch (InterruptedException e)
-            {
-                log.debug("Job {} was cancelled", jobId);
-                jobCancelled.countDown();
-                throw e;
-            }
-            return null;
         };
 
         // Act
@@ -187,23 +201,28 @@ class CancelableJobExecutorTest
         for (int i = 0; i < jobCount; i++)
         {
             final String jobId = "job" + i;
-            Callable<Void> job = () -> {
-                try
+            CancellableJob job = new CancellableJob()
+            {
+                @Override
+                public Void execute() throws Exception
                 {
-                    allJobsStarted.countDown();
-                    // Long-running task
-                    while (!Thread.currentThread().isInterrupted())
+                    try
                     {
-                        Thread.sleep(50);
+                        allJobsStarted.countDown();
+                        // Long-running task
+                        while (!Thread.currentThread().isInterrupted())
+                        {
+                            Thread.sleep(50);
+                        }
                     }
+                    catch (InterruptedException e)
+                    {
+                        log.debug("Job {} was cancelled", jobId);
+                        allJobsCancelled.countDown();
+                        throw e;
+                    }
+                    return null;
                 }
-                catch (InterruptedException e)
-                {
-                    log.debug("Job {} was cancelled", jobId);
-                    allJobsCancelled.countDown();
-                    throw e;
-                }
-                return null;
             };
 
             jobExecutor.submitJob(jobId, job);
@@ -233,13 +252,18 @@ class CancelableJobExecutorTest
         CountDownLatch jobStarted = new CountDownLatch(1);
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
-        Callable<Void> job = () -> {
-            jobStarted.countDown();
-            while (jobBlocked.get())
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
             {
-                Thread.sleep(10);
+                jobStarted.countDown();
+                while (jobBlocked.get())
+                {
+                    Thread.sleep(10);
+                }
+                return null;
             }
-            return null;
         };
 
         // Act
@@ -264,12 +288,17 @@ class CancelableJobExecutorTest
         // Arrange
         AtomicBoolean jobBlocked = new AtomicBoolean(true);
 
-        Callable<Void> job = () -> {
-            while (jobBlocked.get())
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
             {
-                Thread.sleep(10);
+                while (jobBlocked.get())
+                {
+                    Thread.sleep(10);
+                }
+                return null;
             }
-            return null;
         };
 
         // Act
@@ -293,9 +322,14 @@ class CancelableJobExecutorTest
         String jobId = "job1";
         CountDownLatch jobStarted = new CountDownLatch(1);
 
-        Callable<Void> job = () -> {
-            jobStarted.countDown();
-            throw new RuntimeException("Test exception");
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
+            {
+                jobStarted.countDown();
+                throw new RuntimeException("Test exception");
+            }
         };
 
         // Act
@@ -322,9 +356,14 @@ class CancelableJobExecutorTest
         CountDownLatch jobExecuted = new CountDownLatch(1);
 
         // Create a job that completes normally
-        Callable<Void> job = () -> {
-            jobExecuted.countDown();
-            return null;
+        CancellableJob job = new CancellableJob()
+        {
+            @Override
+            public Void execute() throws Exception
+            {
+                jobExecuted.countDown();
+                return null;
+            }
         };
 
         // Submit the job

@@ -16,13 +16,14 @@
 
 package hu.perit.spvitamin.spring.jobexecutor;
 
+import hu.perit.spvitamin.core.jobexecutor.CancellableJob;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 
-import java.util.concurrent.Callable;
-
-public interface CancelableJobWithSecurityContext extends Callable<Void>
+// Use ContextAwareCancellableJob instead
+@Deprecated
+public abstract class CancelableJobWithSecurityContext extends CancellableJob
 {
-    AuthenticatedUser getAuthenticatedUser();
+    abstract AuthenticatedUser getAuthenticatedUser();
 
-    void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
+    abstract void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
 }

@@ -123,7 +123,8 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
         this.traceId = traceId;
         // If the request is coming from a browser, we do not expose any further information
         boolean fromBrowser = RequestQuery.isFromBrowser();
-        if (!fromBrowser)
+        ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(ex);
+        if (!fromBrowser || exceptionWrapper.instanceOf(ApplicationException.class) || exceptionWrapper.instanceOf(ApplicationRuntimeException.class))
         {
             if (myExceptionEnabled)
             {
@@ -135,11 +136,10 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
             }
         }
 
-        ExceptionWrapper exception = ExceptionWrapper.of(ex);
-        if (exception.causedBy("jakarta.validation.ConstraintViolationException"))
+        if (exceptionWrapper.causedBy("jakarta.validation.ConstraintViolationException"))
         {
             //Get all errors
-            exception.getFromCauseChain(jakarta.validation.ConstraintViolationException.class).ifPresent(throwable -> {
+            exceptionWrapper.getFromCauseChain(jakarta.validation.ConstraintViolationException.class).ifPresent(throwable -> {
                 jakarta.validation.ConstraintViolationException cve = (jakarta.validation.ConstraintViolationException) throwable;
                 Set<jakarta.validation.ConstraintViolation<?>> violations = cve.getConstraintViolations();
                 List<String> errors = new ArrayList<>();

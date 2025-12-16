@@ -27,6 +27,8 @@ import java.util.concurrent.Future;
  * @author Peter Nagy
  */
 
+// Use ContextAwareCancelableJobExecutor instead
+@Deprecated
 @Slf4j
 public class CancelableJobExecutorWithSecurityContext<T> extends CancelableJobExecutor<T>
 {
@@ -35,6 +37,7 @@ public class CancelableJobExecutorWithSecurityContext<T> extends CancelableJobEx
     {
         super(poolSize, context);
     }
+
 
     public Future<Void> submitJob(T id, CancelableJobWithSecurityContext job)
     {

@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -69,7 +68,7 @@ public class CancelableJobExecutor<T> extends ThreadPoolExecutor
         this.context = context;
     }
 
-    public synchronized Future<Void> submitJob(T id, Callable<Void> job)
+    public synchronized Future<Void> submitJob(T id, CancellableJob job)
     {
         if (id == null)
         {

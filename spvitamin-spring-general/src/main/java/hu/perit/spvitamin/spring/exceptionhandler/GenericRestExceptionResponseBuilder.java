@@ -50,8 +50,8 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         RestExceptionLogger exceptionLogger = getLogger();
 
         // ========== BAD_REQUEST (400) ================================================================================
-        if (exception.instanceOf(jakarta.validation.ValidationException.class)
-                || exception.instanceOf(InputException.class)
+        if (exception.causedBy(jakarta.validation.ValidationException.class)
+                || exception.causedBy(InputException.class)
                 || exception.causedBy(MethodArgumentNotValidException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
@@ -59,8 +59,8 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         }
 
         // ========== UNAUTHORIZED (401) ===============================================================================
-        else if (exception.instanceOf("org.springframework.security.core.AuthenticationException")
-                || exception.instanceOf("io.jsonwebtoken.JwtException")
+        else if (exception.causedBy("org.springframework.security.core.AuthenticationException")
+                || exception.causedBy("io.jsonwebtoken.JwtException")
                 || exception.causedBy(IllegalStateException.class, "Session was invalidated")
                 || exception.causedBy("feign.FeignException$Unauthorized")
         )
@@ -70,7 +70,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         }
 
         // ========== FORBIDDEN (403) ==================================================================================
-        else if (exception.instanceOf("org.springframework.security.access.AccessDeniedException"))
+        else if (exception.causedBy("org.springframework.security.access.AccessDeniedException"))
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.FORBIDDEN, ex, path, traceId));
@@ -84,14 +84,14 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         }
 
         // ========== NOT_IMPLEMENTED (501) ============================================================================
-        else if (exception.instanceOf(UnsupportedOperationException.class))
+        else if (exception.causedBy(UnsupportedOperationException.class))
         {
             exceptionLogger.log(path, ex, LogLevel.ERROR);
             return Optional.of(this.supplier.get(HttpStatus.NOT_IMPLEMENTED, ex, path, traceId));
         }
 
         // ========== SERVICE_UNAVAILABLE (503) ========================================================================
-        else if (exception.instanceOf("org.springframework.cloud.gateway.support.NotFoundException"))
+        else if (exception.causedBy("org.springframework.cloud.gateway.support.NotFoundException"))
         {
             // kiloggoljuk WARNING-gal
             exceptionLogger.log(path, ex, LogLevel.WARN);
@@ -107,7 +107,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         }
 
         // ========== INTERNAL_SERVER_ERROR (hu.perit.spvitamin.spring.exception) ======================================
-        else if (exception.instanceOf(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
+        else if (exception.causedBy(NullPointerException.class) || exception.instanceOf(RuntimeException.class))
         {
             HttpStatus httpStatus = ExceptionResponseHelper.getHttpStatusFromAnnotation(ex);
             LogLevel logLevel = ExceptionResponseHelper.logLevelByHttpStatus(httpStatus);
