@@ -1,0 +1,245 @@
+package hu.perit.spvitamin.spring.resilientjobrunner.privates;
+
+import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
+import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobDataService;
+import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobCollectionProperties;
+import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.lang.reflect.Field;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class BJobProcessorTest
+{
+    private ResilientJobCollectionProperties collectionProperties;
+    private ResilientJobDataService dataService;
+
+
+    @BeforeEach
+    void setUpMocks()
+    {
+        collectionProperties = mock(ResilientJobCollectionProperties.class);
+        dataService = mock(ResilientJobDataService.class);
+    }
+
+
+    private static ResilientJobProperties createProps(String name, long id, Class<? extends AbstractProcessor> procClass)
+    {
+        ResilientJobProperties p = new ResilientJobProperties();
+        p.setId(id);
+        p.setProcessorClass(procClass.getName());
+        p.setThreadPoolSize(1);
+        p.setRetryTimeout(Duration.ofMinutes(30));
+        p.setContextDecoratorTag("batchId");
+        p.setRetryableExceptions(Arrays.asList(RuntimeException.class.getName()));
+        p.setItemRelatedExceptions(Arrays.asList(IllegalArgumentException.class.getName()));
+        return p;
+    }
+
+
+    private static ProcessorType pt(String name, long id)
+    {
+        return ProcessorType.of(name, id);
+    }
+
+
+    @Test
+    void createProcessor_shouldInstantiateByReflection()
+    {
+        String name = "test";
+        long id = 1L;
+        ResilientJobProperties props = createProps(name, id, TestProcessor.class);
+        BJobProcessor bJobProcessor = new BJobProcessor(collectionProperties, dataService);
+
+        AbstractProcessor p = bJobProcessor.createProcessor(pt(name, id), props);
+
+        assertThat(p).isInstanceOf(TestProcessor.class);
+        assertThat(p.getProcessorType().getName()).isEqualTo(name);
+        assertThat(p.getProcessorType().getProcessorId()).isEqualTo(id);
+        assertThat(p.getProperties()).isEqualTo(props);
+    }
+
+
+    @Test
+    void process_shouldCallServicesAndReturn_onEmptyBatch()
+    {
+        String name = "job1";
+        long id = 11L;
+        ResilientJobProperties props = createProps(name, id, TestProcessor.class);
+
+        Map<String, ResilientJobProperties> map = new HashMap<>();
+        map.put(name, props);
+        when(collectionProperties.getResilientJobs()).thenReturn(map);
+        when(collectionProperties.get(name)).thenReturn(props);
+
+        when(dataService.terminatePermanentlyFailingEntities(any(), any())).thenReturn(0);
+        when(dataService.resetStuckInProgressEntities(any(), any())).thenReturn(0);
+        when(dataService.getNextBatchAndSetInProgressState(any(), anyLong())).thenReturn(java.util.Collections.emptyList());
+
+        BJobProcessor processor = new BJobProcessor(collectionProperties, dataService);
+        processor.setUp();
+
+        ProcessorType processorType = pt(name, id);
+        processor.process(processorType);
+
+        // verify initial calls
+        verify(dataService, times(1)).terminatePermanentlyFailingEntities(eq(processorType), eq(props.getRetryTimeout()));
+        verify(dataService, times(1)).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(5)));
+
+        ArgumentCaptor<Long> lastIdCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(dataService, atLeastOnce()).getNextBatchAndSetInProgressState(eq(processorType), lastIdCaptor.capture());
+        assertThat(lastIdCaptor.getValue()).isEqualTo(0L);
+
+        // Since the batch was empty initially, there should be no final reset (the finally is inside the loop)
+        verify(dataService, never()).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(0)));
+    }
+
+
+    @Test
+    void setUp_shouldCreateExecutorForEachConfiguredJob() throws Exception
+    {
+        ResilientJobProperties p1 = createProps("jobA", 1L, TestProcessor.class);
+        ResilientJobProperties p2 = createProps("jobB", 2L, TestProcessor.class);
+
+        Map<String, ResilientJobProperties> map = new HashMap<>();
+        map.put("jobA", p1);
+        map.put("jobB", p2);
+
+        when(collectionProperties.getResilientJobs()).thenReturn(map);
+
+        BJobProcessor processor = new BJobProcessor(collectionProperties, dataService);
+        processor.setUp();
+
+        Field f = BJobProcessor.class.getDeclaredField("executorMap");
+        f.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<ProcessorType, BatchExecutor> execMap = (Map<ProcessorType, BatchExecutor>) f.get(processor);
+
+        assertThat(execMap).hasSize(2);
+        assertThat(execMap.keySet().stream().map(ProcessorType::getName).toList())
+                .containsExactlyInAnyOrder("jobA", "jobB");
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Test helpers
+    // --------------------------------------------------------------------------------------------
+
+    static class TestProcessor extends AbstractProcessor
+    {
+        public TestProcessor(ProcessorType processorType, ResilientJobProperties properties)
+        {
+            super(processorType, properties);
+        }
+
+
+        @Override
+        public void processJob(ResilientJobData entity)
+        {
+            // no-op
+        }
+
+
+        @Override
+        public void onError(ResilientJobData entity, Exception e)
+        {
+            // no-op
+        }
+    }
+
+    static class TestResilientJobData implements ResilientJobData
+    {
+        private final Long id;
+        private final OffsetDateTime creationTimestamp;
+        private final Long retryCount;
+
+
+        TestResilientJobData(Long id, OffsetDateTime creationTimestamp, Long retryCount)
+        {
+            this.id = id;
+            this.creationTimestamp = creationTimestamp;
+            this.retryCount = retryCount;
+        }
+
+
+        @Override
+        public Long getId()
+        {
+            return id;
+        }
+
+
+        @Override
+        public OffsetDateTime getCreationTimestamp()
+        {
+            return creationTimestamp;
+        }
+
+
+        @Override
+        public hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus getStatus()
+        {
+            return null;
+        }
+
+
+        @Override
+        public Long getProcessorType()
+        {
+            return 0L;
+        }
+
+
+        @Override
+        public Integer getParameterVersion()
+        {
+            return 1;
+        }
+
+
+        @Override
+        public OffsetDateTime getProcessingStartedTimestamp()
+        {
+            return null;
+        }
+
+
+        @Override
+        public String getErrorText()
+        {
+            return null;
+        }
+
+
+        @Override
+        public Long getRetryCount()
+        {
+            return retryCount;
+        }
+
+
+        @Override
+        public <T> T getParameters(Class<T> clazz)
+        {
+            return null;
+        }
+    }
+}

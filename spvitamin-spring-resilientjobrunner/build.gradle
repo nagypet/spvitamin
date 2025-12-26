@@ -1,0 +1,98 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
+    id 'java-library'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
+}
+apply from: '../gradle/common.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+
+// it will be a library, no fat jar
+bootJar {
+    enabled = false
+}
+
+
+dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    implementation project(':spvitamin-core')
+    implementation project(':spvitamin-json-time')
+    implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-logging')
+
+    // Lombok
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    // apache.commons
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+    implementation libs.commons.io
+
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation libs.jakarta.annotation.api
+
+    // jakarta.validation
+    implementation libs.jakarta.validation.api
+    implementation libs.hibernate.validator
+
+    // FasterXML
+    implementation libs.jackson.core
+    implementation libs.jackson.databind
+
+    // Slf4J
+    implementation libs.slf4j.api
+
+    // Reflections
+    implementation libs.reflections
+
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.assertj
+    testImplementation libs.slf4j.log4j12
+    testImplementation libs.log4j.log4j
+    // Needed for ThreadContext used by ThreadContextDecorator during tests
+    testImplementation 'org.apache.logging.log4j:log4j-api:2.22.1'
+}
+
+
+configurations {
+    implementation.exclude module: 'spring-boot-starter-logging'
+}
+
+
+test {
+    useJUnitPlatform()
+}

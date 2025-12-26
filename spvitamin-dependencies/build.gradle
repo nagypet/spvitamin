@@ -60,6 +60,7 @@ dependencies {
         api project(":spvitamin-spring-security-oauth2-idp")
         api project(":spvitamin-spring-server")
         api project(":spvitamin-spring-session-redis")
+        api project(":spvitamin-spring-resilientjobrunner")
         api project(":spvitamin-test")
     }
 }

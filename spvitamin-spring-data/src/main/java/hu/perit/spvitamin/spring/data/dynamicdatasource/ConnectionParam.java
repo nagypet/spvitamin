@@ -169,7 +169,7 @@ public class ConnectionParam extends DatasourceProperties
         return switch (this.dbType)
         {
             case DBTYPE_SQLSERVER -> "org.hibernate.dialect.SQLServerDialect";
-            case DBTYPE_ORACLE -> "org.hibernate.dialect.Oracle10gDialect";
+            case DBTYPE_ORACLE -> "org.hibernate.dialect.OracleDialect";
             case DBTYPE_MYSQL -> "org.hibernate.dialect.MySQL5Dialect";
             case DBTYPE_H2 -> "org.hibernate.dialect.H2Dialect";
             case DBTYPE_POSTGRESQL -> "org.hibernate.dialect.PostgreSQLDialect";
