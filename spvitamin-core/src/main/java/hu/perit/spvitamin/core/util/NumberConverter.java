@@ -25,6 +25,12 @@ public final class NumberConverter
 {
     public static BigDecimal fromText(String text)
     {
+        return fromText(text, null);
+    }
+
+
+    public static BigDecimal fromText(String text, String language)
+    {
         if (text == null)
         {
             return null;
@@ -33,14 +39,31 @@ public final class NumberConverter
         // Handle different number formats
         text = text.replace(" ", "");
 
-        String normalizedText = getNormalizedText(text);
+        String normalizedText = getNormalizedText(text, language);
 
         return new BigDecimal(normalizedText);
     }
 
 
-    private static String getNormalizedText(String text)
+    private static String getNormalizedText(String text, String language)
     {
+        // Locale specific handling (currently only Hungarian)
+        if (language != null && language.toLowerCase().startsWith("hu"))
+        {
+            // In Hungarian format: '.' is thousands separator, ',' is decimal separator
+            if (text.contains(","))
+            {
+                // Remove thousands separators and convert decimal comma to dot
+                return text.replace(".", "").replace(",", ".");
+            }
+            // No comma present: treat any dot as thousands separator to be removed
+            if (text.contains("."))
+            {
+                return text.replace(".", "");
+            }
+            return text;
+        }
+
         // Check if the text contains both period and comma
         if (text.contains(".") && text.contains(","))
         {

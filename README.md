@@ -164,6 +164,7 @@ dependencyManagement {
 - RestExceptionResponse: ApplicationException and ApplicationRuntimeExceptions are propagated to the frontend
 - GenericRestExceptionResponseBuilder creates HTTP 400 response in case of database level ValidationExceptions
 - New module: spvitamin-spring-resilientjobrunner added
+- NumberConverter improved
 
 
 ### 3.3.3-2-RELEASE not yet released

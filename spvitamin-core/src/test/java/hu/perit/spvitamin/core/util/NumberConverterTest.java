@@ -33,5 +33,6 @@ class NumberConverterTest
         assertThat(NumberConverter.fromText("1973,50")).isEqualTo(new BigDecimal("1973.50"));
         assertThat(NumberConverter.fromText("1.973,50")).isEqualTo(new BigDecimal("1973.50"));
         assertThat(NumberConverter.fromText("1 973,50")).isEqualTo(new BigDecimal("1973.50"));
+        assertThat(NumberConverter.fromText("6.133", "hu")).isEqualTo(new BigDecimal("6133"));
     }
 }
