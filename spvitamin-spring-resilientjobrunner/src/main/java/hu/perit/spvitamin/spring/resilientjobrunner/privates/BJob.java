@@ -6,9 +6,9 @@ import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobDataService;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.threadcontext.ThreadContextDecorator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,24 +43,25 @@ class BJob extends BatchJob
                         jobData.getRetryCount(),
                         calculateRemainingTime(jobData.getCreationTimestamp()));
 
-                if (this.processor.isRetryableException(e))
+                boolean isItemRelated = this.processor.isItemRelatedException(e);
+                boolean isRetryable = this.processor.isRetryableException(e);
+
+                if (isRetryable || !isItemRelated)
                 {
-                    // Setting back the status to the unprocessed state
+                    // retryable or unknown error => we will retry the job
                     this.resilientJobDataService.saveError(jobData.getId(), ResilientJobStatus.CREATED, e);
 
-                    // It is no use to try all the batch in case of a network error or other general infrastructure failure.
-                    if (!this.processor.isItemRelatedException(e))
+                    // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
+                    if (isRetryable && !isItemRelated)
                     {
                         throw e;
                     }
                 }
-                else
+                else // item-related && not-retryable
                 {
+                    // job should be set in error, but the batch should continue
                     this.resilientJobDataService.saveError(jobData.getId(), ResilientJobStatus.ERROR, e);
                     onError(e);
-
-                    // Itt NEM dobunk tovább kivételt, így a batch többi eleme kap egy esélyt.
-                    // Ez valósítja meg a "unknown = maybe item-related" stratégiát.
                 }
             }
         }
