@@ -100,7 +100,7 @@ public interface ResilientJobDataService
 {
     int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout);
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
-    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType);
+    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId);
     int resetInProgressEntitiesById(List<Long> ids);
     void deleteById(Long id);
     void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e);
@@ -182,6 +182,7 @@ resilient-jobs:
     processor-class: com.example.DocumentRemover
     thread-pool-size: 10
     retry-timeout: 1h
+    processing-timeout: 5m
     retryable-exceptions:
       - "feign.RetryableException"
       - "feign.FeignException$GatewayTimeout"
@@ -198,6 +199,7 @@ resilient-jobs:
 - `processor-class` (FQN) — your `AbstractProcessor` implementation
 - `thread-pool-size` (int) — parallel workers for this job type
 - `retry-timeout` (duration) — how long we will retry since creation time (e.g., `1h`, `24h`)
+- `processing-timeout` (duration) — how long is a job allowed to be in `IN_PROGRESS` state before it will be reset to `CREATED` (e.g., `5m`, `60s`)
 - `context-decorator-tag` (string, optional) — MDC/ThreadContext tag name for batch/job ids (default: `batchId`)
 - `retryable-exceptions` (list of class names)
 - `item-related-exceptions` (list of class names)
@@ -323,7 +325,7 @@ public interface ResilientJobRepo extends JpaRepository<ResilientJobEntity, Long
     // We use here timeout = 0 which means, do not wait for locked rows.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
-    List<ResilientJobEntity> findAllByProcessorTypeAndStatusOrderById(Long processorType, ResilientJobStatus status, PageRequest pageRequest);
+    List<ResilientJobEntity> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
 
     @Modifying
     @Query("update ResilientJobEntity e set e.status = :status, e.processingStartedTimestamp = :processingStartedTimestamp where e.id in :ids")
@@ -393,10 +395,10 @@ public class ResilientJobEntityServiceImpl implements ResilientJobEntityService
 
     @Override
     @Transactional
-    public List<ResilientJobEntity> getNextBatchAndSetInProgressState(ProcessorType processorType)
+    public List<ResilientJobEntity> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId)
     {
         PageRequest pageRequest = PageRequest.of(0, 200);
-        List<ResilientJobEntity> entities = this.repo.findAllByProcessorTypeAndStatusOrderById(processorType.getProcessorId(), ResilientJobStatus.CREATED, pageRequest);
+        List<ResilientJobEntity> entities = this.repo.findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(processorType.getProcessorId(), lastId, ResilientJobStatus.CREATED, pageRequest);
         this.repo.updateStatusAndProcessingStartedTimestamp(entities.stream().map(ResilientJobEntity::getId).toList(), ResilientJobStatus.IN_PROGRESS, OffsetDateTime.now());
         return entities;
     }

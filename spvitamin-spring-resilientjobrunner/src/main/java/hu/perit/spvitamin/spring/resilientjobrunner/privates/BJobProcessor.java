@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -93,13 +92,17 @@ class BJobProcessor
                 log.info("{} jobs have been reset back to {}", countResetedEntities, ResilientJobStatus.CREATED);
             }
 
+            long lastId = 0;
             while (!Thread.currentThread().isInterrupted())
             {
-                List<? extends ResilientJobData> entities = getNextBatch(processorType);
+                // Here the lastId is only needed to enforce iterating through the whole list. Otherwise, we would
+                // get failed jobs immediately back, and the while loop would run continuously.
+                List<? extends ResilientJobData> entities = getNextBatch(processorType, lastId);
                 if (entities.isEmpty())
                 {
                     return;
                 }
+                lastId = entities.getLast().getId();
 
                 // Creating BJobs
                 BatchExecutor batchExecutor = this.executorMap.get(processorType);
@@ -135,11 +138,11 @@ class BJobProcessor
     }
 
 
-    List<? extends ResilientJobData> getNextBatch(ProcessorType processorType)
+    List<? extends ResilientJobData> getNextBatch(ProcessorType processorType, long lastId)
     {
         try
         {
-            List<? extends ResilientJobData> entities = this.resilientJobDataService.getNextBatchAndSetInProgressState(processorType);
+            List<? extends ResilientJobData> entities = this.resilientJobDataService.getNextBatchAndSetInProgressState(processorType, lastId);
             if (entities.isEmpty())
             {
                 return entities;

@@ -10,7 +10,7 @@ public interface ResilientJobDataService
 
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
 
-    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType);
+    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId);
 
     int resetInProgressEntitiesById(List<Long> ids);
 
