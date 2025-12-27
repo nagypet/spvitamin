@@ -1,9 +1,9 @@
 package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.batchprocessing.BatchJob;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
+import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 
 @RequiredArgsConstructor
 @Slf4j
-class BJob extends BatchJob
+class BJob extends ContextAwareBatchJob
 {
     private final ResilientJobData jobData;
     private final AbstractProcessor processor;

@@ -93,7 +93,7 @@ class BJobProcessorTest
 
         when(dataService.terminatePermanentlyFailingEntities(any(), any())).thenReturn(0);
         when(dataService.resetStuckInProgressEntities(any(), any())).thenReturn(0);
-        when(dataService.getNextBatchAndSetInProgressState(any(), anyLong())).thenReturn(java.util.Collections.emptyList());
+        when(dataService.getNextBatchAndSetInProgressState(any())).thenReturn(java.util.Collections.emptyList());
 
         BJobProcessor processor = new BJobProcessor(collectionProperties, dataService);
         processor.setUp();
@@ -105,9 +105,7 @@ class BJobProcessorTest
         verify(dataService, times(1)).terminatePermanentlyFailingEntities(eq(processorType), eq(props.getRetryTimeout()));
         verify(dataService, times(1)).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(5)));
 
-        ArgumentCaptor<Long> lastIdCaptor = ArgumentCaptor.forClass(Long.class);
-        verify(dataService, atLeastOnce()).getNextBatchAndSetInProgressState(eq(processorType), lastIdCaptor.capture());
-        assertThat(lastIdCaptor.getValue()).isEqualTo(0L);
+        verify(dataService, atLeastOnce()).getNextBatchAndSetInProgressState(eq(processorType));
 
         // Since the batch was empty initially, there should be no final reset (the finally is inside the loop)
         verify(dataService, never()).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(0)));

@@ -16,6 +16,7 @@ public class ResilientJobProperties
     private String processorClass;
     private int threadPoolSize = 10;
     private Duration retryTimeout = Duration.ofHours(24);
+    private Duration processingTimeout = Duration.ofMinutes(5);
     private String contextDecoratorTag = "batchId";
     @NotEmpty
     private List<String> retryableExceptions;

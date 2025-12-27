@@ -1,6 +1,26 @@
-### spvitamin-spring-resilientjobrunner
+# spvitamin-spring-resilientjobrunner
 
-#### What is this?
+<!-- TOC -->
+* [spvitamin-spring-resilientjobrunner](#spvitamin-spring-resilientjobrunner)
+  * [What is this?](#what-is-this)
+  * [When to use](#when-to-use)
+  * [High-level architecture](#high-level-architecture)
+  * [Core APIs (from this module)](#core-apis-from-this-module)
+  * [Installation](#installation)
+  * [Configuration](#configuration)
+  * [Implementing the persistence side](#implementing-the-persistence-side)
+  * [Implementing a processor](#implementing-a-processor)
+  * [Enqueueing jobs](#enqueueing-jobs)
+  * [How processing runs](#how-processing-runs)
+  * [Exception classification cheat sheet](#exception-classification-cheat-sheet)
+  * [Observability](#observability)
+  * [Tips and best practices](#tips-and-best-practices)
+  * [Troubleshooting](#troubleshooting)
+  * [Minimal checklist to integrate](#minimal-checklist-to-integrate)
+  * [License](#license)
+<!-- TOC -->
+
+## What is this?
 
 `spvitamin-spring-resilientjobrunner` is a small Spring component for reliably processing background jobs stored in a
 persistent store (typically a database).
@@ -16,7 +36,7 @@ It repeatedly polls for new jobs and processes them in parallel worker threads w
 
 ---
 
-#### When to use
+## When to use
 
 Use this component if you need to:
 
@@ -30,7 +50,7 @@ DB-centric and you want a light, Spring-native job runner, this fits well.
 
 ---
 
-#### High-level architecture
+## High-level architecture
 
 - You model a job row using an entity that implements `ResilientJobData` (e.g., `ResilientJobEntity`).
 - You implement `ResilientJobDataService` to provide the minimal data operations (batch fetch + state changes).
@@ -57,27 +77,19 @@ Status lifecycle:
 
 ---
 
-#### Core APIs (from this module)
+## Core APIs (from this module)
 
 ```java
 public interface ResilientJobData
 {
     Long getId();
-
     OffsetDateTime getCreationTimestamp();
-
     ResilientJobStatus getStatus();
-
     Long getProcessorType();
-
     Integer getParameterVersion();
-
     OffsetDateTime getProcessingStartedTimestamp();
-
     String getErrorText();
-
     Long getRetryCount();
-
     <T> T getParameters(Class<T> clazz);
 }
 
@@ -87,13 +99,10 @@ public interface ResilientJobData
 public interface ResilientJobDataService
 {
     int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout);
-
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
-
-    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType, long lastId);
-
+    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType);
+    int resetInProgressEntitiesById(List<Long> ids);
     void deleteById(Long id);
-
     void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e);
 }
 ```
@@ -132,7 +141,7 @@ public abstract class AbstractProcessor
 
 ---
 
-#### Installation
+## Installation
 
 1) Add module dependency to your service (Gradle example):
 
@@ -159,7 +168,7 @@ spring:
 
 ---
 
-#### Configuration
+## Configuration
 
 Define your job types under the root `resilient-jobs` property. Each entry has a unique name and maps to
 `ResilientJobProperties`:
@@ -202,7 +211,7 @@ Notes:
 
 ---
 
-#### Implementing the persistence side
+## Implementing the persistence side
 
 1) Entity implementing `ResilientJobData`
 
@@ -311,9 +320,10 @@ public interface ResilientJobRepo extends JpaRepository<ResilientJobEntity, Long
             ResilientJobStatus targetState
     );
 
+    // We use here timeout = 0 which means, do not wait for locked rows.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
-    List<ResilientJobEntity> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
+    List<ResilientJobEntity> findAllByProcessorTypeAndStatusOrderById(Long processorType, ResilientJobStatus status, PageRequest pageRequest);
 
     @Modifying
     @Query("update ResilientJobEntity e set e.status = :status, e.processingStartedTimestamp = :processingStartedTimestamp where e.id in :ids")
@@ -323,29 +333,38 @@ public interface ResilientJobRepo extends JpaRepository<ResilientJobEntity, Long
             OffsetDateTime processingStartedTimestamp
     );
 
-
     @Modifying
     @Query("update ResilientJobEntity e set e.status = :status, e.errorText = :errorText, e.retryCount = e.retryCount + 1 where e.id = :id")
     void updateStatusAndError(
             Long id,
             ResilientJobStatus status,
             String errorText
-    );
+    ); 
+
+    @Modifying
+    @Query("update ResilientJobEntity e set e.status = :status where e.id in :ids and e.status = :criteria")
+    int updateStatusWhere(List<Long> ids, ResilientJobStatus status, ResilientJobStatus criteria);
 }
 ```
 
-3) Implement `ResilientJobDataService`
+3) Create interface `ResilientJobEntityService`
 
 ```java
 public interface ResilientJobEntityService extends ResilientJobDataService
 {
     ResilientJobEntity save(ResilientJobEntity entity);
 }
+```
 
+4) Implement `ResilientJobEntityService`
+
+```java
 @Service
 @RequiredArgsConstructor
 public class ResilientJobEntityServiceImpl implements ResilientJobEntityService
 {
+    public static final int MAX_CRITERIA_IN_QUERIES = 1000;
+
     private final ResilientJobRepo repo;
 
 
@@ -374,12 +393,23 @@ public class ResilientJobEntityServiceImpl implements ResilientJobEntityService
 
     @Override
     @Transactional
-    public List<ResilientJobEntity> getNextBatchAndSetInProgressState(ProcessorType processorType, long lastId)
+    public List<ResilientJobEntity> getNextBatchAndSetInProgressState(ProcessorType processorType)
     {
         PageRequest pageRequest = PageRequest.of(0, 200);
-        List<ResilientJobEntity> entities = this.repo.findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(processorType.getProcessorId(), lastId, ResilientJobStatus.CREATED, pageRequest);
+        List<ResilientJobEntity> entities = this.repo.findAllByProcessorTypeAndStatusOrderById(processorType.getProcessorId(), ResilientJobStatus.CREATED, pageRequest);
         this.repo.updateStatusAndProcessingStartedTimestamp(entities.stream().map(ResilientJobEntity::getId).toList(), ResilientJobStatus.IN_PROGRESS, OffsetDateTime.now());
         return entities;
+    }
+
+
+    @Override
+    @Transactional
+    public int resetInProgressEntitiesById(List<Long> ids)
+    {
+        // com.microsoft.sqlserver.jdbc.SQLServerException: The incoming request has too many parameters. The server supports a maximum of 2100 parameters. Reduce the number of parameters and resend the request
+        return Lists.partition(ids, MAX_CRITERIA_IN_QUERIES).stream()
+                .mapToInt(idList -> this.repo.updateStatusWhere(ids, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
+                .sum();
     }
 
 
@@ -402,7 +432,7 @@ public class ResilientJobEntityServiceImpl implements ResilientJobEntityService
 
 ---
 
-#### Implementing a processor
+## Implementing a processor
 
 Create a class extending `AbstractProcessor`. In GDPR service, `DocumentRemover` performs deletion in an external system
 and updates a business log on success/error.
@@ -441,7 +471,7 @@ in the `processorType` column.
 
 ---
 
-#### Enqueueing jobs
+## Enqueueing jobs
 
 Create and save an entity row with required fields. In GDPR service:
 
@@ -469,7 +499,7 @@ Your API endpoint or service layer calls the above to enqueue a job.
 
 ---
 
-#### How processing runs
+## How processing runs
 
 `BJobProcessor` is a Spring `@Component` with a `@Scheduled(fixedDelay = 5000)` method. For each configured job type:
 
@@ -486,7 +516,7 @@ exhausting a bad dependency while leaving items to be retried later.
 
 ---
 
-#### Exception classification cheat sheet
+## Exception classification cheat sheet
 
 - Retryable exception? → job goes back to `CREATED` and will be tried again until `retry-timeout` expires.
 - Item-related but not retryable? → job goes to `ERROR`, `onError` is invoked, batch continues.
@@ -499,7 +529,7 @@ You control classification by listing exception class names in config (`retryabl
 
 ---
 
-#### Observability
+## Observability
 
 - Logs include a thread context decorator tag (`context-decorator-tag`, default `batchId`) to correlate batch and job
   logs.
@@ -509,7 +539,7 @@ You control classification by listing exception class names in config (`retryabl
 
 ---
 
-#### Tips and best practices
+## Tips and best practices
 
 - Make `processJob` idempotent. Jobs may be retried or restarted after partial failures.
 - Keep job parameters small but sufficient for idempotency (e.g., stable business keys). Store as JSON in `parameters`.
@@ -521,7 +551,7 @@ You control classification by listing exception class names in config (`retryabl
 
 ---
 
-#### Troubleshooting
+## Troubleshooting
 
 - Jobs never start: ensure `@EnableScheduling` is present and `resilient-jobs` config is loaded; verify your
   `ResilientJobDataService` bean is in the context.
@@ -534,7 +564,7 @@ You control classification by listing exception class names in config (`retryabl
 
 ---
 
-#### Minimal checklist to integrate
+## Minimal checklist to integrate
 
 - [ ] Add module dependency and enable scheduling
 - [ ] Create entity implementing `ResilientJobData`
@@ -546,6 +576,6 @@ You control classification by listing exception class names in config (`retryabl
 
 ---
 
-#### License
+## License
 
 Apache License, Version 2.0
