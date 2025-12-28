@@ -2,7 +2,7 @@ package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
 import hu.perit.spvitamin.core.batchprocessing.BatchProcessor;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 
 class BatchExecutor extends BatchProcessor
 {
@@ -16,7 +16,7 @@ class BatchExecutor extends BatchProcessor
     }
 
 
-    public BJob createBJob(ResilientJobData entity)
+    public BJob createBJob(AbstractResilientJobEntity entity)
     {
         return new BJob(entity, processor);
     }

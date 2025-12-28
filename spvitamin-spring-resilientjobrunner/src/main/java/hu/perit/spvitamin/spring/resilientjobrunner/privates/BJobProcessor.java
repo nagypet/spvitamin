@@ -4,11 +4,11 @@ import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
 import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobDataService;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobCollectionProperties;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
+import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import hu.perit.spvitamin.spring.threadcontext.ThreadContextDecorator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 class BJobProcessor
 {
     private final ResilientJobCollectionProperties resilientJobCollectionProperties;
-    private final ResilientJobDataService resilientJobDataService;
+    private final ResilientJobEntityService<? extends AbstractResilientJobEntity> resilientJobEntityService;
     private final Map<ProcessorType, BatchExecutor> executorMap = new HashMap<>();
 
 
@@ -80,13 +80,13 @@ class BJobProcessor
         ResilientJobProperties properties = getProperties(processorType);
         try (var ctx = new ThreadContextDecorator(properties.getContextDecoratorTag(), BJobHelper.getBatchId(processorType, null)))
         {
-            int countTerminatedEntities = this.resilientJobDataService.terminatePermanentlyFailingEntities(processorType, properties.getRetryTimeout());
+            int countTerminatedEntities = this.resilientJobEntityService.terminatePermanentlyFailingEntities(processorType, properties.getRetryTimeout());
             if (countTerminatedEntities > 0)
             {
                 log.info("{} jobs have been terminated due to permanent errors", countTerminatedEntities);
             }
 
-            int countResetedEntities = this.resilientJobDataService.resetStuckInProgressEntities(processorType, properties.getProcessingTimeout());
+            int countResetedEntities = this.resilientJobEntityService.resetStuckInProgressEntities(processorType, properties.getProcessingTimeout());
             if (countResetedEntities > 0)
             {
                 log.info("{} jobs have been reset back to {}", countResetedEntities, ResilientJobStatus.CREATED);
@@ -97,7 +97,7 @@ class BJobProcessor
             {
                 // Here the lastId is only needed to enforce iterating through the whole list. Otherwise, we would
                 // get failed jobs immediately back, and the while loop would run continuously.
-                List<? extends ResilientJobData> entities = getNextBatch(processorType, lastId);
+                List<? extends AbstractResilientJobEntity> entities = getNextBatch(processorType, lastId);
                 if (entities.isEmpty())
                 {
                     return;
@@ -127,7 +127,7 @@ class BJobProcessor
                 finally
                 {
                     // Here we have to reset those records that were not processed successfully
-                    countResetedEntities = this.resilientJobDataService.resetInProgressEntitiesById(entities.stream().map(ResilientJobData::getId).toList());
+                    countResetedEntities = this.resilientJobEntityService.resetInProgressEntitiesById(entities.stream().map(i -> i.getId()).toList());
                     if (countResetedEntities > 0)
                     {
                         log.info("{} jobs have been reset back to {}", countResetedEntities, ResilientJobStatus.CREATED);
@@ -138,11 +138,11 @@ class BJobProcessor
     }
 
 
-    List<? extends ResilientJobData> getNextBatch(ProcessorType processorType, long lastId)
+    List<? extends AbstractResilientJobEntity> getNextBatch(ProcessorType processorType, long lastId)
     {
         try
         {
-            List<? extends ResilientJobData> entities = this.resilientJobDataService.getNextBatchAndSetInProgressState(processorType, lastId);
+            List<? extends AbstractResilientJobEntity> entities = this.resilientJobEntityService.getNextBatchAndSetInProgressState(processorType, lastId);
             if (entities.isEmpty())
             {
                 return entities;

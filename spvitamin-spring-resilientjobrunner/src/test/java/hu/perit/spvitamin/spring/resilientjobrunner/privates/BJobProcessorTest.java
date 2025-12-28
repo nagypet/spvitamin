@@ -2,10 +2,10 @@ package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
 import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobDataService;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobCollectionProperties;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
+import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,14 +31,14 @@ import static org.mockito.Mockito.when;
 class BJobProcessorTest
 {
     private ResilientJobCollectionProperties collectionProperties;
-    private ResilientJobDataService dataService;
+    private ResilientJobEntityService<?> resilientJobEntityService;
 
 
     @BeforeEach
     void setUpMocks()
     {
         collectionProperties = mock(ResilientJobCollectionProperties.class);
-        dataService = mock(ResilientJobDataService.class);
+        resilientJobEntityService = mock(ResilientJobEntityService.class);
     }
 
 
@@ -68,7 +68,7 @@ class BJobProcessorTest
         String name = "test";
         long id = 1L;
         ResilientJobProperties props = createProps(name, id, TestProcessor.class);
-        BJobProcessor bJobProcessor = new BJobProcessor(collectionProperties, dataService);
+        BJobProcessor bJobProcessor = new BJobProcessor(collectionProperties, resilientJobEntityService);
 
         AbstractProcessor p = bJobProcessor.createProcessor(pt(name, id), props);
 
@@ -91,26 +91,26 @@ class BJobProcessorTest
         when(collectionProperties.getResilientJobs()).thenReturn(map);
         when(collectionProperties.get(name)).thenReturn(props);
 
-        when(dataService.terminatePermanentlyFailingEntities(any(), any())).thenReturn(0);
-        when(dataService.resetStuckInProgressEntities(any(), any())).thenReturn(0);
-        when(dataService.getNextBatchAndSetInProgressState(any(), anyLong())).thenReturn(java.util.Collections.emptyList());
+        when(resilientJobEntityService.terminatePermanentlyFailingEntities(any(), any())).thenReturn(0);
+        when(resilientJobEntityService.resetStuckInProgressEntities(any(), any())).thenReturn(0);
+        when(resilientJobEntityService.getNextBatchAndSetInProgressState(any(), anyLong())).thenReturn(java.util.Collections.emptyList());
 
-        BJobProcessor processor = new BJobProcessor(collectionProperties, dataService);
+        BJobProcessor processor = new BJobProcessor(collectionProperties, resilientJobEntityService);
         processor.setUp();
 
         ProcessorType processorType = pt(name, id);
         processor.process(processorType);
 
         // verify initial calls
-        verify(dataService, times(1)).terminatePermanentlyFailingEntities(eq(processorType), eq(props.getRetryTimeout()));
-        verify(dataService, times(1)).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(5)));
+        verify(resilientJobEntityService, times(1)).terminatePermanentlyFailingEntities(eq(processorType), eq(props.getRetryTimeout()));
+        verify(resilientJobEntityService, times(1)).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(5)));
 
         ArgumentCaptor<Long> lastIdCaptor = ArgumentCaptor.forClass(Long.class);
-        verify(dataService, atLeastOnce()).getNextBatchAndSetInProgressState(eq(processorType), lastIdCaptor.capture());
+        verify(resilientJobEntityService, atLeastOnce()).getNextBatchAndSetInProgressState(eq(processorType), lastIdCaptor.capture());
         assertThat(lastIdCaptor.getValue()).isEqualTo(0L);
 
         // Since the batch was empty initially, there should be no final reset (the finally is inside the loop)
-        verify(dataService, never()).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(0)));
+        verify(resilientJobEntityService, never()).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(0)));
     }
 
 
@@ -126,7 +126,7 @@ class BJobProcessorTest
 
         when(collectionProperties.getResilientJobs()).thenReturn(map);
 
-        BJobProcessor processor = new BJobProcessor(collectionProperties, dataService);
+        BJobProcessor processor = new BJobProcessor(collectionProperties, resilientJobEntityService);
         processor.setUp();
 
         Field f = BJobProcessor.class.getDeclaredField("executorMap");
@@ -152,27 +152,27 @@ class BJobProcessorTest
 
 
         @Override
-        public void processJob(ResilientJobData entity)
+        public void processJob(AbstractResilientJobEntity entity)
         {
             // no-op
         }
 
 
         @Override
-        public void onError(ResilientJobData entity, Exception e)
+        public void onError(AbstractResilientJobEntity entity, Exception e)
         {
             // no-op
         }
     }
 
-    static class TestResilientJobData implements ResilientJobData
+    static class TestResilientJobEntity extends AbstractResilientJobEntity
     {
         private final Long id;
         private final OffsetDateTime creationTimestamp;
         private final Long retryCount;
 
 
-        TestResilientJobData(Long id, OffsetDateTime creationTimestamp, Long retryCount)
+        TestResilientJobEntity(Long id, OffsetDateTime creationTimestamp, Long retryCount)
         {
             this.id = id;
             this.creationTimestamp = creationTimestamp;

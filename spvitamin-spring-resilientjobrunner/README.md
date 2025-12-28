@@ -52,8 +52,8 @@ DB-centric and you want a light, Spring-native job runner, this fits well.
 
 ## High-level architecture
 
-- You model a job row using an entity that implements `ResilientJobData` (e.g., `ResilientJobEntity`).
-- You implement `ResilientJobDataService` to provide the minimal data operations (batch fetch + state changes).
+- You model a job row using an entity that extends `AbstractResilientJobEntity` (e.g., `ResilientJobEntity`).
+- You implement `ResilientJobEntityService` to provide the minimal data operations (batch fetch + state changes).
 - You implement one or more `AbstractProcessor` subclasses — one per job type — containing your domain logic and error
   handling hooks.
 - You configure job types in `application.yml` under `resilient-jobs.*` (ID, processor class, thread pool size,
@@ -80,35 +80,104 @@ Status lifecycle:
 ## Core APIs (from this module)
 
 ```java
-public interface ResilientJobData
+@Getter
+@Setter
+@MappedSuperclass
+public class AbstractResilientJobEntity
 {
-    Long getId();
-    OffsetDateTime getCreationTimestamp();
-    ResilientJobStatus getStatus();
-    Long getProcessorType();
-    Integer getParameterVersion();
-    OffsetDateTime getProcessingStartedTimestamp();
-    String getErrorText();
-    Long getRetryCount();
-    <T> T getParameters(Class<T> clazz);
-}
+    public static final String COL_ID = "id";
+    public static final String COL_CREATION_TIMESTAMP = "creation_timestamp";
+    public static final String COL_STATUS = "status";
+    public static final String COL_PROCESSOR = "processor";
+    public static final String COL_PARAMETER_VERSION = "parameter_version";
+    public static final String COL_PARAMETERS = "parameters";
+    public static final String COL_RETRY_COUNT = "retry_count";
+    public static final String COL_PROCESSING_STARTED_TIMESTAMP = "processing_started_timestamp";
+    public static final String COL_EROR_TEXT = "error_text";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_generator")
+    @NotNull
+    @Column(name = COL_ID, nullable = false)
+    private Long id;
+
+    @Column(name = COL_CREATION_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime creationTimestamp;
+
+    @NotNull
+    @Column(name = COL_STATUS, nullable = false)
+    @Convert(converter = ResilientJobStatusConverter.class)
+    private ResilientJobStatus status;
+
+    @NotNull
+    @Column(name = COL_PROCESSOR, nullable = false)
+    private Long processorType;
+
+    @NotNull
+    @Column(name = COL_PARAMETER_VERSION, nullable = false)
+    private Integer parameterVersion;
+
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    @NotNull
+    @Column(name = COL_PARAMETERS, nullable = false, columnDefinition = "TEXT")
+    private String parameters;
+
+    @Column(name = COL_PROCESSING_STARTED_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime processingStartedTimestamp;
+
+    @Column(name = COL_EROR_TEXT, columnDefinition = "TEXT")
+    private String errorText;
+
+    @Column(name = COL_RETRY_COUNT)
+    private Long retryCount;
+
+
+    public void setParameters(Object data)
+    {
+        try
+        {
+            ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            this.parameters = mapper.writeValueAsString(data);
+        }
+        catch (JsonProcessingException e)
+        {
+            ServerException.throwFrom(e);
+        }
+    }
+
+
+    public <T> T getParameters(Class<T> clazz)
+    {
+        try
+        {
+            return JSonSerializer.fromJson(this.parameters, clazz);
+        }
+        catch (IOException e)
+        {
+            return ServerException.throwFrom(e);
+        }
+    }
+}
 ```
 
 ```java
-public interface ResilientJobDataService
+public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
 {
     int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout);
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
-    List<? extends ResilientJobData> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId);
+    List<T> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId);
     int resetInProgressEntitiesById(List<Long> ids);
     void deleteById(Long id);
     void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e);
+    T save(T entity);
 }
 ```
 
 ```java
-
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractProcessor
@@ -117,9 +186,9 @@ public abstract class AbstractProcessor
     private final ResilientJobProperties properties;
 
 
-    public abstract void processJob(ResilientJobData entity) throws Exception;
+    public abstract void processJob(AbstractResilientJobEntity entity) throws Exception;
 
-    public abstract void onError(ResilientJobData entity, Exception e);
+    public abstract void onError(AbstractResilientJobEntity entity, Exception e);
 
 
     /**
@@ -136,7 +205,6 @@ public abstract class AbstractProcessor
         return ExceptionHelper.isItemRelatedException(e, this.properties.getItemRelatedExceptions());
     }
 }
-
 ```
 
 ---
@@ -215,7 +283,7 @@ Notes:
 
 ## Implementing the persistence side
 
-1) Entity implementing `ResilientJobData`
+1) Entity extending `AbstractResilientJobEntity`
 
 Schema and fields are under your control; here’s a simplified JPA entity:
 
@@ -223,211 +291,39 @@ Schema and fields are under your control; here’s a simplified JPA entity:
 @Getter
 @Setter
 @Entity
-@Table(name = "TBL_GDPR_RESILIENT_JOB", indexes = {
-        @Index(name = "ix_job_01", columnList = "creation_timestamp"),
-        @Index(name = "ix_job_02", columnList = "status"),
-        @Index(name = "ix_job_03", columnList = "processing_started_timestamp")
+@Table(name = ResilientJobEntity.TABLE_NAME, schema = Constants.SCHEMA, indexes = {
+        @Index(name = ResilientJobEntity.IX_CREATION_TIMESTAMP, columnList = ResilientJobEntity.COL_CREATION_TIMESTAMP),
+        @Index(name = ResilientJobEntity.IX_STATUS, columnList = ResilientJobEntity.COL_STATUS),
+        @Index(name = ResilientJobEntity.IX_PROCESSING_STARTED_TIMESTAMP, columnList = ResilientJobEntity.COL_PROCESSING_STARTED_TIMESTAMP)
 })
-public class ResilientJobEntity implements ResilientJobData
+@SequenceGenerator(name = "job_generator", sequenceName = "job_seq", schema = Constants.SCHEMA, allocationSize = 1)
+@Generated // To disable counting in unit test coverage
+public class ResilientJobEntity extends AbstractResilientJobEntity
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_generator")
-    @SequenceGenerator(name = "job_generator", sequenceName = "seq_gdpr_resilient_job", allocationSize = 1)
-    @NotNull
-    @Column(name = "id", nullable = false)
-    private Long id;
-
-    @Column(name = "creation_timestamp")
-    @Convert(converter = OffsetDateTimeToUTCConverter.class)
-    private OffsetDateTime creationTimestamp;
-
-    @NotNull
-    @Column(name = "status", nullable = false)
-    @Convert(converter = ResilientJobStatusConverter.class)
-    private ResilientJobStatus status;
-
-    @NotNull
-    @Column(name = "processor", nullable = false)
-    private Long processorType;
-
-    @NotNull
-    @Column(name = "parameter_version", nullable = false)
-    private Integer parameterVersion;
-
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @NotNull
-    @Column(name = "parameters", nullable = false, columnDefinition = "TEXT")
-    private String parameters;
-
-    @Column(name = "processing_started_timestamp")
-    @Convert(converter = OffsetDateTimeToUTCConverter.class)
-    private OffsetDateTime processingStartedTimestamp;
-
-    @Column(name = "error_text", columnDefinition = "TEXT")
-    private String errorText;
-
-    @Column(name = "retry_count", nullable = false)
-    private Long retryCount;
-
-
-    public void setParameters(Object data)
-    {
-        try
-        {
-            ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            this.parameters = mapper.writeValueAsString(data);
-        }
-        catch (JsonProcessingException e)
-        {
-            ServerException.throwFrom(e);
-        }
-    }
-
-
-    public <T> T getParameters(Class<T> clazz)
-    {
-        try
-        {
-            return JSonSerializer.fromJson(this.parameters, clazz);
-        }
-        catch (IOException e)
-        {
-            return ServerException.throwFrom(e);
-        }
-    }
+    public static final String TABLE_NAME = "job";
+    public static final String IX_CREATION_TIMESTAMP = "ix_job_01";
+    public static final String IX_STATUS = "ix_job_02";
+    public static final String IX_PROCESSING_STARTED_TIMESTAMP = "ix_job_03";
 }
 ```
 
-2) Repository helpers (example snippets from `ResilientJobRepo`)
+2) Repository extending `AbstractResilientJobRepo`
 
 ```
-public interface ResilientJobRepo extends JpaRepository<ResilientJobEntity, Long>
+public interface ResilientJobRepo extends AbstractResilientJobRepo<ResilientJobEntity>
 {
-    @Modifying
-    @Query("update ResilientJobEntity e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp")
-    int terminatePermanentlyFailingEntities(
-            Long processorType,
-            OffsetDateTime timestamp,
-            ResilientJobStatus errorState
-    );
-
-    @Modifying
-    @Query("update ResilientJobEntity e set e.status = :targetState, e.retryCount = e.retryCount + 1 where e.processorType = :processorType and e.status = :whereState and e.processingStartedTimestamp < :timestamp")
-    int resetStuckInProgressEntities(
-            Long processorType,
-            OffsetDateTime timestamp,
-            ResilientJobStatus whereState,
-            ResilientJobStatus targetState
-    );
-
-    // We use here timeout = 0 which means, do not wait for locked rows.
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
-    List<ResilientJobEntity> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
-
-    @Modifying
-    @Query("update ResilientJobEntity e set e.status = :status, e.processingStartedTimestamp = :processingStartedTimestamp where e.id in :ids")
-    int updateStatusAndProcessingStartedTimestamp(
-            List<Long> ids,
-            ResilientJobStatus status,
-            OffsetDateTime processingStartedTimestamp
-    );
-
-    @Modifying
-    @Query("update ResilientJobEntity e set e.status = :status, e.errorText = :errorText, e.retryCount = e.retryCount + 1 where e.id = :id")
-    void updateStatusAndError(
-            Long id,
-            ResilientJobStatus status,
-            String errorText
-    ); 
-
-    @Modifying
-    @Query("update ResilientJobEntity e set e.status = :status where e.id in :ids and e.status = :criteria")
-    int updateStatusWhere(List<Long> ids, ResilientJobStatus status, ResilientJobStatus criteria);
 }
 ```
 
-3) Create interface `ResilientJobEntityService`
-
-```java
-public interface ResilientJobEntityService extends ResilientJobDataService
-{
-    ResilientJobEntity save(ResilientJobEntity entity);
-}
-```
-
-4) Implement `ResilientJobEntityService`
+3) Implement `ResilientJobEntityService`
 
 ```java
 @Service
-@RequiredArgsConstructor
-public class ResilientJobEntityServiceImpl implements ResilientJobEntityService
+public class ResilientJobEntityServiceImpl extends AbstractResilientJobEntityServiceImpl<ResilientJobEntity> implements ResilientJobEntityService<ResilientJobEntity>
 {
-    public static final int MAX_CRITERIA_IN_QUERIES = 1000;
-
-    private final ResilientJobRepo repo;
-
-
-    @Override
-    public ResilientJobEntity save(ResilientJobEntity entity)
+    public ResilientJobEntityServiceImpl(ResilientJobRepo repo)
     {
-        return this.repo.save(entity);
-    }
-
-
-    @Override
-    @Transactional
-    public int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout)
-    {
-        return this.repo.terminatePermanentlyFailingEntities(processorType.getProcessorId(), OffsetDateTime.now().minusSeconds(timeout.getSeconds()), ResilientJobStatus.ERROR);
-    }
-
-
-    @Override
-    @Transactional
-    public int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout)
-    {
-        return this.repo.resetStuckInProgressEntities(processorType.getProcessorId(), OffsetDateTime.now().minusSeconds(timeout.getSeconds()), ResilientJobStatus.IN_PROGRESS, ResilientJobStatus.CREATED);
-    }
-
-
-    @Override
-    @Transactional
-    public List<ResilientJobEntity> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId)
-    {
-        PageRequest pageRequest = PageRequest.of(0, 200);
-        List<ResilientJobEntity> entities = this.repo.findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(processorType.getProcessorId(), lastId, ResilientJobStatus.CREATED, pageRequest);
-        this.repo.updateStatusAndProcessingStartedTimestamp(entities.stream().map(ResilientJobEntity::getId).toList(), ResilientJobStatus.IN_PROGRESS, OffsetDateTime.now());
-        return entities;
-    }
-
-
-    @Override
-    @Transactional
-    public int resetInProgressEntitiesById(List<Long> ids)
-    {
-        // com.microsoft.sqlserver.jdbc.SQLServerException: The incoming request has too many parameters. The server supports a maximum of 2100 parameters. Reduce the number of parameters and resend the request
-        return Lists.partition(ids, MAX_CRITERIA_IN_QUERIES).stream()
-                .mapToInt(idList -> this.repo.updateStatusWhere(ids, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
-                .sum();
-    }
-
-
-    @Override
-    @Transactional
-    public void deleteById(Long id)
-    {
-        this.repo.deleteById(id);
-    }
-
-
-    @Override
-    @Transactional
-    public void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e)
-    {
-        this.repo.updateStatusAndError(id, resilientJobStatus, StackTracer.toString(e));
+        super(repo);
     }
 }
 ```
@@ -450,7 +346,7 @@ public class DocumentRemover extends AbstractProcessor
 
 
     @Override
-    public void processJob(ResilientJobData entity) throws Exception
+    public void processJob(AbstractResilientJobEntity entity) throws Exception
     {
         RemoveJobRequest request = entity.getParameters(RemoveJobRequest.class);
 
@@ -459,7 +355,7 @@ public class DocumentRemover extends AbstractProcessor
 
 
     @Override
-    public void onError(ResilientJobData entity, Exception e)
+    public void onError(AbstractResilientJobEntity entity, Exception e)
     {
         RemoveJobRequest request = entity.getParameters(RemoveJobRequest.class);
 
@@ -479,21 +375,29 @@ Create and save an entity row with required fields. In GDPR service:
 
 ```
 @Service
-public class ResilientJobRunnerServiceImpl implements ResilientJobRunnerService {
-  private final ResilientJobEntityService jobService;
-  private final ResilientJobCollectionProperties jobProps;
+@RequiredArgsConstructor
+@Slf4j
+public class ResilientJobRunnerServiceImpl implements ResilientJobRunnerService
+{
+    private final ResilientJobEntityService<ResilientJobEntity> resilientJobEntityService;
+    private final ResilientJobCollectionProperties resilientJobCollectionProperties;
 
-  @Override
-  public ResilientJobEntity putRemoveJob(RemoveJobRequest request) {
-    ResilientJobEntity e = new ResilientJobEntity();
-    e.setCreationTimestamp(OffsetDateTime.now());
-    e.setStatus(ResilientJobStatus.CREATED);
-    e.setProcessorType(jobProps.get("document-remover").getId());
-    e.setParameterVersion(1);
-    e.setParameters(request); // serialized to JSON by entity
-    e.setRetryCount(0L);
-    return jobService.save(e);
-  }
+
+    @Override
+    public ResilientJobEntity putEmailJob(EmailData emailData)
+    {
+        log.info("Email job taken over for processing: {} to {}", emailData.getSubject(), emailData.getTo());
+
+        ResilientJobEntity resilientJobEntity = new ResilientJobEntity();
+        resilientJobEntity.setCreationTimestamp(OffsetDateTime.now());
+        resilientJobEntity.setStatus(ResilientJobStatus.CREATED);
+        resilientJobEntity.setProcessorType(this.resilientJobCollectionProperties.get("email-processor").getId());
+        resilientJobEntity.setParameterVersion(emailData.getVersion());
+        resilientJobEntity.setParameters(emailData);
+        resilientJobEntity.setRetryCount(0L);
+
+        return this.resilientJobEntityService.save(resilientJobEntity);
+    }
 }
 ```
 

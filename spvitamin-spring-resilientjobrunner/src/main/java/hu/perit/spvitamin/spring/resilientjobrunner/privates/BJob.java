@@ -6,9 +6,9 @@ import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
 import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobData;
-import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobDataService;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
+import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import hu.perit.spvitamin.spring.threadcontext.ThreadContextDecorator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +20,16 @@ import java.time.OffsetDateTime;
 @Slf4j
 class BJob extends ContextAwareBatchJob
 {
-    private final ResilientJobData jobData;
+    private final AbstractResilientJobEntity entity;
     private final AbstractProcessor processor;
 
-    private final ResilientJobDataService resilientJobDataService = SpringContext.getBean(ResilientJobDataService.class);
+    private final ResilientJobEntityService<?> resilientJobEntityService = SpringContext.getBean(ResilientJobEntityService.class);
 
 
     @Override
     protected Void execute() throws Exception
     {
-        try (var ctx = new ThreadContextDecorator(processor.getProperties().getContextDecoratorTag(), BJobHelper.getBatchId(processor.getProcessorType(), jobData.getId())))
+        try (var ctx = new ThreadContextDecorator(processor.getProperties().getContextDecoratorTag(), BJobHelper.getBatchId(processor.getProcessorType(), entity.getId())))
         {
             try
             {
@@ -40,8 +40,8 @@ class BJob extends ContextAwareBatchJob
                 ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(e);
                 log.error(exceptionWrapper.toStringWithCauses());
                 log.error("Exception. Retried {} times. Remaining time for retries: {}.",
-                        jobData.getRetryCount(),
-                        calculateRemainingTime(jobData.getCreationTimestamp()));
+                        entity.getRetryCount(),
+                        calculateRemainingTime(entity.getCreationTimestamp()));
 
                 boolean isItemRelated = this.processor.isItemRelatedException(e);
                 boolean isRetryable = this.processor.isRetryableException(e);
@@ -49,7 +49,7 @@ class BJob extends ContextAwareBatchJob
                 if (isRetryable || !isItemRelated)
                 {
                     // retryable or unknown error => we will retry the job
-                    this.resilientJobDataService.saveError(jobData.getId(), ResilientJobStatus.CREATED, e);
+                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.CREATED, e);
 
                     // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
                     if (isRetryable && !isItemRelated)
@@ -60,7 +60,7 @@ class BJob extends ContextAwareBatchJob
                 else // item-related && not-retryable
                 {
                     // job should be set in error, but the batch should continue
-                    this.resilientJobDataService.saveError(jobData.getId(), ResilientJobStatus.ERROR, e);
+                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, e);
                     onError(e);
                 }
             }
@@ -85,7 +85,7 @@ class BJob extends ContextAwareBatchJob
         // Calling processor
         if (this.processor != null)
         {
-            this.processor.processJob(this.jobData);
+            this.processor.processJob(this.entity);
         }
         else
         {
@@ -95,7 +95,7 @@ class BJob extends ContextAwareBatchJob
         log.info("Processed successfully");
 
         // Deleting the entity after successful processing
-        this.resilientJobDataService.deleteById(this.jobData.getId());
+        this.resilientJobEntityService.deleteById(this.entity.getId());
     }
 
 
@@ -103,7 +103,7 @@ class BJob extends ContextAwareBatchJob
     {
         try
         {
-            this.processor.onError(jobData, e);
+            this.processor.onError(entity, e);
         }
         catch (Exception ex)
         {

@@ -42,6 +42,7 @@ dependencies {
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-json-time')
     implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-data')
     implementation project(':spvitamin-spring-logging')
     implementation project(':spvitamin-spring-security')
 
@@ -65,6 +66,9 @@ dependencies {
     // jakarta.validation
     implementation libs.jakarta.validation.api
     implementation libs.hibernate.validator
+
+    // Guava
+    implementation libs.guava
 
     // FasterXML
     implementation libs.jackson.core

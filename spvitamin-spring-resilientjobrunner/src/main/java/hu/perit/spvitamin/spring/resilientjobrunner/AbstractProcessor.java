@@ -1,6 +1,7 @@
 package hu.perit.spvitamin.spring.resilientjobrunner;
 
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,9 +13,9 @@ public abstract class AbstractProcessor
     private final ResilientJobProperties properties;
 
 
-    public abstract void processJob(ResilientJobData entity) throws Exception;
+    public abstract void processJob(AbstractResilientJobEntity entity) throws Exception;
 
-    public abstract void onError(ResilientJobData entity, Exception e);
+    public abstract void onError(AbstractResilientJobEntity entity, Exception e);
 
 
     /**
