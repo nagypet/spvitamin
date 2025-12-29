@@ -38,9 +38,11 @@ if (project.hasProperty('compileJava')) {
 /********************************************************************************************************
  * JDK > 1.8
  *******************************************************************************************************/
-if (project.hasProperty('java') && project.hasProperty('compileJava')) {
-    sourceCompatibility = jvmVersion
-    println "sourceCompatibility: " + sourceCompatibility
+pluginManager.withPlugin('java') {
+    project.java {
+        sourceCompatibility = jvmVersion
+    }
+    println "sourceCompatibility for ${project.name}: ${jvmVersion}"
     if (jvmVersion != '1.8') {
         compileJava {
             options.compilerArgs << '--add-exports'
@@ -98,6 +100,12 @@ if (new File("${projectDir}/version.ver").exists()) {
 /********************************************************************************************************
  * Test support
  *******************************************************************************************************/
+
+pluginManager.withPlugin('java') {
+    dependencies {
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+}
 
 task prepareTest(type: Copy) {
     group 'fmake'
@@ -167,9 +175,9 @@ if (project.hasProperty('jar')) {
                         'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
                         'Implementation-Version': version
                 )
-                if (project.hasProperty('application')) {
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
                     attributes(
-                            'Implementation-Title': applicationName,
+                            'Implementation-Title': project.name,
                             'Implementation-Type': 'Library'
                     )
                 }
@@ -187,9 +195,9 @@ if (project.hasProperty('bootJar')) {
                         'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
                         'Implementation-Version': version
                 )
-                if (project.hasProperty('application')) {
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
                     attributes(
-                            'Implementation-Title': applicationName,
+                            'Implementation-Title': project.name,
                             'Implementation-Type': 'Library'
                     )
                 }
@@ -219,7 +227,7 @@ if (project.hasProperty('installBootDist')) {
 /********************************************************************************************************
  * Application
  *******************************************************************************************************/
-if (project.hasProperty('application')) {
+if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
     application {
         if (applicationDefaultJvmArgs.isEmpty()) {
             applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']

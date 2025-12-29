@@ -31,6 +31,7 @@ copyTo spvitamin-spring-cloud-feign
 copyTo spvitamin-spring-data
 copyTo spvitamin-spring-general
 copyTo spvitamin-spring-logging
+copyTo spvitamin-spring-resilientjobrunner
 copyTo spvitamin-spring-security
 copyTo spvitamin-spring-security-authservice
 copyTo spvitamin-spring-security-keycloak
