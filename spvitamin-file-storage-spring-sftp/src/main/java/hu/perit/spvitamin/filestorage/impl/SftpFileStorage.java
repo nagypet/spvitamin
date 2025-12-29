@@ -25,8 +25,7 @@ import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.common.SftpException;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpSession;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,9 +60,11 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 @Retryable(
-        retryFor = {IllegalStateException.class},
-        maxAttempts = 10,
-        backoff = @Backoff(delay = 100, maxDelay = 1000, multiplier = 2.0)
+        value = {IllegalStateException.class},
+        maxRetries = 10,
+        delay = 100,
+        maxDelay = 1000,
+        multiplier = 2.0
 )
 public class SftpFileStorage implements FileStorage
 {

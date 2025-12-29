@@ -16,6 +16,13 @@
 
 package hu.perit.spvitamin.spring.data.dynamicdatasource;
 
+import com.zaxxer.hikari.HikariDataSource;
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.resilience.annotation.Retryable;
+
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -23,19 +30,8 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-
-import com.zaxxer.hikari.HikariDataSource;
-
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
-
 /**
- * This implementation can actually be closed. When you call close(), it creates a new DataSource object 
+ * This implementation can actually be closed. When you call close(), it creates a new DataSource object
  * so that it can be re-initialized with different parameters than before.
  *
  * @author Peter Nagy
@@ -50,11 +46,13 @@ public class DynamicDataSource implements DataSource, Closeable
     private boolean connected;
     private boolean initialized = false;
 
+
     public DynamicDataSource()
     {
         this.dataSource = new HikariDataSource();
         this.init();
     }
+
 
     public void setConnectionParam(ConnectionParam connParam)
     {
@@ -80,6 +78,7 @@ public class DynamicDataSource implements DataSource, Closeable
         }
     }
 
+
     private void init()
     {
         this.connected = false;
@@ -87,6 +86,7 @@ public class DynamicDataSource implements DataSource, Closeable
         //this.dataSource.setJdbcUrl("jdbc:sqlserver://localhost");
         //this.dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
     }
+
 
     @Override
     public void close()
@@ -97,8 +97,9 @@ public class DynamicDataSource implements DataSource, Closeable
         this.initialized = false;
     }
 
+
     @Override
-    @Retryable(maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 2.0, maxDelay = 60_000))
+    @Retryable(maxRetries = 4, delay = 10_000, maxDelay = 60_000, multiplier = 2.0)
     public Connection getConnection() throws SQLException
     {
         if (!this.initialized)
@@ -121,8 +122,9 @@ public class DynamicDataSource implements DataSource, Closeable
         }
     }
 
+
     @Override
-    @Retryable(maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 2.0, maxDelay = 60_000))
+    @Retryable(maxRetries = 4, delay = 10_000, maxDelay = 60_000, multiplier = 2.0)
     public Connection getConnection(String username, String password) throws SQLException
     {
         try
@@ -140,11 +142,13 @@ public class DynamicDataSource implements DataSource, Closeable
         }
     }
 
+
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException
     {
         return this.dataSource.unwrap(iface);
     }
+
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException
@@ -152,11 +156,13 @@ public class DynamicDataSource implements DataSource, Closeable
         return this.dataSource.isWrapperFor(iface);
     }
 
+
     @Override
     public PrintWriter getLogWriter() throws SQLException
     {
         return this.dataSource.getLogWriter();
     }
+
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException
@@ -164,17 +170,20 @@ public class DynamicDataSource implements DataSource, Closeable
         this.dataSource.setLogWriter(out);
     }
 
+
     @Override
     public void setLoginTimeout(int seconds) throws SQLException
     {
         this.dataSource.setLoginTimeout(seconds);
     }
 
+
     @Override
     public int getLoginTimeout() throws SQLException
     {
         return this.dataSource.getLoginTimeout();
     }
+
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException

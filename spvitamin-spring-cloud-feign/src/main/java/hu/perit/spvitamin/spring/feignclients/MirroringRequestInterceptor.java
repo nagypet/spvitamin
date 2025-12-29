@@ -19,12 +19,12 @@ package hu.perit.spvitamin.spring.feignclients;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpHeaders;
 
 @RequiredArgsConstructor
 public class MirroringRequestInterceptor implements RequestInterceptor
 {
-    private final MultiValueMap<String, String> headers;
+    private final HttpHeaders headers;
 
 
     @Override

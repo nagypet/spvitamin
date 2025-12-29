@@ -36,7 +36,6 @@ dependencies {
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-file-storage')
 
-    implementation 'org.springframework.retry:spring-retry'
     // SFTP
     implementation 'org.springframework.integration:spring-integration-file'
     implementation 'org.springframework.integration:spring-integration-sftp'

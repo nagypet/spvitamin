@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 final class BufferedResponseWrapper implements HttpServletResponse
 {
@@ -174,6 +176,28 @@ final class BufferedResponseWrapper implements HttpServletResponse
         this.original.sendRedirect(location);
     }
 
+
+    @Override
+    public void sendRedirect(String location, boolean clearBuffer) throws IOException
+    {
+        this.original.sendRedirect(location, clearBuffer);
+    }
+
+
+    @Override
+    public void sendRedirect(String location, int sc) throws IOException
+    {
+        this.original.sendRedirect(location, sc);
+    }
+
+
+    @Override
+    public void sendRedirect(String s, int i, boolean b) throws IOException
+    {
+        this.original.sendRedirect(s, i, b);
+    }
+
+
     public void setDateHeader(String name, long date)
     {
         this.original.setDateHeader(name, date);
@@ -218,6 +242,21 @@ final class BufferedResponseWrapper implements HttpServletResponse
     {
         return this.original.getHeaderNames();
     }
+
+
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier)
+    {
+        this.original.setTrailerFields(supplier);
+    }
+
+
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields()
+    {
+        return this.original.getTrailerFields();
+    }
+
 
     public Collection<String> getHeaders(String arg0)
     {

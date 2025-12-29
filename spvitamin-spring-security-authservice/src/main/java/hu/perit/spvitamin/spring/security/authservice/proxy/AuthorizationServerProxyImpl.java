@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -187,7 +186,7 @@ public class AuthorizationServerProxyImpl implements AuthorizationServerProxy
         }
 
         // Putting back the IDP_SESSION cookie into SESSION for authentication
-        if (springHeaders.containsKey(HttpHeaders.COOKIE))
+        if (springHeaders.containsHeader(HttpHeaders.COOKIE))
         {
             List<String> cookieHeaders = new ArrayList<>(springHeaders.getOrEmpty(HttpHeaders.COOKIE));
 

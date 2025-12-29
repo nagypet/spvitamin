@@ -1,8 +1,9 @@
 [versions]
 aspectj = '1.9.22.1'
-jackson = '2.18.2'
+jackson-annotations = '2.20'
+jackson = '2.20.1'
 jsonwebtoken = '0.12.6'
-junit = '5.11.4'
+junit = '6.0.1'
 logback = '1.5.16'
 mapstruct = '1.6.0'
 springdoc = '2.8.5'
@@ -13,27 +14,27 @@ czhabarta = '3.2.1263'
 ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '3.4.3' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.1' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 
 [libraries]
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
-assertj = 'org.assertj:assertj-core:3.26.3'
-awaitility = 'org.awaitility:awaitility:4.2.2'
+assertj = 'org.assertj:assertj-core:3.27.6'
+awaitility = 'org.awaitility:awaitility:4.3.0'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
 commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
-jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson' }
+jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson-annotations' }
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
 jakarta-annotation-api = 'jakarta.annotation:jakarta.annotation-api:3.0.0'
-jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.0'
-jaxb-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.1'
+jaxb-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.4'
 jimfs = 'com.google.jimfs:jimfs:1.3.0'
 jsonwebtoken-api = { module = 'io.jsonwebtoken:jjwt-api', version.ref = 'jsonwebtoken' }
 jsonwebtoken-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jsonwebtoken' }
@@ -41,6 +42,7 @@ jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }
 junit-jupiter-params = { module = 'org.junit.jupiter:junit-jupiter-params', version.ref = 'junit' }
+junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher', version.ref = 'junit' }
 keycloakbom = 'org.keycloak.bom:keycloak-adapter-bom:12.0.4'
 log4j-log4j = 'log4j:log4j:1.2.17'
 logback-classic = { module = 'ch.qos.logback:logback-classic', version.ref = 'logback' }
@@ -53,10 +55,9 @@ nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 reflections = 'org.reflections:reflections:0.10.2'
-slf4j-api = 'org.slf4j:slf4j-api:2.0.15'
-slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
-spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0'
-
+slf4j-api = 'org.slf4j:slf4j-api:2.0.17'
+slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.17'
+spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2025.1.0'
 
 [bundles]
 jsonwebtoken = ["jsonwebtoken-api", "jsonwebtoken-impl", "jsonwebtoken-jackson"]

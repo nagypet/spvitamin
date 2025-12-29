@@ -19,11 +19,13 @@ package hu.perit.spvitamin.spring.resttemplate;
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -31,7 +33,7 @@ public class RestTemplateErrorHandler extends DefaultResponseErrorHandler
 {
 
     @Override
-    public void handleError(ClientHttpResponse response) throws IOException
+    public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException
     {
         Exception ex = this.getException(response);
         if (ex instanceof RuntimeException)

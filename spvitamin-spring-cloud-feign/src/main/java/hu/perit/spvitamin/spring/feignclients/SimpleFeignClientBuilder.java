@@ -32,15 +32,15 @@ import feign.slf4j.Slf4jLogger;
 import hu.perit.spvitamin.spring.config.FeignProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import hu.perit.spvitamin.spring.objectprovider.StaticObjectProvider;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -80,10 +80,12 @@ public class SimpleFeignClientBuilder
         this.encoder = new JacksonEncoder(objectMapper); // default encoder
 
         // Decoder
-        ObjectFactory<HttpMessageConverters> messageConverters = () -> new HttpMessageConverters(new ByteArrayHttpMessageConverter());
+        FeignHttpMessageConverters converters = new FeignHttpMessageConverters(StaticObjectProvider.of(new ByteArrayHttpMessageConverter()), null);
+        ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(converters);
+
         this.decoder = new OptionalDecoder(
                 new ResponseEntityDecoder(
-                        new SpringDecoder(messageConverters)
+                        new SpringDecoder(feignHttpMessageConverters)
                 )
         );
 
@@ -113,11 +115,13 @@ public class SimpleFeignClientBuilder
 
     public SimpleFeignClientBuilder withMultipartEncoder()
     {
-        ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
-        List<HttpMessageConverter<?>> converters = new RestTemplate().getMessageConverters();
-        converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
-        converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
-        this.encoder = new SpringFormEncoder(new SpringEncoder(() -> new HttpMessageConverters(converters)));
+        //ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        List<HttpMessageConverter<?>> converterList = new RestTemplate().getMessageConverters();
+        //converterList.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
+        //converterList.add(new MappingJackson2HttpMessageConverter(objectMapper));
+
+        ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(new FeignHttpMessageConverters(StaticObjectProvider.of(converterList), null));
+        this.encoder = new SpringFormEncoder(new SpringEncoder(feignHttpMessageConverters));
         return this;
     }
 

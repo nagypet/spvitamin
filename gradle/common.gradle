@@ -102,8 +102,13 @@ if (new File("${projectDir}/version.ver").exists()) {
  *******************************************************************************************************/
 
 pluginManager.withPlugin('java') {
-    dependencies {
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Csak akkor adjuk hozzá, ha van olyan teszt feladat, ami JUnit Platformot használ
+    tasks.withType(Test).configureEach {
+        if (testFramework instanceof org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFramework) {
+            project.dependencies {
+                testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+            }
+        }
     }
 }
 

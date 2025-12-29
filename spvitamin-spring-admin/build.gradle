@@ -66,6 +66,9 @@ dependencies {
     implementation libs.openapi.ui
     implementation libs.openapi.api
 
+    // Jackson
+    implementation libs.jackson.core
+
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
     // -----------------------------------------------------------------------------------------------------------------

@@ -53,7 +53,6 @@ dependencies {
     // Spring Boot
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.retry:spring-retry'
 
     // jakarta.validation
     implementation libs.jakarta.validation.api
