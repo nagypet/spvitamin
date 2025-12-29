@@ -81,6 +81,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation libs.slf4j.log4j12
     testImplementation libs.log4j.log4j
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 

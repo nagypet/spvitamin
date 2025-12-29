@@ -62,6 +62,7 @@ dependencies {
     testImplementation libs.awaitility
     testImplementation libs.guava
     testImplementation libs.jimfs
+    testRuntimeOnly libs.junit.platform.launcher
 
     // Mockito
     testImplementation 'org.mockito:mockito-core:5.11.0'

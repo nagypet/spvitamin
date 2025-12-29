@@ -71,6 +71,11 @@ dependencies {
 
     // Micrometer Prometheus plugin
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 

@@ -90,6 +90,7 @@ dependencies {
     testImplementation libs.log4j.log4j
     // Needed for ThreadContext used by ThreadContextDecorator during tests
     testImplementation 'org.apache.logging.log4j:log4j-api:2.22.1'
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 

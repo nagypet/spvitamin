@@ -80,6 +80,7 @@ dependencies {
     testImplementation libs.assertj
     testImplementation libs.slf4j.log4j12
     testImplementation libs.log4j.log4j
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 
