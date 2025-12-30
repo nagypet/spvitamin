@@ -5,6 +5,11 @@ please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
 
+### 4.0.1-1-RELEASE
+
+- SpringBoot 4.0.1
+- SpingCloud 2025.1.0
+
 ### 3.4.3-1-RELEASE
 
 - SpringBoot 3.4.3
@@ -54,7 +59,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.4.3-1-RELEASE')
+    set('spvitaminVersion', '4.0.1-1-RELEASE')
 }
 
 dependencies {
@@ -90,6 +95,11 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 4.0.1-1-RELEASE not yet released
+
+- Java21, SpringBoot 4.0.1
+
 
 ### 3.4.3-1-RELEASE not yet released
 
