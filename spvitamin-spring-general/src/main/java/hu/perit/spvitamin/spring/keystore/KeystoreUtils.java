@@ -65,7 +65,7 @@ public class KeystoreUtils
     {
         Environment env = SpringEnvironment.get();
 
-        if (!Boolean.parseBoolean(env.getProperty("server.ssl.enabled")))
+        if (!Boolean.parseBoolean(env.getProperty("server.ssl.enabled")) && StringUtils.isBlank(env.getProperty("jwt.private-key-alias")))
         {
             return;
         }

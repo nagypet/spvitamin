@@ -21,13 +21,17 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilder;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.AsyncProperties;
 import hu.perit.spvitamin.spring.config.CryptoProperties;
+import hu.perit.spvitamin.spring.config.FeignProperties;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.config.MetricsProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceProperties;
+import hu.perit.spvitamin.spring.config.SchedulerConfig;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
+import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
@@ -58,15 +62,18 @@ class StandardServerParameters
 {
     public static final String LINKS = "1-Links";
 
+    private final AdminProperties adminProperties;
+    private final AsyncProperties asyncProperties;
     private final CryptoProperties cryptoProperties;
+    private final FeignProperties feignClientProperties;
     private final JwtProperties jwtProperties;
     private final MetricsProperties metricsProperties;
-    private final SystemProperties systemProperties;
+    private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final SecurityProperties securityProperties;
     private final ServerProperties serverProperties;
-    private final MicroserviceCollectionProperties microserviceCollectionProperties;
+    private final SessionProperties sessionProperties;
     private final SwaggerProperties swaggerProperties;
-    private final AdminProperties adminProperties;
+    private final SystemProperties systemProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -83,13 +90,17 @@ class StandardServerParameters
 //            params.add(LINKS, new ServerParameter("H2 console", this.getH2ConsoleUrl(h2ConsoleProperties), true));
 //        }
 
+        params.add(ServerParameterListBuilder.of(this.adminProperties));
+        params.add(ServerParameterListBuilder.of(this.asyncProperties));
         params.add(ServerParameterListBuilder.of(this.cryptoProperties));
+        params.add(ServerParameterListBuilder.of(this.feignClientProperties));
         params.add(ServerParameterListBuilder.of(this.jwtProperties));
         params.add(ServerParameterListBuilder.of(this.metricsProperties));
-        params.add(ServerParameterListBuilder.of(this.systemProperties));
         params.add(ServerParameterListBuilder.of(this.securityProperties));
         params.add(ServerParameterListBuilder.of(this.serverProperties));
-        params.add(ServerParameterListBuilder.of(this.adminProperties));
+        params.add(ServerParameterListBuilder.of(this.sessionProperties));
+        params.add(ServerParameterListBuilder.of(this.swaggerProperties));
+        params.add(ServerParameterListBuilder.of(this.systemProperties));
 
 //        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
 //        {

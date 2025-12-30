@@ -80,7 +80,9 @@ public class SimpleFeignClientBuilder
         this.encoder = new JacksonEncoder(objectMapper); // default encoder
 
         // Decoder
-        FeignHttpMessageConverters converters = new FeignHttpMessageConverters(StaticObjectProvider.of(new ByteArrayHttpMessageConverter()), null);
+        FeignHttpMessageConverters converters = new FeignHttpMessageConverters(
+                StaticObjectProvider.of(new ByteArrayHttpMessageConverter()),
+                StaticObjectProvider.empty());
         ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(converters);
 
         this.decoder = new OptionalDecoder(

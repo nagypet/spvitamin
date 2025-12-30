@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.security.auth.jwt;
 
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
+import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
@@ -321,6 +322,7 @@ public class JwtTokenProvider
         }
         catch (Exception e)
         {
+            log.error("JWT token parse failed! {}", StackTracer.toString(e));
             return true;
         }
     }

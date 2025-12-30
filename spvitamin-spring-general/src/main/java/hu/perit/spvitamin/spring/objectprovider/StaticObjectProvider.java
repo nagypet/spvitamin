@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.objectprovider;
 
 import org.springframework.beans.factory.ObjectProvider;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -49,6 +50,9 @@ public class StaticObjectProvider<T> implements ObjectProvider<T>
         return new StaticObjectProvider<T>(objectList);
     }
 
+    public static <T> ObjectProvider<T> empty() {
+        return new StaticObjectProvider<>(Collections.emptyList());
+    }
 
     @Override
     public Stream<T> stream()
