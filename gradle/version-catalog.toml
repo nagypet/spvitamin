@@ -1,11 +1,10 @@
 [versions]
 aspectj = '1.9.22.1'
 jackson-annotations = '2.20'
-jackson = '2.20.1'
 jackson3 = '3.0.3'
 jsonwebtoken = '0.12.6'
 junit = '6.0.1'
-logback = '1.5.16'
+logback = '1.5.22'
 mapstruct = '1.6.0'
 springdoc = '3.0.0'
 czhabarta = '3.2.1263'
@@ -29,10 +28,6 @@ commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson-annotations' }
-#jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
-#jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
-#jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson' }
-#jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
 jackson3-core = { module = 'tools.jackson.core:jackson-core', version.ref = 'jackson3' }
 jackson3-databind = { module = 'tools.jackson.core:jackson-databind', version.ref = 'jackson3' }
 jackson3-dataformat-yaml = { module = 'tools.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson3' }
