@@ -16,13 +16,12 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -32,33 +31,33 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JSonSerializer
 {
-    public static String toJson(Object object) throws JsonProcessingException
+    public static String toJson(Object object) throws JacksonException
     {
         return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON).writeValueAsString(object);
     }
 
 
-    public static String toYaml(Object object) throws JsonProcessingException
+    public static String toYaml(Object object) throws JacksonException
     {
         return SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML).writeValueAsString(object);
     }
 
 
-    public static <T> T fromJson(String jsonString, Class<T> target) throws IOException
+    public static <T> T fromJson(String jsonString, Class<T> target) throws JacksonException
     {
         ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
     }
 
 
-    public static <T> List<T> listFromJson(String jsonString, Class<T> elementType) throws IOException
+    public static <T> List<T> listFromJson(String jsonString, Class<T> elementType) throws JacksonException
     {
         ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructCollectionType(List.class, elementType));
     }
 
 
-    public static <T> T fromYaml(String jsonString, Class<T> target) throws IOException
+    public static <T> T fromYaml(String jsonString, Class<T> target) throws JacksonException
     {
         ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML);
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));

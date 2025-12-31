@@ -91,9 +91,19 @@ public class PersonName
     {
         if (this.nameOrder != null && nameOrder != this.nameOrder)
         {
-            String currentFamilyName = this.familyName;
-            this.familyName = this.givenName;
-            this.givenName = currentFamilyName;
+            if (StringUtils.isBlank(this.additionalGivenNames))
+            {
+                String currentFamilyName = this.familyName;
+                this.familyName = this.givenName;
+                this.givenName = currentFamilyName;
+            }
+            else
+            {
+                String currentAdditionalGivenNames = this.additionalGivenNames;
+                this.additionalGivenNames = this.familyName;
+                this.familyName = this.givenName;
+                this.givenName = currentAdditionalGivenNames;
+            }
         }
         this.nameOrder = nameOrder;
         return this;

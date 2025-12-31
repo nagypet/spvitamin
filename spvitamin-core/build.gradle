@@ -46,7 +46,7 @@ dependencies {
 
     // Jackson
     implementation libs.jackson.annotations
-    implementation libs.jackson.databind
+    implementation libs.jackson3.databind
 
     implementation libs.nv.i18n
 
@@ -69,7 +69,7 @@ dependencies {
     testImplementation libs.log4j.log4j
 
     // Jackson
-    testImplementation libs.jackson.datatype.jsr310
+    testImplementation libs.jackson3.databind
 }
 
 

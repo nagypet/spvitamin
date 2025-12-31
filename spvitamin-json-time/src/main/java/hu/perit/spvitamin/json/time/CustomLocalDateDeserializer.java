@@ -16,14 +16,13 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ext.javatime.deser.InstantDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -33,13 +32,13 @@ import java.time.format.DateTimeFormatter;
  * @author Peter Nagy
  */
 
-public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
+public class CustomLocalDateDeserializer extends ValueDeserializer<LocalDate>
 {
 
     @Override
-    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt)
     {
-        if (StringUtils.isBlank(jp.getText()))
+        if (StringUtils.isBlank(jp.getString()))
         {
             return null;
         }
@@ -48,7 +47,7 @@ public class CustomLocalDateDeserializer extends JsonDeserializer<LocalDate>
         {
             try
             {
-                return this.tryParseWithPattern(jp.getText(), pattern);
+                return this.tryParseWithPattern(jp.getString(), pattern);
             }
             catch (Exception ex)
             {

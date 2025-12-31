@@ -16,17 +16,16 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class ValueListSerializer extends JsonSerializer<ValueList>
+public class ValueListSerializer extends ValueSerializer<ValueList>
 {
 
     @Override
-    public void serialize(ValueList valueList, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(ValueList valueList, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
         gen.writeStartArray();
 
@@ -35,22 +34,22 @@ public class ValueListSerializer extends JsonSerializer<ValueList>
             if (element instanceof Value value)
             {
                 // Serialize Value objects directly
-                gen.writeObject(value.getValue());
+                gen.writePOJO(value.getValue());
             }
             else if (element instanceof ValueMap valueMap)
             {
                 // Serialize nested ValueMap objects
-                gen.writeObject(valueMap);
+                gen.writePOJO(valueMap);
             }
             else if (element instanceof ValueList nestedList)
             {
                 // Serialize nested lists
-                gen.writeObject(nestedList);
+                gen.writePOJO(nestedList);
             }
             else
             {
                 // Default serialization for any other Thing type
-                gen.writeObject(element);
+                gen.writePOJO(element);
             }
         }
 

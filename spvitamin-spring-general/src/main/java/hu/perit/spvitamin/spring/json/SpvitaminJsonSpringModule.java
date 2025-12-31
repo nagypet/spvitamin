@@ -16,7 +16,8 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import tools.jackson.databind.module.SimpleModule;
 
 public class SpvitaminJsonSpringModule extends SimpleModule
 {

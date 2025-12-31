@@ -16,17 +16,17 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
 import java.time.Instant;
 
-public class CustomInstantSerializer extends JsonSerializer<Instant>
+public class CustomInstantSerializer extends ValueSerializer<Instant>
 {
     @Override
-    public void serialize(Instant value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(Instant value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
         String stringValue = value.toString();
         if (!stringValue.isEmpty() && !stringValue.equals("null"))

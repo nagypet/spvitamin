@@ -61,8 +61,8 @@ dependencies {
     implementation 'org.springframework.security:spring-security-core'
 
     // FasterXML
-    implementation libs.jackson.core
-    implementation libs.jackson.databind
+    implementation libs.jackson3.core
+    implementation libs.jackson3.databind
 
     // Slf4J
     implementation libs.slf4j.api

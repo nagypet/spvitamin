@@ -16,23 +16,22 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ext.javatime.deser.InstantDeserializer;
 
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime>
+public class CustomZonedDateTimeDeserializer extends ValueDeserializer<ZonedDateTime>
 {
     @Override
-    public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt)
     {
-        if (StringUtils.isBlank(jp.getText()))
+        if (StringUtils.isBlank(jp.getString()))
         {
             return null;
         }
@@ -43,13 +42,14 @@ public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateT
         return zonedDateTime.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault());
     }
 
-    private ZonedDateTime deserializeInternal(JsonParser jp, DeserializationContext ctxt) throws IOException
+
+    private ZonedDateTime deserializeInternal(JsonParser jp, DeserializationContext ctxt)
     {
         for (String pattern : AdditionalDateFormats.getPatterns())
         {
             try
             {
-                return this.tryParseWithPattern(jp.getText(), pattern);
+                return this.tryParseWithPattern(jp.getString(), pattern);
             }
             catch (Exception ex)
             {

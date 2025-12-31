@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -107,7 +106,7 @@ public final class LocalDateUtils
         {
             return JSonSerializer.fromJson(dateAsString, clazz);
         }
-        catch (IOException e)
+        catch (RuntimeException e)
         {
             return null;
         }

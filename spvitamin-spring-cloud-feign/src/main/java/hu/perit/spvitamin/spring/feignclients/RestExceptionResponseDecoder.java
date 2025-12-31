@@ -22,6 +22,7 @@ import feign.codec.ErrorDecoder;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.json.JsonSerializable;
 import org.springframework.http.HttpStatus;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,7 +53,7 @@ public class RestExceptionResponseDecoder implements ErrorDecoder
                         return ex;
                     }
                 }
-                catch (IOException ex)
+                catch (IOException | JacksonException ex)
                 {
                     // Error response could not be converted into a RestExceptionResponse
                 }

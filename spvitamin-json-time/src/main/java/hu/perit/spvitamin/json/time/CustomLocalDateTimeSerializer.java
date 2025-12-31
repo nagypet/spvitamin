@@ -16,11 +16,10 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,21 +27,27 @@ import java.time.format.DateTimeFormatter;
  * @author Peter Nagy
  */
 
-public class CustomLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
+public class CustomLocalDateTimeSerializer extends ValueSerializer<LocalDateTime>
+{
 
     @Override
-    public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(LocalDateTime value, JsonGenerator gen, SerializationContext ctxt)
+    {
         String stringValue = value.format(DateTimeFormatter.ofPattern(Constants.DEFAULT_JACKSON_TIMESTAMPFORMAT));
-        if (!stringValue.isEmpty() && !stringValue.equals("null")) {
+        if (!stringValue.isEmpty() && !stringValue.equals("null"))
+        {
             gen.writeString(stringValue);
         }
-        else {
+        else
+        {
             gen.writeNull();
         }
     }
 
+
     @Override
-    public Class<LocalDateTime> handledType() {
+    public Class<LocalDateTime> handledType()
+    {
         return LocalDateTime.class;
     }
 }

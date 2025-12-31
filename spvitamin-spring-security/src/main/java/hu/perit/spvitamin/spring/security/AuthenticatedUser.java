@@ -24,8 +24,8 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import tools.jackson.core.JacksonException;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -102,7 +102,7 @@ public class AuthenticatedUser implements UserDetails
                 String json = JSonSerializer.toJson(this.additionalClaims.get(name));
                 return Optional.ofNullable(JSonSerializer.fromJson(json, clazz));
             }
-            catch (IOException ex)
+            catch (JacksonException ex)
             {
                 return Optional.empty();
             }

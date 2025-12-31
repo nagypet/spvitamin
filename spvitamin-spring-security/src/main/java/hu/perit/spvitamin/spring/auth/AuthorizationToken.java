@@ -18,13 +18,13 @@ package hu.perit.spvitamin.spring.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import hu.perit.spvitamin.json.time.CustomInstantDeserializer;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.Instant;
 import java.util.Map;

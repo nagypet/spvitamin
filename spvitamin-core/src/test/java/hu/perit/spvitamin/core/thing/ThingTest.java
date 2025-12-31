@@ -16,10 +16,7 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import hu.perit.spvitamin.json.JSonSerializer;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -244,7 +241,7 @@ class ThingTest
 
 
     @Test
-    void testVisitor() throws JsonProcessingException
+    void testVisitor()
     {
         CreateDocumentRequest request = getCreateDocumentRequest();
 
@@ -299,10 +296,7 @@ class ThingTest
                   "type":"ALMA"
                 }""");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        log.debug(objectMapper.writeValueAsString(thing));
+        log.debug(JSonSerializer.toJson(thing));
     }
 
 
@@ -477,7 +471,8 @@ class ThingTest
     {
         // Create a very long string
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             sb.append("Long string test. ");
         }
         String longString = sb.toString();

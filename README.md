@@ -98,7 +98,7 @@ dependencyManagement {
 
 ### 4.0.1-1-RELEASE not yet released
 
-- Java21, SpringBoot 4.0.1
+- 2025-12-31: Java21, SpringBoot 4.0.1
 
 
 ### 3.4.3-1-RELEASE not yet released

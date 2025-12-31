@@ -21,8 +21,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JacksonException;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -130,7 +130,7 @@ public final class OffsetDateTimeUtils
         {
             return JSonSerializer.fromJson(dateAsString, clazz);
         }
-        catch (IOException e)
+        catch (JacksonException e)
         {
             return null;
         }

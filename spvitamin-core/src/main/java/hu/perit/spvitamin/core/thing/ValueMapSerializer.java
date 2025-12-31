@@ -16,27 +16,21 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ValueMapSerializer extends JsonSerializer<ValueMap>
+public class ValueMapSerializer extends ValueSerializer<ValueMap>
 {
 
     @Override
-    public void serialize(ValueMap valueMap, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(ValueMap valueMap, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
-        gen.writeStartObject();  // Új JSON objektum kezdete
+        Map<String, Object> out = new LinkedHashMap<>(valueMap.getProperties());
 
-        // Map elemek közvetlen kiírása
-        for (Map.Entry<String, Thing> entry : valueMap.getProperties().entrySet())
-        {
-            gen.writeObjectField(entry.getKey(), entry.getValue());
-        }
-
-        gen.writeEndObject();  // JSON objektum vége
-    }
+        gen.writePOJO(out);    }
 }

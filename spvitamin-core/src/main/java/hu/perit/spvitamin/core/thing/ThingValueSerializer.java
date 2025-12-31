@@ -16,18 +16,18 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-public class ValueSerializer extends JsonSerializer<Value>
+public class ThingValueSerializer extends ValueSerializer<Value>
 {
     @Override
-    public void serialize(Value value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(Value value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
         // Csak a "value" mezőt írjuk ki közvetlenül
-        gen.writeObject(value.getValue());
+        gen.writePOJO(value.getValue());
     }
 }

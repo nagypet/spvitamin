@@ -16,13 +16,12 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.deser.jdk.JavaUtilDateDeserializer;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -32,11 +31,11 @@ import java.util.Date;
  * @author Peter Nagy
  */
 
-public class CustomDateDeserializer extends JsonDeserializer<Date>
+public class CustomDateDeserializer extends ValueDeserializer<Date>
 {
 
     @Override
-    public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public Date deserialize(JsonParser jp, DeserializationContext ctxt)
     {
 
         if (StringUtils.isBlank(jp.getText()))
@@ -46,7 +45,8 @@ public class CustomDateDeserializer extends JsonDeserializer<Date>
 
         try
         {
-            return DateDeserializers.DateDeserializer.instance.deserialize(jp, ctxt);
+            JavaUtilDateDeserializer dateDeserializer = new JavaUtilDateDeserializer();
+            return dateDeserializer.deserialize(jp, ctxt);
         }
         catch (Exception e)
         {

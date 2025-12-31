@@ -16,14 +16,13 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ext.javatime.deser.InstantDeserializer;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -32,13 +31,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
-public class CustomInstantDeserializer extends JsonDeserializer<Instant>
+public class CustomInstantDeserializer extends ValueDeserializer<Instant>
 {
     @Override
-    public Instant deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public Instant deserialize(JsonParser jp, DeserializationContext ctxt)
     {
 
-        if (StringUtils.isBlank(jp.getText()))
+        if (StringUtils.isBlank(jp.getString()))
         {
             return null;
         }
@@ -47,7 +46,7 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
         {
             try
             {
-                return this.tryParseWithPattern(jp.getText(), pattern);
+                return this.tryParseWithPattern(jp.getString(), pattern);
             }
             catch (Exception ex)
             {
@@ -77,9 +76,9 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>
         }
 
         // Legacy: timestamp in LocalDateTime format (ex. 2025-09-25T05:39:59.802)
-        LocalDateTime ldt = LocalDateTime.parse(jp.getText(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        LocalDateTime ldt = LocalDateTime.parse(jp.getString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         Instant instant = ldt.atZone(ZoneId.systemDefault()).toInstant();
-        log.warn("Deserializing Instant from json timestamp without time zone! {} => {}", jp.getText(), instant.toString());
+        log.warn("Deserializing Instant from json timestamp without time zone! {} => {}", jp.getString(), instant.toString());
         return instant;
     }
 

@@ -16,20 +16,22 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
+import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.reflections.Reflections;
+import tools.jackson.databind.jsontype.NamedType;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TypeRegistry
 {
-    private static final Map<Class<?>, String> TYPES = new HashMap<>();
+    private static final Map<Class<?>, String> TYPES = new ConcurrentHashMap<>();
+
 
     public static void autoRegisterTypes(String... basePackages)
     {
@@ -41,11 +43,8 @@ public final class TypeRegistry
             AutoregisterJsonType annotation = clazz.getAnnotation(AutoregisterJsonType.class);
             TYPES.put(clazz, annotation.name());
         }
-    }
 
-
-    public static void registerTypesInMapper(ObjectMapper mapper)
-    {
-        TYPES.forEach((key, value) -> mapper.registerSubtypes(new NamedType(key, value)));
+        List<NamedType> namedTypes = TYPES.entrySet().stream().map(i -> new NamedType(i.getKey(), i.getValue())).toList();
+        SpvitaminObjectMapper.registerSubtypes(namedTypes);
     }
 }

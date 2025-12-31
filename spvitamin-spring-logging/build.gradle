@@ -66,7 +66,7 @@ dependencies {
     implementation libs.jaxb.api
 
     // Jackson
-    implementation libs.jackson.core
+    implementation libs.jackson3.core
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies

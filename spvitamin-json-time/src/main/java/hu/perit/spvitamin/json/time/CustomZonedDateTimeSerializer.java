@@ -16,18 +16,17 @@
 
 package hu.perit.spvitamin.json.time;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class CustomZonedDateTimeSerializer extends JsonSerializer<ZonedDateTime>
+public class CustomZonedDateTimeSerializer extends ValueSerializer<ZonedDateTime>
 {
     @Override
-    public void serialize(ZonedDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(ZonedDateTime value, JsonGenerator gen, SerializationContext ctxt)
     {
         String stringValue = value.format(DateTimeFormatter.ofPattern(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT));
         if (!stringValue.isEmpty() && !stringValue.equals("null"))

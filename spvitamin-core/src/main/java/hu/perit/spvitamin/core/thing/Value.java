@@ -16,13 +16,13 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Getter
-@JsonSerialize(using = ValueSerializer.class)
+@JsonSerialize(using = ThingValueSerializer.class)
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Value extends Thing

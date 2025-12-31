@@ -16,9 +16,6 @@
 
 package hu.perit.spvitamin.spring.resilientjobrunner.db.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.data.converter.OffsetDateTimeToUTCConverter;
@@ -36,8 +33,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -100,10 +98,11 @@ public class AbstractResilientJobEntity
         try
         {
             ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            // TODO
+            //mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             this.parameters = mapper.writeValueAsString(data);
         }
-        catch (JsonProcessingException e)
+        catch (JacksonException e)
         {
             ServerException.throwFrom(e);
         }
@@ -116,7 +115,7 @@ public class AbstractResilientJobEntity
         {
             return JSonSerializer.fromJson(this.parameters, clazz);
         }
-        catch (IOException e)
+        catch (JacksonException e)
         {
             return ServerException.throwFrom(e);
         }

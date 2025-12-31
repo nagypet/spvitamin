@@ -16,7 +16,6 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import hu.perit.spvitamin.spring.json.JSonSerializer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import tools.jackson.core.JacksonException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -35,7 +35,7 @@ public class ObjectLogger
         {
             return JSonSerializer.toJson(object);
         }
-        catch (JsonProcessingException e)
+        catch (JacksonException e)
         {
             // Causes illegal reflective access, but good enough as fallback
             log.warn(e.toString());

@@ -16,22 +16,21 @@
 
 package hu.perit.spvitamin.json.time;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.Test;
-
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Nagy
  */
 
 @Slf4j
-public class JsonAbstractClassTest
+class JsonAbstractClassTest
 {
 	@Test
 	void toJsonRoundtrip() throws IOException

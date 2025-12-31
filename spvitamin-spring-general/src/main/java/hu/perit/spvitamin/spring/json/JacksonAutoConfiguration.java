@@ -16,10 +16,11 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import tools.jackson.databind.json.JsonMapper;
 
 
 /**
@@ -30,10 +31,9 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonAutoConfiguration
 {
     @Bean
-    public ObjectMapper objectMapper()
+    @Primary
+    public JsonMapper jsonMapper()
     {
-        ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-        TypeRegistry.registerTypesInMapper(mapper);
-        return mapper;
+        return (JsonMapper) SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
     }
 }

@@ -17,7 +17,7 @@
 package hu.perit.spvitamin.json.time;
 
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.time.Instant;
 import java.time.LocalDate;

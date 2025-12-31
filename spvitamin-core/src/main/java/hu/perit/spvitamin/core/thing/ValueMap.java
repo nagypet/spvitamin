@@ -16,11 +16,11 @@
 
 package hu.perit.spvitamin.core.thing;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

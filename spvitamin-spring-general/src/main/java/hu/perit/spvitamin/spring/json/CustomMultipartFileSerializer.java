@@ -16,15 +16,14 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class CustomMultipartFileSerializer extends JsonSerializer<MultipartFile>
+public class CustomMultipartFileSerializer extends ValueSerializer<MultipartFile>
 {
     @Data
     private static class SerializedMultipartFile
@@ -34,8 +33,9 @@ public class CustomMultipartFileSerializer extends JsonSerializer<MultipartFile>
         private final long size;
     }
 
+
     @Override
-    public void serialize(MultipartFile value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(MultipartFile value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
         //String stringValue = String.format("{contentType: %s, originalFileName: %s}", value.getContentType(), value.getOriginalFilename());
         if (value == null)
@@ -44,23 +44,13 @@ public class CustomMultipartFileSerializer extends JsonSerializer<MultipartFile>
             return;
         }
 
-        gen.writeObject(new SerializedMultipartFile(value.getContentType(), value.getOriginalFilename(), value.getSize()));
-
-//        if (!stringValue.isEmpty() && !stringValue.equals("null"))
-//        {
-//            gen.writeString(stringValue);
-//        }
-//        else
-//        {
-//            gen.writeNull();
-//        }
-
+        gen.writePOJO(new SerializedMultipartFile(value.getContentType(), value.getOriginalFilename(), value.getSize()));
     }
+
 
     @Override
     public Class<MultipartFile> handledType()
     {
         return MultipartFile.class;
     }
-
 }

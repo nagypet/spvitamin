@@ -16,15 +16,14 @@
 
 package hu.perit.spvitamin.json.time;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import hu.perit.spvitamin.json.JsonSerializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @ToString
@@ -34,8 +33,8 @@ public class ObjectContainer implements JsonSerializable
 {
 	private final List<AbstractComponent> list = new ArrayList<>();
 
-	public static ObjectContainer fromJson(String json) throws IOException
-	{
+	public static ObjectContainer fromJson(String json)
+    {
 		return JsonSerializable.fromJson(json, ObjectContainer.class);
 	}
 }

@@ -16,32 +16,22 @@
 
 package hu.perit.spvitamin.spring.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpvitaminSpringObjectMapper
 {
-    private static final ObjectMapper jsonMapper = internalCreateMapper(SpvitaminObjectMapper.MapperType.JSON);
-    private static final ObjectMapper yamlMapper = internalCreateMapper(SpvitaminObjectMapper.MapperType.YAML);
+    static
+    {
+        // Register additional modules for use within the Spring framework
+        SpvitaminObjectMapper.addModule(new SpvitaminJsonSpringModule());
+    }
 
     public static ObjectMapper createMapper(SpvitaminObjectMapper.MapperType type)
     {
-        return switch (type)
-        {
-            case JSON -> jsonMapper;
-            case YAML -> yamlMapper;
-        };
-    }
-
-    private static ObjectMapper internalCreateMapper(SpvitaminObjectMapper.MapperType type)
-    {
-        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(type);
-        // Register additional modules for use within the Spring framework
-        mapper.registerModule(new SpvitaminJsonSpringModule());
-
-        return mapper;
+        return SpvitaminObjectMapper.createMapper(type);
     }
 }

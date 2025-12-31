@@ -20,8 +20,6 @@ import hu.perit.spvitamin.json.JSonSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -279,7 +277,7 @@ class PersonNameTest
 
 
     @Test
-    void testToJsonRoundtrip() throws IOException
+    void testToJsonRoundtrip()
     {
         PersonName expected = PersonName.from("Kovács-Nagy Béla János", PersonName.NameOrder.EASTERN);
         String json = JSonSerializer.toJson(expected);
@@ -290,7 +288,18 @@ class PersonNameTest
 
 
     @Test
-    void testFromJson() throws IOException
+    void testToJsonRoundtrip2()
+    {
+        PersonName expected = PersonName.from("Kovács-Nagy Béla", PersonName.NameOrder.EASTERN);
+        String json = JSonSerializer.toJson(expected);
+        log.debug(json);
+        PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);
+        assertThat(deserialized).isEqualTo(expected);
+    }
+
+
+    @Test
+    void testFromJson()
     {
         String json = "{\"nameOrder\":\"EASTERN\",\"name\":\"Kovács-Nagy Béla János\"}";
         PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);
@@ -302,7 +311,7 @@ class PersonNameTest
 
 
     @Test
-    void testFromJson2() throws IOException
+    void testFromJson2()
     {
         String json = "{\"nameOrder\":\"EASTERN\",\"familyName\":\"Kovács-Nagy\",\"givenName\":\"Béla\",\"additionalGivenNames\":\"János\"}";
         PersonName deserialized = JSonSerializer.fromJson(json, PersonName.class);

@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.util.Strings;
+import tools.jackson.core.JacksonException;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -166,7 +167,7 @@ public class HttpLoggingFilter implements Filter
             thing.accept(visitor);
             return visitor.getJson();
         }
-        catch (IOException e)
+        catch (JacksonException e)
         {
             return jsonBody;
         }

@@ -16,13 +16,22 @@
 
 package hu.perit.spvitamin.json;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import hu.perit.spvitamin.core.singleton.SingletonFactory;
 import hu.perit.spvitamin.json.time.SpvitaminJsonTimeModul;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLMapper;
+
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpvitaminObjectMapper
@@ -32,29 +41,74 @@ public final class SpvitaminObjectMapper
         JSON, YAML
     }
 
-    private static final ObjectMapper jsonMapper = internalCreateMapper(MapperType.JSON);
-    private static final ObjectMapper yamlMapper = internalCreateMapper(MapperType.YAML);
+    private static final SingletonFactory<ObjectMapper> jsonMapperFactory = SingletonFactory.of(() -> internalCreateMapper(MapperType.JSON));
+    private static final SingletonFactory<ObjectMapper> yamlMapperFactory = SingletonFactory.of(() -> internalCreateMapper(MapperType.YAML));
 
 
     public static ObjectMapper createMapper(MapperType type)
     {
         return switch (type)
         {
-            case JSON -> jsonMapper;
-            case YAML -> yamlMapper;
+            case JSON -> jsonMapperFactory.getInstance();
+            case YAML -> yamlMapperFactory.getInstance();
         };
     }
 
 
-    private static ObjectMapper internalCreateMapper(MapperType type)
+    public static void addModule(JacksonModule module)
     {
-        ObjectMapper mapper = MapperType.JSON.equals(type) ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // We encode timestamps with millisecond precision
-        //mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT));
-        mapper.registerModule(new SpvitaminJsonTimeModul());
+        CustomSettings.addModule(module);
+        jsonMapperFactory.renew();
+        yamlMapperFactory.renew();
+    }
 
-        return mapper;
+
+    public static void registerAbstractType(Class<?> api, Class<?> impl)
+    {
+        CustomSettings.registerAbstractType(api, impl);
+        jsonMapperFactory.renew();
+        yamlMapperFactory.renew();
+    }
+
+
+    public static void registerSubtypes(List<NamedType> namedTypes)
+    {
+        CustomSettings.registerSubtypes(namedTypes);
+        jsonMapperFactory.renew();
+        yamlMapperFactory.renew();
+    }
+
+
+    static ObjectMapper internalCreateMapper(MapperType type)
+    {
+        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("hu.perit.")
+                .allowIfSubType("java.")
+                .build();
+
+        if (type == MapperType.JSON)
+        {
+            return JsonMapper.builderWithJackson2Defaults()
+                    .polymorphicTypeValidator(ptv)
+                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                    .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
+                    .addModule(new SpvitaminJsonTimeModul())
+                    .addModules(CustomSettings.getAdditionalModules())
+                    .registerSubtypes(CustomSettings.getSubtypes())
+                    .build();
+        }
+
+        return YAMLMapper.builder(new YAMLFactory())
+                .polymorphicTypeValidator(ptv)
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
+                .addModule(new SpvitaminJsonTimeModul())
+                .addModules(CustomSettings.getAdditionalModules())
+                .registerSubtypes(CustomSettings.getSubtypes())
+                .build();
     }
 }

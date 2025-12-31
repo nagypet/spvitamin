@@ -68,4 +68,10 @@ public class SingletonFactory<T>
         }
         return value;
     }
+
+
+    public void renew()
+    {
+        atomicReference.set(null);
+    }
 }
