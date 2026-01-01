@@ -81,8 +81,8 @@ if (project.hasProperty('application')) {
 	}
 
 	task dockerBackendImage(type: Exec) {
-		group 'docker'
-		description 'Builds docker image based on the installation'
+		group = 'docker'
+		description = 'Builds docker image based on the installation'
 
 		dependsOn 'installDist'
 		dependsOn 'dockerCopyDependencies'
@@ -110,6 +110,6 @@ else {
  * Placeholder task
  *******************************************************************************************************/
 task dockerImage() {
-    group 'docker'
-	description 'Builds docker image.'
+    group = 'docker'
+	description = 'Builds docker image.'
 }

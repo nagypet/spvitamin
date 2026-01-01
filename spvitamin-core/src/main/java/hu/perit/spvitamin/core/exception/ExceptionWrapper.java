@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.core.exception;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class ExceptionWrapper implements ServerExceptionInterface
         {
             sb.append(System.lineSeparator());
             sb.append(String.join("", Collections.nCopies(i + 1, "  ")));
-            sb.append("caused by " + removeLineSeparators(causes.get(i).toString()));
+            sb.append("caused by ").append(removeLineSeparators(causes.get(i).toString()));
         }
         return sb.toString();
     }
@@ -170,14 +171,14 @@ public class ExceptionWrapper implements ServerExceptionInterface
         if (StringUtils.isNotBlank(messageStart))
         {
             if (getClassName(root).equalsIgnoreCase(anExceptionClassName)
-                    && StringUtils.startsWith(root.getMessage(), messageStart))
+                    && Strings.CI.startsWith(root.getMessage(), messageStart))
             {
                 return true;
             }
             // e.g. root: InsufficientAuthenticationException
             // anExceptionClass: AuthenticationException should return true
             if (isInstanceOf(root, anExceptionClassName)
-                    && StringUtils.startsWith(root.getMessage(), messageStart))
+                    && Strings.CI.startsWith(root.getMessage(), messageStart))
             {
                 return true;
             }
@@ -216,9 +217,9 @@ public class ExceptionWrapper implements ServerExceptionInterface
 
     public static String getClassName(Throwable throwable)
     {
-        if (throwable instanceof ServerException)
+        if (throwable instanceof ServerException serverException)
         {
-            return ((ServerException) throwable).getClassName();
+            return serverException.getClassName();
         }
         else
         {

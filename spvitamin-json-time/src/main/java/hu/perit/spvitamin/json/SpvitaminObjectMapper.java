@@ -33,18 +33,20 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
 
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SpvitaminObjectMapper
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SpvitaminObjectMapper
 {
     public enum MapperType
     {
         JSON, YAML
     }
 
-    private static final SingletonFactory<ObjectMapper> jsonMapperFactory = SingletonFactory.of(() -> internalCreateMapper(MapperType.JSON));
-    private static final SingletonFactory<ObjectMapper> yamlMapperFactory = SingletonFactory.of(() -> internalCreateMapper(MapperType.YAML));
+    private static final SingletonFactory<JsonMapper> jsonMapperFactory = SingletonFactory.of(() -> internalCreateMapper(JsonMapper.class));
+    private static final SingletonFactory<YAMLMapper> yamlMapperFactory = SingletonFactory.of(() -> internalCreateMapper(YAMLMapper.class));
 
 
+    // Use getJsonMapper() or getYamlMapper() instead of this method!
+    @Deprecated
     public static ObjectMapper createMapper(MapperType type)
     {
         return switch (type)
@@ -52,6 +54,18 @@ public final class SpvitaminObjectMapper
             case JSON -> jsonMapperFactory.getInstance();
             case YAML -> yamlMapperFactory.getInstance();
         };
+    }
+
+
+    public static JsonMapper getJsonMapper()
+    {
+        return jsonMapperFactory.getInstance();
+    }
+
+
+    public static YAMLMapper getYamlMapper()
+    {
+        return yamlMapperFactory.getInstance();
     }
 
 
@@ -63,7 +77,7 @@ public final class SpvitaminObjectMapper
     }
 
 
-    public static void registerAbstractType(Class<?> api, Class<?> impl)
+    public static <T> void registerAbstractType(Class<T> api, Class<? extends T> impl)
     {
         CustomSettings.registerAbstractType(api, impl);
         jsonMapperFactory.renew();
@@ -79,16 +93,17 @@ public final class SpvitaminObjectMapper
     }
 
 
-    static ObjectMapper internalCreateMapper(MapperType type)
+    @SuppressWarnings("unchecked")
+    static <T> T internalCreateMapper(Class<T> type)
     {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType("hu.perit.")
                 .allowIfSubType("java.")
                 .build();
 
-        if (type == MapperType.JSON)
+        if (type.equals(JsonMapper.class))
         {
-            return JsonMapper.builderWithJackson2Defaults()
+            return (T) JsonMapper.builderWithJackson2Defaults()
                     .polymorphicTypeValidator(ptv)
                     .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -99,16 +114,19 @@ public final class SpvitaminObjectMapper
                     .registerSubtypes(CustomSettings.getSubtypes())
                     .build();
         }
-
-        return YAMLMapper.builder(new YAMLFactory())
-                .polymorphicTypeValidator(ptv)
-                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-                .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
-                .addModule(new SpvitaminJsonTimeModul())
-                .addModules(CustomSettings.getAdditionalModules())
-                .registerSubtypes(CustomSettings.getSubtypes())
-                .build();
+        else if (type.equals(YAMLMapper.class))
+        {
+            return (T) YAMLMapper.builder(new YAMLFactory())
+                    .polymorphicTypeValidator(ptv)
+                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                    .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
+                    .addModule(new SpvitaminJsonTimeModul())
+                    .addModules(CustomSettings.getAdditionalModules())
+                    .registerSubtypes(CustomSettings.getSubtypes())
+                    .build();
+        }
+        throw new IllegalArgumentException("Unknown type: " + type);
     }
 }

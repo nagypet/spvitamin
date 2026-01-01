@@ -22,8 +22,9 @@ import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import hu.perit.spvitamin.spring.session.SessionUtils;
 import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
@@ -81,11 +82,13 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
             if (session != null)
             {
                 SecurityContext securityContext = session.getAttribute(Constants.SPRING_SECURITY_CONTEXT);
-                if (securityContext != null
-                        && securityContext.getAuthentication() != null
-                        && securityContext.getAuthentication().getPrincipal() instanceof AuthenticatedUser authenticatedUser)
+                if (securityContext != null)
                 {
-                    retval.add(authenticatedUser);
+                    Authentication authentication = securityContext.getAuthentication();
+                    if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser authenticatedUser)
+                    {
+                        retval.add(authenticatedUser);
+                    }
                 }
             }
         }
@@ -164,7 +167,7 @@ public class SpvitaminSpringSessionBackedSessionRegistry<S extends Session> exte
 
     private static boolean principalNamesEqual(String sessionPrincipalName, AuthenticatedUser authenticatedUser)
     {
-        return StringUtils.equalsAnyIgnoreCase(sessionPrincipalName, authenticatedUser.getUsername());
+        return Strings.CI.equalsAny(sessionPrincipalName, authenticatedUser.getUsername());
     }
 
 

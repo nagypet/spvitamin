@@ -38,7 +38,7 @@ public class CustomDateDeserializer extends ValueDeserializer<Date>
     public Date deserialize(JsonParser jp, DeserializationContext ctxt)
     {
 
-        if (StringUtils.isBlank(jp.getText()))
+        if (StringUtils.isBlank(jp.getString()))
         {
             return null;
         }

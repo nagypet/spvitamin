@@ -19,7 +19,7 @@ package hu.perit.spvitamin.spring.httplogging;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.thing.PrinterVisitor;
 import hu.perit.spvitamin.core.thing.Thing;
-import hu.perit.spvitamin.spring.json.JSonSerializer;
+import hu.perit.spvitamin.json.JSonSerializer;
 import hu.perit.spvitamin.spring.logging.RequestLoggerVisitor;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

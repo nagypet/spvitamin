@@ -39,6 +39,7 @@ dependencies {
     // Compile dependencies
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
+    implementation project(':spvitamin-json-time')
     implementation project(':spvitamin-spring-general')
 
     // Lombok

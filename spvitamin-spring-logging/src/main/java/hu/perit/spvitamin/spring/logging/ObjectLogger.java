@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.logging;
 
-import hu.perit.spvitamin.spring.json.JSonSerializer;
+import hu.perit.spvitamin.json.JSonSerializer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -23,7 +23,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -33,7 +37,7 @@ public class JpaWriteBehindCacheImpl<T, ID> implements JpaWriteBehindCache<T, ID
     private JpaRepository<T, ID> jpaRepository;
     private long maxQueueSize = 200;
     private long maxDelayMillis = 5_000;
-    private Consumer thrownAwayMethod;
+    private Consumer<List<T>> thrownAwayMethod;
 
     private final List<T> cache = new ArrayList<>();
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);

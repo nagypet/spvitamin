@@ -108,7 +108,7 @@ def customizePom(pom) {
             resolveStrategy = Closure.DELEGATE_FIRST
 
             name "${project.group}:${project.name}"
-            description 'A general purpose library to use in a spring based microservice environment.'
+            description = 'A general purpose library to use in a spring based microservice environment.'
             url 'https://github.com/nagypet/spvitamin'
 
             scm {

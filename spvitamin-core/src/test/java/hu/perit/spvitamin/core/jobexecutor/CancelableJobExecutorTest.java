@@ -73,11 +73,10 @@ class CancelableJobExecutorTest
 
         // Wait for job to be removed from executor
         // The job is removed asynchronously in the afterExecute method
-        Thread.sleep(200);
+        await().atMost(2, TimeUnit.SECONDS).until(() -> jobExecutor.countAll() == 0);
 
         // Assert
         assertTrue(jobExecuted.await(0, TimeUnit.MILLISECONDS), "Job was not executed");
-        assertThat(jobExecutor.countAll()).isEqualTo(0); // Job should be removed after completion
     }
 
 
@@ -95,10 +94,8 @@ class CancelableJobExecutorTest
             @Override
             public Void execute() throws Exception
             {
-                while (jobBlocked.get())
-                {
-                    Thread.sleep(10);
-                }
+                // Wait until the block is released
+                await().until(() -> !jobBlocked.get());
                 return null;
             }
         };
@@ -157,7 +154,7 @@ class CancelableJobExecutorTest
         assertTrue(jobStarted.await(1, TimeUnit.SECONDS), "Job did not start within timeout");
 
         // Make sure job is in RUNNING state
-        Thread.sleep(100);
+        await().atMost(1, TimeUnit.SECONDS).until(() -> jobExecutor.countRunning() == 1);
 
         // Cancel the job
         boolean result = jobExecutor.cancelJob(jobId);
@@ -170,8 +167,7 @@ class CancelableJobExecutorTest
         assertThat(cancelled).isTrue();
 
         // Wait for job to be removed from executor
-        Thread.sleep(100);
-        assertThat(jobExecutor.countAll()).isZero(); // Job should be removed after cancellation
+        await().atMost(1, TimeUnit.SECONDS).until(() -> jobExecutor.countAll() == 0);
     }
 
 
@@ -260,7 +256,7 @@ class CancelableJobExecutorTest
                 jobStarted.countDown();
                 while (jobBlocked.get())
                 {
-                    Thread.sleep(10);
+                    await().until(() -> !jobBlocked.get());
                 }
                 return null;
             }
@@ -293,10 +289,7 @@ class CancelableJobExecutorTest
             @Override
             public Void execute() throws Exception
             {
-                while (jobBlocked.get())
-                {
-                    Thread.sleep(10);
-                }
+                await().until(() -> !jobBlocked.get());
                 return null;
             }
         };
@@ -337,12 +330,13 @@ class CancelableJobExecutorTest
 
         // Wait for job to start and complete
         jobStarted.await(1, TimeUnit.SECONDS);
-        Thread.sleep(100);
+        await().atMost(2, TimeUnit.SECONDS).until(future::isDone);
+        await().atMost(2, TimeUnit.SECONDS).until(() -> jobExecutor.countAll() == 0);
 
         // Assert
         assertThat(future.isDone()).isTrue();
         assertThrows(ExecutionException.class, future::get);
-        assertThat(jobExecutor.countAll()).isEqualTo(0); // Job should be removed after exception
+        assertThat(jobExecutor.countAll()).isZero(); // Job should be removed after exception
     }
 
 
@@ -390,10 +384,10 @@ class CancelableJobExecutorTest
                 .invoke(jobExecutor, badFuture, null);
 
         // Wait for afterExecute to complete
-        Thread.sleep(100);
+        await().atMost(2, TimeUnit.SECONDS).until(() -> jobExecutor.countAll() == 0);
 
         // Assert that the future was removed from the map despite the RuntimeException
-        assertThat(jobExecutor.countAll()).isEqualTo(0);
+        assertThat(jobExecutor.countAll()).isZero();
     }
 
 

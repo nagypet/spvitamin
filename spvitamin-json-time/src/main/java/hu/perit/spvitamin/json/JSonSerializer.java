@@ -19,7 +19,8 @@ package hu.perit.spvitamin.json;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -37,20 +38,20 @@ public final class JSonSerializer
 {
     public static String toJson(Object object) throws JacksonException
     {
-        return SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON).writeValueAsString(object);
+        return SpvitaminObjectMapper.getJsonMapper().writeValueAsString(object);
     }
 
 
     public static String toYaml(Object object) throws JacksonException
     {
-        return SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML).writeValueAsString(object);
+        return SpvitaminObjectMapper.getYamlMapper().writeValueAsString(object);
     }
 
 
     public static <T> T fromJson(String jsonString, Class<T> target) throws JacksonException
     {
         String fixedJson = fixRoorLevelObjects(jsonString, target);
-        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        JsonMapper mapper = SpvitaminObjectMapper.getJsonMapper();
         return mapper.readValue(fixedJson, mapper.getTypeFactory().constructType(target));
     }
 
@@ -82,7 +83,7 @@ public final class JSonSerializer
 
     public static <T> T fromYaml(String jsonString, Class<T> target) throws JacksonException
     {
-        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.YAML);
+        YAMLMapper mapper = SpvitaminObjectMapper.getYamlMapper();
         return mapper.readValue(jsonString, mapper.getTypeFactory().constructType(target));
     }
 }

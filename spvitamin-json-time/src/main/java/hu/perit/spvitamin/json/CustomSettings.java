@@ -42,14 +42,21 @@ public final class CustomSettings
         SimpleAbstractTypeResolver resolver = new SimpleAbstractTypeResolver();
         if (!ABSTRACT_TYPE_MAPPINGS.isEmpty())
         {
-            ABSTRACT_TYPE_MAPPINGS.forEach((api, impl) -> resolver.addMapping((Class) api, (Class) impl));
+            ABSTRACT_TYPE_MAPPINGS.forEach((api, impl) -> addMapping(resolver, api, impl));
         }
 
         return resolver;
     }
 
 
-    static void registerAbstractType(Class<?> api, Class<?> impl)
+    @SuppressWarnings("unchecked")
+    private static <T> void addMapping(SimpleAbstractTypeResolver resolver, Class<?> api, Class<?> impl)
+    {
+        resolver.addMapping((Class<T>) api, (Class<? extends T>) impl);
+    }
+
+
+    static <T> void registerAbstractType(Class<T> api, Class<? extends T> impl)
     {
         ABSTRACT_TYPE_MAPPINGS.put(api, impl);
     }

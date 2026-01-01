@@ -65,6 +65,7 @@ dependencies {
     // FasterXML
     implementation libs.jackson3.core
     implementation libs.jackson3.databind
+    implementation libs.jackson3.dataformat.yaml
 
     // Slf4J
     implementation libs.slf4j.api

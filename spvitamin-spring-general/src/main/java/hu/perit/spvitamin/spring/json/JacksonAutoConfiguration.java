@@ -34,6 +34,9 @@ public class JacksonAutoConfiguration
     @Primary
     public JsonMapper jsonMapper()
     {
-        return (JsonMapper) SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        // Register additional modules for use within the Spring framework
+        SpvitaminObjectMapper.addModule(new SpvitaminJsonSpringModule());
+
+        return SpvitaminObjectMapper.getJsonMapper();
     }
 }

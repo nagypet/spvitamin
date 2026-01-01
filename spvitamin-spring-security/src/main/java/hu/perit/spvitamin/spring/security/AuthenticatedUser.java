@@ -16,8 +16,8 @@
 
 package hu.perit.spvitamin.spring.security;
 
+import hu.perit.spvitamin.json.JSonSerializer;
 import hu.perit.spvitamin.spring.exception.BadTokenException;
-import hu.perit.spvitamin.spring.json.JSonSerializer;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.Builder;
 import lombok.Data;

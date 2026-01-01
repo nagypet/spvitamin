@@ -17,8 +17,8 @@
 package hu.perit.spvitamin.spring.resttemplate;
 
 import hu.perit.spvitamin.core.exception.ServerException;
+import hu.perit.spvitamin.json.JSonSerializer;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.json.JsonSerializable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
@@ -56,7 +56,7 @@ public class RestTemplateErrorHandler extends DefaultResponseErrorHandler
         }
         response.getBody();
         String bodyAsText = StreamUtils.copyToString(response.getBody(), charset);
-        RestExceptionResponse exceptionResponse = JsonSerializable.fromJson(bodyAsText, RestExceptionResponse.class);
+        RestExceptionResponse exceptionResponse = JSonSerializer.fromJson(bodyAsText, RestExceptionResponse.class);
         return this.getException(exceptionResponse);
     }
 

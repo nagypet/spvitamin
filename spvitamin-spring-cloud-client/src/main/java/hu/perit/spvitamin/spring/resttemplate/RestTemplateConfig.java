@@ -20,18 +20,16 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class RestTemplateConfig
 {
+	private final JsonMapper objectMapper;
 
-	private final ObjectMapper objectMapper;
-
-	public RestTemplateConfig(ObjectMapper objectMapper)
+	public RestTemplateConfig(JsonMapper objectMapper)
 	{
 		this.objectMapper = objectMapper;
 	}
@@ -65,16 +63,14 @@ public class RestTemplateConfig
 		 * RestTemplate restTemplate = new RestTemplate(requestFactory);
 		 */
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(0, createMappingJacksonHttpMessageConverter());
+		restTemplate.getMessageConverters().addFirst(createHttpMessageConverter());
 		restTemplate.setErrorHandler(new RestTemplateErrorHandler());
 		return restTemplate;
 	}
 
 
-	private MappingJackson2HttpMessageConverter createMappingJacksonHttpMessageConverter()
+	private JacksonJsonHttpMessageConverter createHttpMessageConverter()
 	{
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setObjectMapper(this.objectMapper);
-		return converter;
+        return new JacksonJsonHttpMessageConverter(this.objectMapper);
 	}
 }

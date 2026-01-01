@@ -19,8 +19,8 @@ package hu.perit.spvitamin.spring.feignclients;
 import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
+import hu.perit.spvitamin.json.JSonSerializer;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.json.JsonSerializable;
 import org.springframework.http.HttpStatus;
 import tools.jackson.core.JacksonException;
 
@@ -46,7 +46,7 @@ public class RestExceptionResponseDecoder implements ErrorDecoder
                 try
                 {
                     String body = Util.toString(response.body().asReader(StandardCharsets.UTF_8));
-                    RestExceptionResponse exceptionResponse = JsonSerializable.fromJson(body, RestExceptionResponse.class);
+                    RestExceptionResponse exceptionResponse = JSonSerializer.fromJson(body, RestExceptionResponse.class);
                     Exception ex = this.getException(exceptionResponse);
                     if (ex != null)
                     {

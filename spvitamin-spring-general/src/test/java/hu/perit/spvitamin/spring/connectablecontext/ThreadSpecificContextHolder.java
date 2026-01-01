@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.connectablecontext;
 
 import hu.perit.spvitamin.core.connectablecontext.ConnectableContextCollection;
 import hu.perit.spvitamin.core.connectablecontext.SimpleConnectableContextHolder;
+import lombok.Getter;
 
 /**
  * @author Peter Nagy
@@ -25,21 +26,20 @@ import hu.perit.spvitamin.core.connectablecontext.SimpleConnectableContextHolder
 
 public class ThreadSpecificContextHolder extends SimpleConnectableContextHolder<ThreadSpecificContext>
 {
-    private static ThreadSpecificContextHolder instance = new ThreadSpecificContextHolder();
+    @Getter
+    private static final ThreadSpecificContextHolder instance = new ThreadSpecificContextHolder();
 
-    public static ThreadSpecificContextHolder getInstance()
-    {
-        return instance;
-    }
 
     private ThreadSpecificContextHolder()
     {
     }
 
-    private ConnectableContextCollection<ThreadSpecificContext> contextCollection = new ConnectableContextCollection<>(ThreadSpecificContext::new);
+
+    private final ConnectableContextCollection<ThreadSpecificContext> contextCollection = new ConnectableContextCollection<>(ThreadSpecificContext::new);
+
 
     @Override
-    protected ConnectableContextCollection getContextCollection()
+    protected ConnectableContextCollection<ThreadSpecificContext> getContextCollection()
     {
         return this.contextCollection;
     }

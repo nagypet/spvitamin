@@ -16,7 +16,7 @@
 
 package hu.perit.spvitamin.spring.data.converter;
 
-import hu.perit.spvitamin.spring.json.JSonSerializer;
+import hu.perit.spvitamin.json.JSonSerializer;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.RequiredArgsConstructor;

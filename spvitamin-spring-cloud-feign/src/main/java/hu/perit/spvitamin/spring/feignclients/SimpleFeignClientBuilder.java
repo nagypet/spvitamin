@@ -29,6 +29,7 @@ import feign.form.spring.SpringFormEncoder;
 import feign.jackson.JacksonEncoder;
 import feign.optionals.OptionalDecoder;
 import feign.slf4j.Slf4jLogger;
+import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.config.FeignProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
@@ -41,7 +42,9 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -117,10 +120,10 @@ public class SimpleFeignClientBuilder
 
     public SimpleFeignClientBuilder withMultipartEncoder()
     {
-        //ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        JsonMapper jsonMapper = SpvitaminObjectMapper.getJsonMapper();
         List<HttpMessageConverter<?>> converterList = new RestTemplate().getMessageConverters();
-        //converterList.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
-        //converterList.add(new MappingJackson2HttpMessageConverter(objectMapper));
+        converterList.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
+        converterList.add(new JacksonJsonHttpMessageConverter(jsonMapper));
 
         ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(new FeignHttpMessageConverters(StaticObjectProvider.of(converterList), null));
         this.encoder = new SpringFormEncoder(new SpringEncoder(feignHttpMessageConverters));

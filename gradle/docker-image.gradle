@@ -20,8 +20,8 @@ task clean(type: Delete) {
 
 
 task dockerCreateImage(type: Exec) {
-    group 'docker'
-    description "Builds the ${dockerImageName} docker image."
+    group = 'docker'
+    description = "Builds the ${dockerImageName} docker image."
 
 	dependsOn 'dockerGeatherInputs'
 	

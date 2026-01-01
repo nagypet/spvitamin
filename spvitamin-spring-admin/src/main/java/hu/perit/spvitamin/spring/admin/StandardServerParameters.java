@@ -28,7 +28,6 @@ import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.config.MetricsProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceProperties;
-import hu.perit.spvitamin.spring.config.SchedulerConfig;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
 import hu.perit.spvitamin.spring.config.SessionProperties;
@@ -37,7 +36,7 @@ import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.AbstractEnvironment;
@@ -152,7 +151,7 @@ class StandardServerParameters
 
     private static boolean isSecret(String propName)
     {
-        return StringUtils.containsAny(StringUtils.toRootLowerCase(propName), "password", "secret");
+        return Strings.CI.containsAny(propName, "password", "secret");
     }
 
     private String getActuatorUrl()

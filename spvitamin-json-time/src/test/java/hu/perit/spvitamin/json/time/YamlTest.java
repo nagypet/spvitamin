@@ -33,7 +33,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class YamlTest
+class YamlTest
 {
 	@AllArgsConstructor
 	@ToString
