@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.resilientjobrunner.service.api;
 
 import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
+import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
 import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 
 import java.time.Duration;
@@ -25,6 +26,8 @@ import java.util.List;
 
 public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
 {
+    T createNew(ResilientJobProperties jobProperties, ResilientJobParameter parameter);
+
     int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout);
 
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
@@ -36,6 +39,4 @@ public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
     void deleteById(Long id);
 
     void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e);
-
-    T save(T entity);
 }

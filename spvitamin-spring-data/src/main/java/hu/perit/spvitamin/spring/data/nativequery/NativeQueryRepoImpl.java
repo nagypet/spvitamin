@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,16 +33,19 @@ public class NativeQueryRepoImpl
     private final int timeout; // seconds
     private final EntityManager em;
 
+
     public NativeQueryRepoImpl(EntityManager em, long timeoutMillis)
     {
         this.em = em;
         this.timeout = (int) (timeoutMillis / 1000);
     }
 
+
     public List<?> getResultList(String sql)
     {
         return this.getResultList(sql, true);
     }
+
 
     public List<?> getResultList(String sql, boolean logSql)
     {
@@ -61,10 +65,12 @@ public class NativeQueryRepoImpl
         }
     }
 
+
     public List<?> getResultList(String sql, List<Object> params, boolean logSql)
     {
         return getResultList(sql, params, logSql, null);
     }
+
 
     public List<?> getResultList(String sql, List<Object> params, boolean logSql, Integer limit)
     {
@@ -116,6 +122,36 @@ public class NativeQueryRepoImpl
             }
             Query query = this.em.createNativeQuery(sql);
             return query.setHint(TIMEOUT_HINT, timeout).getSingleResult();
+        }
+    }
+
+
+    public Object getSingleResult(String sql, List<Object> params, boolean logSql)
+    {
+        if (params == null)
+        {
+            throw new CodingException("\"params\" cannot be null!");
+        }
+
+        try (Took took = new Took(false))
+        {
+            if (logSql)
+            {
+                log.debug(sql);
+                log.debug("params: " + params.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            }
+            Query query = this.em.createNativeQuery(sql);
+            int i = 0;
+            for (Object p : params)
+            {
+                query.setParameter(++i, p);
+            }
+            Object result = query.setHint(TIMEOUT_HINT, timeout).getSingleResult();
+            if (logSql)
+            {
+                log.debug(MessageFormat.format("getSingleResult() returned {0} in {1} ms", result, took.getDuration()));
+            }
+            return result;
         }
     }
 

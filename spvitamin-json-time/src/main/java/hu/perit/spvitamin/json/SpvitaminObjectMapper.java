@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
@@ -108,6 +109,7 @@ public class SpvitaminObjectMapper
                     .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                    .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
                     .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
                     .addModule(new SpvitaminJsonTimeModul())
                     .addModules(CustomSettings.getAdditionalModules())
@@ -121,6 +123,7 @@ public class SpvitaminObjectMapper
                     .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                    .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
                     .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
                     .addModule(new SpvitaminJsonTimeModul())
                     .addModules(CustomSettings.getAdditionalModules())

@@ -33,7 +33,7 @@ import java.util.List;
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
     @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp")
+    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp and e.processingStartedTimestamp is not null")
     int terminatePermanentlyFailingEntities(
             Long processorType,
             OffsetDateTime timestamp,
@@ -55,7 +55,11 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     List<T> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
 
     @Modifying
-    @Query("update #{#entityName} e set e.status = :status, e.processingStartedTimestamp = :processingStartedTimestamp where e.id in :ids")
+    @Query("""
+            update #{#entityName} e set e.status = :status,
+            e.processingStartedTimestamp = :processingStartedTimestamp,
+            e.creationTimestamp = case when (e.retryCount = 0 or e.retryCount is null) then :processingStartedTimestamp else e.creationTimestamp end
+            where e.id in :ids""")
     int updateStatusAndProcessingStartedTimestamp(
             List<Long> ids,
             ResilientJobStatus status,

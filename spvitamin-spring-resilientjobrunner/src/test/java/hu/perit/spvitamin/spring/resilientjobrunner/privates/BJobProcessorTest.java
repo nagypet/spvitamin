@@ -253,7 +253,7 @@ class BJobProcessorTest
 
 
         @Override
-        public <T> T getParameters(Class<T> clazz)
+        public String getParameters()
         {
             return null;
         }

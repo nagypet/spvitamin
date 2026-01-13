@@ -60,6 +60,7 @@ class BJobProcessor
                     processorType,
                     new BatchExecutor(properties.getThreadPoolSize(), createProcessor(processorType, properties))
             );
+            log.info("{} configured", processorType);
         }
     }
 

@@ -16,7 +16,6 @@
 
 package hu.perit.spvitamin.spring.feignclients;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Client;
 import feign.Feign;
 import feign.Logger;
@@ -26,12 +25,10 @@ import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
-import feign.jackson.JacksonEncoder;
 import feign.optionals.OptionalDecoder;
 import feign.slf4j.Slf4jLogger;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.config.FeignProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.objectprovider.StaticObjectProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -76,11 +73,11 @@ public class SimpleFeignClientBuilder
         // Adding the TracingFeignInterceptor
         this.requestInterceptorAdapter.addInterceptor(new TracingFeignInterceptor());
 
-        ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        JsonMapper jsonMapper = SpvitaminObjectMapper.getJsonMapper();
         FeignProperties feignProperties = SysConfig.getFeignProperties();
 
         // Encoder
-        this.encoder = new JacksonEncoder(objectMapper); // default encoder
+        this.encoder = new Jackson3Encoder(jsonMapper); // default encoder
 
         // Decoder
         FeignHttpMessageConverters converters = new FeignHttpMessageConverters(
