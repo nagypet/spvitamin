@@ -71,6 +71,13 @@ dependencies {
 
     // Micrometer Prometheus plugin
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.assertj
 }
 
 
