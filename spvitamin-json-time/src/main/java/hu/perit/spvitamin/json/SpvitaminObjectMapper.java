@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import hu.perit.spvitamin.json.time.SpvitaminJsonTimeModul;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,7 @@ public final class SpvitaminObjectMapper
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // We encode timestamps with millisecond precision
         //mapper.setDateFormat(new SimpleDateFormat(Constants.DEFAULT_JACKSON_ZONEDTIMESTAMPFORMAT));
+        mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new SpvitaminJsonTimeModul());
 
         return mapper;

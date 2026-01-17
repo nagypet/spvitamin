@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +46,7 @@ public class ExampleClass implements JsonSerializable
     private final ZonedDateTime zonedDateTime;
     private final OffsetDateTime offsetDateTime;
     private final Instant instant;
+    private final Duration duration;
 
 
     public ExampleClass()
@@ -57,6 +59,7 @@ public class ExampleClass implements JsonSerializable
         this.zonedDateTime = null;
         this.offsetDateTime = null;
         this.instant = null;
+        this.duration = null;
     }
 
 
@@ -71,15 +74,16 @@ public class ExampleClass implements JsonSerializable
     public String toString()
     {
         return new StringJoiner(", ", ExampleClass.class.getSimpleName() + "[", "]")
-            .add("name='" + name + "'")
-            .add("age=" + age)
-            .add("date=" + formatDate(date))
-            .add("localDate=" + localDate)
-            .add("localDateTime=" + localDateTime)
-            .add("zonedDateTime=" + zonedDateTime)
-            .add("offsetDateTime=" + offsetDateTime)
-            .add("instant=" + instant)
-            .toString();
+                .add("name='" + name + "'")
+                .add("age=" + age)
+                .add("date=" + formatDate(date))
+                .add("localDate=" + localDate)
+                .add("localDateTime=" + localDateTime)
+                .add("zonedDateTime=" + zonedDateTime)
+                .add("offsetDateTime=" + offsetDateTime)
+                .add("instant=" + instant)
+                .add("duration=" + duration)
+                .toString();
     }
 
 
@@ -121,6 +125,7 @@ public class ExampleClass implements JsonSerializable
                 .append(zonedDateTime, that.zonedDateTime)
                 .append(thisOffsetInstant, thatOffsetInstant)
                 .append(instant, that.instant)
+                .append(duration, that.duration)
                 .isEquals();
     }
 
@@ -137,6 +142,7 @@ public class ExampleClass implements JsonSerializable
                 .append(zonedDateTime)
                 .append(offsetDateTime)
                 .append(instant)
+                .append(duration)
                 .toHashCode();
     }
 }
