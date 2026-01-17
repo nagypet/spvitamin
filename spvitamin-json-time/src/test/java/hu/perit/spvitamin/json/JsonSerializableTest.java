@@ -23,6 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -126,7 +127,8 @@ class JsonSerializableTest
                 LocalDateTime.of(2020, 5, 11, 10, 10, 10),
                 ZonedDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneId.systemDefault()),
                 OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")),
-                Instant.from(OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00")))
+                Instant.from(OffsetDateTime.of(2020, 5, 11, 10, 10, 10, 0, ZoneOffset.of("+02:00"))),
+                Duration.ofSeconds(100)
         );
         return originalObject;
     }
