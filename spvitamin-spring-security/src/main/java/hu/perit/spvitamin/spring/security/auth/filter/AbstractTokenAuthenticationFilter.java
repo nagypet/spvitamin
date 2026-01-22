@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -63,6 +64,9 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         try
         {
             log.debug("{} called", this.getClass().getSimpleName());
+
+            String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(HttpSession::getId).orElse(null);
+            ThreadContext.put("sessionId", sessionIdInRequest);
 
             AbstractAuthorizationToken token = getJwtFromRequest(request, response);
             if (token != null)
@@ -92,7 +96,6 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     if (securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
                     {
                         String sessionIdInToken = claims.getSessionId();
-                        String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(HttpSession::getId).orElse(null);
                         checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
                     }
 
