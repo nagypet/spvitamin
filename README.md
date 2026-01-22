@@ -101,6 +101,7 @@ dependencyManagement {
 - 2025-12-31: Java21, SpringBoot 4.0.1
 - bugfix in resilientjobrunner
 - AsyncExecutor improved
+- Putting the sessionId in ThreadContext
 
 
 ### 3.4.3-1-RELEASE not yet released
