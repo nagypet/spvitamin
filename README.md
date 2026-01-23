@@ -166,6 +166,8 @@ dependencyManagement {
 - New module: spvitamin-spring-resilientjobrunner added
 - NumberConverter improved
 - Putting the sessionId in ThreadContext
+- PessimisticJpaRepository fixed
+- AsyncExecutor: delegating ThreadContext 
 
 
 ### 3.3.3-2-RELEASE not yet released

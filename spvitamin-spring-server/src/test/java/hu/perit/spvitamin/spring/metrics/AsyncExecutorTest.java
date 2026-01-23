@@ -16,6 +16,15 @@ import static org.assertj.core.api.Assertions.fail;
 @Slf4j
 class AsyncExecutorTest
 {
+    // Custom checked exception for testing rethrow behavior
+    static class MyCheckedException extends Exception
+    {
+        MyCheckedException(String message)
+        {
+            super(message);
+        }
+    }
+
 
     @Test
     void invoke_shouldReturnResult_whenFinishedWithinTimeout() throws TimeoutException
@@ -102,5 +111,17 @@ class AsyncExecutorTest
         {
             log.warn(StackTracer.toString(e));
         }
+    }
+
+
+    @Test
+    void invokeVoid_shouldRethrowSameCheckedException_fromAsyncTask()
+    {
+        // Expect: the same checked exception type (and message) thrown inside the async runnable
+        assertThatThrownBy(() -> AsyncExecutor.invokeVoid(() -> {
+            throw new MyCheckedException("boom");
+        }, Duration.ofMillis(500)))
+                .isInstanceOf(MyCheckedException.class)
+                .hasMessage("boom");
     }
 }
