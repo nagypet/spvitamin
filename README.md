@@ -102,6 +102,8 @@ dependencyManagement {
 - bugfix in resilientjobrunner
 - AsyncExecutor improved
 - Putting the sessionId in ThreadContext
+- PessimisticJpaRepository fixed
+- AsyncExecutor: delegating ThreadContext
 
 
 ### 3.4.3-1-RELEASE not yet released

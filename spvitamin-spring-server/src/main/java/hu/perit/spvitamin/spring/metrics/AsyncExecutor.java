@@ -22,6 +22,7 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.ThreadContext;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +47,26 @@ public final class AsyncExecutor
         CompletableFuture<T> completableFuture = null;
         try
         {
-            completableFuture = CompletableFuture.supplyAsync(supplier);
+            // Capture the current thread's logging context (Log4j ThreadContext)
+            final var parentThreadContext = ThreadContext.getContext();
+
+            completableFuture = CompletableFuture.supplyAsync(() -> {
+                try
+                {
+                    // Propagate the parent thread's context to the async thread
+                    if (parentThreadContext != null && !parentThreadContext.isEmpty())
+                    {
+                        ThreadContext.putAll(parentThreadContext);
+                    }
+
+                    return supplier.get();
+                }
+                finally
+                {
+                    // Clean up the ThreadContext in the async thread to avoid leaking data
+                    ThreadContext.clearMap();
+                }
+            });
 
             return completableFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         }
@@ -74,15 +94,29 @@ public final class AsyncExecutor
         CompletableFuture<Void> completableFuture = null;
         try
         {
+            // Capture the current thread's logging context (Log4j ThreadContext)
+            final var parentThreadContext = ThreadContext.getContext();
+
             completableFuture = CompletableFuture.supplyAsync(() -> {
                 try
                 {
+                    // Propagate the parent thread's context to the async thread
+                    if (parentThreadContext != null && !parentThreadContext.isEmpty())
+                    {
+                        ThreadContext.putAll(parentThreadContext);
+                    }
+
                     runnable.run();
                     return null;
                 }
                 catch (Exception e)
                 {
                     throw new RuntimeException(e);
+                }
+                finally
+                {
+                    // Clean up the ThreadContext in the async thread to avoid leaking data
+                    ThreadContext.clearMap();
                 }
             });
             completableFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
