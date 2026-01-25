@@ -6,7 +6,8 @@ public enum CredentialType
     ANONYMOUS,
     BASIC,
     BEARER,
-    COOKIE,
+    AT_IN_COOKIE,
+    RT_IN_COOKIE,
     API_KEY,
     OAUTH2
 }
