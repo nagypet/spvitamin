@@ -24,6 +24,7 @@ import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.exception.InputException;
 import hu.perit.spvitamin.core.exception.LogLevel;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -70,7 +71,9 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         }
 
         // ========== FORBIDDEN (403) ==================================================================================
-        else if (exception.causedBy("org.springframework.security.access.AccessDeniedException"))
+        else if (exception.causedBy("org.springframework.security.access.AccessDeniedException")
+                || exception.causedBy(AuthorizationException.class)
+        )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.FORBIDDEN, ex, path, traceId));

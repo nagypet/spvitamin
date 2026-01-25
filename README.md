@@ -105,6 +105,7 @@ dependencyManagement {
 - PessimisticJpaRepository fixed
 - AsyncExecutor: delegating ThreadContext
 - credentialType added to AuthorizationToken
+- AuthorizationException handled in GenericRestExceptionResponseBuilder
 
 
 ### 3.4.3-1-RELEASE not yet released
