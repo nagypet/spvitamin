@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.auth.filter.jwt;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.info.CookieHelper;
+import hu.perit.spvitamin.spring.security.CredentialType;
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
             boolean dummyToken = StringUtils.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
             if (!dummyToken)
             {
-                return new JwtString(tokenInHeader);
+                return new JwtString(tokenInHeader, CredentialType.BEARER);
             }
         }
 
@@ -78,7 +79,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
                 // Returning only if valid
                 if (!tokenProvider.isExpired(accessTokenInCookie))
                 {
-                    return new JwtString(accessTokenInCookie);
+                    return new JwtString(accessTokenInCookie, CredentialType.COOKIE);
                 }
                 else
                 {
@@ -97,7 +98,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
                 // Returning only if valid
                 if (!tokenProvider.isExpired(refreshTokenInCookie))
                 {
-                    return new JwtString(refreshTokenInCookie);
+                    return new JwtString(refreshTokenInCookie, CredentialType.COOKIE);
                 }
                 else
                 {

@@ -18,6 +18,8 @@ package hu.perit.spvitamin.spring.security.ldap;
 
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.CredentialType;
 import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
 import lombok.Getter;
 import lombok.Setter;
@@ -206,10 +208,23 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
     )
     {
         GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+
+        UserDetails principal = AuthenticatedUser.builder()
+                .username(user.getUsername())
+                .displayName(userData.getStringAttribute("cn"))
+                .authorities(authoritiesMapper.mapAuthorities(user.getAuthorities()))
+                .anonymous(false)
+                .source(url)
+                .credentialType(CredentialType.BASIC)
+                .build();
+
         LdapAuthenticationToken result = new LdapAuthenticationToken(
-                user,
+                principal,
                 authentication.getCredentials(),
-                authoritiesMapper.mapAuthorities(user.getAuthorities()), url, userData.getStringAttribute("cn"));
+                authoritiesMapper.mapAuthorities(user.getAuthorities()),
+                url,
+                userData.getStringAttribute("cn")
+        );
         result.setDetails(authentication.getDetails());
         return result;
     }

@@ -59,7 +59,15 @@ import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -259,7 +267,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
             {
                 Collection<? extends GrantedAuthority> groups = authenticatedUser.getAuthorities();
                 Collection<GrantedAuthority> roles = this.roleMapperService.mapUsernameAndGroupToRoles(authenticatedUser.getUsername(), groups);
-                authenticatedUser.setAuthorities(roles);
+                authenticatedUser = authenticatedUser.clone().authorities(roles).build();
 
                 log.debug(String.format("Granted roles: '%s'", authenticatedUser.getAuthorities().toString()));
                 authorizationService.setAuthenticatedUser(authenticatedUser);

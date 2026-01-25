@@ -166,6 +166,7 @@ public class JwtTokenProvider
                     .source(authenticatedUser.getSource())
                     .sid(RequestQuery.getSessionId())
                     .additionalClaims(authenticatedUser.getAdditionalClaims())
+                    .credentialType(authenticatedUser.getCredentialType())
                     .build();
 
             String jwt = getJwtFromAuthorizationToken(authorizationToken);

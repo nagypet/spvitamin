@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.security.oauth2;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.CredentialType;
 import hu.perit.spvitamin.spring.security.auth.AuthenticatedUserFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -46,7 +47,9 @@ public class AuthenticatedUserFactoryForOidcUser implements AuthenticatedUserFac
                     .authorities(getRoles(oidcUser))
                     .userId(null)
                     .source("oauth2")
-                    .anonymous(false).build();
+                    .anonymous(false)
+                    .credentialType(CredentialType.OAUTH2)
+                    .build();
         }
 
         return null;

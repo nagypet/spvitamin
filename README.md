@@ -168,6 +168,7 @@ dependencyManagement {
 - Putting the sessionId in ThreadContext
 - PessimisticJpaRepository fixed
 - AsyncExecutor: delegating ThreadContext 
+- credentialType added to AuthorizationToken
 
 
 ### 3.3.3-2-RELEASE not yet released

@@ -19,14 +19,18 @@ package hu.perit.spvitamin.spring.security;
 import hu.perit.spvitamin.spring.exception.BadTokenException;
 import hu.perit.spvitamin.spring.json.JSonSerializer;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,22 +45,31 @@ import java.util.stream.Collectors;
  */
 
 
-@Data
-@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class AuthenticatedUser implements UserDetails
 {
     @Serial
     private static final long serialVersionUID = -4734744978387700215L;
 
+
     private String username;
     private String userId;
     private String displayName;
     private Collection<? extends GrantedAuthority> authorities;
-    @Builder.Default
     private boolean anonymous = true;
     private String source;
-    //@Singular("additionalClaim")
-    private Map<String, Object> additionalClaims;
+    private Map<String, Serializable> additionalClaims;
+    private CredentialType credentialType = CredentialType.UNKNOWN;
+
+
+    public static Builder builder()
+    {
+        return new Builder();
+    }
 
 
     public static AuthenticatedUser fromClaims(TokenClaims claims)
@@ -83,6 +96,7 @@ public class AuthenticatedUser implements UserDetails
     }
 
 
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> getAdditionalClaim(String name, Class<T> clazz)
     {
         if (additionalClaims == null || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
@@ -110,21 +124,7 @@ public class AuthenticatedUser implements UserDetails
     }
 
 
-    public void putAdditionalClaim(String name, Object value)
-    {
-        if (this.additionalClaims == null)
-        {
-            this.additionalClaims = new HashMap<>();
-        }
-        else if (!(this.additionalClaims instanceof HashMap))
-        {
-            this.additionalClaims = new HashMap<>(this.additionalClaims);
-        }
-        this.additionalClaims.put(name, value);
-    }
-
-
-    public AuthenticatedUser clone()
+    public Builder clone()
     {
         return AuthenticatedUser.builder()
                 .username(username)
@@ -134,7 +134,8 @@ public class AuthenticatedUser implements UserDetails
                 .anonymous(anonymous)
                 .source(source)
                 .additionalClaims(additionalClaims)
-                .build();
+                .credentialType(credentialType)
+                ;
     }
 
 
@@ -182,5 +183,104 @@ public class AuthenticatedUser implements UserDetails
     public boolean isEnabled()
     {
         return true;
+    }
+
+
+    public static class Builder
+    {
+        private String username;
+        private String userId;
+        private String displayName;
+        private Collection<? extends GrantedAuthority> authorities;
+        private boolean anonymous = true;
+        private String source;
+        private Map<String, Serializable> additionalClaims;
+        private CredentialType credentialType = CredentialType.UNKNOWN;
+
+
+        public Builder username(String username)
+        {
+            this.username = username;
+            return this;
+        }
+
+
+        public Builder userId(String userId)
+        {
+            this.userId = userId;
+            return this;
+        }
+
+
+        public Builder displayName(String displayName)
+        {
+            this.displayName = displayName;
+            return this;
+        }
+
+
+        public Builder authorities(Collection<? extends GrantedAuthority> authorities)
+        {
+            this.authorities = authorities;
+            return this;
+        }
+
+
+        public Builder anonymous(boolean anonymous)
+        {
+            this.anonymous = anonymous;
+            return this;
+        }
+
+
+        public Builder source(String source)
+        {
+            this.source = source;
+            return this;
+        }
+
+
+        public Builder additionalClaims(Map<String, Serializable> additionalClaims)
+        {
+            this.additionalClaims = additionalClaims;
+            return this;
+        }
+
+
+        public Builder additionalClaim(String name, Serializable value)
+        {
+            if (this.additionalClaims == null)
+            {
+                this.additionalClaims = new HashMap<>();
+            }
+            else if (!(this.additionalClaims instanceof HashMap))
+            {
+                this.additionalClaims = new HashMap<>(this.additionalClaims);
+            }
+            this.additionalClaims.put(name, value);
+            return this;
+        }
+
+
+        public Builder credentialType(CredentialType credentialType)
+        {
+            this.credentialType = credentialType;
+            return this;
+        }
+
+
+        public AuthenticatedUser build()
+        {
+            return new AuthenticatedUser(
+                    username,
+                    userId,
+                    displayName,
+                    authorities,
+                    anonymous,
+                    source,
+                    additionalClaims,
+                    credentialType
+            );
+        }
     }
 }
