@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.io.Serial;
 import java.util.Collection;
 
+// TODO: Rename this class to UsernamePasswordAuthenticationTokenWithSource
 @Getter
 public class LdapAuthenticationToken extends UsernamePasswordAuthenticationToken
 {

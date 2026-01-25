@@ -104,6 +104,7 @@ dependencyManagement {
 - Putting the sessionId in ThreadContext
 - PessimisticJpaRepository fixed
 - AsyncExecutor: delegating ThreadContext
+- credentialType added to AuthorizationToken
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -180,6 +181,9 @@ dependencyManagement {
 - GenericRestExceptionResponseBuilder creates HTTP 400 response in case of database level ValidationExceptions
 - New module: spvitamin-spring-resilientjobrunner added
 - NumberConverter improved
+- Putting the sessionId in ThreadContext
+- PessimisticJpaRepository fixed
+- AsyncExecutor: delegating ThreadContext 
 
 
 ### 3.3.3-2-RELEASE not yet released

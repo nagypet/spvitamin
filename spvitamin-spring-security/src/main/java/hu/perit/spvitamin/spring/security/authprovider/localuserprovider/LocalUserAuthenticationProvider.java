@@ -16,32 +16,98 @@
 
 package hu.perit.spvitamin.spring.security.authprovider.localuserprovider;
 
+import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.CredentialType;
+import hu.perit.spvitamin.spring.security.authprovider.SpvitaminBasicAuthenticationProvider;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @ConditionalOnBean(annotation = EnableLocalUserAuthProvider.class)
-public class LocalUserAuthenticationProvider extends DaoAuthenticationProvider
+public class LocalUserAuthenticationProvider implements SpvitaminBasicAuthenticationProvider
 {
-    private final PasswordEncoder passwordEncoder;
-
-
-    public LocalUserAuthenticationProvider(LocalUserService localUserService, PasswordEncoder passwordEncoder)
-    {
-        super(localUserService);
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final LocalUserProperties localUserProperties;
 
 
     @PostConstruct
     private void init()
     {
         log.info("Initializing {}", this.getClass().getName());
-        setPasswordEncoder(this.passwordEncoder);
+    }
+
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException
+    {
+        try
+        {
+            AuthenticatedUser authenticatedUser = loadUserByUsernameAndPassword(authentication.getName(), (String) authentication.getCredentials());
+            return new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
+        }
+        catch (UsernameNotFoundException e)
+        {
+            return null;
+        }
+    }
+
+
+    @Override
+    public boolean supports(Class<?> authentication)
+    {
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+
+    @Override
+    public AuthenticatedUser loadUserByUsernameAndPassword(String username, String password) throws AuthenticationException
+    {
+        if (!this.localUserProperties.getLocaluser().containsKey(username))
+        {
+            throw new UsernameNotFoundException(username);
+        }
+
+        LocalUserProperties.User user = this.localUserProperties.getLocaluser().get(username);
+        String pwd;
+        if (user.getEncryptedPassword() != null)
+        {
+            CryptoUtil crypto = new CryptoUtil();
+
+            pwd = crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), user.getEncryptedPassword());
+        }
+        else
+        {
+            pwd = user.getPassword();
+        }
+
+        if (!StringUtils.equals(pwd, password))
+        {
+            throw new BadCredentialsException("Invalid user credentials!");
+        }
+
+        return AuthenticatedUser.builder()
+                .username(username)
+                .displayName(username)
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_EMPTY")))
+                .anonymous(false)
+                .source("LOCALUSER")
+                .credentialType(CredentialType.BASIC)
+                .build();
     }
 }

@@ -99,7 +99,9 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                         checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
                     }
 
-                    AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
+                    AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims).clone()
+                            .credentialType(token.getCredentialType())
+                            .build();
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
                     UsernamePasswordAuthenticationToken authentication;

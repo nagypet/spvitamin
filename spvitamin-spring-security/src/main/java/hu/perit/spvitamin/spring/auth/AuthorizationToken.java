@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.auth;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.perit.spvitamin.json.time.CustomInstantDeserializer;
+import hu.perit.spvitamin.spring.security.CredentialType;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -60,8 +62,10 @@ public class AuthorizationToken implements AbstractAuthorizationToken
     private Set<String> scope;
     private String source;
     private String sid;
-    private Map<String, Object> additionalClaims;
-    private Map<String, Object> ext;
+    private Map<String, Serializable> additionalClaims;
+    private Map<String, Serializable> ext;
+    @JsonProperty("credential_type")
+    private CredentialType credentialType;
 
 
     public AuthorizationToken clone()
@@ -80,6 +84,7 @@ public class AuthorizationToken implements AbstractAuthorizationToken
                 .source(this.source)
                 .sid(this.sid)
                 .additionalClaims(this.additionalClaims)
+                .credentialType(this.credentialType)
                 .build();
     }
 }

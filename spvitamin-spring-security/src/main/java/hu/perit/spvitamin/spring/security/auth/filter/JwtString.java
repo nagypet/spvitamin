@@ -17,17 +17,14 @@
 package hu.perit.spvitamin.spring.security.auth.filter;
 
 import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
+import hu.perit.spvitamin.spring.security.CredentialType;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class JwtString implements AbstractAuthorizationToken
 {
-
     private final String jwt;
-
-
-    public JwtString(String jwt)
-    {
-        this.jwt = jwt;
-    }
+    private final CredentialType credentialType;
 }

@@ -16,10 +16,13 @@
 
 package hu.perit.spvitamin.spring.auth;
 
+import hu.perit.spvitamin.spring.security.CredentialType;
+
 import java.io.Serializable;
 
 public interface AbstractAuthorizationToken extends Serializable
 {
-
     String getJwt();
+
+    CredentialType getCredentialType();
 }

@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -175,13 +176,14 @@ public class TokenClaims extends DefaultClaims
     }
 
 
-    public Map<String, Object> getAdditionalClaims()
+    @SuppressWarnings("unchecked")
+    public Map<String, Serializable> getAdditionalClaims()
     {
-        return (Map<String, Object>) this.get(ADD, Map.class);
+        return this.get(ADD, Map.class);
     }
 
 
-    public void setAdditionalClaims(Map<String, Object> additionalClaims)
+    public void setAdditionalClaims(Map<String, Serializable> additionalClaims)
     {
         if (additionalClaims != null && !additionalClaims.isEmpty())
         {

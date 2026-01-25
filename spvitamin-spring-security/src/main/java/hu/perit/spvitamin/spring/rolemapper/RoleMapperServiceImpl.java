@@ -58,9 +58,7 @@ public class RoleMapperServiceImpl implements RoleMapperService
         // Mapping roles => privileges
         Collection<? extends GrantedAuthority> privileges = mapRolesToPrivileges(roles);
 
-        AuthenticatedUser clone = authenticatedUser.clone();
-        clone.setAuthorities(privileges);
-        return clone;
+        return authenticatedUser.clone().authorities(privileges).build();
     }
 
 
