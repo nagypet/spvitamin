@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
                 // Returning only if valid
                 if (!tokenProvider.isExpired(accessTokenInCookie))
                 {
-                    return new JwtString(accessTokenInCookie, CredentialType.COOKIE);
+                    return new JwtString(accessTokenInCookie, CredentialType.AT_IN_COOKIE);
                 }
                 else
                 {
@@ -98,7 +98,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
                 // Returning only if valid
                 if (!tokenProvider.isExpired(refreshTokenInCookie))
                 {
-                    return new JwtString(refreshTokenInCookie, CredentialType.COOKIE);
+                    return new JwtString(refreshTokenInCookie, CredentialType.RT_IN_COOKIE);
                 }
                 else
                 {
