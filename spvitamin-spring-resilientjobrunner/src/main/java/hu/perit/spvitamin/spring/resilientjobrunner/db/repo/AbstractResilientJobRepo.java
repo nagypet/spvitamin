@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package hu.perit.spvitamin.spring.resilientjobrunner.db.repo;
 
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
@@ -17,7 +33,7 @@ import java.util.List;
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
     @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp")
+    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp and e.processingStartedTimestamp is not null")
     int terminatePermanentlyFailingEntities(
             Long processorType,
             OffsetDateTime timestamp,
@@ -39,7 +55,11 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     List<T> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
 
     @Modifying
-    @Query("update #{#entityName} e set e.status = :status, e.processingStartedTimestamp = :processingStartedTimestamp where e.id in :ids")
+    @Query("""
+            update #{#entityName} e set e.status = :status,
+            e.processingStartedTimestamp = :processingStartedTimestamp,
+            e.creationTimestamp = case when (e.retryCount = 0 or e.retryCount is null) then :processingStartedTimestamp else e.creationTimestamp end
+            where e.id in :ids""")
     int updateStatusAndProcessingStartedTimestamp(
             List<Long> ids,
             ResilientJobStatus status,

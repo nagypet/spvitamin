@@ -171,6 +171,7 @@ dependencyManagement {
 - credentialType added to AuthorizationToken
 - AuthorizationException handled in GenericRestExceptionResponseBuilder
 - New module: spvitamin-pdf
+- ResilientJobRunner fixes ported back from 4.0.1
 
 
 ### 3.3.3-2-RELEASE not yet released

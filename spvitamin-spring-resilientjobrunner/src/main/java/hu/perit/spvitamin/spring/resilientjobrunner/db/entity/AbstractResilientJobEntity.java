@@ -1,13 +1,22 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package hu.perit.spvitamin.spring.resilientjobrunner.db.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import hu.perit.spvitamin.core.exception.ServerException;
-import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.data.converter.OffsetDateTimeToUTCConverter;
-import hu.perit.spvitamin.spring.json.JSonSerializer;
-import hu.perit.spvitamin.spring.json.SpvitaminSpringObjectMapper;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatusConverter;
 import jakarta.persistence.Column;
@@ -17,11 +26,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -62,8 +69,6 @@ public class AbstractResilientJobEntity
     @Column(name = COL_PARAMETER_VERSION, nullable = false)
     private Integer parameterVersion;
 
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
     @NotNull
     @Column(name = COL_PARAMETERS, nullable = false, columnDefinition = "TEXT")
     private String parameters;
@@ -77,32 +82,4 @@ public class AbstractResilientJobEntity
 
     @Column(name = COL_RETRY_COUNT)
     private Long retryCount;
-
-
-    public void setParameters(Object data)
-    {
-        try
-        {
-            ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            this.parameters = mapper.writeValueAsString(data);
-        }
-        catch (JsonProcessingException e)
-        {
-            ServerException.throwFrom(e);
-        }
-    }
-
-
-    public <T> T getParameters(Class<T> clazz)
-    {
-        try
-        {
-            return JSonSerializer.fromJson(this.parameters, clazz);
-        }
-        catch (IOException e)
-        {
-            return ServerException.throwFrom(e);
-        }
-    }
 }

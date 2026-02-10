@@ -16,9 +16,11 @@
 
 package hu.perit.spvitamin.spring.resilientjobrunner.config;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -30,14 +32,24 @@ import java.util.Map;
 @Component
 @ConfigurationProperties
 @Validated
+@Slf4j
 public class ResilientJobCollectionProperties
 {
-    @NotEmpty
     private Map<String, @Valid ResilientJobProperties> resilientJobs = new HashMap<>();
 
 
     public ResilientJobProperties get(String name)
     {
         return this.resilientJobs.get(name);
+    }
+
+
+    @PostConstruct
+    private void init()
+    {
+        if (this.resilientJobs.isEmpty())
+        {
+            log.warn("Resilient jobs properties are missing!");
+        }
     }
 }
