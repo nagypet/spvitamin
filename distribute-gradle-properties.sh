@@ -22,6 +22,7 @@ copyTo() {
 
 copyTo pwdtool
 copyTo spvitamin-core
+copyTo spvitamin-pdf
 copyTo spvitamin-file-storage
 copyTo spvitamin-file-storage-spring-sftp
 copyTo spvitamin-json-time

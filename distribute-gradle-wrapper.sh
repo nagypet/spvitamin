@@ -27,6 +27,7 @@ copyTo spvitamin-core
 copyTo spvitamin-file-storage
 copyTo spvitamin-file-storage-spring-sftp
 copyTo spvitamin-json-time
+copyTo spvitamin-pdf
 copyTo spvitamin-spring-admin
 copyTo spvitamin-spring-cloud-client
 copyTo spvitamin-spring-cloud-feign

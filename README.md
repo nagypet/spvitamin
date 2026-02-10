@@ -106,6 +106,7 @@ dependencyManagement {
 - AsyncExecutor: delegating ThreadContext
 - credentialType added to AuthorizationToken
 - AuthorizationException handled in GenericRestExceptionResponseBuilder
+- New module: spvitamin-pdf
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -185,6 +186,9 @@ dependencyManagement {
 - Putting the sessionId in ThreadContext
 - PessimisticJpaRepository fixed
 - AsyncExecutor: delegating ThreadContext 
+- credentialType added to AuthorizationToken
+- AuthorizationException handled in GenericRestExceptionResponseBuilder
+- New module: spvitamin-pdf
 
 
 ### 3.3.3-2-RELEASE not yet released
