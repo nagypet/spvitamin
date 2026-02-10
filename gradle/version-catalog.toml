@@ -52,6 +52,8 @@ nimbus-jose-jwt = 'com.nimbusds:nimbus-jose-jwt:10.5'
 nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
+pdfbox = 'org.apache.pdfbox:pdfbox:3.0.3'
+pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.3'
 reflections = 'org.reflections:reflections:0.10.2'
 slf4j-api = 'org.slf4j:slf4j-api:2.0.15'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
