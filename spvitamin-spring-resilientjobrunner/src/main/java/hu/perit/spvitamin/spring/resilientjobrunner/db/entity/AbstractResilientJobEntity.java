@@ -43,7 +43,9 @@ public class AbstractResilientJobEntity
     public static final String COL_PARAMETER_VERSION = "parameter_version";
     public static final String COL_PARAMETERS = "parameters";
     public static final String COL_RETRY_COUNT = "retry_count";
-    public static final String COL_PROCESSING_STARTED_TIMESTAMP = "processing_started_timestamp";
+    public static final String COL_PROCESSING_FIRST_STARTED_TIMESTAMP = "processing_first_started_timestamp";
+    public static final String COL_PROCESSING_LAST_STARTED_TIMESTAMP = "processing_last_started_timestamp";
+    public static final String COL_NEXT_RETRY_TIMESTAMP = "next_retry_timestamp";
     public static final String COL_EROR_TEXT = "error_text";
 
     @Id
@@ -73,9 +75,17 @@ public class AbstractResilientJobEntity
     @Column(name = COL_PARAMETERS, nullable = false, columnDefinition = "TEXT")
     private String parameters;
 
-    @Column(name = COL_PROCESSING_STARTED_TIMESTAMP)
+    @Column(name = COL_PROCESSING_FIRST_STARTED_TIMESTAMP)
     @Convert(converter = OffsetDateTimeToUTCConverter.class)
-    private OffsetDateTime processingStartedTimestamp;
+    private OffsetDateTime processingFirstStartedTimestamp;
+
+    @Column(name = COL_PROCESSING_LAST_STARTED_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime processingLastStartedTimestamp;
+
+    @Column(name = COL_NEXT_RETRY_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime nextRetryTimestamp;
 
     @Column(name = COL_EROR_TEXT, columnDefinition = "TEXT")
     private String errorText;

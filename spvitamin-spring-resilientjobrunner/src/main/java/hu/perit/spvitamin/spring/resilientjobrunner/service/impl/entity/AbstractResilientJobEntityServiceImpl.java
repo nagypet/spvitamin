@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.EnumSet;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -62,7 +63,11 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     @Transactional
     public int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout)
     {
-        return this.repo.terminatePermanentlyFailingEntities(processorType.getProcessorId(), OffsetDateTime.now().minusSeconds(timeout.getSeconds()), ResilientJobStatus.ERROR);
+        return this.repo.terminatePermanentlyFailingEntities(
+                processorType.getProcessorId(),
+                OffsetDateTime.now().minusSeconds(timeout.getSeconds()),
+                EnumSet.of(ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS),
+                ResilientJobStatus.ERROR);
     }
 
 
@@ -70,7 +75,12 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     @Transactional
     public int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout)
     {
-        return this.repo.resetStuckInProgressEntities(processorType.getProcessorId(), OffsetDateTime.now().minusSeconds(timeout.getSeconds()), ResilientJobStatus.IN_PROGRESS, ResilientJobStatus.CREATED);
+        return this.repo.resetStuckInProgressEntities(
+                processorType.getProcessorId(),
+                OffsetDateTime.now().minusSeconds(timeout.getSeconds()),
+                ResilientJobStatus.IN_PROGRESS,
+                ResilientJobStatus.CREATED
+        );
     }
 
 
@@ -79,8 +89,18 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     public List<T> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId)
     {
         PageRequest pageRequest = PageRequest.of(0, 200);
-        List<T> entities = this.repo.findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(processorType.getProcessorId(), lastId, ResilientJobStatus.CREATED, pageRequest);
-        this.repo.updateStatusAndProcessingStartedTimestamp(entities.stream().map(i -> i.getId()).toList(), ResilientJobStatus.IN_PROGRESS, OffsetDateTime.now());
+        List<T> entities = this.repo.findReadyForProcessing(
+                processorType.getProcessorId(),
+                lastId,
+                ResilientJobStatus.CREATED,
+                OffsetDateTime.now(),
+                pageRequest
+        );
+        this.repo.updateStatusAndProcessingStartedTimestamp(
+                entities.stream().map(i -> i.getId()).toList(),
+                ResilientJobStatus.IN_PROGRESS,
+                OffsetDateTime.now()
+        );
         return entities;
     }
 
@@ -106,8 +126,8 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
 
     @Override
     @Transactional
-    public void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e)
+    public void saveError(Long id, ResilientJobStatus resilientJobStatus, OffsetDateTime nextRetryTimestamp, Exception e)
     {
-        this.repo.updateStatusAndError(id, resilientJobStatus, StackTracer.toString(e));
+        this.repo.updateStatusAndError(id, resilientJobStatus, nextRetryTimestamp, StackTracer.toString(e));
     }
 }

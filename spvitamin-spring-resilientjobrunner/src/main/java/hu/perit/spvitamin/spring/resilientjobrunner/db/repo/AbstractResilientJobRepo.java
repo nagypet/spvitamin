@@ -29,19 +29,25 @@ import org.springframework.data.jpa.repository.QueryHints;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
+    // The 'coalesce(e.processingFirstStartedTimestamp, e.creationTimestamp)' is only necessary for the database migration
+    // By using the whereState this method will work fine even if the DONE records are not deleted.
     @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status <> :errorState and e.creationTimestamp < :timestamp and e.processingStartedTimestamp is not null")
+    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and coalesce(e.processingFirstStartedTimestamp, e.creationTimestamp) < :timestamp")
     int terminatePermanentlyFailingEntities(
             Long processorType,
             OffsetDateTime timestamp,
+            Set<ResilientJobStatus> whereStates,
             ResilientJobStatus errorState
     );
 
+
+    // The 'coalesce(e.processingLastStartedTimestamp, e.creationTimestamp)' is only necessary for the database migration
     @Modifying
-    @Query("update #{#entityName} e set e.status = :targetState, e.retryCount = e.retryCount + 1 where e.processorType = :processorType and e.status = :whereState and e.processingStartedTimestamp < :timestamp")
+    @Query("update #{#entityName} e set e.status = :targetState, e.retryCount = e.retryCount + 1 where e.processorType = :processorType and e.status = :whereState and coalesce(e.processingLastStartedTimestamp, e.creationTimestamp) < :timestamp")
     int resetStuckInProgressEntities(
             Long processorType,
             OffsetDateTime timestamp,
@@ -49,16 +55,31 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
             ResilientJobStatus targetState
     );
 
+
     // We use here timeout = 0 which means, do not wait for locked rows.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
-    List<T> findAllByProcessorTypeAndIdGreaterThanAndStatusOrderById(Long processorType, long lastId, ResilientJobStatus status, PageRequest pageRequest);
+    @Query("""
+            select e from #{#entityName} e
+            where e.processorType = :processorType
+            and e.id > :lastId
+            and e.status = :status
+            and (e.nextRetryTimestamp is null or e.nextRetryTimestamp <= :now)
+            order by e.id""")
+    List<T> findReadyForProcessing(
+            Long processorType,
+            long lastId,
+            ResilientJobStatus status,
+            OffsetDateTime now,
+            PageRequest pageRequest
+    );
+
 
     @Modifying
     @Query("""
             update #{#entityName} e set e.status = :status,
-            e.processingStartedTimestamp = :processingStartedTimestamp,
-            e.creationTimestamp = case when (e.retryCount = 0 or e.retryCount is null) then :processingStartedTimestamp else e.creationTimestamp end
+            e.processingFirstStartedTimestamp = case when (e.retryCount = 0 or e.retryCount is null) then :processingStartedTimestamp else e.processingFirstStartedTimestamp end,
+            e.processingLastStartedTimestamp = :processingStartedTimestamp
             where e.id in :ids""")
     int updateStatusAndProcessingStartedTimestamp(
             List<Long> ids,
@@ -68,10 +89,11 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
 
 
     @Modifying
-    @Query("update #{#entityName} e set e.status = :status, e.errorText = :errorText, e.retryCount = e.retryCount + 1 where e.id = :id")
+    @Query("update #{#entityName} e set e.status = :status, e.nextRetryTimestamp = :nextRetryTimestamp, e.errorText = :errorText, e.retryCount = e.retryCount + 1 where e.id = :id")
     void updateStatusAndError(
             Long id,
             ResilientJobStatus status,
+            OffsetDateTime nextRetryTimestamp,
             String errorText
     );
 

@@ -232,7 +232,14 @@ class BJobProcessorTest
 
 
         @Override
-        public OffsetDateTime getProcessingStartedTimestamp()
+        public OffsetDateTime getProcessingFirstStartedTimestamp()
+        {
+            return null;
+        }
+
+
+        @Override
+        public OffsetDateTime getProcessingLastStartedTimestamp()
         {
             return null;
         }

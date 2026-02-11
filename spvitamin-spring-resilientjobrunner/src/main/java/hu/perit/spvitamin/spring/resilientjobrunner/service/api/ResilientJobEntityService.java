@@ -22,6 +22,7 @@ import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobPropertie
 import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
@@ -38,5 +39,5 @@ public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
 
     void deleteById(Long id);
 
-    void saveError(Long id, ResilientJobStatus resilientJobStatus, Exception e);
+    void saveError(Long id, ResilientJobStatus resilientJobStatus, OffsetDateTime nextRetryTimestamp, Exception e);
 }
