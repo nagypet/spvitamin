@@ -27,9 +27,9 @@ import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJ
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import hu.perit.spvitamin.spring.threadcontext.ThreadContextDecorator;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -37,6 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -46,11 +49,15 @@ class BJobProcessor
     private final ResilientJobCollectionProperties resilientJobCollectionProperties;
     private final ResilientJobEntityService<? extends AbstractResilientJobEntity> resilientJobEntityService;
     private final Map<ProcessorType, BatchExecutor> executorMap = new HashMap<>();
+    private ScheduledExecutorService scheduler;
 
 
     @PostConstruct
     void setUp()
     {
+        int processorCount = this.resilientJobCollectionProperties.getResilientJobs().size();
+        this.scheduler = Executors.newScheduledThreadPool(processorCount);
+
         for (Map.Entry<String, ResilientJobProperties> entry : this.resilientJobCollectionProperties.getResilientJobs().entrySet())
         {
             String name = entry.getKey();
@@ -60,7 +67,38 @@ class BJobProcessor
                     processorType,
                     new BatchExecutor(properties.getThreadPoolSize(), createProcessor(processorType, properties))
             );
-            log.info("{} configured", processorType);
+
+            long pollingMillis = properties.getPollingInterval().toMillis();
+            this.scheduler.scheduleWithFixedDelay(
+                    () -> process(processorType),
+                    pollingMillis,
+                    pollingMillis,
+                    TimeUnit.MILLISECONDS
+            );
+
+            log.info("{} configured with polling interval: {}", processorType, properties.getPollingInterval());
+        }
+    }
+
+
+    @PreDestroy
+    void tearDown()
+    {
+        if (this.scheduler != null)
+        {
+            this.scheduler.shutdown();
+            try
+            {
+                if (!this.scheduler.awaitTermination(30, TimeUnit.SECONDS))
+                {
+                    this.scheduler.shutdownNow();
+                }
+            }
+            catch (InterruptedException e)
+            {
+                this.scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -76,13 +114,6 @@ class BJobProcessor
         {
             return ServerException.throwFrom(e);
         }
-    }
-
-
-    @Scheduled(fixedDelay = 5000)
-    private void triggerProcessing()
-    {
-        this.executorMap.keySet().parallelStream().forEach(this::process);
     }
 
 

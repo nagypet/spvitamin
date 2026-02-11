@@ -107,6 +107,7 @@ dependencyManagement {
 - credentialType added to AuthorizationToken
 - AuthorizationException handled in GenericRestExceptionResponseBuilder
 - New module: spvitamin-pdf
+- ResilientJobRunner implements an exponential back-off strategy for retry
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -189,6 +190,8 @@ dependencyManagement {
 - credentialType added to AuthorizationToken
 - AuthorizationException handled in GenericRestExceptionResponseBuilder
 - New module: spvitamin-pdf
+- ResilientJobRunner fixes ported back from 4.0.1
+- ResilientJobRunner implements an exponential back-off strategy for retry
 
 
 ### 3.3.3-2-RELEASE not yet released

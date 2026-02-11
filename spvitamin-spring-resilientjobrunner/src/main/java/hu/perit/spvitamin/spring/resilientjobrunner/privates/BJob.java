@@ -65,7 +65,12 @@ class BJob extends ContextAwareBatchJob
                 if (isRetryable || !isItemRelated)
                 {
                     // retryable or unknown error => we will retry the job
-                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.CREATED, e);
+                    this.resilientJobEntityService.saveError(
+                            entity.getId(),
+                            ResilientJobStatus.CREATED,
+                            calculateNextRetryTimestamp(entity.getRetryCount()),
+                            e
+                    );
 
                     // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
                     if (isRetryable && !isItemRelated)
@@ -76,7 +81,7 @@ class BJob extends ContextAwareBatchJob
                 else // item-related && not-retryable
                 {
                     // job should be set in error, but the batch should continue
-                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, e);
+                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, null, e);
                     onError(e);
                 }
             }
@@ -125,6 +130,19 @@ class BJob extends ContextAwareBatchJob
         {
             log.error("Error in onError method: {}", StackTracer.toString(ex));
         }
+    }
+
+
+    /**
+     * Exponential backoff: 5s, 10s, 20s, 40s, 80s, ... capped at 5 minutes
+     */
+    OffsetDateTime calculateNextRetryTimestamp(Long retryCount)
+    {
+        Duration initialRetryDelay = this.processor.getProperties().getInitialRetryDelay();
+        Duration maxRetryDelay = this.processor.getProperties().getMaxRetryDelay();
+        long count = retryCount != null ? retryCount : 0;
+        long delaySeconds = Math.min((long) (initialRetryDelay.toSeconds() * Math.pow(2, count)), maxRetryDelay.toSeconds());
+        return OffsetDateTime.now().plusSeconds(delaySeconds);
     }
 
 
