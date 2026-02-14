@@ -108,6 +108,7 @@ dependencyManagement {
 - AuthorizationException handled in GenericRestExceptionResponseBuilder
 - New module: spvitamin-pdf
 - ResilientJobRunner implements an exponential back-off strategy for retry
+- TokenCache put in spvitamin-spring-cloud-feign
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -192,6 +193,7 @@ dependencyManagement {
 - New module: spvitamin-pdf
 - ResilientJobRunner fixes ported back from 4.0.1
 - ResilientJobRunner implements an exponential back-off strategy for retry
+- TokenCache put in spvitamin-spring-cloud-feign
 
 
 ### 3.3.3-2-RELEASE not yet released
