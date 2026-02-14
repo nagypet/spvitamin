@@ -33,10 +33,9 @@ import java.util.Set;
 
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
-    // The 'coalesce(e.processingFirstStartedTimestamp, e.creationTimestamp)' is only necessary for the database migration
     // By using the whereState this method will work fine even if the DONE records are not deleted.
     @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and coalesce(e.processingFirstStartedTimestamp, e.creationTimestamp) < :timestamp")
+    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and e.processingFirstStartedTimestamp < :timestamp")
     int terminatePermanentlyFailingEntities(
             Long processorType,
             OffsetDateTime timestamp,
@@ -78,7 +77,10 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     @Modifying
     @Query("""
             update #{#entityName} e set e.status = :status,
-            e.processingFirstStartedTimestamp = case when (e.retryCount = 0 or e.retryCount is null) then :processingStartedTimestamp else e.processingFirstStartedTimestamp end,
+            e.processingFirstStartedTimestamp = case
+                when (e.retryCount = 0 or e.retryCount is null or e.processingFirstStartedTimestamp is null) then :processingStartedTimestamp
+                else e.processingFirstStartedTimestamp
+            end,
             e.processingLastStartedTimestamp = :processingStartedTimestamp
             where e.id in :ids""")
     int updateStatusAndProcessingStartedTimestamp(

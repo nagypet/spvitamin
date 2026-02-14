@@ -46,6 +46,10 @@ public class ResilientJobCollectionProperties
     @PostConstruct
     private void init()
     {
+        for (Map.Entry<String, @Valid ResilientJobProperties> jobProperty : this.resilientJobs.entrySet())
+        {
+            log.info("{}: {}", jobProperty.getKey(), jobProperty.getValue());
+        }
         if (this.resilientJobs.isEmpty())
         {
             log.warn("Resilient jobs properties are missing!");
