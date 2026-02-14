@@ -101,7 +101,7 @@ class BJob extends ContextAwareBatchJob
 
     void processEntity() throws Exception
     {
-        log.info("Processing entity");
+        log.info("Processor {} starting entity {}", this.processor.getClass().getSimpleName(), this.entity);
 
         // Calling processor
         if (this.processor != null)
@@ -113,7 +113,7 @@ class BJob extends ContextAwareBatchJob
             throw new RuntimeException("Job parameters could not be retrieved!");
         }
 
-        log.info("Processed successfully");
+        log.info("Processor {} finished entity {}", this.processor.getClass().getSimpleName(), this.entity);
 
         // Deleting the entity after successful processing
         this.resilientJobEntityService.deleteById(this.entity.getId());
