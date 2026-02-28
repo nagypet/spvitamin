@@ -59,7 +59,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.4.3-1-RELEASE')
+    set('spvitaminVersion', '4.0.3-1-RELEASE')
 }
 
 dependencies {
@@ -95,6 +95,10 @@ dependencyManagement {
 ```
 
 ## Release history
+
+### 4.0.3-1-RELEASE not yet released
+
+- 2025-02-28: Java21, SpringBoot 4.0.3
 
 ### 4.0.1-1-RELEASE not yet released
 

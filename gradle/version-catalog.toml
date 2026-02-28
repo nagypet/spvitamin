@@ -1,7 +1,7 @@
 [versions]
 aspectj = '1.9.22.1'
 jackson-annotations = '2.20'
-jackson3 = '3.0.3'
+jackson3 = '3.1.0'
 jsonwebtoken = '0.12.6'
 junit = '6.0.1'
 logback = '1.5.22'
@@ -14,7 +14,7 @@ czhabarta = '3.2.1263'
 ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.1' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 
 [libraries]
