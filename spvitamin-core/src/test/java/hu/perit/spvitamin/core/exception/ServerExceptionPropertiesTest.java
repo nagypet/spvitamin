@@ -16,14 +16,13 @@
 
 package hu.perit.spvitamin.core.exception;
 
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 /**
  * @author Peter Nagy
@@ -80,7 +79,7 @@ class ServerExceptionPropertiesTest {
         if (ex1.getCause() != null) {
             this.compare(ex1.getCause(), ex2.getCause());
         }
-        if (!ex1.getClass().equals(ex2.getClass()) || (!(ex1 instanceof NullPointerException) && !StringUtils.equals(ex1.getMessage(), ex2.getMessage()))) {
+        if (!ex1.getClass().equals(ex2.getClass()) || (!(ex1 instanceof NullPointerException) && !Strings.CS.equals(ex1.getMessage(), ex2.getMessage()))) {
             Assertions.fail(String.format("'%s' != '%s'", ex1.getMessage(), ex2.getMessage()));
         }
         if (ex1 instanceof NullPointerException) {

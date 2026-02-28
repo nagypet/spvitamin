@@ -23,6 +23,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -35,7 +36,11 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
@@ -47,6 +52,7 @@ public class OAuth2Configurer
     private final AuthorizationService authorizationService;
     private final AuthenticationRepository authenticationRepository;
     private final SecurityProperties securityProperties;
+
 
     @PostConstruct
     private void setUp()
@@ -83,7 +89,7 @@ public class OAuth2Configurer
             String registrationId = entry.getKey();
 
             ClientRegistration clientRegistration = null;
-            if (StringUtils.equalsIgnoreCase(registrationId, "spvitamin"))
+            if (Strings.CI.equals(registrationId, "spvitamin"))
             {
                 clientRegistration = ClientRegistrations.fromOidcConfiguration(Map.of(
                                 "issuer", provider.getIssuerUri(),

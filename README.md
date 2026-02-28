@@ -59,7 +59,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '4.0.1-1-RELEASE')
+    set('spvitaminVersion', '3.4.3-1-RELEASE')
 }
 
 dependencies {
@@ -116,6 +116,7 @@ dependencyManagement {
   - there is no refresh token for technical users
   - session lifetime equals with access token validity for technical users
   - /authenticate endpoint: only basic authentication creates a nes session
+- 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -204,10 +205,11 @@ dependencyManagement {
 - 2026-02-28: BatchProcessor: nulls filtered out
 - 2026-02-28: new typehelper: IntUtils
 - 2026-02-28: Security:
-  - token validation fixed
-  - there is no refresh token for technical users
-  - session lifetime equals with access token validity for technical users
-  - /authenticate endpoint: only basic authentication creates a nes session
+    - token validation fixed
+    - there is no refresh token for technical users
+    - session lifetime equals with access token validity for technical users
+    - /authenticate endpoint: only basic authentication creates a nes session
+- 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 
 
 ### 3.3.3-2-RELEASE not yet released

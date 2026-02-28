@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -79,14 +80,14 @@ public final class RequestQuery
             String userAgent = httpServletRequest.getHeader("user-agent");
             if (StringUtils.isNotBlank(userAgent))
             {
-                if (StringUtils.containsIgnoreCase(userAgent, "firefox")
-                        || StringUtils.containsIgnoreCase(userAgent, "chrome")
-                        || StringUtils.containsIgnoreCase(userAgent, "mozilla")
-                        || StringUtils.containsIgnoreCase(userAgent, "safari")
-                        || StringUtils.containsIgnoreCase(userAgent, "edge")
-                        || StringUtils.containsIgnoreCase(userAgent, "opera")
-                        || StringUtils.containsIgnoreCase(userAgent, "msie")
-                        || StringUtils.containsIgnoreCase(userAgent, "trident")
+                if (Strings.CI.contains(userAgent, "firefox")
+                        || Strings.CI.contains(userAgent, "chrome")
+                        || Strings.CI.contains(userAgent, "mozilla")
+                        || Strings.CI.contains(userAgent, "safari")
+                        || Strings.CI.contains(userAgent, "edge")
+                        || Strings.CI.contains(userAgent, "opera")
+                        || Strings.CI.contains(userAgent, "msie")
+                        || Strings.CI.contains(userAgent, "trident")
                 )
                 {
                     return true;

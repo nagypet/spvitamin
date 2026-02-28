@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
@@ -135,7 +136,7 @@ public class PrinterVisitor implements ThingVisitor
         }
 
         // if this is a password
-        if (options.hidePasswords && StringUtils.containsIgnoreCase(name, PASSWORD))
+        if (options.hidePasswords && Strings.CI.contains(name, PASSWORD))
         {
             return "*** [hidden]";
         }

@@ -149,10 +149,12 @@ class StandardServerParameters
 //        }
 //    }
 
+
     private static boolean isSecret(String propName)
     {
         return Strings.CI.containsAny(propName, "password", "secret");
     }
+
 
     private String getActuatorUrl()
     {
@@ -164,10 +166,12 @@ class StandardServerParameters
 //        return this.serverProperties.getServiceUrl() + h2ConsoleProperties.getPath();
 //    }
 
+
     private String getApiDocsUrl()
     {
         return this.serverProperties.getServiceUrl() + this.swaggerProperties.getApiDocs().getPath();
     }
+
 
     private String getSwaggerUrl()
     {
