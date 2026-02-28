@@ -23,6 +23,7 @@ import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.BasicOnlySessionSecurityContextRepository;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
@@ -143,6 +144,20 @@ public class SimpleHttpSecurityBuilder
                 http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1])));
             }
         }
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication() throws Exception
+    {
+        SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
+        this.http
+                .sessionManagement(i -> i
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .sessionAuthenticationStrategy(authenticationStrategy)
+                )
+                .securityContext(ctx -> ctx.securityContextRepository(new BasicOnlySessionSecurityContextRepository()));
 
         return this;
     }
@@ -303,7 +318,7 @@ public class SimpleHttpSecurityBuilder
                 .addLocalUserAuthenticationProvider()
                 .basicAuth()
                 .jwtAuth()
-                .createSession();
+                .createSessionOnlyForBasicAuthentication();
 
         return this;
     }
@@ -333,7 +348,7 @@ public class SimpleHttpSecurityBuilder
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .authorizeRequests(r -> r.anyRequest().permitAll())
-                .createSession();
+                .createSessionOnlyForBasicAuthentication();
 
         return this;
     }

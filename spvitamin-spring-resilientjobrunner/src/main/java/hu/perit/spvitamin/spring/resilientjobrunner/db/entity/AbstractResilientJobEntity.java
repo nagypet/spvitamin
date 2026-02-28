@@ -28,12 +28,14 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @MappedSuperclass
+@ToString
 public class AbstractResilientJobEntity
 {
     public static final String COL_ID = "id";

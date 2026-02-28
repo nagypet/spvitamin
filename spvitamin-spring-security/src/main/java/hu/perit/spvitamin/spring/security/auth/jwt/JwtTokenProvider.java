@@ -28,6 +28,7 @@ import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
 import io.jsonwebtoken.Claims;
@@ -73,9 +74,6 @@ public class JwtTokenProvider
 {
     public static final String HIDDEN = "hidden";
 
-    private final SecurityProperties securityProperties;
-
-
     @RequiredArgsConstructor
     @Getter
     public enum Type
@@ -94,6 +92,7 @@ public class JwtTokenProvider
     }
 
 
+    private final SecurityProperties securityProperties;
     private final JwtProperties jwtProperties;
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private final AdvancedSessionRegistry sessionRegistry;
@@ -111,19 +110,33 @@ public class JwtTokenProvider
         // Creating the jwt token
         AuthorizationToken jwtToken = this.generateToken(Type.JWT, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, ttl);
 
-        // Creating the refresh token
-        AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, refreshTtl);
-
-        jwtToken.setExt(Map.of("rtiat", refreshToken.getIat(), "rtexp", refreshToken.getExp()));
+        boolean technicalUser = PrincipalUtils.isTechnicalUser(authenticatedUser);
+        AuthorizationToken refreshToken = null;
+        if (!technicalUser)
+        {
+            // Creating the refresh token
+            refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, refreshTtl);
+        }
+        // For compatibility reasons the rtiat and rtexp properties will be set even if there is no refresh token
+        jwtToken.setExt(Map.of(
+                "rtiat", refreshToken != null ? refreshToken.getIat() : jwtToken.getIat(),
+                "rtexp", refreshToken != null ? refreshToken.getExp() : jwtToken.getExp()
+        ));
 
         // Putting tokens into the cookie
         HttpHeaders headers = new HttpHeaders();
-        if (!auth.isAllowTokenInResponse() && RequestQuery.isFromBrowser())
+        if (RequestQuery.isFromBrowser())
         {
             headers.add(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
-            jwtToken.setJwt(HIDDEN);
+            if (refreshToken != null)
+            {
+                headers.add(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
+            }
+            if (!auth.isAllowTokenInResponse())
+            {
+                jwtToken.setJwt(HIDDEN);
+            }
         }
-        headers.add(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
 
         return new ResponseEntity<>(jwtToken, headers, HttpStatus.OK);
     }
@@ -135,11 +148,22 @@ public class JwtTokenProvider
         {
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
-            if (type == Type.REFRESH)
+            if (!PrincipalUtils.isTechnicalUser(authenticatedUser))
             {
-                // Update session timeout
-                setSessionTimeout(ttl);
-                touchSession(type);
+                if (type == Type.REFRESH)
+                {
+                    // Update session timeout
+                    setSessionTimeout(ttl);
+                    touchSession(type);
+                }
+            }
+            else
+            {
+                if (type != Type.REFRESH)
+                {
+                    // Update session timeout
+                    setSessionTimeout(ttl);
+                }
             }
 
             // Updating session-registry

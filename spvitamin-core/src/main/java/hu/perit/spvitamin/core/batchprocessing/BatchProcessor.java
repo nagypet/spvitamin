@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -109,7 +110,7 @@ public abstract class BatchProcessor
         }
 
         // Creating a copy of the ArrayList of BatchJobs, so that the input remains untouched
-        List<BatchJob> copyOfBatchJobs = new ArrayList<>(batchJobs);
+        List<BatchJob> copyOfBatchJobs = new ArrayList<>(batchJobs.stream().filter(Objects::nonNull).toList());
 
         log.info(String.format("Processing started with %d jobs in %d threads...", copyOfBatchJobs.size(), threadPoolSize));
 

@@ -57,7 +57,7 @@ class BJob extends ContextAwareBatchJob
                 log.error(exceptionWrapper.toStringWithCauses());
                 log.error("Exception. Retried {} times. Remaining time for retries: {}.",
                         entity.getRetryCount(),
-                        calculateRemainingTime(entity.getCreationTimestamp()));
+                        calculateRemainingTime(entity.getProcessingFirstStartedTimestamp()));
 
                 boolean isItemRelated = this.processor.isItemRelatedException(e);
                 boolean isRetryable = this.processor.isRetryableException(e);
@@ -93,7 +93,11 @@ class BJob extends ContextAwareBatchJob
 
     String calculateRemainingTime(OffsetDateTime creationTimestamp)
     {
-        long elapsedSeconds = Duration.between(creationTimestamp, OffsetDateTime.now()).toSeconds();
+        long elapsedSeconds = 0;
+        if (creationTimestamp != null)
+        {
+            elapsedSeconds = Duration.between(creationTimestamp, OffsetDateTime.now()).toSeconds();
+        }
         long remainingSeconds = this.processor.getProperties().getRetryTimeout().getSeconds() - elapsedSeconds;
         return TimeFormatter.getHumanReadableDuration(remainingSeconds * 1000);
     }

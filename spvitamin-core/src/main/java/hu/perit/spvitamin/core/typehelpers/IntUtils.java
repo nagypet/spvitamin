@@ -23,12 +23,12 @@ import java.math.BigInteger;
 
 /**
  * A utility class for working with Long and BigInteger values.
- *
+ * 
  * <p>This class provides methods for comparing, checking equality, and performing
  * other common operations on Long and BigInteger values with proper null handling.
  * It simplifies working with numeric types by providing consistent behavior for
  * null values and conversions between different numeric representations.</p>
- *
+ * 
  * <p>Features:</p>
  * <ul>
  *   <li>Null-safe equality checking between Long and BigInteger values</li>
@@ -37,168 +37,168 @@ import java.math.BigInteger;
  *   <li>Safe parsing of strings to Long values</li>
  *   <li>Default value handling for null Longs</li>
  * </ul>
- *
+ * 
  * <p>Example usage:</p>
  * <pre>
  * // Compare Long values with null handling
  * int result = LongUtils.compare(value1, value2, true); // true = null is less than non-null
- *
+ * 
  * // Check if a Long is blank (null or zero)
  * boolean isBlank = LongUtils.isBlank(value);
- *
+ * 
  * // Get a default value (0) for null
  * long safe = LongUtils.get(nullableLong);
- *
+ * 
  * // Safely parse a string to Long (returns null on error)
  * Long parsed = LongUtils.parse("123");
  * </pre>
- *
+ * 
  * @author Peter Nagy (xgxtpna)
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LongUtils
+public final class IntUtils
 {
     /**
-     * @param l1
-     * @param l2
+     * @param i1
+     * @param i2
      * @return boolean
      */
-    public static boolean equals(final Long l1, final Long l2)
+    public static boolean equals(final Integer i1, final Integer i2)
     {
-        if (l1 == l2) // NOSONAR
+        if (i1 == i2) // NOSONAR
         {
             return true;
         }
 
-        if (l1 == null || l2 == null)
+        if (i1 == null || i2 == null)
         {
             return false;
         }
 
-        return l1.equals(l2);
+        return i1.equals(i2);
     }
 
 
     /**
      * @param bi
-     * @param l
+     * @param i
      * @return boolean
      */
-    public static boolean equals(final BigInteger bi, final Long l)
+    public static boolean equals(final BigInteger bi, final Integer i)
     {
-        if (bi == null || l == null)
+        if (bi == null || i == null)
         {
             return false;
         }
 
-        return equals(bi.longValue(), l);
+        return equals(bi.intValue(), i);
     }
 
 
     /**
-     * @param l
+     * @param i
      * @param bi
      * @return boolean
      */
-    public static boolean equals(final Long l, final BigInteger bi)
+    public static boolean equals(final Integer i, final BigInteger bi)
     {
-        if (bi == null || l == null)
+        if (bi == null || i == null)
         {
             return false;
         }
 
-        return equals(bi.longValue(), l);
+        return equals(bi.intValue(), i);
     }
 
 
     /**
-     * @param l1
-     * @param l2
+     * @param i1
+     * @param i2
      * @param nullIsLess whether consider {@code null} value less than non-{@code null} value
-     * @return &lt; 0, 0, &gt; 0, if {@code l1} is respectively less, equal ou greater than {@code l2}
+     * @return &lt; 0, 0, &gt; 0, if {@code i1} is respectively less, equal ou greater than {@code i2}
      */
-    public static int compare(final Long l1, final Long l2, final boolean nullIsLess)
+    public static int compare(final Integer i1, final Integer i2, final boolean nullIsLess)
     {
-        if (l1 == l2) // NOSONAR
+        if (i1 == i2) // NOSONAR
         {
             return 0;
         }
-        if (l1 == null)
+        if (i1 == null)
         {
             return nullIsLess ? -1 : 1;
         }
-        if (l2 == null)
+        if (i2 == null)
         {
             return nullIsLess ? 1 : -1;
         }
-        return l1.compareTo(l2);
+        return i1.compareTo(i2);
     }
 
 
     /**
-     * @param l1
-     * @param l2
-     * @return &lt; 0, 0, &gt; 0, if {@code l1} is respectively less, equal ou greater than {@code l2}
+     * @param i1
+     * @param i2
+     * @return &lt; 0, 0, &gt; 0, if {@code i1} is respectively less, equal ou greater than {@code i2}
      */
-    public static int compare(final Long l1, final Long l2)
+    public static int compare(final Integer i1, final Integer i2)
     {
-        return compare(l1, l2, true);
+        return compare(i1, i2, true);
     }
 
 
     /**
-     * @param l
+     * @param i
      * @param bi
      * @param nullIsLess
-     * @return &lt; 0, 0, &gt; 0, if {@code l} is respectively less, equal ou greater than {@code bi}
+     * @return &lt; 0, 0, &gt; 0, if {@code i} is respectively less, equal ou greater than {@code bi}
      */
-    public static int compare(final Long l, final BigInteger bi, final boolean nullIsLess)
+    public static int compare(final Integer i, final BigInteger bi, final boolean nullIsLess)
     {
         if (bi == null)
         {
             return nullIsLess ? 1 : -1;
         }
 
-        return compare(l, bi.longValue(), nullIsLess);
+        return compare(i, bi.intValue(), nullIsLess);
     }
 
 
     /**
-     * @param l
+     * @param i
      * @param bi
-     * @return &lt; 0, 0, &gt; 0, if {@code l} is respectively less, equal ou greater than {@code bi}
+     * @return &lt; 0, 0, &gt; 0, if {@code i} is respectively less, equal ou greater than {@code bi}
      */
-    public static int compare(final Long l, final BigInteger bi)
+    public static int compare(final Integer i, final BigInteger bi)
     {
-        return compare(l, bi, true);
+        return compare(i, bi, true);
     }
 
 
     /**
      * @param bi
-     * @param l
+     * @param i
      * @param nullIsLess
-     * @return &lt; 0, 0, &gt; 0, if {@code bi} is respectively less, equal ou greater than {@code l}
+     * @return &lt; 0, 0, &gt; 0, if {@code bi} is respectively less, equal ou greater than {@code i}
      */
-    public static int compare(final BigInteger bi, final Long l, final boolean nullIsLess)
+    public static int compare(final BigInteger bi, final Integer i, final boolean nullIsLess)
     {
         if (bi == null)
         {
             return nullIsLess ? -1 : 1;
         }
 
-        return compare(bi.longValue(), l, nullIsLess);
+        return compare(bi.intValue(), i, nullIsLess);
     }
 
 
     /**
      * @param bi
-     * @param l
-     * @return &lt; 0, 0, &gt; 0, if {@code bi} is respectively less, equal ou greater than {@code l}
+     * @param i
+     * @return &lt; 0, 0, &gt; 0, if {@code bi} is respectively less, equal ou greater than {@code i}
      */
-    public static int compare(final BigInteger bi, final Long l)
+    public static int compare(final BigInteger bi, final Integer i)
     {
-        return compare(bi, l, true);
+        return compare(bi, i, true);
     }
 
 
@@ -237,25 +237,25 @@ public final class LongUtils
     }
 
 
-    public static boolean isBlank(Long l)
+    public static boolean isBlank(Integer l)
     {
-        return (l == null || l.equals(0L));
+        return (l == null || l.equals(0));
     }
 
 
-    public static boolean isNotBlank(Long l)
+    public static boolean isNotBlank(Integer l)
     {
         return !isBlank(l);
     }
 
 
-    public static long get(Long l)
+    public static int get(Integer l)
     {
         return l != null ? l : 0;
     }
 
 
-    public static Long parse(String text)
+    public static Integer parse(String text)
     {
         if (text == null)
         {
@@ -264,7 +264,7 @@ public final class LongUtils
 
         try
         {
-            return Long.parseLong(text);
+            return Integer.parseInt(text);
         }
         catch (Exception e)
         {
@@ -273,14 +273,14 @@ public final class LongUtils
     }
 
 
-    public static long min(Long l1, Long l2)
+    public static int min(Integer i1, Integer i2)
     {
-        return Math.min(get(l1), get(l2));
+        return Math.min(get(i1), get(i2));
     }
 
 
-    public static long max(Long l1, Long l2)
+    public static int max(Integer i1, Integer i2)
     {
-        return Math.max(get(l1), get(l2));
+        return Math.max(get(i1), get(i2));
     }
 }

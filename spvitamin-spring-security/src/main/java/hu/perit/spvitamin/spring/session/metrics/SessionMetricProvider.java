@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.session.metrics;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class SessionMetricProvider
                 .toList();
 
         List<SessionInformation> filteredSessions = allSessions.stream()
-                .filter(i -> !i.isExpired() && !isTechnicalUser(i.getPrincipal()))
+                .filter(i -> !i.isExpired() && !PrincipalUtils.isTechnicalUser(i.getPrincipal()))
                 .toList();
 
         dump("Named-user sessions", filteredSessions);
@@ -90,21 +91,5 @@ public class SessionMetricProvider
             return user.getUsername();
         }
         return principal.toString();
-    }
-
-
-    private static boolean isTechnicalUser(Object principal)
-    {
-        if (principal == null)
-        {
-            return false;
-        }
-        if (principal instanceof UserDetails userDetails)
-        {
-            return userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .anyMatch("ROLE_TECHNICAL_USER"::equals);
-        }
-        return false;
     }
 }
