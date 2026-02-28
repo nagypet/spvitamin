@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.security.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,5 +31,21 @@ public final class PrincipalUtils
            return userDetails.getUsername();
        }
        return principal.toString();
+    }
+
+
+    public static boolean isTechnicalUser(Object principal)
+    {
+        if (principal == null)
+        {
+            return false;
+        }
+        if (principal instanceof UserDetails userDetails)
+        {
+            return userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch("ROLE_TECHNICAL_USER"::equals);
+        }
+        return false;
     }
 }

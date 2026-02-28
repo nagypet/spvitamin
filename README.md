@@ -174,6 +174,13 @@ dependencyManagement {
 - ResilientJobRunner fixes ported back from 4.0.1
 - ResilientJobRunner implements an exponential back-off strategy for retry
 - TokenCache put in spvitamin-spring-cloud-feign
+- BatchProcessor: nulls filtered out
+- new typehelper: IntUtils
+- Security: 
+  - token validation fixed
+  - there is no refresh token for technical users
+  - session lifetime equals with access token validity for technical users
+  - /authenticate endpoint: only basic authentication creates a nes session
 
 
 ### 3.3.3-2-RELEASE not yet released

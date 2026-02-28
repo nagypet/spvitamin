@@ -96,7 +96,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     if (securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
                     {
                         String sessionIdInToken = claims.getSessionId();
-                        checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
+                        checkTokenValidity(token, sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
                     }
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims).clone()
@@ -148,12 +148,12 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     }
 
 
-    private static void checkTokenValidity(String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser, JwtTokenProvider.Type tokenType)
+    private static void checkTokenValidity(AbstractAuthorizationToken token, String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser, JwtTokenProvider.Type tokenType)
     {
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
 
-        // Checking session validity (not for access- and refresh tokens)
-        if ((tokenType == JwtTokenProvider.Type.JWT && isAuthenticateEndpoint()))
+        // Checking session validity (not for access tokens)
+        if ((tokenType == JwtTokenProvider.Type.JWT || tokenType == JwtTokenProvider.Type.REFRESH) && isAuthenticateEndpoint())
         {
             AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
             SessionInformation sessionInformation = sessionRegistry.getSessionInformation(sessionIdInToken);
@@ -171,26 +171,14 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                 throw new InvalidTokenException("Invalid session id in JWT token!");
             }
 
-            // If the token does not contain basic auth credentials, then the cookie must contain a valid refresh token.
-            // Backend components are always calling with basic authentication
-            HttpServletRequest httpServletRequest = RequestQuery.getHttpServletRequest();
-            String authorizationHeader = Optional.ofNullable(httpServletRequest).map(i -> i.getHeader("Authorization")).orElse(null);
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Basic"))
+            // If this is a refresh token, then the client-ID must match
+            if (tokenType == JwtTokenProvider.Type.REFRESH)
             {
-                String refreshJwt = CookieHelper.getCookieValue(securityProperties.getAuth().getRefreshTokenCookieName(), httpServletRequest);
                 JwtTokenProvider jwtTokenProvider = SpringContext.getBean(JwtTokenProvider.class);
-                AuthorizationToken refreshToken = jwtTokenProvider.getAuthorizationTokenFromJwt(refreshJwt);
-                // Client-ID must match
+                AuthorizationToken refreshToken = jwtTokenProvider.getAuthorizationTokenFromJwt(token.getJwt());
                 if (!StringUtils.equalsIgnoreCase(refreshToken.getClientId(), securityProperties.getAuth().getClientId()))
                 {
                     log.warn("Client-ID mismatch in JWT token!");
-                    throw new InvalidTokenException("Invalid refresh token!");
-                }
-
-                // Token type
-                if (refreshToken.getType() != JwtTokenProvider.Type.REFRESH)
-                {
-                    log.warn("Token type mismatch in JWT token! Expected: {}, actual: {}", JwtTokenProvider.Type.REFRESH, refreshToken.getType());
                     throw new InvalidTokenException("Invalid refresh token!");
                 }
             }
