@@ -18,7 +18,7 @@ package hu.perit.spvitamin.spring.security.auth.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -34,7 +34,7 @@ class BearerTokenMaskingRequestWrapper extends HttpServletRequestWrapper
 
     private boolean isRemoved(String name)
     {
-        if (name == null || !StringUtils.equalsIgnoreCase(name, "authorization"))
+        if (name == null || !Strings.CI.equals(name, "authorization"))
         {
             return false;
         }

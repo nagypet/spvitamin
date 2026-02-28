@@ -34,7 +34,7 @@ import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
@@ -71,6 +71,7 @@ class StandardServerParameters
     private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final SwaggerProperties swaggerProperties;
     private final AdminProperties adminProperties;
+
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -131,6 +132,7 @@ class StandardServerParameters
         return params;
     }
 
+
     private H2ConsoleProperties getH2Properties()
     {
         try
@@ -143,25 +145,30 @@ class StandardServerParameters
         }
     }
 
+
     private static boolean isSecret(String propName)
     {
-        return StringUtils.containsAny(StringUtils.toRootLowerCase(propName), "password", "secret");
+        return Strings.CI.containsAny(propName, "password", "secret");
     }
+
 
     private String getActuatorUrl()
     {
         return this.serverProperties.getServiceUrl() + "/actuator";
     }
 
+
     private String getH2ConsoleUrl(H2ConsoleProperties h2ConsoleProperties)
     {
         return this.serverProperties.getServiceUrl() + h2ConsoleProperties.getPath();
     }
 
+
     private String getApiDocsUrl()
     {
         return this.serverProperties.getServiceUrl() + this.swaggerProperties.getApiDocs().getPath();
     }
+
 
     private String getSwaggerUrl()
     {

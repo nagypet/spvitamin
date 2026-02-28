@@ -24,7 +24,7 @@ import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
@@ -113,7 +113,7 @@ public class SpvitaminSessionRegistry<S extends Session> extends SessionRegistry
 
     private static boolean principalNamesEqual(String sessionPrincipalName, AuthenticatedUser authenticatedUser)
     {
-        return StringUtils.equalsAnyIgnoreCase(sessionPrincipalName, authenticatedUser.getUsername());
+        return Strings.CI.equalsAny(sessionPrincipalName, authenticatedUser.getUsername());
     }
 
 

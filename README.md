@@ -165,22 +165,23 @@ dependencyManagement {
 - GenericRestExceptionResponseBuilder creates HTTP 400 response in case of database level ValidationExceptions
 - New module: spvitamin-spring-resilientjobrunner added
 - NumberConverter improved
-- Putting the sessionId in ThreadContext
-- PessimisticJpaRepository fixed
-- AsyncExecutor: delegating ThreadContext 
-- credentialType added to AuthorizationToken
-- AuthorizationException handled in GenericRestExceptionResponseBuilder
-- New module: spvitamin-pdf
-- ResilientJobRunner fixes ported back from 4.0.1
-- ResilientJobRunner implements an exponential back-off strategy for retry
-- TokenCache put in spvitamin-spring-cloud-feign
-- BatchProcessor: nulls filtered out
-- new typehelper: IntUtils
-- Security: 
-  - token validation fixed
-  - there is no refresh token for technical users
-  - session lifetime equals with access token validity for technical users
-  - /authenticate endpoint: only basic authentication creates a nes session
+- 2025-01-22: Putting the sessionId in ThreadContext
+- 2025-01-22: PessimisticJpaRepository fixed
+- 2025-01-23: AsyncExecutor: delegating ThreadContext
+- 2025-01-25: credentialType added to AuthorizationToken
+- 2025-01-25: AuthorizationException handled in GenericRestExceptionResponseBuilder
+- 2026-02-10: New module: spvitamin-pdf
+- 2026-02-10: ResilientJobRunner fixes ported back from 4.0.1
+- 2026-02-14: ResilientJobRunner implements an exponential back-off strategy for retry
+- 2026-02-14: TokenCache put in spvitamin-spring-cloud-feign
+- 2026-02-28: BatchProcessor: nulls filtered out
+- 2026-02-28: new typehelper: IntUtils
+- 2026-02-28: Security:
+    - token validation fixed
+    - there is no refresh token for technical users
+    - session lifetime equals with access token validity for technical users
+    - /authenticate endpoint: only basic authentication creates a nes session
+- 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 
 
 ### 3.3.3-2-RELEASE not yet released

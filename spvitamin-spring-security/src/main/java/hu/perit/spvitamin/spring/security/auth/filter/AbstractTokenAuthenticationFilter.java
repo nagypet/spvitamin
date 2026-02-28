@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -164,7 +165,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             }
 
             // Additionally, if the request comes from a browser, then the token must match with the request too
-            if (fromBrowser && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionIdInRequest))
+            if (fromBrowser && !Strings.CI.equals(sessionIdInToken, sessionIdInRequest))
             {
                 // The token has been issued for another session
                 log.info("sessionIdInToken: {}, sessionIdInRequest: {}", sessionIdInToken, sessionIdInRequest);
@@ -176,7 +177,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             {
                 JwtTokenProvider jwtTokenProvider = SpringContext.getBean(JwtTokenProvider.class);
                 AuthorizationToken refreshToken = jwtTokenProvider.getAuthorizationTokenFromJwt(token.getJwt());
-                if (!StringUtils.equalsIgnoreCase(refreshToken.getClientId(), securityProperties.getAuth().getClientId()))
+                if (!Strings.CI.equals(refreshToken.getClientId(), securityProperties.getAuth().getClientId()))
                 {
                     log.warn("Client-ID mismatch in JWT token!");
                     throw new InvalidTokenException("Invalid refresh token!");
@@ -189,6 +190,6 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     protected static boolean isAuthenticateEndpoint()
     {
         String servletPath = Optional.ofNullable(RequestQuery.getHttpServletRequest()).map(i -> i.getServletPath()).orElse(null);
-        return StringUtils.equalsIgnoreCase(servletPath, AuthApi.BASE_URL_AUTHENTICATE);
+        return Strings.CI.equals(servletPath, AuthApi.BASE_URL_AUTHENTICATE);
     }
 }

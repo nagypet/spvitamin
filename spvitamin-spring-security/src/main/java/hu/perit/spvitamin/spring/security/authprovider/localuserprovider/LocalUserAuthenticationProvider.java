@@ -25,7 +25,7 @@ import hu.perit.spvitamin.spring.security.authprovider.SpvitaminBasicAuthenticat
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -96,7 +96,7 @@ public class LocalUserAuthenticationProvider implements SpvitaminBasicAuthentica
             pwd = user.getPassword();
         }
 
-        if (!StringUtils.equals(pwd, password))
+        if (!Strings.CS.equals(pwd, password))
         {
             throw new BadCredentialsException("Invalid user credentials!");
         }

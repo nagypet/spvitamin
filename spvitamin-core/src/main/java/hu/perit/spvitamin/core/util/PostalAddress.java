@@ -20,6 +20,7 @@ import com.neovisionaries.i18n.CountryCode;
 import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -99,7 +100,7 @@ public class PostalAddress
             return this.fullAddress;
         }
 
-        String regionCodeString = countryCode == null || StringUtils.equalsIgnoreCase(DEFAULT_REGION_CODE, countryCode) ? "" : String.format(" (%s)", countryCode);
+        String regionCodeString = countryCode == null || Strings.CI.equals(DEFAULT_REGION_CODE, countryCode) ? "" : String.format(" (%s)", countryCode);
         if (address2 == null)
         {
             return MessageFormat.format("{0} {1}{2}, {3}", zip, city, regionCodeString, address1);

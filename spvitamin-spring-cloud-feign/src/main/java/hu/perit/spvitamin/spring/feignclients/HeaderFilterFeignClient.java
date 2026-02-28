@@ -21,7 +21,7 @@ import feign.Request;
 import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -43,7 +43,7 @@ public final class HeaderFilterFeignClient implements Client
         for (Map.Entry<String, Collection<String>> entry : rawResponse.headers().entrySet())
         {
             String name = entry.getKey();
-            if (StringUtils.equalsAnyIgnoreCase(name, "set-cookie", "set-cookie2"))
+            if (Strings.CI.equalsAny(name, "set-cookie", "set-cookie2"))
             {
                 log.info("Header removed {}, {}", name, entry.getValue());
             }

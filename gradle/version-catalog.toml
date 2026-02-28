@@ -23,7 +23,7 @@ assertj = 'org.assertj:assertj-core:3.26.3'
 awaitility = 'org.awaitility:awaitility:4.2.2'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.19.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson' }

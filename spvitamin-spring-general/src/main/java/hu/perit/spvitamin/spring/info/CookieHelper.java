@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.ResponseCookie;
 
 import java.time.Duration;
@@ -66,7 +67,7 @@ public final class CookieHelper
             return Optional.empty();
         }
 
-        return Arrays.stream(cookies).filter(i -> StringUtils.equalsIgnoreCase(cookieName, i.getName())).findFirst();
+        return Arrays.stream(cookies).filter(i -> Strings.CI.equals(cookieName, i.getName())).findFirst();
     }
 
 

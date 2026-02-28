@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.HttpHeaders;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
@@ -61,7 +62,7 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
         if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer ") && authorization.length() > 7)
         {
             String tokenInHeader = authorization.substring(7);
-            boolean dummyToken = StringUtils.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
+            boolean dummyToken = Strings.CS.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
             if (!dummyToken)
             {
                 return new JwtString(tokenInHeader, CredentialType.BEARER);

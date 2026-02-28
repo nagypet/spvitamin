@@ -19,7 +19,7 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.registry;
 import hu.perit.spvitamin.spring.security.oauth2.idp.config.Constants;
 import hu.perit.spvitamin.spring.security.oauth2.idp.config.SpvitaminOAuth2Properties;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -67,7 +67,7 @@ public class SpvitaminClientRegistry
         {
             return Collections.emptySet();
         }
-        if (StringUtils.equalsIgnoreCase(grantType, Constants.CLIENT_CREDENTIALS) && requested.contains(Constants.OFFLINE_ACCESS))
+        if (Strings.CI.equals(grantType, Constants.CLIENT_CREDENTIALS) && requested.contains(Constants.OFFLINE_ACCESS))
         {
             throw new IllegalArgumentException("invalid_scope");
         }
