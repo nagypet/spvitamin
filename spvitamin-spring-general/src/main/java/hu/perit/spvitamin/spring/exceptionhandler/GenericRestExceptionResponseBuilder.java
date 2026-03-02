@@ -53,7 +53,9 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         // ========== BAD_REQUEST (400) ================================================================================
         if (exception.causedBy(jakarta.validation.ValidationException.class)
                 || exception.causedBy(InputException.class)
-                || exception.causedBy(MethodArgumentNotValidException.class))
+                || exception.causedBy(MethodArgumentNotValidException.class)
+                || exception.causedBy("hu.perit.ngface.core.widget.exception.NgFaceBadRequestException")
+        )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.BAD_REQUEST, ex, path, traceId));
