@@ -1,6 +1,6 @@
 [versions]
 aspectj = '1.9.22.1'
-jackson-annotations = '2.20'
+jackson-annotations = '2.21'
 jackson3 = '3.1.0'
 jsonwebtoken = '0.12.6'
 junit = '6.0.1'

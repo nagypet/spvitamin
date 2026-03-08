@@ -99,6 +99,9 @@ dependencyManagement {
 ### 4.0.3-1-RELEASE not yet released
 
 - 2025-02-28: Java21, SpringBoot 4.0.3
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+
 
 ### 4.0.1-1-RELEASE not yet released
 

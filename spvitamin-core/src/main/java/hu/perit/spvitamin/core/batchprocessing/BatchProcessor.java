@@ -17,8 +17,8 @@
 package hu.perit.spvitamin.core.batchprocessing;
 
 import hu.perit.spvitamin.core.StackTracer;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -35,12 +35,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A parallel batch processing framework that executes a list of {@link BatchJob} instances using a thread pool.
- * 
+ *
  * <p>This class provides functionality to process batch jobs in parallel with configurable thread pool size.
  * It supports running the first job synchronously to verify connectivity before processing the rest in parallel.
  * The processor handles both fatal and non-fatal exceptions, where fatal exceptions will stop the entire batch
  * processing while non-fatal exceptions allow the processing to continue.</p>
- * 
+ *
  * <p>Features:</p>
  * <ul>
  *   <li>Configurable thread pool size</li>
@@ -49,25 +49,27 @@ import java.util.concurrent.TimeUnit;
  *   <li>Distinction between fatal and non-fatal exceptions</li>
  *   <li>Graceful shutdown on fatal errors</li>
  * </ul>
- * 
+ *
  * <p>Concrete implementations must provide the {@link #createExecutorService()} method to define
  * how the thread pool is created.</p>
- * 
+ *
  * @author Peter Nagy
  */
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 @Slf4j
-public abstract class BatchProcessor
+@ToString
+public class BatchProcessor
 {
     protected final int threadPoolSize;
+
 
     /**
      * Process a list of batch jobs with default settings.
      * The first job will be executed synchronously, and no progress reporting will be done.
      *
      * @param batchJobs the list of batch jobs to process
-     * @throws ExecutionException if a fatal exception occurs during processing
+     * @throws ExecutionException   if a fatal exception occurs during processing
      * @throws InterruptedException if the thread is interrupted during processing
      */
     public void process(List<? extends BatchJob> batchJobs) throws ExecutionException, InterruptedException
@@ -75,13 +77,14 @@ public abstract class BatchProcessor
         process(batchJobs, true, null, null);
     }
 
+
     /**
      * Process a list of batch jobs with optional synchronous execution of the first job.
      * No progress reporting will be done.
      *
-     * @param batchJobs the list of batch jobs to process
+     * @param batchJobs             the list of batch jobs to process
      * @param runFirstSynchronously whether to run the first job synchronously
-     * @throws ExecutionException if a fatal exception occurs during processing
+     * @throws ExecutionException   if a fatal exception occurs during processing
      * @throws InterruptedException if the thread is interrupted during processing
      */
     public void process(List<? extends BatchJob> batchJobs, boolean runFirstSynchronously) throws ExecutionException, InterruptedException
@@ -89,15 +92,16 @@ public abstract class BatchProcessor
         process(batchJobs, runFirstSynchronously, null, null);
     }
 
+
     /**
      * Process a list of batch jobs with full configuration options.
      * This is the main processing method that handles the execution of batch jobs.
      *
-     * @param batchJobs the list of batch jobs to process
+     * @param batchJobs             the list of batch jobs to process
      * @param runFirstSynchronously whether to run the first job synchronously
      * @param reportEveryNProcessed if not null, progress will be reported every N processed jobs
-     * @param name optional name for the batch process, used in progress reporting
-     * @throws ExecutionException if a fatal exception occurs during processing
+     * @param name                  optional name for the batch process, used in progress reporting
+     * @throws ExecutionException   if a fatal exception occurs during processing
      * @throws InterruptedException if the thread is interrupted during processing
      */
     @SuppressWarnings({"squid:S3776", "squid:S1141", "squid:S1193"})
@@ -251,10 +255,10 @@ public abstract class BatchProcessor
     /**
      * Reports progress of the batch processing if the reportEveryNProcessed parameter is set.
      *
-     * @param lastReportedCount the count at which progress was last reported
-     * @param countRemaining the current count of remaining tasks
+     * @param lastReportedCount     the count at which progress was last reported
+     * @param countRemaining        the current count of remaining tasks
      * @param reportEveryNProcessed how often to report progress (null means no reporting)
-     * @param name the name of the batch process
+     * @param name                  the name of the batch process
      * @return the new lastReportedCount value
      */
     private static int reportProgress(int lastReportedCount, int countRemaining, Integer reportEveryNProcessed, String name)
@@ -269,6 +273,7 @@ public abstract class BatchProcessor
         }
         return lastReportedCount;
     }
+
 
     /**
      * Creates the ExecutorService used for parallel processing.

@@ -17,6 +17,7 @@
 package hu.perit.spvitamin.spring.config;
 
 import jakarta.validation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import java.util.Set;
  */
 
 
+@Slf4j
 public class SysConfig
 {
 
@@ -70,7 +72,15 @@ public class SysConfig
 
     public static FeignProperties getFeignProperties()
     {
-        return SpringContext.getBean(FeignProperties.class);
+        try
+        {
+            return SpringContext.getBean(FeignProperties.class);
+        }
+        catch (Exception e)
+        {
+            log.warn("FeignProperties not found! Returning default value!");
+            return new FeignProperties();
+        }
     }
 
 

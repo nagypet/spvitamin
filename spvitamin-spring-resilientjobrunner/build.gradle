@@ -71,6 +71,7 @@ dependencies {
     implementation libs.guava
 
     // FasterXML
+    implementation libs.jackson.annotations
     implementation libs.jackson3.core
     implementation libs.jackson3.databind
 
