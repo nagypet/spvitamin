@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.feignclients;
 import feign.Client;
 import feign.Feign;
 import feign.Logger;
+import feign.Request;
 import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.Decoder;
@@ -60,6 +61,7 @@ public class SimpleFeignClientBuilder
     private Retryer retryer;
     private Client client;
     private boolean allowCookies = false;
+    private Request.Options options;
 
 
     public static SimpleFeignClientBuilder newInstance()
@@ -183,6 +185,13 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder options(Request.Options options)
+    {
+        this.options = options;
+        return this;
+    }
+
+
     public <T> T build(Class<T> apiType, String url)
     {
         this.builder.encoder(this.encoder);
@@ -196,6 +205,10 @@ public class SimpleFeignClientBuilder
         else
         {
             this.builder.client(new HeaderFilterFeignClient(this.client));
+        }
+        if (this.options != null)
+        {
+            this.builder.options(this.options);
         }
 
         return this.builder.target(apiType, url);

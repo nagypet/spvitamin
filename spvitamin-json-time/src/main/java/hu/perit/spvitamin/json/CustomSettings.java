@@ -21,7 +21,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tools.jackson.databind.AbstractTypeResolver;
 import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 import tools.jackson.databind.module.SimpleAbstractTypeResolver;
 
 import java.util.ArrayList;
@@ -35,7 +37,13 @@ public final class CustomSettings
     private static final Map<Class<?>, Class<?>> ABSTRACT_TYPE_MAPPINGS = new ConcurrentHashMap<>();
     private static final Map<String, JacksonModule> MODULES = new ConcurrentHashMap<>();
     private static final Map<String, NamedType> SUBTYPES = new ConcurrentHashMap<>();
+    private static final List<String> ADDITIONAL_POLYMORPHIC_SUBTYPES = new ArrayList<>();
 
+
+    static
+    {
+        ADDITIONAL_POLYMORPHIC_SUBTYPES.addAll(List.of("hu.perit", "java"));
+    }
 
     static AbstractTypeResolver getAbstractTypeResolver()
     {
@@ -83,5 +91,19 @@ public final class CustomSettings
     public static NamedType[] getSubtypes()
     {
         return SUBTYPES.values().toArray(new NamedType[0]);
+    }
+
+
+    public static void addAdditionalPolymorphicSubtypePrefix(String prefix)
+    {
+        ADDITIONAL_POLYMORPHIC_SUBTYPES.add(prefix);
+    }
+
+
+    public static PolymorphicTypeValidator getPolymorphicTypeValidator()
+    {
+        BasicPolymorphicTypeValidator.Builder ptvBuilder = BasicPolymorphicTypeValidator.builder();
+        ADDITIONAL_POLYMORPHIC_SUBTYPES.forEach(ptvBuilder::allowIfSubType);
+        return ptvBuilder.build();
     }
 }

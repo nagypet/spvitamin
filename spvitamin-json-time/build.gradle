@@ -52,6 +52,7 @@ dependencies {
     implementation libs.commons.collections4
 
     // FasterXML
+    implementation libs.jackson.annotations
     implementation libs.jackson3.core
     implementation libs.jackson3.databind
     implementation libs.jackson3.dataformat.yaml
