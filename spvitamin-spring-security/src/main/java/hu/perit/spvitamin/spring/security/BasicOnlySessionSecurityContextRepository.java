@@ -3,7 +3,7 @@ package hu.perit.spvitamin.spring.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.DeferredSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
@@ -67,7 +67,7 @@ public class BasicOnlySessionSecurityContextRepository implements SecurityContex
             log.trace("servletPath: {}, no authorization => using stateless repo", request.getServletPath());
             return statelessRepo;
         }
-        else if (StringUtils.startsWithIgnoreCase(auth, "basic "))
+        else if (Strings.CI.startsWith(auth, "basic "))
         {
             log.trace("servletPath: {}, with basic authentication => using session repo", request.getServletPath());
             return sessionRepo;

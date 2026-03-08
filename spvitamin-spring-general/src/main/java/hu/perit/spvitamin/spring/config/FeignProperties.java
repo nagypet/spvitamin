@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FeignProperties
 {
-    private String loggerLevel = "BASIC";
+    private String loggerLevel = "basic";
 
     @NestedConfigurationProperty
     private Retry retry = new Retry();

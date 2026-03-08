@@ -182,7 +182,8 @@ dependencyManagement {
     - session lifetime equals with access token validity for technical users
     - /authenticate endpoint: only basic authentication creates a nes session
 - 2026-02-28: StringUtils -> Strings.CI/Strings.CS
-
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
 
 ### 3.3.3-2-RELEASE not yet released
 
