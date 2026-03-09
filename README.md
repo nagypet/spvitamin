@@ -184,6 +184,7 @@ dependencyManagement {
 - 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 - 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
 - 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
 
 ### 3.3.3-2-RELEASE not yet released
 

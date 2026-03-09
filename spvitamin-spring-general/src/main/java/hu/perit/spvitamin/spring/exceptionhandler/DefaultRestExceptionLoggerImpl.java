@@ -20,6 +20,7 @@ import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.LogLevel;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 
 /**
  * This is a default implementation of RestExceptionLogger. It can be overridden on application level to implement
@@ -42,7 +43,7 @@ public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
     @Override
     public void log(String path, Throwable ex, LogLevel level)
     {
-        if ("uri=/favicon.ico".equalsIgnoreCase(path))
+        if (Strings.CI.equalsAny(path, "uri=/favicon.ico", "uri=/.well-known/appspecific/com.chrome.devtools.json"))
         {
             return;
         }
