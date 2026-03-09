@@ -22,8 +22,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,14 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BatchProcessorTest
 {
 
-    private TestBatchProcessor batchProcessor;
+    private BatchProcessor batchProcessor;
     private List<BatchJob> batchJobs;
 
 
     @BeforeEach
     void setUp()
     {
-        batchProcessor = new TestBatchProcessor(2); // Use 2 threads for testing
+        batchProcessor = new BatchProcessor(2); // Use 2 threads for testing
         batchJobs = new ArrayList<>();
     }
 
@@ -193,23 +191,6 @@ class BatchProcessorTest
         // Verify
         assertThat(job1.isExecuted()).isTrue();
         assertThat(job2.isExecuted()).isTrue();
-    }
-
-
-    // A concrete implementation of BatchProcessor for testing
-    private static class TestBatchProcessor extends BatchProcessor
-    {
-        public TestBatchProcessor(int threadPoolSize)
-        {
-            super(threadPoolSize);
-        }
-
-
-        @Override
-        protected ExecutorService createExecutorService()
-        {
-            return Executors.newFixedThreadPool(threadPoolSize);
-        }
     }
 
 
