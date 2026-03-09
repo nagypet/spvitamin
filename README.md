@@ -103,6 +103,7 @@ dependencyManagement {
 - 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
 - 2026-03-08: SpvitanObjectMapper improved
 - 2026-03-08: SimpleFeignClientBuilder improved
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
 
 
 ### 4.0.1-1-RELEASE not yet released
