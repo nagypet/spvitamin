@@ -1,22 +1,6 @@
-/*
- * Copyright 2020-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-08-13 08:18:41.
+// Generated using typescript-generator version 3.2.1263 on 2026-01-29 07:09:51.
 
 export namespace Ngface {
 
@@ -31,7 +15,7 @@ export namespace Ngface {
         defaultItemId: string;
     }
 
-    export interface RowSelectParams<T> {
+    export interface RowSelectParams<T> extends Serializable {
         selectMode: RowSelectParams.SelectMode;
         rows: RowSelectParams.Row<T>[];
     }
@@ -89,6 +73,12 @@ export namespace Ngface {
 
     }
 
+    export interface AbstractOption extends Comparable<AbstractOption> {
+        texts: string[];
+        id: string;
+        type: string;
+    }
+
     export interface Autocomplete extends Input<Autocomplete.Data, string, Autocomplete> {
         type: "Autocomplete";
         data: Autocomplete.Data;
@@ -99,13 +89,20 @@ export namespace Ngface {
         export interface Data extends Value<string> {
             type: "Autocomplete.Data";
             value: string | null;
-            extendedReadOnlyData: ExtendedReadOnlyData;
+            extendedReadOnlyData: Autocomplete.Data.ExtendedReadOnlyData;
         }
 
     }
 
-    export interface ExtendedReadOnlyData {
-        valueSet: ValueSet;
+    export namespace Autocomplete.Data {
+
+        export interface ExtendedReadOnlyData {
+            valueSet: ValueSet;
+        }
+
+    }
+
+    export interface AutocompleteOption extends AbstractOption {
     }
 
     export interface DateInput extends Input<DateInput.Data, Date, DateInput> {
@@ -149,6 +146,44 @@ export namespace Ngface {
         export interface Data extends Value<Date> {
             type: "DateTimeInput.Data";
             value: Date | null;
+        }
+
+    }
+
+    export interface GenericAutocomplete<T> extends Input<GenericAutocomplete.Data<T>, T, GenericAutocomplete<T>> {
+        type: "GenericAutocomplete";
+        data: GenericAutocomplete.Data<T>;
+    }
+
+    export namespace GenericAutocomplete {
+
+        export interface Data<T> extends Value<T> {
+            type: "GenericAutocomplete.Data";
+            value: T | null;
+            extendedReadOnlyData: GenericAutocomplete.Data.ExtendedReadOnlyData<T>;
+        }
+
+    }
+
+    export namespace GenericAutocomplete.Data {
+
+        export interface ExtendedReadOnlyData<T> {
+            valueSet: GenericValueSet<T>;
+        }
+
+    }
+
+    export interface GenericValueSet<T> extends Serializable {
+        remote: boolean;
+        truncated: boolean;
+        values: GenericValueSet.Item<T>[];
+    }
+
+    export namespace GenericValueSet {
+
+        export interface Item<T> extends Serializable {
+            value: T;
+            selected: boolean;
         }
 
     }
@@ -235,6 +270,8 @@ export namespace Ngface {
     export interface Action {
         id: string;
         label: string;
+        text: string;
+        textPlacement: TextPlacement;
         icon: string;
         enabled: boolean;
         badge: string;
@@ -280,7 +317,7 @@ export namespace Ngface {
         order: number;
     }
 
-    export interface Paginator {
+    export interface Paginator extends Serializable {
         pageIndex: number;
         pageSize: number;
         length: number;
@@ -296,11 +333,12 @@ export namespace Ngface {
         id: T;
         idType: string;
         cells: { [index: string]: Cell<any, any> };
+        additionalInfo: { [index: string]: any };
         selected: boolean;
         disabled: boolean;
     }
 
-    export interface Sorter {
+    export interface Sorter extends Serializable {
         column: string;
         direction: Direction;
     }
@@ -314,11 +352,12 @@ export namespace Ngface {
         totalRow: Row<T> | null;
         selectMode: Table.SelectMode;
         notification: string | null;
+        countSelectedRows: number;
     }
 
     export namespace Table {
 
-        export interface Data extends WidgetData {
+        export interface Data extends WidgetData, Serializable {
             type: "Table.Data";
             paginator: Paginator | null;
             sorter: Sorter | null;
@@ -365,6 +404,10 @@ export namespace Ngface {
         code: string;
         placement: Icon.Placement;
         color: string;
+        label: string;
+    }
+
+    export interface IconBuilder {
     }
 
     export interface NumericCell extends Cell<number, NumericCell> {
@@ -429,15 +472,18 @@ export namespace Ngface {
 
     export namespace RowSelectParams {
 
-        export interface Row<T> {
+        export interface Row<T> extends Serializable {
             id: T;
             selected: boolean;
         }
 
     }
 
-    export interface WidgetData {
-        type: any | "WidgetList.Data" | "DateRangeInput.Data" | "Select.Data" | "Table.Data" | "VoidWidgetData" | "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "NumericInput.Data" | "TextInput.Data";
+    export interface Serializable {
+    }
+
+    export interface WidgetData extends Serializable {
+        type: "WidgetList.Data" | "DateRangeInput.Data" | "Select.Data" | "Table.Data" | "VoidWidgetData" | "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "GenericAutocomplete.Data" | "NumericInput.Data" | "TextInput.Data";
     }
 
     export interface VoidWidgetData extends WidgetData {
@@ -445,7 +491,7 @@ export namespace Ngface {
     }
 
     export interface Widget<WD, SUB> {
-        type: any | "Button" | "WidgetList" | "FormattedText" | "Table" | "Titlebar" | "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "NumericInput" | "Select" | "TextInput";
+        type: "Button" | "WidgetList" | "FormattedText" | "Table" | "Titlebar" | "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "GenericAutocomplete" | "NumericInput" | "Select" | "TextInput";
         id: string;
         label: string;
         hint: string;
@@ -465,9 +511,6 @@ export namespace Ngface {
         digitGrouping: boolean;
     }
 
-    export interface Serializable {
-    }
-
     export interface BiFunction<T, U, R> {
     }
 
@@ -480,12 +523,15 @@ export namespace Ngface {
     }
 
     export interface Value<V> extends WidgetData {
-        type: "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "NumericInput.Data" | "TextInput.Data";
+        type: "Value" | "FormattedText.Data" | "Autocomplete.Data" | "DateInput.Data" | "DateTimeInput.Data" | "GenericAutocomplete.Data" | "NumericInput.Data" | "TextInput.Data";
         value: V | null;
     }
 
+    export interface Comparable<T> {
+    }
+
     export interface Input<WD, V, SUB> extends Widget<WD, SUB> {
-        type: "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "NumericInput" | "Select" | "TextInput";
+        type: "Autocomplete" | "DateInput" | "DateRangeInput" | "DateTimeInput" | "GenericAutocomplete" | "NumericInput" | "Select" | "TextInput";
         placeholder: string;
         validators: Validator[];
     }
@@ -506,9 +552,11 @@ export namespace Ngface {
 
     export namespace Action {
 
-        export type Style = "ICON" | "BUTTON" | "ACTION_GROUP";
+        export type Style = "ICON" | "BUTTON" | "ACTION_GROUP" | "LINK";
 
     }
+
+    export type TextPlacement = "HIDDEN" | "BEFORE" | "AFTER";
 
     export namespace Column {
 

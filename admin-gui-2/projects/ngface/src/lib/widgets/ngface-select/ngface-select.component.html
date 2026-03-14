@@ -21,6 +21,7 @@
               [placeholder]="getData().placeholder !== null ? getData().placeholder : ''"
               [required]="isRequired()"
               [errorStateMatcher]="errorStateMatcher"
+              (selectionChange)="selectionChange($event)"
   >
     @for (optionId of getOptionIds();track optionId) {
       <mat-option [value]="optionId">{{ getOptionValue(optionId) }}</mat-option>

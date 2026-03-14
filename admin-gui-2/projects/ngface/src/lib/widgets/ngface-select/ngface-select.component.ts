@@ -14,26 +14,38 @@
  * limitations under the License.
  */
 
-import {Component, OnChanges, SimpleChange} from '@angular/core';
+import {Component, EventEmitter, OnChanges, Output, SimpleChange} from '@angular/core';
 import {InputBaseComponent} from '../input-base.component';
 import {Ngface} from '../../ngface-models';
-import { MatOptionModule } from '@angular/material/core';
-import { NgFor, NgIf } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatOptionModule} from '@angular/material/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatSelectChange, MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
 
-@Component({
-    // tslint:disable-next-line:component-selector
-    selector: 'ngface-select',
-    templateUrl: './ngface-select.component.html',
-    standalone: true,
-    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, NgFor, MatOptionModule, NgIf, ResponsiveClassDirective]
-})
-export class NgfaceSelectComponent extends InputBaseComponent implements OnChanges {
+export interface SelectionChangeEvent
+{
+  widgetId: string;
+  optionId: string;
+  optionValue: string;
+}
 
-  constructor() {
+
+@Component({
+  // tslint:disable-next-line:component-selector
+  selector: 'ngface-select',
+  templateUrl: './ngface-select.component.html',
+  standalone: true,
+  imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, ResponsiveClassDirective]
+})
+export class NgfaceSelectComponent extends InputBaseComponent implements OnChanges
+{
+
+  @Output()
+  onSelectionChange: EventEmitter<SelectionChangeEvent> = new EventEmitter();
+
+  constructor()
+  {
     super();
   }
 
@@ -68,8 +80,19 @@ export class NgfaceSelectComponent extends InputBaseComponent implements OnChang
     return Object.keys(this.getData().data?.options);
   }
 
+
   getOptionValue(id: string): string | null
   {
     return this.getData().data?.options[id];
+  }
+
+
+  selectionChange($event: MatSelectChange)
+  {
+    this.onSelectionChange.emit({
+      widgetId: this.widgetid,
+      optionId: $event.value,
+      optionValue: this.getOptionValue($event.value)!
+    });
   }
 }

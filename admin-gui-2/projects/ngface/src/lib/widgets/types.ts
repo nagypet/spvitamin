@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
+import {Ngface} from "../ngface-models";
+
 export interface ValueSetItem
 {
   masterSelect: boolean;
   text: string;
+  selected: boolean;
+  selectable: boolean;
+}
+
+
+export interface GenericValueSetItem
+{
+  masterSelect: boolean;
+  id: string;
+  value: Ngface.AbstractOption;
   selected: boolean;
   selectable: boolean;
 }

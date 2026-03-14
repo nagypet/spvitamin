@@ -84,6 +84,40 @@ export class NgfaceWidgetFactory
   }
 
 
+  public static createRemoteGenericAutocomplete(input: Partial<{
+    id: string;
+    label: string;
+    placeholder: string;
+    value: Ngface.AbstractOption;
+    validators: Ngface.Validator[];
+    valueSet: Ngface.GenericValueSet<Ngface.AbstractOption>;
+  }> = {}): Ngface.GenericAutocomplete<Ngface.AbstractOption>
+  {
+    const defaults = {
+      id: '',
+      label: 'undefined label',
+      placeholder: '',
+      //value: {id: '', type: '', texts: ['alma']},
+      value: null,
+      validators: [],
+      valueSet: {remote: true, truncated: false, values: []}
+    };
+
+    const params = {...defaults, ...input};
+
+    return {
+      id: params.id,
+      type: 'GenericAutocomplete',
+      label: params.label,
+      placeholder: params.placeholder,
+      hint: '',
+      data: {type: 'GenericAutocomplete.Data', value: params.value, extendedReadOnlyData: {valueSet: params.valueSet}},
+      enabled: true,
+      validators: params.validators
+    } as Ngface.GenericAutocomplete<Ngface.AbstractOption>;
+  }
+
+
   public static createButton(input: Partial<{ id: string, label: string, style: Ngface.Button.Style, enabled: boolean }> = {}): Ngface.Button
   {
     const defaults = {
@@ -102,5 +136,34 @@ export class NgfaceWidgetFactory
       style: params.style,
       enabled: params.enabled
     } as Ngface.Button;
+  }
+
+
+  public static createSelect(input: Partial<{
+    id: string;
+    label: string;
+    options: { [index: string]: string };
+    selected: string;
+    validators: Ngface.Validator[];
+  }> = {}): Ngface.Select
+  {
+    const defaults = {
+      id: '',
+      label: 'undefined label',
+      validators: []
+    };
+
+    const params = {...defaults, ...input};
+
+    return {
+      id: params.id,
+      type: 'Select',
+      label: params.label,
+      placeholder: params.label,
+      hint: '',
+      data: {type: 'Select.Data', options: params.options, selected: params.selected},
+      enabled: true,
+      validators: params.validators
+    } as Ngface.Select;
   }
 }
