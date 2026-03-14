@@ -65,11 +65,11 @@
                 [matTooltip]="getCellLabel(row, column)" matTooltipPosition="above"
             >
               @if (isActionCell(row, column)) {
-                <!-- ActionCell -->
+                <!-- ActionCell --------------------------------------------------------------------------------------->
                 <div class="action-cell">
                   @for (action of getActions(row, column); track action) {
                     @if (action.actions && action.actions.length > 0) {
-                      <!-- Action with submenu (one-level). Parent opens menu; submenu items show labels only. -->
+                      <!-- Action with submenu (one-level). Parent opens menu; submenu items show labels only. -------->
                       @if (action.style === 'ICON') {
                         <button mat-icon-button class="action-button"
                                 [disabled]="!action.enabled || row.disabled"
@@ -78,7 +78,9 @@
                                 [matMenuTriggerFor]="menu"
                                 (click)="$event.stopPropagation()"
                         >
-                          <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}</mat-icon>
+                          <mat-icon class="material-symbols-outlined"
+                                    [ngClass]="getActionClass(action)">{{ action.icon }}
+                          </mat-icon>
                         </button>
                       } @else {
                         <button class="action-button-button ngface-button"
@@ -94,49 +96,90 @@
                           <button mat-menu-item
                                   [disabled]="!sub.enabled || row.disabled"
                                   (click)="$event.stopPropagation(); actionClick(row, sub)">
-                            {{ sub.label }}
+                            {{ sub.text }}
                           </button>
                         }
                       </mat-menu>
+
                     } @else if (action.style === 'ICON') {
-                      <button mat-icon-button class="action-button"
-                              [disabled]="!action.enabled || row.disabled"
-                              [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
-                              matTooltipPosition="above"
-                              hideTooltipOnClick
-                              (click)="$event.stopPropagation(); actionClick(row, action)"
-                      >
-                        <mat-icon class="material-symbols-outlined" [ngClass]="getActionClass(action)">{{ action.icon }}
-                        </mat-icon>
-                      </button>
-                    } @else {
+                      <!-- Icon with optional text -------------------------------------------------------------------->
+                      <div class="icon-cell" [ngClass]="getCellStyle(row, column)">
+                        @if (action.textPlacement === 'BEFORE') {
+                          <span [innerHTML]="action.text | safeHtml"></span>
+                        }
+                        <button mat-icon-button class="action-button"
+                                [disabled]="!action.enabled || row.disabled"
+                                [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                                matTooltipPosition="above"
+                                hideTooltipOnClick
+                                (click)="$event.stopPropagation(); actionClick(row, action)"
+                        >
+                          <mat-icon class="material-symbols-outlined"
+                                    [ngClass]="getActionClass(action)">{{ action.icon }}
+                          </mat-icon>
+                        </button>
+                        @if (action.textPlacement === 'AFTER') {
+                          <span [innerHTML]="action.text | safeHtml"></span>
+                        }
+                      </div>
+
+                    } @else if (action.style === 'LINK') {
+                      <!-- Link with optional icon -------------------------------------------------------------------->
+                      <div class="icon-cell" [ngClass]="getCellStyle(row, column)">
+                        @if (getIcon(row, column)?.placement === 'BEFORE') {
+                          <mat-icon class="material-symbols-outlined"
+                                    [matTooltip]="action.enabled && !row.disabled ? getIcon(row, column)?.label : ''"
+                                    [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
+                          </mat-icon>
+                        }
+                        <a href
+                           class="action-link"
+                           [attr.aria-disabled]="!action.enabled || row.disabled ? true : null"
+                           (click)="$event.stopPropagation(); $event.preventDefault(); (action.enabled && !row.disabled) ? actionClick(row, action) : null;"
+                           [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                           [innerHTML]="action.text | safeHtml"
+                        >
+                          {{ action.label }}
+                        </a>
+                        @if (getIcon(row, column)?.placement === 'AFTER') {
+                          <mat-icon class="material-symbols-outlined"
+                                    [matTooltip]="action.enabled && !row.disabled ? getIcon(row, column)?.label : ''"
+                                    [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
+                          </mat-icon>
+                        }
+                      </div>
+
+                    } @else  if (action.style === 'BUTTON') {
+                      <!-- Button ------------------------------------------------------------------------------------->
                       <button class="action-button-button ngface-button"
                               [disabled]="!action.enabled || row.disabled"
                               (click)="$event.stopPropagation(); actionClick(row, action)"
                       >
-                        {{ action.label }}
+                        {{ action.text }}
                       </button>
                     }
                   }
                   {{ getCellText(row, column) }}
                 </div>
               } @else if (hasIcon(row, column)) {
-                <!-- Icon cell -->
+                <!-- Non-action cell with an icon --------------------------------------------------------------------->
                 <div class="icon-cell" [ngClass]="getCellStyle(row, column)">
                   @if (getIcon(row, column)?.placement === 'BEFORE') {
                     <mat-icon class="material-symbols-outlined"
+                              [matTooltip]="!row.disabled ? getIcon(row, column)?.label : ''"
                               [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
                     </mat-icon>
                     <span [innerHTML]="getCellText(row, column) | safeHtml"></span>
                   } @else {
                     <span [innerHTML]="getCellText(row, column) | safeHtml"></span>
                     <mat-icon class="material-symbols-outlined"
+                              [matTooltip]="!row.disabled ? getIcon(row, column)?.label : ''"
                               [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
                     </mat-icon>
                   }
                 </div>
               } @else {
-                <!-- Non-action cell -->
+                <!-- Non-action cell ---------------------------------------------------------------------------------->
                 <div [ngClass]="getCellStyle(row, column)">
                   <p [innerHTML]="getCellText(row, column) | safeHtml"></p>
                 </div>

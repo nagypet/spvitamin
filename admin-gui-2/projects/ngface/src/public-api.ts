@@ -26,6 +26,8 @@ export * from './lib/widgets/ngface-date-range-input/ngface-date-range-input.com
 export * from './lib/widgets/ngface-numeric-input/ngface-numeric-input.component';
 export * from './lib/widgets/ngface-select/ngface-select.component';
 export * from './lib/widgets/ngface-text-input/ngface-text-input.component';
+export * from './lib/widgets/ngface-autocomplete/ngface-autocomplete.component';
+export * from './lib/widgets/ngface-generic-autocomplete/ngface-generic-autocomplete.component';
 export * from './lib/form/ngface-form/ngface-form.component'
 export * from './lib/form/form-base.component'
 export * from './lib/ngface.module';

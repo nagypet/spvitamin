@@ -433,6 +433,7 @@ export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterView
         hint: '',
         selectMode: 'NONE',
         notification: '',
+        countSelectedRows: 0
       };
     }
     return this.formdata?.widgets[this.widgetid] as Ngface.Table<any>;

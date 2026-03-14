@@ -16,14 +16,14 @@
 
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {Ngface} from '../../ngface-models';
-import {ValueSetItem} from '../types';
+import {GenericValueSetItem, ValueSetItem} from '../types';
 import {map} from 'rxjs/operators';
 import {DistinctBehaviorSubject} from '../../utils/distinct-behavior-subject';
 
 
-export class AutocompleteValueSetProvider
+export class GenericAutocompleteValueSetProvider
 {
-  private _valueSetItems: Ngface.ValueSet.Item[] = [];
+  private _valueSetItems: Ngface.GenericValueSet.Item<Ngface.AbstractOption>[] = [];
   private _searchText: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private _multiselect: boolean = false;
   private _searchTextSubscription?: Subscription;
@@ -48,31 +48,31 @@ export class AutocompleteValueSetProvider
 
 
   // BehaviorSubject for filteredOptions: this is what we see in the list
-  private _filteredOptions$: DistinctBehaviorSubject<ValueSetItem[]> = new DistinctBehaviorSubject<ValueSetItem[]>([],
+  private _filteredOptions$: DistinctBehaviorSubject<GenericValueSetItem[]> = new DistinctBehaviorSubject<GenericValueSetItem[]>([],
     (a, b) => JSON.stringify(a) === JSON.stringify(b));
-  get filteredOptions$(): Observable<ValueSetItem[]>
+  get filteredOptions$(): Observable<GenericValueSetItem[]>
   {
     return this._filteredOptions$.asObservable();
   }
 
 
   // This is the filtered ValueSet for send to other components
-  private _valueSet$: DistinctBehaviorSubject<Ngface.ValueSet | undefined> = new DistinctBehaviorSubject<Ngface.ValueSet | undefined>(undefined,
+  private _valueSet$: DistinctBehaviorSubject<Ngface.GenericValueSet<Ngface.AbstractOption> | undefined> = new DistinctBehaviorSubject<Ngface.GenericValueSet<Ngface.AbstractOption> | undefined>(undefined,
     (a, b) => JSON.stringify(a) === JSON.stringify(b));
-  get valueSet$(): Observable<Ngface.ValueSet | undefined>
+  get valueSet$(): Observable<Ngface.GenericValueSet<Ngface.AbstractOption> | undefined>
   {
     return this._valueSet$.asObservable();
   }
 
 
-  private valueSetNext(items: Ngface.ValueSet.Item[])
+  private valueSetNext(items: Ngface.GenericValueSet.Item<Ngface.AbstractOption>[])
   {
     this._valueSet$.next({remote: this._remote, truncated: this._truncated, values: items});
     this._filteredOptions$.next(this.addMasterSelect(items ?? [], this._truncated ?? false));
   }
 
 
-  set valueSet(valueSet: Ngface.ValueSet)
+  set valueSet(valueSet: Ngface.GenericValueSet<Ngface.AbstractOption>)
   {
     this._valueSetItems = valueSet.values ?? [];
     this._truncated = valueSet?.truncated ?? false;
@@ -99,38 +99,60 @@ export class AutocompleteValueSetProvider
   }
 
 
-  private addMasterSelect(items: Ngface.ValueSet.Item[], truncated: boolean): ValueSetItem[]
+  private addMasterSelect(items: Ngface.GenericValueSet.Item<Ngface.AbstractOption>[], truncated: boolean): GenericValueSetItem[]
   {
-    var valueSetItems: ValueSetItem[] = [];
+    const valueSetItems: GenericValueSetItem[] = [];
+
+    const withTexts = (value: Ngface.AbstractOption, text: string): Ngface.AbstractOption =>
+    {
+      // Megjegyzés: ha az AbstractOption immutábilisnak van szánva, akkor is biztonságosabb
+      // egy új objektumot visszaadni, mint módosítani az eredetit.
+      return { ...(value as any), texts: [text] } as Ngface.AbstractOption;
+    };
+
     // Master select
     if (this._multiselect)
     {
-      valueSetItems.push({masterSelect: true, text: '(Select All)', selected: true, selectable: true});
+      valueSetItems.push({
+        masterSelect: true,
+        id: '__master__',
+        value: null as unknown as Ngface.AbstractOption,
+        selected: true,
+        selectable: true
+      });
     }
 
     // Items
-    items.forEach(item => valueSetItems.push(({
-      masterSelect: false,
-      text: item.text ?? '(Blanks)',
-      selected: item.selected,
-      selectable: true
-    })));
+    // Ngface.GenericValueSet.Item<Ngface.AbstractOption>[]
+    items.forEach(item =>
+    {
+      const value = item.value;
+
+      valueSetItems.push({
+        masterSelect: false,
+        id: item.value.id,
+        value: value.texts == null ? withTexts(value, '(Blanks)') : value,
+        selected: item.selected,
+        selectable: true
+      });
+    });
 
     // Truncated indicator
     if (truncated && this._multiselect)
     {
       valueSetItems.push({
         masterSelect: false,
-        text: 'The list is truncated...',
+        id: '__truncated__',
+        value: withTexts({} as Ngface.AbstractOption, 'The list is truncated'),
         selected: false,
         selectable: false
       });
     }
+
     return valueSetItems;
   }
 
-
-  get valueSet(): Ngface.ValueSet | undefined
+  get valueSet(): Ngface.GenericValueSet<Ngface.AbstractOption> | undefined
   {
     return this._valueSet$.value;
   }
@@ -142,15 +164,16 @@ export class AutocompleteValueSetProvider
   }
 
 
-  private filter(searchText: string): Ngface.ValueSet.Item[]
+  private filter(searchText: string): Ngface.GenericValueSet.Item<Ngface.AbstractOption>[]
   {
     const filterValue = searchText.toLowerCase();
     if (!this._valueSetItems)
     {
       return [];
     }
-    return this._valueSetItems
-      .filter(item => item.text.toLowerCase().includes(filterValue));
+    return this._valueSetItems.filter(item =>
+      item.value.texts.some(text => text.toLowerCase().includes(filterValue))
+    );
   }
 
 
@@ -167,12 +190,12 @@ export class AutocompleteValueSetProvider
   }
 
 
-  select(text: string, value: boolean)
+  select(id: string, value: boolean)
   {
     var items = this._valueSet$.value?.values;
     if (items)
     {
-      items.filter(c => c.text === text).forEach(c => c.selected = value);
+      items.filter(c => c.value.id === id).forEach(c => c.selected = value);
       // since we are changing the values of the BehaviorSubject, the valueSetNext will not emit any change on the _valueSet$, which is
       // the intended behavior.
       this.valueSetNext(items);
