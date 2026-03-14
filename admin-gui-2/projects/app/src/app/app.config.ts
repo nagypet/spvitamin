@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import {APP_INITIALIZER, ApplicationConfig, importProvidersFrom, LOCALE_ID, provideZoneChangeDetection} from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  importProvidersFrom,
+  LOCALE_ID,
+  provideZoneChangeDetection
+} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 
 import {routes} from './app.routes';

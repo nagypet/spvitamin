@@ -22,7 +22,10 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {MatCardModule} from '@angular/material/card';
 import {AdminService} from '../../core/services/admin.service';
 import {SpvitaminAdmin} from '../../core/model/spvitamin-admin-models';
-import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
+import {
+  AuthenticationRepositoryService
+} from "../../../../../ngface/src/lib/services/auth/authentication-repository.service";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -42,16 +45,26 @@ export class SettingsComponent implements OnInit
 {
   public settings: { [index: string]: SpvitaminAdmin.ServerParameter[] } | null = null;
   public shutdownIsInProgress = false;
+  private subscriptions = new Array<Subscription | undefined>();
 
   constructor(
     public adminService: AdminService,
-    public authService: OAuthService
+    private authenticationRepositoryService: AuthenticationRepositoryService
   )
   {
-
+    this.subscriptions.push(this.authenticationRepositoryService.authService?.loggedIn$.subscribe(value =>
+    {
+      this.loadSettings();
+    }));
   }
 
   ngOnInit()
+  {
+    this.loadSettings();
+  }
+
+
+  private loadSettings()
   {
     this.adminService.getSettings().subscribe((data: SpvitaminAdmin.ServerSettingsResponse) =>
     {
@@ -61,7 +74,6 @@ export class SettingsComponent implements OnInit
       this.settings = null;
     });
   }
-
 
   onShutdown()
   {
@@ -87,5 +99,10 @@ export class SettingsComponent implements OnInit
       return this.settings[key];
     }
     return [];
+  }
+
+  isLoggedIn(): boolean
+  {
+    return !!this.authenticationRepositoryService.authService?.isLoggedIn;
   }
 }

@@ -48,10 +48,15 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   private refreshQueue$ = new Subject<void>();
   private refreshTimerSub: any;
 
-  private _displayName$ = this.token$.pipe(map(t => t?.preferred_username ?? t?.sub ?? 'Anonymous'));
+  private _displayName$ = this.token$.pipe(map(t => t?.preferred_username ?? t?.sub));
   public get displayName$(): Observable<string | undefined>
   {
     return this._displayName$;
+  }
+
+  public get loggedIn$(): Observable<boolean>
+  {
+    return this.token$.pipe(map(t => t !== null));
   }
 
 

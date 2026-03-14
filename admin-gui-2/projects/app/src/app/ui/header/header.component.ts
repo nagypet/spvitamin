@@ -50,7 +50,7 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
   constructor
   (
     private adminService: AdminService,
-    public repositoryService: AuthenticationRepositoryService,
+    public authenticationRepositoryService: AuthenticationRepositoryService,
     private router: Router,
   )
   {
@@ -63,7 +63,7 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
     form.widgets['button-about'] = NgfaceWidgetFactory.createButton({id: 'button-about', label: 'About', style: 'PRIMARY'});
     this.formData = form;
 
-    this.subscriptions.push(this.repositoryService.authService?.displayName$.subscribe(value => this.displayName = value));
+    this.subscriptions.push(this.authenticationRepositoryService.authService?.displayName$.subscribe(value => this.displayName = value));
   }
 
 
@@ -92,6 +92,6 @@ export class HeaderComponent extends FormBaseComponent implements OnInit, OnDest
 
   onLogout()
   {
-    this.repositoryService.authService?.logout().subscribe(() => this.router.navigateByUrl('/'));
+    this.authenticationRepositoryService.authService?.logout().subscribe(() => this.router.navigateByUrl('/'));
   }
 }
