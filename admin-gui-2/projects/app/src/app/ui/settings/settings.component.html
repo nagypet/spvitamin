@@ -17,7 +17,6 @@
 <div>
   @if (settings !== null) {
     <div>
-
       <h2>Server settings</h2>
       @for (group of getKeys();track group) {
         <div class="group-name">{{ group }}</div>
@@ -39,7 +38,7 @@
       }
       <hr>
 
-      @if (authService.isLoggedIn) {
+      @if (isLoggedIn()) {
         <button mat-raised-button color="primary" (click)="onShutdown()" matTooltip="Shuts down the service"
                 matTooltipPosition="right">Shutdown
         </button>

@@ -73,6 +73,12 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
   }
 
 
+  public get loggedIn$(): Observable<boolean>
+  {
+    return this.token$.pipe(map(t => t !== null));
+  }
+
+
   constructor(private httpClient: HttpClient)
   {
     super();
