@@ -29,7 +29,6 @@ admin-gui/dist
 #Others
 .gradle
 build
-bin
 out
 polc
 distributions
