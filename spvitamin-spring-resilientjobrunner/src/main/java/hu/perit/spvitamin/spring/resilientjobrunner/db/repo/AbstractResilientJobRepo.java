@@ -55,9 +55,13 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     );
 
 
-    // We use here timeout = 0 which means, do not wait for locked rows.
+    // We use timeout = -2 which means, skip locked rows. If the underlying database doesn't support SKIP LOCKED,
+    // use timeout = 0 which means, do not wait for locked rows.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
+    @QueryHints({
+            @QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2"),
+            @QueryHint(name = "org.hibernate.lock.timeout", value = "-2")
+    })
     @Query("""
             select e from #{#entityName} e
             where e.processorType = :processorType

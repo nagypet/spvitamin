@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Slf4j
@@ -48,6 +49,24 @@ public final class CurrencyConverter
         CODE_TO_SYMBOL.put("RUB", "₽");
         CODE_TO_SYMBOL.put("CHF", "Fr");
     }
+
+    /**
+     * @return Az összes ismert szimbólum (pl. "$", "€", "Ft") és a hozzájuk tartozó ISO kód
+     */
+    public static Map<String, String> getSymbolToCodeMap()
+    {
+        return Map.copyOf(SYMBOL_TO_CODE);
+    }
+
+
+    /**
+     * @return Az összes ismert ISO kód (pl. "USD", "EUR", "HUF")
+     */
+    public static Set<String> getKnownCodes()
+    {
+        return Set.copyOf(CODE_TO_SYMBOL.keySet());
+    }
+
 
     public static String getStandardCode(String symbol)
     {
