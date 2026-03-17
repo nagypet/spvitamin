@@ -127,6 +127,11 @@ dependencyManagement {
   - session lifetime equals with access token validity for technical users
   - /authenticate endpoint: only basic authentication creates a nes session
 - 2026-02-28: StringUtils -> Strings.CI/Strings.CS
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
+- 2026-03-17: New class: NonNull
+- 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -220,7 +225,11 @@ dependencyManagement {
     - session lifetime equals with access token validity for technical users
     - /authenticate endpoint: only basic authentication creates a nes session
 - 2026-02-28: StringUtils -> Strings.CI/Strings.CS
-
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
+- 2026-03-17: New class: NonNull
+- 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
 
 ### 3.3.3-2-RELEASE not yet released
 
