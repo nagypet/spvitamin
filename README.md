@@ -132,6 +132,8 @@ dependencyManagement {
 - 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
 - 2026-03-17: New class: NonNull
 - 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
+- 2026-03-28: ResilientJobEntity has parameterHash
+- 2026-03-28: new class HashUtils
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -230,6 +232,8 @@ dependencyManagement {
 - 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
 - 2026-03-17: New class: NonNull
 - 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
+- 2026-03-28: ResilientJobEntity has parameterHash
+- 2026-03-28: new class HashUtils
 
 ### 3.3.3-2-RELEASE not yet released
 

@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.resilientjobrunner.service.impl.entity;
 
 import com.google.common.collect.Lists;
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.crypto.HashUtils;
 import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
@@ -26,6 +27,7 @@ import hu.perit.spvitamin.spring.resilientjobrunner.db.repo.AbstractResilientJob
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobParameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +35,10 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractResilientJobEntity> implements ResilientJobEntityService<T>
 {
     public static final int MAX_CRITERIA_IN_QUERIES = 1000;
@@ -44,18 +48,40 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
 
     protected abstract T supplyEntity();
 
+
     @Override
     public T createNew(ResilientJobProperties jobProperties, ResilientJobParameter parameter)
     {
+        // Checking if there is already an ongoing job with the same parameters
+        String parameterJson = parameter.toJson();
+        String parameterHash = HashUtils.get32BytesSha256Hash(parameterJson);
+        T existingEntity = findExistingOngoingJob(jobProperties.getId(), parameterHash).orElse(null);
+        if (existingEntity != null)
+        {
+            log.info("This job is already processing: {}", existingEntity);
+            return existingEntity;
+        }
+
         T resilientJobEntity = supplyEntity();
         resilientJobEntity.setCreationTimestamp(OffsetDateTime.now());
         resilientJobEntity.setStatus(ResilientJobStatus.CREATED);
         resilientJobEntity.setProcessorType(jobProperties.getId());
         resilientJobEntity.setParameterVersion(parameter.getVersion());
-        resilientJobEntity.setParameters(parameter.toJson());
+        resilientJobEntity.setParameters(parameterJson);
+        resilientJobEntity.setParameterHash(parameterHash);
         resilientJobEntity.setRetryCount(0L);
 
         return this.repo.save(resilientJobEntity);
+    }
+
+
+    private Optional<T> findExistingOngoingJob(Long processorType, String parameterHash)
+    {
+        return this.repo.findByStatusInAndProcessorTypeAndParameterHash(
+                EnumSet.of(ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS),
+                processorType,
+                parameterHash
+        );
     }
 
 
