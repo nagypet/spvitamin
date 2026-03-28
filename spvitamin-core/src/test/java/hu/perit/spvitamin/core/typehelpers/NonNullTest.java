@@ -2,6 +2,7 @@ package hu.perit.spvitamin.core.typehelpers;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +39,16 @@ class NonNullTest
 
         assertThat(result).isEmpty();
     }
+
+
+    @Test
+    void get_shouldReturnEmpty_whenSupplierThrowsNoSuchElementException()
+    {
+        Optional<Object> result = NonNull.get(() -> List.of().getFirst());
+
+        assertThat(result).isEmpty();
+    }
+
 
 
     @Test

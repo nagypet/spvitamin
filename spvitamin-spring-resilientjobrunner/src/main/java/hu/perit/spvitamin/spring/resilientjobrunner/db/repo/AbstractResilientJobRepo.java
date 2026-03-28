@@ -29,6 +29,7 @@ import org.springframework.data.jpa.repository.QueryHints;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
@@ -106,4 +107,7 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     @Modifying
     @Query("update #{#entityName} e set e.status = :status where e.id in :ids and e.status = :criteria")
     int updateStatusWhere(List<Long> ids, ResilientJobStatus status, ResilientJobStatus criteria);
+
+
+    Optional<T> findByStatusInAndProcessorTypeAndParameterHash(Set<ResilientJobStatus> status, Long processorType, String parameterHash);
 }

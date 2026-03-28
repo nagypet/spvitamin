@@ -3,6 +3,7 @@ package hu.perit.spvitamin.core.typehelpers;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -16,9 +17,9 @@ public class NonNull
         {
             return Optional.ofNullable(supplier.get());
         }
-        catch (NullPointerException e)
+        catch (NullPointerException | NoSuchElementException e)
         {
-            log.trace("Null encountered in supplier chain", e);
+            log.trace("Exception encountered in supplier chain", e);
             return Optional.empty();
         }
     }

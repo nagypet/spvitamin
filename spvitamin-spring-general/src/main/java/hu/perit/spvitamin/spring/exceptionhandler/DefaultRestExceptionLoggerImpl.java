@@ -43,7 +43,11 @@ public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
     @Override
     public void log(String path, Throwable ex, LogLevel level)
     {
-        if (Strings.CI.equalsAny(path, "uri=/favicon.ico", "uri=/.well-known/appspecific/com.chrome.devtools.json"))
+        if (Strings.CI.equalsAny(path,
+                "uri=/favicon.ico",
+                "uri=/.well-known/appspecific/com.chrome.devtools.json",
+                "uri=/frontend/sse/subscribe"
+        ))
         {
             return;
         }
