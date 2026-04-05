@@ -20,7 +20,10 @@ import hu.perit.spvitamin.core.typehelpers.MapUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tools.jackson.databind.AbstractTypeResolver;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.ConfigFeature;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.NamedType;
 import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -38,11 +41,15 @@ public final class CustomSettings
     private static final Map<String, JacksonModule> MODULES = new ConcurrentHashMap<>();
     private static final Map<String, NamedType> SUBTYPES = new ConcurrentHashMap<>();
     private static final List<String> ADDITIONAL_POLYMORPHIC_SUBTYPES = new ArrayList<>();
+    private static final Map<ConfigFeature, Boolean> CONFIG_FEATURES = new ConcurrentHashMap<>();
 
 
     static
     {
         ADDITIONAL_POLYMORPHIC_SUBTYPES.addAll(List.of("hu.perit", "java"));
+        CONFIG_FEATURES.put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        CONFIG_FEATURES.put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        CONFIG_FEATURES.put(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
     static AbstractTypeResolver getAbstractTypeResolver()
@@ -105,5 +112,17 @@ public final class CustomSettings
         BasicPolymorphicTypeValidator.Builder ptvBuilder = BasicPolymorphicTypeValidator.builder();
         ADDITIONAL_POLYMORPHIC_SUBTYPES.forEach(ptvBuilder::allowIfSubType);
         return ptvBuilder.build();
+    }
+
+
+    public static void addConfigFeature(ConfigFeature configFeature, Boolean value)
+    {
+        CONFIG_FEATURES.put(configFeature, value);
+    }
+
+
+    public static Map<ConfigFeature, Boolean> getConfigFeatures()
+    {
+        return CONFIG_FEATURES;
     }
 }

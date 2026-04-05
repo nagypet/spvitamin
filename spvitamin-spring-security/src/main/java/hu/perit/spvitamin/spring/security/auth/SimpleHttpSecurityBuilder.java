@@ -28,14 +28,13 @@ import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilte
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
-import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.LocalUserAuthenticationProvider;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -47,6 +46,7 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -80,14 +80,14 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder defaultCors() throws Exception
+    public SimpleHttpSecurityBuilder defaultCors()
     {
         http.cors(i -> i.configurationSource(corsConfigurationSource()));
         return this;
     }
 
 
-    public SimpleHttpSecurityBuilder defaultCsrf() throws Exception
+    public SimpleHttpSecurityBuilder defaultCsrf()
     {
         http.csrf(i -> i.disable());
         return this;
@@ -95,7 +95,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
+                                                      AccessDeniedHandler accessDeniedHandler)
     {
         http.exceptionHandling(i -> i.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
         return this;
@@ -131,7 +131,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders() throws Exception
+    public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders()
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
@@ -149,7 +149,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication() throws Exception
+    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication()
     {
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
@@ -163,7 +163,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder createSession() throws Exception
+    public SimpleHttpSecurityBuilder createSession()
     {
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
@@ -176,9 +176,13 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder basicAuth() throws Exception
+    public SimpleHttpSecurityBuilder basicAuth()
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+
+        // Adding Authentication Manager
+        AuthenticationManager authenticationManager = SpringContext.getBean(AuthenticationManager.class);
+        this.http.authenticationManager(authenticationManager);
 
         this.http.httpBasic(i -> i.authenticationEntryPoint(authenticationEntryPoint));
 
@@ -280,7 +284,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder allowFrames() throws Exception
+    public SimpleHttpSecurityBuilder allowFrames()
     {
         this.http.headers(i -> i.frameOptions(j -> j.sameOrigin()));
         return this;
@@ -289,8 +293,18 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder h2() throws Exception
     {
-        allowFrames();
-        this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        if (ClassUtils.isPresent(
+                "org.springframework.boot.h2console.autoconfigure.H2ConsoleProperties",
+                this.getClass().getClassLoader()))
+        {
+            log.info("H2 console enabled");
+            allowFrames();
+            this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        }
+        else
+        {
+            log.warn("*** H2 console is not available!");
+        }
         return this;
     }
 
@@ -315,29 +329,9 @@ public class SimpleHttpSecurityBuilder
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .ignorePersistedSecurity()
                 .authorizeRequests(r -> r.anyRequest().authenticated())
-                .addLocalUserAuthenticationProvider()
                 .basicAuth()
                 .jwtAuth()
                 .createSessionOnlyForBasicAuthentication();
-
-        return this;
-    }
-
-
-    private SimpleHttpSecurityBuilder addLocalUserAuthenticationProvider()
-    {
-        try
-        {
-            LocalUserAuthenticationProvider provider = SpringContext.getBean(LocalUserAuthenticationProvider.class);
-            AuthenticationManagerBuilder authenticationManagerBuilder = SpringContext.getBean(AuthenticationManagerBuilder.class);
-            http.authenticationProvider(provider);
-            authenticationManagerBuilder.authenticationProvider(provider);
-            log.debug("{} applied to the security.", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
-        catch (Exception e)
-        {
-            log.info("{} is not configured!", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
 
         return this;
     }

@@ -41,6 +41,7 @@ dependencies {
     // Compile dependencies
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
+    implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-admin')
     implementation project(':spvitamin-spring-security')
 

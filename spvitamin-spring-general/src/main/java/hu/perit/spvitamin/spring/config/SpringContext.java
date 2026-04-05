@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeansException;
@@ -25,7 +26,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
+import java.util.Map;
 
 /**
  * #know-how:access-spring-managed-beans-from-outside
@@ -40,6 +41,7 @@ import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 public final class SpringContext implements ApplicationContextAware
 {
     private static ApplicationContext context;
+
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException
@@ -62,11 +64,13 @@ public final class SpringContext implements ApplicationContextAware
         return context.getBean(beanClass);
     }
 
+
     public static <T> T getBean(String name, Class<T> beanClass)
     {
         validateSelf();
         return context.getBean(name, beanClass);
     }
+
 
     public static String[] getBeanNamesForType(Class<?> beanClass)
     {
@@ -74,12 +78,21 @@ public final class SpringContext implements ApplicationContextAware
         return context.getBeanNamesForType(beanClass);
     }
 
+
+    public static <T> Map<String, T> getBeansOfType(Class<T> beanClass)
+    {
+        validateSelf();
+        return context.getBeansOfType(beanClass);
+    }
+
+
     public static boolean isBeanAvailable(Class<?> beanClass)
     {
         validateSelf();
         String[] names = context.getBeanNamesForType(beanClass);
         return names.length > 0;
     }
+
 
     private static void validateSelf()
     {

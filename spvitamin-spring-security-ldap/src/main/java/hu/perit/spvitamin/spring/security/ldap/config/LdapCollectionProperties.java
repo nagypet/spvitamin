@@ -20,6 +20,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -28,13 +31,14 @@ import java.util.Map;
 @Data
 @Component
 @ConfigurationProperties
-public class LdapCollectionProperties {
-
+public class LdapCollectionProperties
+{
     private Map<String, LdapProperties> ldaps = new HashMap<>();
 
     @Getter
     @Setter
-    public static class LdapProperties {
+    public static class LdapProperties
+    {
 
         private boolean enabled = true;
         private String url;
@@ -45,5 +49,17 @@ public class LdapCollectionProperties {
         private int connectTimeoutMs = 1000;
         private String bindUserPattern;
         private boolean enableAccessWithoutDomain = false;
+    }
+
+
+    public static LdapCollectionProperties bindLdapCollectionProperties(Environment environment)
+    {
+        Binder binder = Binder.get(environment);
+        BindResult<LdapCollectionProperties> result = binder.bind("", LdapCollectionProperties.class);
+        return result.orElseGet(LdapCollectionProperties::new);
+//        LdapCollectionProperties props = new LdapCollectionProperties();
+//        Binder binder = Binder.get(environment);
+//        binder.bind("ldaps", org.springframework.boot.context.properties.bind.Bindable.ofInstance(props.getLdaps()));
+//        return props;
     }
 }

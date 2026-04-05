@@ -26,12 +26,14 @@ import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.ConfigFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.NamedType;
 import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpvitaminObjectMapper
@@ -41,8 +43,8 @@ public class SpvitaminObjectMapper
         JSON, YAML
     }
 
-    private static final SingletonFactory<JsonMapper> jsonMapperFactory = SingletonFactory.of(() -> internalCreateMapper(JsonMapper.class));
-    private static final SingletonFactory<YAMLMapper> yamlMapperFactory = SingletonFactory.of(() -> internalCreateMapper(YAMLMapper.class));
+    private static final SingletonFactory<JsonMapper> jsonMapperFactory = SingletonFactory.of(() -> createNewMapper(JsonMapper.class));
+    private static final SingletonFactory<YAMLMapper> yamlMapperFactory = SingletonFactory.of(() -> createNewMapper(YAMLMapper.class));
 
 
     // Use getJsonMapper() or getYamlMapper() instead of this method!
@@ -101,39 +103,80 @@ public class SpvitaminObjectMapper
     }
 
 
+    public static void addConfigFeature(ConfigFeature configFeature, Boolean value)
+    {
+        CustomSettings.addConfigFeature(configFeature, value);
+        jsonMapperFactory.renew();
+        yamlMapperFactory.renew();
+    }
+
+
     @SuppressWarnings("unchecked")
-    static <T> T internalCreateMapper(Class<T> type)
+    public static <T> T createNewMapper(Class<T> type)
     {
         if (type.equals(JsonMapper.class))
         {
-            return (T) JsonMapper.builderWithJackson2Defaults()
-                    .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
-                    .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
-                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-                    .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
-                    .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
-                    .addModule(new SpvitaminJsonTimeModul())
-                    .addModules(CustomSettings.getAdditionalModules())
-                    .registerSubtypes(CustomSettings.getSubtypes())
-                    .build();
+            return (T) jsonMapperBuilderWithDefaults().build();
         }
         else if (type.equals(YAMLMapper.class))
         {
-            return (T) YAMLMapper.builder(new YAMLFactory())
-                    .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
-                    .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
-                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-                    .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
-                    .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
-                    .addModule(new SpvitaminJsonTimeModul())
-                    .addModules(CustomSettings.getAdditionalModules())
-                    .registerSubtypes(CustomSettings.getSubtypes())
-                    .build();
+            return (T) yamlMapperBuilderWithDefaults().build();
         }
         throw new IllegalArgumentException("Unknown type: " + type);
     }
+
+
+    public static JsonMapper.Builder jsonMapperBuilderWithDefaults()
+    {
+        JsonMapper.Builder builder = JsonMapper.builderWithJackson2Defaults()
+                .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
+                .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
+                .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
+                .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
+                .addModule(new SpvitaminJsonTimeModul())
+                .addModules(CustomSettings.getAdditionalModules())
+                .registerSubtypes(CustomSettings.getSubtypes());
+
+        for (Map.Entry<ConfigFeature, Boolean> configFeatureBooleanEntry : CustomSettings.getConfigFeatures().entrySet())
+        {
+            if (configFeatureBooleanEntry.getKey() instanceof SerializationFeature serializationFeature)
+            {
+                builder.configure(serializationFeature, configFeatureBooleanEntry.getValue());
+            }
+            else if (configFeatureBooleanEntry.getKey() instanceof DeserializationFeature deserializationFeature)
+            {
+                builder.configure(deserializationFeature, configFeatureBooleanEntry.getValue());
+            }
+        }
+
+        return builder;
+    }
+
+
+    public static YAMLMapper.Builder yamlMapperBuilderWithDefaults()
+    {
+        YAMLMapper.Builder builder = YAMLMapper.builder(new YAMLFactory())
+                .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
+                .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
+                .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
+                .addAbstractTypeResolver(CustomSettings.getAbstractTypeResolver())
+                .addModule(new SpvitaminJsonTimeModul())
+                .addModules(CustomSettings.getAdditionalModules())
+                .registerSubtypes(CustomSettings.getSubtypes());
+
+        for (Map.Entry<ConfigFeature, Boolean> configFeatureBooleanEntry : CustomSettings.getConfigFeatures().entrySet())
+        {
+            if (configFeatureBooleanEntry.getKey() instanceof SerializationFeature serializationFeature)
+            {
+                builder.configure(serializationFeature, configFeatureBooleanEntry.getValue());
+            }
+            else if (configFeatureBooleanEntry.getKey() instanceof DeserializationFeature deserializationFeature)
+            {
+                builder.configure(deserializationFeature, configFeatureBooleanEntry.getValue());
+            }
+        }
+
+        return builder;
+    }
+
 }

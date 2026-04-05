@@ -98,7 +98,7 @@ dependencyManagement {
 
 ### 4.0.3-1-RELEASE not yet released
 
-- 2025-02-28: Java21, SpringBoot 4.0.3
+- 2026-02-28: Java21, SpringBoot 4.0.3
 - 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
 - 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
 - 2026-03-08: SpvitanObjectMapper improved
@@ -108,6 +108,10 @@ dependencyManagement {
 - 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
 - 2026-03-28: ResilientJobEntity has parameterHash
 - 2026-03-28: new class HashUtils
+- 2026-04-05: SpvitaminObjectMapper: builder is public to create locally used mapper with special settings
+- 2026-04-05: SpringContext new method: getBeansOfType
+- 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
+- 2026-04-05: LDAP authentication provider is now a bean
 
 
 ### 4.0.1-1-RELEASE not yet released
