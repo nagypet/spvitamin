@@ -189,6 +189,10 @@ dependencyManagement {
 - 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
 - 2026-03-28: ResilientJobEntity has parameterHash
 - 2026-03-28: new class HashUtils
+- 2026-04-05: SpringContext new method: getBeansOfType
+- 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
+- 2026-04-05: LDAP authentication provider is now a bean
+
 
 ### 3.3.3-2-RELEASE not yet released
 

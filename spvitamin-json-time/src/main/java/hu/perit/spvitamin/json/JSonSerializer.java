@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -53,6 +54,13 @@ public final class JSonSerializer
         String fixedJson = fixRoorLevelObjects(jsonString, target);
         ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
         return mapper.readValue(fixedJson, mapper.getTypeFactory().constructType(target));
+    }
+
+
+    public static <T> List<T> listFromJson(String jsonString, Class<T> elementType) throws JsonProcessingException
+    {
+        ObjectMapper mapper = SpvitaminObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
+        return mapper.readValue(jsonString, mapper.getTypeFactory().constructCollectionType(List.class, elementType));
     }
 
 
