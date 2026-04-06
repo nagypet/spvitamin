@@ -129,6 +129,7 @@ public class SpvitaminObjectMapper
     public static JsonMapper.Builder jsonMapperBuilderWithDefaults()
     {
         JsonMapper.Builder builder = JsonMapper.builderWithJackson2Defaults()
+                .annotationIntrospector(new UnderscorePrefixIntrospector())
                 .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
                 .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
                 .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
@@ -156,6 +157,7 @@ public class SpvitaminObjectMapper
     public static YAMLMapper.Builder yamlMapperBuilderWithDefaults()
     {
         YAMLMapper.Builder builder = YAMLMapper.builder(new YAMLFactory())
+                .annotationIntrospector(new UnderscorePrefixIntrospector())
                 .polymorphicTypeValidator(CustomSettings.getPolymorphicTypeValidator())
                 .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
                 .configure(MapperFeature.USE_GETTERS_AS_SETTERS, true)
