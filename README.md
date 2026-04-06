@@ -112,6 +112,7 @@ dependencyManagement {
 - 2026-04-05: SpringContext new method: getBeansOfType
 - 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
 - 2026-04-05: LDAP authentication provider is now a bean
+- 2026-04-06: DefaultRestExceptionLoggerImpl: ignore .*/sse/subscribe
 
 
 ### 4.0.1-1-RELEASE not yet released
