@@ -135,7 +135,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
     }
 
 
-    private static RestExceptionLogger getLogger()
+    protected static RestExceptionLogger getLogger()
     {
         try
         {

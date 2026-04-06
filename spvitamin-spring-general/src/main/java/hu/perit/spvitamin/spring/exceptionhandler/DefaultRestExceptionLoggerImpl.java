@@ -43,15 +43,10 @@ public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
     @Override
     public void log(String path, Throwable ex, LogLevel level)
     {
-        if (Strings.CI.equalsAny(path,
-                "uri=/favicon.ico",
-                "uri=/.well-known/appspecific/com.chrome.devtools.json",
-                "uri=/frontend/sse/subscribe"
-        ))
+        if (shouldIgnore(path))
         {
             return;
         }
-
         switch (level)
         {
             case DEBUG -> log.debug(String.format(FORMAT, path, StackTracer.toString(ex)));
@@ -60,5 +55,14 @@ public class DefaultRestExceptionLoggerImpl implements RestExceptionLogger
             case WARN -> log.warn(String.format(FORMAT, path, StackTracer.toString(ex)));
             default -> log.error(String.format(FORMAT, path, StackTracer.toString(ex)));
         }
+    }
+
+
+    private boolean shouldIgnore(String path)
+    {
+        return Strings.CI.equalsAny(path,
+                "uri=/favicon.ico",
+                "uri=/.well-known/appspecific/com.chrome.devtools.json"
+        ) || path != null && path.matches("uri=.*/sse/subscribe");
     }
 }
