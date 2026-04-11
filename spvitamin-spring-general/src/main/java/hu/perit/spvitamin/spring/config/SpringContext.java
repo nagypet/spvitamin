@@ -72,6 +72,13 @@ public final class SpringContext implements ApplicationContextAware
     }
 
 
+    public static Object getBean(String name)
+    {
+        validateSelf();
+        return context.getBean(name);
+    }
+
+
     public static String[] getBeanNamesForType(Class<?> beanClass)
     {
         validateSelf();

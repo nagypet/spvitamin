@@ -55,9 +55,6 @@ class BJob extends ContextAwareBatchJob
             {
                 ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(e);
                 log.error(exceptionWrapper.toStringWithCauses());
-                log.error("Exception. Retried {} times. Remaining time for retries: {}.",
-                        entity.getRetryCount(),
-                        calculateRemainingTime(entity.getProcessingFirstStartedTimestamp()));
 
                 boolean isItemRelated = this.processor.isItemRelatedException(e);
                 boolean isRetryable = this.processor.isRetryableException(e);
@@ -65,10 +62,17 @@ class BJob extends ContextAwareBatchJob
                 if (isRetryable || !isItemRelated)
                 {
                     // retryable or unknown error => we will retry the job
+                    OffsetDateTime nextRetryTimestamp = calculateNextRetryTimestamp(entity.getRetryCount());
+                    log.info("Job id: {} retried {} times. Remaining time for retries: {}. Next retry in {}.",
+                            entity.getId(),
+                            entity.getRetryCount(),
+                            calculateRemainingTime(entity.getProcessingFirstStartedTimestamp()),
+                            TimeFormatter.getHumanReadableDuration(nextRetryTimestamp.minusSeconds(OffsetDateTime.now().getSecond()).getSecond() * 1000L)
+                    );
                     this.resilientJobEntityService.saveError(
                             entity.getId(),
                             ResilientJobStatus.CREATED,
-                            calculateNextRetryTimestamp(entity.getRetryCount()),
+                            nextRetryTimestamp,
                             e
                     );
 
@@ -80,6 +84,7 @@ class BJob extends ContextAwareBatchJob
                 }
                 else // item-related && not-retryable
                 {
+                    log.info("Job id: {} will not be retried", entity.getId());
                     // job should be set in error, but the batch should continue
                     this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, null, e);
                     onError(e);

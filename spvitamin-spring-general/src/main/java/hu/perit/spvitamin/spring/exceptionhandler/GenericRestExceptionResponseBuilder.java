@@ -28,6 +28,7 @@ import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -55,6 +56,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
                 || exception.causedBy(InputException.class)
                 || exception.causedBy(MethodArgumentNotValidException.class)
                 || exception.causedBy("hu.perit.ngface.core.widget.exception.NgFaceBadRequestException")
+                || exception.causedBy(HttpMessageNotReadableException.class)
         )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);

@@ -18,6 +18,9 @@ package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
+import hu.perit.spvitamin.core.thing.Thing;
+import hu.perit.spvitamin.core.thing.Value;
+import hu.perit.spvitamin.core.thing.ValueMap;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -46,7 +49,6 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -54,6 +56,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -293,11 +296,11 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder h2() throws Exception
     {
-        if (ClassUtils.isPresent(
-                "org.springframework.boot.h2console.autoconfigure.H2ConsoleProperties",
-                this.getClass().getClassLoader()))
+        String h2ConsolePath = getH2ConsolePath().orElse(null);
+        if (h2ConsolePath != null)
         {
-            log.info("H2 console enabled");
+            String serviceUrl = SysConfig.getServerProperties().getServiceUrl();
+            log.info("H2 console available: {}{}", serviceUrl, h2ConsolePath);
             allowFrames();
             this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
         }
@@ -306,6 +309,31 @@ public class SimpleHttpSecurityBuilder
             log.warn("*** H2 console is not available!");
         }
         return this;
+    }
+
+
+    public static Optional<String> getH2ConsolePath()
+    {
+        try
+        {
+            Class<?> h2PropsClass = Class.forName("org.springframework.boot.h2console.autoconfigure.H2ConsoleProperties");
+            if (SpringContext.isBeanAvailable(h2PropsClass))
+            {
+                Thing h2ConsoleProperties = Thing.from(SpringContext.getBean(h2PropsClass));
+                if (h2ConsoleProperties instanceof ValueMap valueMap)
+                {
+                    if (valueMap.getProperties().get("path") instanceof Value value)
+                    {
+                        return Optional.of(value.getValue().toString());
+                    }
+                }
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            // H2ConsoleProperties class does not exist, so we don't care'
+        }
+        return Optional.empty();
     }
 
 
