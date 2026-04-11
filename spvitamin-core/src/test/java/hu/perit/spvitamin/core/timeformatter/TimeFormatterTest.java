@@ -38,29 +38,33 @@ class TimeFormatterTest
 
         s = TimeFormatter.getHumanReadableDuration(1234);
         log.debug(s);
-        assertThat(s).isEqualTo("1.234 sec");
+        assertThat(s).isEqualTo("1.23 sec");
 
-        s = TimeFormatter.getHumanReadableDuration(12345);
+        s = TimeFormatter.getHumanReadableDuration(10_000);
         log.debug(s);
-        assertThat(s).isEqualTo("12.345 sec");
+        assertThat(s).isEqualTo("10 sec");
 
-        s = TimeFormatter.getHumanReadableDuration(123456);
+        s = TimeFormatter.getHumanReadableDuration(12_345);
         log.debug(s);
-        assertThat(s).isEqualTo("2:03.456 min");
+        assertThat(s).isEqualTo("12.34 sec");
 
-        s = TimeFormatter.getHumanReadableDuration(1234567);
+        s = TimeFormatter.getHumanReadableDuration(123_456);
+        log.debug(s);
+        assertThat(s).isEqualTo("2:03 min");
+
+        s = TimeFormatter.getHumanReadableDuration(1_234_567);
         log.debug(s);
         assertThat(s).isEqualTo("20:34 min");
 
-        s = TimeFormatter.getHumanReadableDuration(12345678);
+        s = TimeFormatter.getHumanReadableDuration(12_345_678);
         log.debug(s);
         assertThat(s).isEqualTo("3:25:45 hour");
 
-        s = TimeFormatter.getHumanReadableDuration(123456789);
+        s = TimeFormatter.getHumanReadableDuration(123_456_789);
         log.debug(s);
         assertThat(s).isEqualTo("1:10:17:36 day");
 
-        s = TimeFormatter.getHumanReadableDuration(1234567899);
+        s = TimeFormatter.getHumanReadableDuration(1_234_567_899);
         log.debug(s);
         assertThat(s).isEqualTo("14:06:56:07 day");
     }

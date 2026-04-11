@@ -18,16 +18,15 @@ package hu.perit.spvitamin.core.timeformatter;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
  * A utility class for formatting time durations in a human-readable format.
- * 
+ *
  * <p>This class provides methods to convert time durations (in milliseconds) into
  * human-readable strings with appropriate units. It automatically selects the most
  * appropriate time unit (milliseconds, seconds, minutes, hours, or days) based on
  * the magnitude of the duration.</p>
- * 
+ *
  * <p>Features:</p>
  * <ul>
  *   <li>Format elapsed time since a start timestamp</li>
@@ -35,7 +34,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
  *   <li>Automatic unit selection based on duration magnitude</li>
  *   <li>Appropriate precision for different duration ranges</li>
  * </ul>
- * 
+ *
  * <p>Example outputs:</p>
  * <ul>
  *   <li>500 ms</li>
@@ -53,32 +52,50 @@ public final class TimeFormatter
         return getHumanReadableDuration(System.currentTimeMillis() - start);
     }
 
+
     public static String getHumanReadableDuration(long duration)
     {
-        double sec = 1000.0;
-        double min = 60 * sec;
-        double hour = 60.0 * min;
-        if (duration < 1 * sec)
+        long sec = 1_000L;
+        long min = 60L * sec;
+        long hour = 60L * min;
+        long day = 24L * hour;
+
+        if (duration < sec)
         {
             return String.format("%d ms", duration);
         }
-        else if (duration < 1 * min)
+        else if (duration < min)
         {
-            return DurationFormatUtils.formatDuration(duration, "s.S") + " sec";
+            long seconds = duration / sec;
+            long hundredths = (duration % sec) / 10L;
+            return hundredths == 0
+                    ? String.format("%d sec", seconds)
+                    : String.format("%d.%02d sec", seconds, hundredths);
         }
         else if (duration < 10 * min)
         {
-            return DurationFormatUtils.formatDuration(duration, "m:ss.S") + " min";
+            long minutes = duration / min;
+            long seconds = (duration % min) / sec;
+            return String.format("%d:%02d min", minutes, seconds);
         }
-        else if (duration < 1 * hour)
+        else if (duration < hour)
         {
-            return DurationFormatUtils.formatDuration(duration, "m:ss") + " min";
+            long minutes = duration / min;
+            long seconds = (duration % min) / sec;
+            return String.format("%d:%02d min", minutes, seconds);
         }
-        else if (duration < 24 * hour)
+        else if (duration < day)
         {
-            return DurationFormatUtils.formatDuration(duration, "H:mm:ss") + " hour";
+            long hours = duration / hour;
+            long minutes = (duration % hour) / min;
+            long seconds = (duration % min) / sec;
+            return String.format("%d:%02d:%02d hour", hours, minutes, seconds);
         }
 
-        return DurationFormatUtils.formatDuration(duration, "d:HH:mm:ss") + " day";
+        long days = duration / day;
+        long hours = (duration % day) / hour;
+        long minutes = (duration % hour) / min;
+        long seconds = (duration % min) / sec;
+        return String.format("%d:%02d:%02d:%02d day", days, hours, minutes, seconds);
     }
 }

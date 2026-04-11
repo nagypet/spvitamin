@@ -18,6 +18,9 @@ package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
+import hu.perit.spvitamin.core.thing.Thing;
+import hu.perit.spvitamin.core.thing.Value;
+import hu.perit.spvitamin.core.thing.ValueMap;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -28,14 +31,13 @@ import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilte
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
-import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.LocalUserAuthenticationProvider;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,6 +56,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -180,6 +183,10 @@ public class SimpleHttpSecurityBuilder
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
 
+        // Adding Authentication Manager
+        AuthenticationManager authenticationManager = SpringContext.getBean(AuthenticationManager.class);
+        this.http.authenticationManager(authenticationManager);
+
         this.http.httpBasic(i -> i.authenticationEntryPoint(authenticationEntryPoint));
 
         if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
@@ -289,9 +296,44 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder h2() throws Exception
     {
-        allowFrames();
-        this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        String h2ConsolePath = getH2ConsolePath().orElse(null);
+        if (h2ConsolePath != null)
+        {
+            String serviceUrl = SysConfig.getServerProperties().getServiceUrl();
+            log.info("H2 console available: {}{}", serviceUrl, h2ConsolePath);
+            allowFrames();
+            this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        }
+        else
+        {
+            log.warn("*** H2 console is not available!");
+        }
         return this;
+    }
+
+
+    public static Optional<String> getH2ConsolePath()
+    {
+        try
+        {
+            Class<?> h2PropsClass = Class.forName("org.springframework.boot.h2console.autoconfigure.H2ConsoleProperties");
+            if (SpringContext.isBeanAvailable(h2PropsClass))
+            {
+                Thing h2ConsoleProperties = Thing.from(SpringContext.getBean(h2PropsClass));
+                if (h2ConsoleProperties instanceof ValueMap valueMap)
+                {
+                    if (valueMap.getProperties().get("path") instanceof Value value)
+                    {
+                        return Optional.of(value.getValue().toString());
+                    }
+                }
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            // H2ConsoleProperties class does not exist, so we don't care'
+        }
+        return Optional.empty();
     }
 
 
@@ -315,29 +357,9 @@ public class SimpleHttpSecurityBuilder
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .ignorePersistedSecurity()
                 .authorizeRequests(r -> r.anyRequest().authenticated())
-                .addLocalUserAuthenticationProvider()
                 .basicAuth()
                 .jwtAuth()
                 .createSessionOnlyForBasicAuthentication();
-
-        return this;
-    }
-
-
-    private SimpleHttpSecurityBuilder addLocalUserAuthenticationProvider()
-    {
-        try
-        {
-            LocalUserAuthenticationProvider provider = SpringContext.getBean(LocalUserAuthenticationProvider.class);
-            AuthenticationManagerBuilder authenticationManagerBuilder = SpringContext.getBean(AuthenticationManagerBuilder.class);
-            http.authenticationProvider(provider);
-            authenticationManagerBuilder.authenticationProvider(provider);
-            log.debug("{} applied to the security.", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
-        catch (Exception e)
-        {
-            log.info("{} is not configured!", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
 
         return this;
     }
