@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -69,7 +68,7 @@ public class AuthorizationServerProxyImpl implements AuthorizationServerProxy
 
         AuthApi idpAuthApi = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new MirroringRequestInterceptor(getHeaders(request)))
-                .allowCookies(true)
+                .exposeSetCookieHeaders(true)
                 .build(AuthApi.class, url);
 
         ResponseEntity<AuthorizationToken> authResponse = idpAuthApi.authenticateUsingGET(null);
