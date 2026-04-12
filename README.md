@@ -118,6 +118,7 @@ dependencyManagement {
 - 2026-04-11: SimpleHttpSecurityBuilder: H2 console path is now retrieved from H2ConsoleProperties bean
 - 2026-04-11: Logging improved in ResilientJobRunner's BJob
 - 2026-04-11: HttpMessageNotReadableException handled in GenericRestExceptionResponseBuilder, producing HTTP 400 Bad Request
+- 2026-04-12: Browser mode in the SimpleFeignClientBuilder: sending cookies
 
 
 ### 4.0.1-1-RELEASE not yet released
@@ -241,6 +242,16 @@ dependencyManagement {
 - 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
 - 2026-03-28: ResilientJobEntity has parameterHash
 - 2026-03-28: new class HashUtils
+- 2026-04-05: SpringContext new method: getBeansOfType
+- 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
+- 2026-04-05: LDAP authentication provider is now a bean
+- 2026-04-06: DefaultRestExceptionLoggerImpl: ignore .*/sse/subscribe
+- 2026-04-11: TimeFormatter improved
+- 2026-04-11: SimpleHttpSecurityBuilder: H2 console path is now retrieved from H2ConsoleProperties bean
+- 2026-04-11: Logging improved in ResilientJobRunner's BJob
+- 2026-04-11: HttpMessageNotReadableException handled in GenericRestExceptionResponseBuilder, producing HTTP 400 Bad Request
+- 2026-04-12: Browser mode in the SimpleFeignClientBuilder: sending cookies
+
 
 ### 3.3.3-2-RELEASE not yet released
 

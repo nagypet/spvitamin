@@ -27,11 +27,15 @@ import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
 import feign.optionals.OptionalDecoder;
-import feign.slf4j.Slf4jLogger;
 import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.config.FeignProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.feignclients.cookie.CookieHandlingFeignClient;
+import hu.perit.spvitamin.spring.feignclients.cookie.CookieRequestInterceptor;
+import hu.perit.spvitamin.spring.feignclients.cookie.CookieStoreService;
 import hu.perit.spvitamin.spring.objectprovider.StaticObjectProvider;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
@@ -60,8 +64,10 @@ public class SimpleFeignClientBuilder
     private ErrorDecoder errorDecoder = new RestExceptionResponseDecoder();
     private Retryer retryer;
     private Client client;
-    private boolean allowCookies = false;
+    private boolean exposeSetCookieHeaders = false;
     private Request.Options options;
+    private boolean browserMode = false;
+    private String clientId;
 
 
     public static SimpleFeignClientBuilder newInstance()
@@ -106,7 +112,6 @@ public class SimpleFeignClientBuilder
         this.builder = Feign.builder()
                 .contract(new SpringMvcContract())
                 .requestInterceptor(this.requestInterceptorAdapter)
-                .logger(new Slf4jLogger(getClass()))
                 .logLevel(getLevel(feignProperties.getLoggerLevel()));
     }
 
@@ -178,9 +183,17 @@ public class SimpleFeignClientBuilder
     }
 
 
-    public SimpleFeignClientBuilder allowCookies(boolean allowCookies)
+    public SimpleFeignClientBuilder exposeSetCookieHeaders(boolean allowCookies)
     {
-        this.allowCookies = allowCookies;
+        this.exposeSetCookieHeaders = allowCookies;
+        return this;
+    }
+
+
+    public SimpleFeignClientBuilder browserModeWithClientId(String clientId)
+    {
+        this.browserMode = true;
+        this.clientId = clientId;
         return this;
     }
 
@@ -198,19 +211,30 @@ public class SimpleFeignClientBuilder
         this.builder.decoder(this.decoder);
         this.builder.errorDecoder(this.errorDecoder);
         this.builder.retryer(this.retryer);
-        if (this.allowCookies)
+        this.builder.logger(new ClientIdAwareSlf4jLogger(getClass(), this.clientId));
+
+        Client effectiveClient = this.client;
+        if (this.browserMode)
         {
-            this.builder.client(this.client);
+            if (StringUtils.isBlank(this.clientId))
+            {
+                throw new RuntimeException("clientId is required in browser mode!");
+            }
+            CookieStoreService cookieStoreService = SpringContext.getBean(CookieStoreService.class);
+            effectiveClient = new CookieHandlingFeignClient(effectiveClient, cookieStoreService, this.clientId);
+            this.requestInterceptorAdapter.addInterceptor(new CookieRequestInterceptor(cookieStoreService, this.clientId));
         }
-        else
+
+        if (!this.exposeSetCookieHeaders)
         {
-            this.builder.client(new HeaderFilterFeignClient(this.client));
+            effectiveClient = new HeaderFilterFeignClient(effectiveClient);
         }
         if (this.options != null)
         {
             this.builder.options(this.options);
         }
 
+        this.builder.client(effectiveClient);
         return this.builder.target(apiType, url);
     }
 }

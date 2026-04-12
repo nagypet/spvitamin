@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public abstract class AbstractTokenCache<T> implements TokenCache<T>
+public abstract class AbstractTokenCache<T extends Enum<T>> implements TokenCache<T>
 {
     private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final CryptoProperties cryptoProperties;
@@ -33,6 +33,7 @@ public abstract class AbstractTokenCache<T> implements TokenCache<T>
             MicroserviceProperties properties = this.microserviceCollectionProperties.get(propertiesEntry.getValue());
             String decrypted = cryptoUtil.decrypt(this.cryptoProperties.getSecret(), properties.getAuth().getEncryptedPassword());
             this.authApis.put(propertiesEntry.getKey(), SimpleFeignClientBuilder.newInstance()
+                    .browserModeWithClientId(propertiesEntry.getKey().name())
                     .requestInterceptor(new BasicAuthRequestInterceptor(properties.getAuth().getUsername(), decrypted))
                     .build(AuthApi.class, properties.getUrl()));
         }

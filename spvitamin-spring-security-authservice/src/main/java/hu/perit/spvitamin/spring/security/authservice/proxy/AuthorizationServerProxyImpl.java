@@ -68,7 +68,7 @@ public class AuthorizationServerProxyImpl implements AuthorizationServerProxy
 
         AuthApi idpAuthApi = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new MirroringRequestInterceptor(getHeaders(request)))
-                .allowCookies(true)
+                .exposeSetCookieHeaders(true)
                 .build(AuthApi.class, url);
 
         ResponseEntity<AuthorizationToken> authResponse = idpAuthApi.authenticateUsingGET(null);

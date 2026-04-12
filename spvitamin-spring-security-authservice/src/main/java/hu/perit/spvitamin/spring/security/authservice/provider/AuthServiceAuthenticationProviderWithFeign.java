@@ -33,7 +33,7 @@ public class AuthServiceAuthenticationProviderWithFeign extends AuthServiceAuthe
     {
         AuthApi templateAuthClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor(userName, password))
-                .allowCookies(true)
+                .exposeSetCookieHeaders(true)
                 .build(AuthApi.class, getServiceUrl());
 
         return ResponseEntityUtils.get(templateAuthClient.authenticateUsingGET(null));
