@@ -60,6 +60,9 @@ public class PostalAddress
 
     private static String getCountryCode(String countryCode)
     {
+        // Remove everything but letters
+        countryCode = countryCode.replaceAll("[^a-zA-Z]", "");
+
         if (StringUtils.isBlank(countryCode))
         {
             return null;
