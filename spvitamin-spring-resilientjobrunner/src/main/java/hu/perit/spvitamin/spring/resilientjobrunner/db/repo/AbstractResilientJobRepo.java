@@ -36,12 +36,13 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
 {
     // By using the whereState this method will work fine even if the DONE records are not deleted.
     @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and e.processingFirstStartedTimestamp < :timestamp")
+    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and e.processingFirstStartedTimestamp < :timestamp and e.nextRetryTimestamp <= :now")
     int terminatePermanentlyFailingEntities(
             Long processorType,
             OffsetDateTime timestamp,
             Set<ResilientJobStatus> whereStates,
-            ResilientJobStatus errorState
+            ResilientJobStatus errorState,
+            OffsetDateTime now
     );
 
 

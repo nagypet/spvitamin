@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -45,12 +46,14 @@ public final class AsyncExecutor
     public static <T> T invoke(Supplier<T> supplier, T returnValueOnError, Duration timeout) throws TimeoutException
     {
         CompletableFuture<T> completableFuture = null;
+        AtomicReference<Thread> asyncThread = new AtomicReference<>();
         try
         {
             // Capture the current thread's logging context (Log4j ThreadContext)
             final var parentThreadContext = ThreadContext.getContext();
 
             completableFuture = CompletableFuture.supplyAsync(() -> {
+                asyncThread.set(Thread.currentThread());
                 try
                 {
                     // Propagate the parent thread's context to the async thread
@@ -77,6 +80,11 @@ public final class AsyncExecutor
         catch (TimeoutException ex)
         {
             completableFuture.cancel(true);
+            Thread thread = asyncThread.get();
+            if (thread != null)
+            {
+                thread.interrupt();
+            }
             throw ex;
         }
         catch (InterruptedException ex)
@@ -92,12 +100,14 @@ public final class AsyncExecutor
     public static void invokeVoid(ThrowingRunnable runnable, Duration timeout) throws Exception
     {
         CompletableFuture<Void> completableFuture = null;
+        AtomicReference<Thread> asyncThread = new AtomicReference<>();
         try
         {
             // Capture the current thread's logging context (Log4j ThreadContext)
             final var parentThreadContext = ThreadContext.getContext();
 
             completableFuture = CompletableFuture.supplyAsync(() -> {
+                asyncThread.set(Thread.currentThread());
                 try
                 {
                     // Propagate the parent thread's context to the async thread
@@ -132,6 +142,11 @@ public final class AsyncExecutor
         catch (TimeoutException ex)
         {
             completableFuture.cancel(true);
+            Thread thread = asyncThread.get();
+            if (thread != null)
+            {
+                thread.interrupt();
+            }
             throw ex;
         }
         catch (InterruptedException ex)
