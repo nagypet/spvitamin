@@ -199,6 +199,8 @@ dependencyManagement {
 - 2026-04-11: HttpMessageNotReadableException handled in GenericRestExceptionResponseBuilder, producing HTTP 400 Bad Request
 - 2026-04-12: Browser mode in the SimpleFeignClientBuilder: sending cookies
 - 2026-04-14: ResilientJobRunner fix: the onError method of the processor is called in case the total retry timeout is reached
+- 2024-04-27: ResilientJobRunner fix: terminatePermanentlyFailingEntities terminates jobs only if there are no more scheduled retries
+- 2024-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
 
 
 ### 3.3.3-2-RELEASE not yet released

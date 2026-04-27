@@ -93,7 +93,9 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
                 processorType.getProcessorId(),
                 OffsetDateTime.now().minusSeconds(timeout.getSeconds()),
                 EnumSet.of(ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS),
-                ResilientJobStatus.ERROR);
+                ResilientJobStatus.ERROR,
+                OffsetDateTime.now()
+        );
     }
 
 

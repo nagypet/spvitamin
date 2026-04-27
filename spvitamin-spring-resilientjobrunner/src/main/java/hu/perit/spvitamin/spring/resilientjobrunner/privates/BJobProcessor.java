@@ -131,7 +131,9 @@ class BJobProcessor
             int countTerminatedEntities = this.resilientJobEntityService.terminatePermanentlyFailingEntities(processorType, properties.getRetryTimeout());
             if (countTerminatedEntities > 0)
             {
-                log.info("{} jobs have been terminated due to permanent errors", countTerminatedEntities);
+                // This is logged with error level, because in this case the onError method is not called,
+                // and therefore the connected processor may not be aware of the failure.
+                log.error("{} jobs have been terminated due to permanent errors", countTerminatedEntities);
             }
 
             int countResetedEntities = this.resilientJobEntityService.resetStuckInProgressEntities(processorType, properties.getProcessingTimeout());
