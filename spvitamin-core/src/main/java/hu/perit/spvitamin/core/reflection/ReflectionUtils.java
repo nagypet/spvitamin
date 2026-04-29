@@ -27,17 +27,23 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A comprehensive utility class for Java reflection operations.
- * 
+ *
  * <p>This class provides a collection of static methods to simplify common reflection
  * tasks such as discovering properties, working with getters and setters, accessing
  * fields, and handling annotations. It includes special handling for various Java types
  * and supports both public and private member access.</p>
- * 
+ *
  * <p>Features:</p>
  * <ul>
  *   <li>Property discovery and access from classes</li>
@@ -47,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  *   <li>Recursive annotation lookup through class hierarchies</li>
  *   <li>Terminal type detection for object traversal</li>
  * </ul>
- * 
+ *
  * <p>The class is designed to handle edge cases and provide consistent behavior
  * across different Java types and inheritance hierarchies.</p>
  *
@@ -373,11 +379,11 @@ public class ReflectionUtils
         }
 
         // Special Java types
-        if (clazz.isAssignableFrom(java.util.Date.class)
-                || clazz.isAssignableFrom(XMLGregorianCalendar.class)
-                || clazz.isAssignableFrom(TimeUnit.class)
-                || clazz.isAssignableFrom(TimeZone.class)
-                || clazz.isAssignableFrom(UUID.class)
+        if (java.util.Date.class.isAssignableFrom(clazz)
+                || XMLGregorianCalendar.class.isAssignableFrom(clazz)
+                || TimeUnit.class.isAssignableFrom(clazz)
+                || TimeZone.class.isAssignableFrom(clazz)
+                || UUID.class.equals(clazz)
         )
         {
             return true;
