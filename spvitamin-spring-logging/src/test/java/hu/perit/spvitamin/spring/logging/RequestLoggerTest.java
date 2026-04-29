@@ -21,6 +21,9 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -53,10 +56,11 @@ class RequestLoggerTest
         private LocalDate documentDate;
         private String comment;
         private UUID uuid;
+        private XMLGregorianCalendar retentionTime;
     }
 
     @Test
-    void testSingleRequest()
+    void testSingleRequest() throws DatatypeConfigurationException
     {
         CreateDocumentRequest request = new CreateDocumentRequest();
         request.setDocumentTypeName("testDocumentType");
@@ -64,10 +68,13 @@ class RequestLoggerTest
         request.setContent(getTestContent());
         request.setDocumentDate(LocalDate.of(2024, 11, 3));
         request.setComment("very very very very very very very very very very very very very very very very very very long comment");
+        XMLGregorianCalendar xmlCal = DatatypeFactory.newInstance().newXMLGregorianCalendar("2030-12-31");
+        request.setRetentionTime(xmlCal);
         request.setUuid(UUID.fromString("28321ad7-3abc-4899-b0ab-c006c3d2392c"));
 
         String subject = RequestLogger.toSubject(request);
-        assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}],\"uuid\":\"28321ad7-3abc-4899-b0ab-c006c3d2392c\"}");
+        log.debug(subject);
+        assertThat(subject).isEqualTo("{\"comment\":\"String of size 102 beginning with: very very very very very very very very very very very very very very very very very very long co...\",\"content\":{\"bytes\":\"byte[] of length: 164 bytes\",\"fileName\":\"alma.txt\"},\"documentDate\":\"2024-11-03\",\"documentTypeName\":\"testDocumentType\",\"keywords\":[{\"name\":\"testKeyword1\",\"value\":\"testValue1\"},{\"name\":\"testKeyword2\",\"value\":\"testValue2\"}],\"retentionTime\":\"2030-12-31T01:00:00+02:00\",\"uuid\":\"28321ad7-3abc-4899-b0ab-c006c3d2392c\"}");
     }
 
     private static List<Keyword> getTestKeywords()
