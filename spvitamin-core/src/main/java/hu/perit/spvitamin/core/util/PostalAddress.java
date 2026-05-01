@@ -46,6 +46,13 @@ public class PostalAddress
     }
 
 
+    @JsonIgnore
+    public boolean isValid()
+    {
+        return StringUtils.isNotBlank(this.fullAddress) || StringUtils.isNoneEmpty(this.countryCode, this.zip, this.city, this.address1);
+    }
+
+
     public static PostalAddress fromAddressParts(String countryCode, String zip, String city, String address1, String address2)
     {
         PostalAddress address = new PostalAddress();
