@@ -122,7 +122,8 @@ dependencyManagement {
 - 2026-04-14: ResilientJobRunner fix: the onError method of the processor is called in case the total retry timeout is reached
 - 2026-04-27: ResilientJobRunner fix: terminatePermanentlyFailingEntities terminates jobs only if there are no more scheduled retries
 - 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
-- 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct 
+- 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
+- 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
 
 
 ### 4.0.1-1-RELEASE not yet released
@@ -259,6 +260,7 @@ dependencyManagement {
 - 2026-04-27: ResilientJobRunner fix: terminatePermanentlyFailingEntities terminates jobs only if there are no more scheduled retries
 - 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
 - 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
+- 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
 
 
 ### 3.3.3-2-RELEASE not yet released

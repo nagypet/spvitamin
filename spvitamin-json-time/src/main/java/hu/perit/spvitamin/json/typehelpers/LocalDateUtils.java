@@ -51,6 +51,13 @@ public final class LocalDateUtils
             return null;
         }
 
+        // java.sql.Date.toInstant() throws UnsupportedOperationException,
+        // so we must handle it separately
+        if (date instanceof java.sql.Date sqlDate)
+        {
+            return sqlDate.toLocalDate();
+        }
+
         Instant instant = date.toInstant();
         return LocalDate.ofInstant(instant, ZoneId.systemDefault());
     }
