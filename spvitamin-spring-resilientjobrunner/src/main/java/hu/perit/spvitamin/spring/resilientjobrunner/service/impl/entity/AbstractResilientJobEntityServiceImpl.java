@@ -29,6 +29,7 @@ import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobPara
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -36,6 +37,7 @@ import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -70,6 +72,7 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
         resilientJobEntity.setParameters(parameterJson);
         resilientJobEntity.setParameterHash(parameterHash);
         resilientJobEntity.setRetryCount(0L);
+        resilientJobEntity.setOperationId(UUID.randomUUID());
 
         return this.repo.save(resilientJobEntity);
     }
@@ -157,5 +160,16 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     public void saveError(Long id, ResilientJobStatus resilientJobStatus, OffsetDateTime nextRetryTimestamp, Exception e)
     {
         this.repo.updateStatusAndError(id, resilientJobStatus, nextRetryTimestamp, StackTracer.toString(e));
+    }
+
+
+    /**
+     * Önálló tranzakció: a lépés mellékhatása után a haladás biztosan megmarad.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public void persistSagaContext(Long id, String contextJson, int contextVersion, String lastStep)
+    {
+        this.repo.updateSaga(id, contextJson, contextVersion, lastStep);
     }
 }

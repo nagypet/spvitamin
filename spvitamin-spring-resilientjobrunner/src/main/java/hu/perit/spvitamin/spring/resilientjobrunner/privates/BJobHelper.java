@@ -25,9 +25,9 @@ import java.text.MessageFormat;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class BJobHelper
 {
-    public static String getBatchId(ProcessorType processorType, Long id)
+    public static String getTraceId(ProcessorType processorType, Long id)
     {
-        String idText = id == null ? "" : " (" + id.toString() + ")";
+        String idText = id == null ? "" : "-" + id.toString();
         return MessageFormat.format("{0}{1}", processorType.getName(), idText);
     }
 }

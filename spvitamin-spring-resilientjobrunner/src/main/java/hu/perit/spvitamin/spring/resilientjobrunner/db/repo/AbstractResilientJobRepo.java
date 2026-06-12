@@ -111,4 +111,8 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
 
 
     Optional<T> findByStatusInAndProcessorTypeAndParameterHash(Set<ResilientJobStatus> status, Long processorType, String parameterHash);
+
+    @Modifying
+    @Query("update #{#entityName} e set e.sagaContext = :contextJson, e.sagaContextVersion = :contextVersion, e.sagaLastStep = :lastStep where e.id = :id")
+    void updateSaga(Long id, String contextJson, int contextVersion, String lastStep);
 }

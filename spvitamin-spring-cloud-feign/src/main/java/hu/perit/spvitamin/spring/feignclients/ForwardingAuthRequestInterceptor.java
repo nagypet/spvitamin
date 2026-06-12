@@ -22,33 +22,47 @@ import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
+import java.util.function.Supplier;
+
 public class ForwardingAuthRequestInterceptor implements RequestInterceptor
 {
-    private String authorization;
+    private final Supplier<String> authorizationSupplier;
+
 
     public ForwardingAuthRequestInterceptor()
     {
-        this.authorization = null;
+        this.authorizationSupplier = this::getTokenFromSecurityContext;
     }
 
-    public ForwardingAuthRequestInterceptor(String authorization)
+
+    public ForwardingAuthRequestInterceptor(Supplier<String> authorizationSupplier)
     {
-        this.authorization = authorization;
+        Objects.requireNonNull(authorizationSupplier);
+        this.authorizationSupplier = authorizationSupplier;
     }
+
 
     @Override
     public void apply(RequestTemplate template)
     {
-        if (this.authorization == null)
+        String authorizationHeader = this.authorizationSupplier.get();
+        if (authorizationHeader != null)
         {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object details = authentication.getDetails();
-            if (details instanceof AbstractAuthorizationToken authorizationToken)
-            {
-                this.authorization = "Bearer " + authorizationToken.getJwt();
-            }
+            template.header("Authorization", authorizationHeader);
+            template.header("Content-Type", "application/json");
         }
-        template.header("Authorization", this.authorization);
-        template.header("Content-Type", "application/json");
+    }
+
+
+    private String getTokenFromSecurityContext()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object details = authentication.getDetails();
+        if (details instanceof AbstractAuthorizationToken authorizationToken)
+        {
+            return "Bearer " + authorizationToken.getJwt();
+        }
+        return null;
     }
 }

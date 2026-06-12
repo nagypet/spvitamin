@@ -22,12 +22,20 @@ public class ThreadContextDecorator implements AutoCloseable
 {
     private final String context;
     private final String oldValue;
+    private final ThreadContextDecorator parent;
+
+
+    public static ThreadContextDecorator with(String batchId, String traceId)
+    {
+        return new ThreadContextDecorator("batchId", batchId, new ThreadContextDecorator("traceId", traceId));
+    }
 
 
     public ThreadContextDecorator(String context, String value)
     {
         this.context = context;
         this.oldValue = ThreadContext.get(context);
+        this.parent = null;
 
         ThreadContext.put(context, value);
     }
@@ -37,14 +45,29 @@ public class ThreadContextDecorator implements AutoCloseable
     {
         this.context = context;
         this.oldValue = ThreadContext.get(context);
+        this.parent = null;
 
         ThreadContext.put(context, String.format("%s (%s)", value, ctxId));
+    }
+
+
+    public ThreadContextDecorator(String context, String value, ThreadContextDecorator parent)
+    {
+        this.context = context;
+        this.oldValue = ThreadContext.get(context);
+        this.parent = parent;
+
+        ThreadContext.put(context, value);
     }
 
 
     @Override
     public void close()
     {
+        if (this.parent != null)
+        {
+            parent.close();
+        }
         ThreadContext.put(this.context, oldValue);
     }
 }

@@ -32,6 +32,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 // @formatter:off
 /**
@@ -82,6 +83,10 @@ public class AbstractResilientJobEntity
     public static final String COL_NEXT_RETRY_TIMESTAMP = "next_retry_timestamp";
     public static final String COL_ERROR_TEXT = "error_text";
     public static final String COL_PARAMETER_HASH = "parameter_hash";
+    public static final String COL_SAGA_CONTEXT = "saga_context";
+    public static final String COL_SAGA_CONTEXT_VERSION = "saga_context_version";
+    public static final String COL_LAST_STEP  = "last_step";
+    public static final String COL_OPERATION_ID  = "operation_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_generator")
@@ -128,8 +133,24 @@ public class AbstractResilientJobEntity
     @Column(name = COL_RETRY_COUNT)
     private Long retryCount;
 
+    // This can be used as an idempotent key
     @NotNull
     @Size(max = 50)
     @Column(name = COL_PARAMETER_HASH, nullable = false)
     private String parameterHash;
+
+    // A lépésenként felhalmozódó, MUTÁBILIS állapot (JSON). A parameters immutábilis marad.
+    @Column(name = COL_SAGA_CONTEXT, columnDefinition = "TEXT")
+    private String sagaContext;
+
+    @Column(name = COL_SAGA_CONTEXT_VERSION)
+    private Integer sagaContextVersion;
+
+    // Az utoljára sikeresen befejezett lépés neve (diagnosztika / resume).
+    @Column(name = COL_LAST_STEP)
+    private String sagaLastStep;
+
+    // This will be generated at creation and can be used as an idempotency key.
+    @Column(name = COL_OPERATION_ID)
+    private UUID operationId;
 }
