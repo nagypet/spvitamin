@@ -22,6 +22,7 @@ import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
 import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
@@ -45,7 +46,8 @@ class BJob extends ContextAwareBatchJob
     @Override
     protected Void execute() throws Exception
     {
-        try (var ctx = new ThreadContextDecorator(processor.getProperties().getContextDecoratorTag(), BJobHelper.getBatchId(processor.getProcessorType(), entity.getId())))
+        try (var ctx = ThreadContextDecorator.with(processor.getProcessorType().getName(), BJobHelper.getTraceId(processor.getProcessorType(), entity.getId()));
+             var jobCtx = ResilientJobContext.bind(entity.getOperationId()))
         {
             try
             {

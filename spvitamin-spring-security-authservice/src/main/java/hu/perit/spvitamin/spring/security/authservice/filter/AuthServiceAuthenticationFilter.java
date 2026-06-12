@@ -51,7 +51,7 @@ public class AuthServiceAuthenticationFilter extends AbstractTokenAuthentication
     protected AuthorizationToken getJwtFromRequest(HttpServletRequest request, HttpServletResponse response)
     {
         AuthApi templateAuthClient = SimpleFeignClientBuilder.newInstance()
-                .requestInterceptor(new ForwardingAuthRequestInterceptor(request.getHeader(HttpHeaders.AUTHORIZATION)))
+                .requestInterceptor(new ForwardingAuthRequestInterceptor(() -> request.getHeader(HttpHeaders.AUTHORIZATION)))
                 .build(AuthApi.class, AuthServiceAuthenticationProviderWithFeign.getServiceUrl());
 
         return ResponseEntityUtils.get(templateAuthClient.authenticateUsingGET(null));

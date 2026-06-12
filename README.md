@@ -124,6 +124,12 @@ dependencyManagement {
 - 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
 - 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
 - 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
+- 2026-06-12: ForwardingAuthRequestInterceptor bugfix
+- 2026-06-12: ResilientJobRunner improvements and bugfix:
+  - SagaExecutor
+  - a missing catch-block caused the whole processing to stop in some rare circumstances
+- 2026-06-12: IbanConverter and CharsetSanitizer
+- 2026-06-12: a new validator to provide reasoning
 
 
 ### 4.0.1-1-RELEASE not yet released
@@ -261,6 +267,12 @@ dependencyManagement {
 - 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
 - 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
 - 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
+- 2026-06-12: ForwardingAuthRequestInterceptor bugfix
+- 2026-06-12: ResilientJobRunner improvements and bugfix: 
+  - SagaExecutor
+  - a missing catch-block caused the whole processing to stop in some rare circumstances
+- 2026-06-12: IbanConverter and CharsetSanitizer
+- 2026-06-12: a new validator to provide reasoning
 
 
 ### 3.3.3-2-RELEASE not yet released

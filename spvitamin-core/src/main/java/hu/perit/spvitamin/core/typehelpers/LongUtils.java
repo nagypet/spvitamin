@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * A utility class for working with Long and BigInteger values.
@@ -65,17 +66,7 @@ public final class LongUtils
      */
     public static boolean equals(final Long l1, final Long l2)
     {
-        if (l1 == l2) // NOSONAR
-        {
-            return true;
-        }
-
-        if (l1 == null || l2 == null)
-        {
-            return false;
-        }
-
-        return l1.equals(l2);
+        return Objects.equals(l1, l2);
     }
 
 

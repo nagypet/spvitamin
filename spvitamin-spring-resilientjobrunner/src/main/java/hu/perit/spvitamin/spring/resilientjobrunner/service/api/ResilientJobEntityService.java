@@ -40,4 +40,6 @@ public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
     void deleteById(Long id);
 
     void saveError(Long id, ResilientJobStatus resilientJobStatus, OffsetDateTime nextRetryTimestamp, Exception e);
+
+    void persistSagaContext(Long id, String contextJson, int contextVersion, String lastStep);
 }

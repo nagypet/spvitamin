@@ -85,6 +85,17 @@ public final class OffsetDateTimeUtils
     }
 
 
+    public static OffsetDateTime fromInstant(Instant instant)
+    {
+        if (instant == null)
+        {
+            return null;
+        }
+
+        return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+
+
     public static OffsetDateTime fromString(String dateAsString)
     {
         if (StringUtils.isBlank(dateAsString))
