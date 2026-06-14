@@ -37,6 +37,9 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 /**
  * @author Peter Nagy
  */
@@ -46,6 +49,22 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @Slf4j
 public class SpvitaminWebSecurityConfig
 {
+    // Login, OAuth2, error, logout endpoints – always permit all
+    private static final String[] PERMIT_ALL_ENDPOINTS = {
+            "/login/**",
+            "/oauth2/authorization/*",
+            "/api/spvitamin/oauth2/authorization",
+            "/error",
+            "/logout"
+    };
+
+    // Publicly accessible actuator endpoints (health + prometheus)
+    private static final String[] ACTUATOR_PUBLIC_ENDPOINTS = {
+            "/actuator/health/**",
+            "/actuator/prometheus"
+    };
+
+
     @ConditionalOnBean(annotation = EnableSpvitaminOAuth2Idp.class)
     @Bean
     @Order(1)
@@ -101,7 +120,7 @@ public class SpvitaminWebSecurityConfig
      * ============== Config for the logout endpoint ===================================================================
      */
     @Bean
-    @Order(997)
+    @Order(996)
     @DependsOn(value = "serverProperties")
     public SecurityFilterChain configureLogoutRestEndpoint(HttpSecurity http) throws Exception
     {
@@ -122,7 +141,7 @@ public class SpvitaminWebSecurityConfig
      * ============== Config for the admin endpoints ===================================================================
      */
     @Bean
-    @Order(998)
+    @Order(997)
     public SecurityFilterChain configureAdminRestEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
@@ -172,21 +191,63 @@ public class SpvitaminWebSecurityConfig
 
 
     /*
-     * ============== Config for the rest with persisted security ======================================================
+     * ============== Config swagger and actuator with persisted security ==============================================
+     */
+    @Bean
+    @Order(998)
+    public SecurityFilterChain configureSwaggerAndActuatorWithPersistedSecurity(HttpSecurity http) throws Exception
+    {
+        String[] scopeEndpoints = Stream.of(
+                swaggerEndpoints(),
+                ACTUATOR_PUBLIC_ENDPOINTS,
+                new String[]{"/actuator/**"},
+                adminGuiEndpoints()
+        ).flatMap(Arrays::stream).toArray(String[]::new);
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(scopeEndpoints)
+                .defaults()
+                .authorizeRequests(i -> authorizeSwagger(i))
+                .authorizeRequests(i -> authorizeActuator(i))
+                .authorizeRequests(i -> authorizeAdminGui(i));
+
+        return http.build();
+    }
+
+
+    /*
+     * ============== Config permit-all endpoints ======================================================================
      */
     @Bean
     @Order(999)
+    public SecurityFilterChain configurePermitAllEndpoints(HttpSecurity http) throws Exception
+    {
+        String[] scopeEndpoints = Stream.of(
+                new String[]{AuthenticationRepositoryApi.BASE_URL + "/**"},
+                PERMIT_ALL_ENDPOINTS
+        ).flatMap(Arrays::stream).toArray(String[]::new);
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(scopeEndpoints)
+                .defaults()
+                .ignorePersistedSecurity()
+                .authorizeRequests(i -> i.requestMatchers(AuthenticationRepositoryApi.BASE_URL + "/**").permitAll())
+                .authorizeRequests(i -> permitAllEndpoints(i));
+
+        return http.build();
+    }
+
+
+    /*
+     * ============== Config for all others ============================================================================
+     */
+    @Bean
+    @Order(1000)
     public SecurityFilterChain configureAllOthers(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
                 .defaults()
-                // h2 console uses frames
-                .allowFrames()
-                .authorizeRequests(i -> i.requestMatchers(AuthenticationRepositoryApi.BASE_URL + "/**").permitAll())
-                .authorizeRequests(i -> authorizeSwagger(i))
-                .authorizeRequests(i -> authorizeActuator(i))
-                .authorizeRequests(i -> authorizeAdminGui(i))
-                .authorizeRequests(i -> permitEndpoints(i))
+                .ignorePersistedSecurity()
                 // any other requests
                 .authorizeRequests(i -> i.anyRequest().authenticated());
 
@@ -194,20 +255,11 @@ public class SpvitaminWebSecurityConfig
     }
 
 
-    private void permitEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
+    private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
     {
         registry
-                .requestMatchers(
-                        // Login
-                        PathPatternRequestMatcher.pathPattern("/login/**"),
-                        // OAuth2
-                        PathPatternRequestMatcher.pathPattern("/oauth2/authorization/*"),
-                        PathPatternRequestMatcher.pathPattern("/api/spvitamin/oauth2/authorization"),
-                        // error
-                        PathPatternRequestMatcher.pathPattern("/error"),
-                        // Logout endpoint
-                        PathPatternRequestMatcher.pathPattern("/logout")
-                ).permitAll()
+                .requestMatchers(toMatchers(PERMIT_ALL_ENDPOINTS))
+                .permitAll()
         // H2 console must be enabled within the application
         //.requestMatchers(PathRequest.toH2Console()).permitAll()
         ;
@@ -218,29 +270,8 @@ public class SpvitaminWebSecurityConfig
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        AdminProperties adminProperties = SysConfig.getAdminProperties();
-
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls;
-        if (adminProperties.getAdminGuiUrl().isBlank())
-        {
-            adminGuiUrls = registry
-                    .requestMatchers(
-                            // Admin GUI controller
-                            PathPatternRequestMatcher.pathPattern("/"),
-                            PathPatternRequestMatcher.pathPattern("/*.*"),
-                            PathPatternRequestMatcher.pathPattern("/css/**"),
-                            PathPatternRequestMatcher.pathPattern("/assets/**")
-                    );
-        }
-        else
-        {
-            adminGuiUrls = registry
-                    .requestMatchers(
-                            // Admin GUI controller
-                            PathPatternRequestMatcher.pathPattern("/"),
-                            PathPatternRequestMatcher.pathPattern(String.format("%s/**", adminProperties.getAdminGuiUrl()))
-                    );
-        }
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl adminGuiUrls = registry
+                .requestMatchers(toMatchers(adminGuiEndpoints()));
 
         if ("*".equals(securityProperties.getAdminGuiAccess()))
         {
@@ -257,11 +288,7 @@ public class SpvitaminWebSecurityConfig
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-        registry.requestMatchers(
-                        // Health and Prometheus endpoint
-                        PathPatternRequestMatcher.pathPattern("/actuator/health/**"),
-                        PathPatternRequestMatcher.pathPattern("/actuator/prometheus"))
-                .permitAll();
+        registry.requestMatchers(toMatchers(ACTUATOR_PUBLIC_ENDPOINTS)).permitAll();
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl actuatorUrls = registry
                 .requestMatchers(PathPatternRequestMatcher.pathPattern("/actuator/**"));
@@ -285,18 +312,9 @@ public class SpvitaminWebSecurityConfig
     private void authorizeSwagger(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry)
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-        SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
-        String swaggerUiPath = swaggerProperties.getSwaggerUi().getPath();
-        String apiDocsPath = swaggerProperties.getApiDocs().getPath();
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = registry
-                .requestMatchers(
-                        // Swagger 3
-                        PathPatternRequestMatcher.pathPattern(swaggerUiPath + "/**"),
 
-                        // api-docs
-                        PathPatternRequestMatcher.pathPattern(apiDocsPath + "/**"),
-                        PathPatternRequestMatcher.pathPattern(apiDocsPath + ".yaml")
-                );
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl swaggerUrls = registry
+                .requestMatchers(toMatchers(swaggerEndpoints()));
 
         if ("*".equals(securityProperties.getSwaggerAccess()))
         {
@@ -306,6 +324,42 @@ public class SpvitaminWebSecurityConfig
         {
             swaggerUrls.hasRole(securityProperties.getSwaggerAccess());
         }
+    }
 
+
+    private String[] swaggerEndpoints()
+    {
+        SwaggerProperties swaggerProperties = SpringContext.getBean(SwaggerProperties.class);
+        String swaggerUiPath = swaggerProperties.getSwaggerUi().getPath();
+        String apiDocsPath = swaggerProperties.getApiDocs().getPath();
+        return new String[]{
+                // Swagger 3
+                swaggerUiPath + "/**",
+                // api-docs
+                apiDocsPath + "/**",
+                apiDocsPath + ".yaml"
+        };
+    }
+
+
+    private String[] adminGuiEndpoints()
+    {
+        AdminProperties adminProperties = SysConfig.getAdminProperties();
+        if (adminProperties.getAdminGuiUrl().isBlank())
+        {
+            return new String[]{"/", "/*.*", "/css/**", "/assets/**"};
+        }
+        else
+        {
+            return new String[]{"/", String.format("%s/**", adminProperties.getAdminGuiUrl())};
+        }
+    }
+
+
+    private static PathPatternRequestMatcher[] toMatchers(String[] endpoints)
+    {
+        return Arrays.stream(endpoints)
+                .map(PathPatternRequestMatcher::pathPattern)
+                .toArray(PathPatternRequestMatcher[]::new);
     }
 }

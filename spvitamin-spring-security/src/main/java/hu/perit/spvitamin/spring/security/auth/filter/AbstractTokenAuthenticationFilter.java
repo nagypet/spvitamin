@@ -145,6 +145,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         finally
         {
             SecurityContextHolder.clearContext();
+            ThreadContext.remove("sessionId");
         }
     }
 
@@ -190,6 +191,6 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     protected static boolean isAuthenticateEndpoint()
     {
         String servletPath = Optional.ofNullable(RequestQuery.getHttpServletRequest()).map(i -> i.getServletPath()).orElse(null);
-        return Strings.CI.equals(servletPath, AuthApi.BASE_URL_AUTHENTICATE);
+        return Strings.CS.equals(servletPath, AuthApi.BASE_URL_AUTHENTICATE);
     }
 }

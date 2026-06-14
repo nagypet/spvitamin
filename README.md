@@ -108,6 +108,7 @@ dependencyManagement {
 
 ### 4.1.0-1-RELEASE not yet released
 - 2026-06-13: SpringBoot 4.1.0
+- 2026-06-14: Security module improvements
 
 
 ### 4.0.3-1-RELEASE not yet released

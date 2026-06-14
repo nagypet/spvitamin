@@ -400,21 +400,27 @@ public class SimpleHttpSecurityBuilder
     public static CorsConfigurationSource corsConfigurationSource()
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+        boolean productionMode = securityProperties.isProductionMode();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins()));
-        configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders()));
-        configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods()));
+        configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins(), productionMode));
+        configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders(), productionMode));
+        configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods(), productionMode));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
 
-    private static List<String> getListFromArray(String[] input)
+    private static List<String> getListFromArray(String[] input, boolean productionMode)
     {
         if (input == null || input.length == 0)
         {
+            if (productionMode)
+            {
+                log.warn("CORS configuration is missing in production mode — CORS requests will be blocked!");
+                return List.of();
+            }
             return List.of("*");
         }
         else
