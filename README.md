@@ -5,6 +5,16 @@ please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
 
+### 4.1.0-1-RELEASE
+
+- SpringBoot 4.1.0
+- SpingCloud 2025.1.2
+
+### 4.0.3-1-RELEASE
+
+- SpringBoot 4.0.3
+- SpingCloud 2025.1.0
+
 ### 4.0.1-1-RELEASE
 
 - SpringBoot 4.0.1
@@ -59,7 +69,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '4.0.3-1-RELEASE')
+    set('spvitaminVersion', '4.1.0-1-RELEASE')
 }
 
 dependencies {
@@ -96,8 +106,11 @@ dependencyManagement {
 
 ## Release history
 
-### 4.0.3-1-RELEASE not yet released
+### 4.1.0-1-RELEASE not yet released
+- 2026-06-13: SpringBoot 4.1.0
 
+
+### 4.0.3-1-RELEASE not yet released
 - 2026-02-28: Java21, SpringBoot 4.0.3
 - 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
 - 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore

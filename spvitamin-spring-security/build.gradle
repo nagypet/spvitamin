@@ -86,21 +86,27 @@ test {
 }
 
 
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.OptionalProperties
+import cz.habarta.typescript.generator.OptionalPropertiesDeclaration
+import cz.habarta.typescript.generator.TypeScriptFileType
+import cz.habarta.typescript.generator.TypeScriptOutputKind
+
 generateTypeScript {
-    jsonLibrary = 'jackson2'
+    jsonLibrary = JsonLibrary.jackson3
     classPatterns = [
             'hu.perit.spvitamin.spring.auth.AuthorizationToken',
             'hu.perit.spvitamin.spring.security.config.AuthenticationRepository'
     ]
     outputFile = 'build/spvitamin-security-models.ts'
-    outputFileType = 'implementationFile'
-    outputKind = 'module'
+    outputFileType = TypeScriptFileType.implementationFile
+    outputKind = TypeScriptOutputKind.module
     namespace = 'SpvitaminSecurity'
     //disableTaggedUnions = true
-    optionalProperties = 'useSpecifiedAnnotations'
+    optionalProperties = OptionalProperties.useSpecifiedAnnotations
     optionalAnnotations = [
             'javax.annotation.Nullable',
             'jakarta.annotation.Nullable'
     ]
-    optionalPropertiesDeclaration = 'nullableType'
+    optionalPropertiesDeclaration = OptionalPropertiesDeclaration.nullableType
 }

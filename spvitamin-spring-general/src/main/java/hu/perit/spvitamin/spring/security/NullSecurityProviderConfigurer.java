@@ -21,6 +21,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.security.Provider;
 import java.security.Security;
 
@@ -51,6 +54,23 @@ public class NullSecurityProviderConfigurer
         {
             Provider nullSecurityProvider = new NullSecurityProvider("NullSecurityProvider", "1.0", "Skipping SSL certificate validation");
             Security.insertProviderAt(nullSecurityProvider, 1);
+
+            // In Spring Boot 4.1.0+, SSLContext.getDefault() may already be cached before this @PostConstruct
+            // runs due to earlier SSL initialization in the framework. We must explicitly override the default
+            // SSLContext and the HttpsURLConnection default socket factory to ensure all HTTPS connections
+            // use the null trust manager.
+            try
+            {
+                SSLContext nullContext = SSLContext.getInstance("TLS");
+                nullContext.init(null, new TrustManager[]{new NullTrustManager()}, null);
+                SSLContext.setDefault(nullContext);
+                HttpsURLConnection.setDefaultSSLSocketFactory(nullContext.getSocketFactory());
+                HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+            }
+            catch (Exception e)
+            {
+                log.error("Failed to override default SSL context", e);
+            }
 
             log.warn("NullSecurityProvider installed!");
         }

@@ -81,20 +81,27 @@ test {
     useJUnitPlatform()
 }
 
+
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.OptionalProperties
+import cz.habarta.typescript.generator.OptionalPropertiesDeclaration
+import cz.habarta.typescript.generator.TypeScriptFileType
+import cz.habarta.typescript.generator.TypeScriptOutputKind
+
 generateTypeScript {
-    jsonLibrary = 'jackson2'
+    jsonLibrary = JsonLibrary.jackson3
     classPatterns = [
             'hu.perit.spvitamin.spring.rest.model.**'
     ]
     outputFile = 'build/spvitamin-admin-models.ts'
-    outputFileType = 'implementationFile'
-    outputKind = 'module'
+    outputFileType = TypeScriptFileType.implementationFile
+    outputKind = TypeScriptOutputKind.module
     namespace = 'SpvitaminAdmin'
     //disableTaggedUnions = true
-    optionalProperties = 'useSpecifiedAnnotations'
+    optionalProperties = OptionalProperties.useSpecifiedAnnotations
     optionalAnnotations = [
             'javax.annotation.Nullable',
             'jakarta.annotation.Nullable'
     ]
-    optionalPropertiesDeclaration = 'nullableType'
+    optionalPropertiesDeclaration = OptionalPropertiesDeclaration.nullableType
 }

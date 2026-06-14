@@ -38,17 +38,13 @@ import hu.perit.spvitamin.spring.objectprovider.StaticObjectProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
+import org.springframework.cloud.openfeign.support.HttpMessageConverterCustomizer;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.json.JsonMapper;
-
-import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -88,9 +84,13 @@ public class SimpleFeignClientBuilder
         this.encoder = new Jackson3Encoder(jsonMapper); // default encoder
 
         // Decoder
+        HttpMessageConverterCustomizer decoderCustomizer = converterList -> {
+            converterList.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
+            converterList.add(new JacksonJsonHttpMessageConverter(jsonMapper));
+        };
         FeignHttpMessageConverters converters = new FeignHttpMessageConverters(
-                StaticObjectProvider.of(new ByteArrayHttpMessageConverter()),
-                StaticObjectProvider.empty());
+                StaticObjectProvider.empty(),
+                StaticObjectProvider.of(decoderCustomizer));
         ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(converters);
 
         this.decoder = new OptionalDecoder(
@@ -98,6 +98,7 @@ public class SimpleFeignClientBuilder
                         new SpringDecoder(feignHttpMessageConverters)
                 )
         );
+
 
         // Retryer
         this.retryer = new Retryer.Default(
@@ -125,11 +126,12 @@ public class SimpleFeignClientBuilder
     public SimpleFeignClientBuilder withMultipartEncoder()
     {
         JsonMapper jsonMapper = SpvitaminObjectMapper.getJsonMapper();
-        List<HttpMessageConverter<?>> converterList = new RestTemplate().getMessageConverters();
-        converterList.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
-        converterList.add(new JacksonJsonHttpMessageConverter(jsonMapper));
-
-        ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(new FeignHttpMessageConverters(StaticObjectProvider.of(converterList), null));
+        HttpMessageConverterCustomizer encoderCustomizer = converterList -> {
+            converterList.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
+            converterList.add(new JacksonJsonHttpMessageConverter(jsonMapper));
+        };
+        ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(
+                new FeignHttpMessageConverters(StaticObjectProvider.empty(), StaticObjectProvider.of(encoderCustomizer)));
         this.encoder = new SpringFormEncoder(new SpringEncoder(feignHttpMessageConverters));
         return this;
     }
