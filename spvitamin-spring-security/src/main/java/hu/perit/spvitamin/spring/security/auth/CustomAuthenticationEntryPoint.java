@@ -19,12 +19,15 @@ package hu.perit.spvitamin.spring.security.auth;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 
@@ -34,15 +37,34 @@ import java.io.IOException;
 
 
 @Component
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+@RequiredArgsConstructor
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint
+{
+    private final HandlerExceptionResolver handlerExceptionResolver;
+    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver resolver;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex)
+            throws IOException, ServletException
     {
-        resolver.resolveException(request, response, null, ex);
+        try
+        {
+            HandlerExecutionChain handler = requestMappingHandlerMapping.getHandler(request);
+            if (handler == null)
+            {
+                handlerExceptionResolver.resolveException(request, response, null, new NoResourceFoundException(
+                        HttpMethod.valueOf(request.getMethod()),
+                        request.getRequestURI(),
+                        request.getServletPath()
+                ));
+                return;
+            }
+        }
+        catch (Exception ignored)
+        {
+            // ha a mapping lookup maga hibázik, maradjon az eredeti viselkedés
+        }
+        handlerExceptionResolver.resolveException(request, response, null, ex);
     }
 }
