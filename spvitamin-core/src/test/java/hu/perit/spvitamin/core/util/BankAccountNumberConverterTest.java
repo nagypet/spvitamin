@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class IbanConverterTest
+class BankAccountNumberConverterTest
 {
     private static final String VALID_GIRO = "100000012000000230000003";
     private static final String VALID_IBAN = "HU21" + VALID_GIRO;
@@ -37,30 +37,30 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_null_returnsNull()
+    void toIban_String_null_returnsNull()
     {
-        assertThat(IbanConverter.toIban(null)).isNull();
+        assertThat(BankAccountNumberConverter.toIbanString(null)).isNull();
     }
 
 
     @Test
-    void toIban_emptyString_returnsNull()
+    void toIban_String_emptyString_returnsNull()
     {
-        assertThat(IbanConverter.toIban("")).isNull();
+        assertThat(BankAccountNumberConverter.toIbanString("")).isNull();
     }
 
 
     @Test
-    void toIban_blankWithSpaces_returnsNull()
+    void toIban_String_blankWithSpaces_returnsNull()
     {
-        assertThat(IbanConverter.toIban("   ")).isNull();
+        assertThat(BankAccountNumberConverter.toIbanString("   ")).isNull();
     }
 
 
     @Test
-    void toIban_blankWithTab_returnsNull()
+    void toIban_String_blankWithTab_returnsNull()
     {
-        assertThat(IbanConverter.toIban("\t")).isNull();
+        assertThat(BankAccountNumberConverter.toIbanString("\t")).isNull();
     }
 
     // -------------------------------------------------------------------------
@@ -69,51 +69,51 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_alreadyIban_returnsUnchanged()
+    void toIban_alreadyIban_String_returnsUnchanged()
     {
-        assertThat(IbanConverter.toIban("HU09123456781234567800000000"))
+        assertThat(BankAccountNumberConverter.toIbanString("HU09123456781234567800000000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_alreadyIbanLowercase_returnsUppercased()
+    void toIban_alreadyIbanStringLowercase_returnsUppercased()
     {
-        assertThat(IbanConverter.toIban("hu09123456781234567800000000"))
+        assertThat(BankAccountNumberConverter.toIbanString("hu09123456781234567800000000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_alreadyIbanWithSpaces_stripsSpacesAndUppercases()
+    void toIban_alreadyIbanStringWithSpaces_stripsSpacesAndUppercases()
     {
-        assertThat(IbanConverter.toIban("HU09 1234 5678 1234 5678 0000 0000"))
+        assertThat(BankAccountNumberConverter.toIbanString("HU09 1234 5678 1234 5678 0000 0000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_alreadyIbanWithDashes_stripsDashesAndUppercases()
+    void toIban_alreadyIbanStringWithDashes_stripsDashesAndUppercases()
     {
-        assertThat(IbanConverter.toIban("HU09-1234-5678-1234-5678-0000-0000"))
+        assertThat(BankAccountNumberConverter.toIbanString("HU09-1234-5678-1234-5678-0000-0000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_nonHungarianIban_returnedAsIs()
+    void toIban_nonHungarianIban_String_returnedAsIs()
     {
         // Külföldi IBAN-t nem alakítunk, csak visszaadjuk nagybetűsen
-        assertThat(IbanConverter.toIban("DE89370400440532013000"))
+        assertThat(BankAccountNumberConverter.toIbanString("DE89370400440532013000"))
                 .isEqualTo("DE89370400440532013000");
     }
 
 
     @Test
-    void toIban_nonHungarianIbanLowercase_returnedUppercased()
+    void toIban_nonHungarianIbanStringLowercase_returnedUppercased()
     {
         // Csak numerikus BBAN-ú külföldi IBAN ismerhető fel (pl. DE), mert a regex [A-Za-z]{2}\d+ csak 2 betű + kizárólag számjegyeket fogad el
-        assertThat(IbanConverter.toIban("de89370400440532013000"))
+        assertThat(BankAccountNumberConverter.toIbanString("de89370400440532013000"))
                 .isEqualTo("DE89370400440532013000");
     }
 
@@ -123,43 +123,43 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_16Digits_computesCorrectIban()
+    void toIban_16Digits_computesCorrectIbanString()
     {
         // 1234567812345678 → 123456781234567800000000 → HU09...
-        assertThat(IbanConverter.toIban("1234567812345678"))
+        assertThat(BankAccountNumberConverter.toIbanString("1234567812345678"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_16DigitsAllZeros_computesCorrectIban()
+    void toIban_16DigitsAllZeros_computesCorrectIbanString()
     {
         // 16 db nulla → 24 db nulla BBAN → HU49...
-        assertThat(IbanConverter.toIban("0000000000000000"))
+        assertThat(BankAccountNumberConverter.toIbanString("0000000000000000"))
                 .isEqualTo("HU49000000000000000000000000");
     }
 
 
     @Test
-    void toIban_16DigitsWithSpaces_stripsAndComputesIban()
+    void toIban_16DigitsWithSpaces_stripsAndComputesIbanString()
     {
-        assertThat(IbanConverter.toIban("1234 5678 1234 5678"))
+        assertThat(BankAccountNumberConverter.toIbanString("1234 5678 1234 5678"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_16DigitsWithDashes_stripsAndComputesIban()
+    void toIban_16DigitsWithDashes_stripsAndComputesIbanString()
     {
-        assertThat(IbanConverter.toIban("12345678-12345678"))
+        assertThat(BankAccountNumberConverter.toIbanString("12345678-12345678"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_16DigitsWithMixedFormatting_stripsAndComputesIban()
+    void toIban_16DigitsWithMixedFormatting_stripsAndComputesIbanString()
     {
-        assertThat(IbanConverter.toIban("1234 5678-1234 5678"))
+        assertThat(BankAccountNumberConverter.toIbanString("1234 5678-1234 5678"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
@@ -169,27 +169,27 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_24Digits_computesCorrectIban()
+    void toIban_24Digits_computesCorrectIbanString()
     {
         // 16+8 nullával padded változat és a 24 jegyű közvetlen → azonos eredmény
-        assertThat(IbanConverter.toIban("123456781234567800000000"))
+        assertThat(BankAccountNumberConverter.toIbanString("123456781234567800000000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
 
     @Test
-    void toIban_24DigitsAllOnes_computesCorrectIban()
+    void toIban_24DigitsAllOnes_computesCorrectIbanString()
     {
         // 24 db egyes → HU21...
-        assertThat(IbanConverter.toIban("111111111111111111111111"))
+        assertThat(BankAccountNumberConverter.toIbanString("111111111111111111111111"))
                 .isEqualTo("HU21111111111111111111111111");
     }
 
 
     @Test
-    void toIban_24DigitsWithSpaces_stripsAndComputesIban()
+    void toIban_24DigitsWithSpaces_stripsAndComputesIbanString()
     {
-        assertThat(IbanConverter.toIban("1234 5678 1234 5678 0000 0000"))
+        assertThat(BankAccountNumberConverter.toIbanString("1234 5678 1234 5678 0000 0000"))
                 .isEqualTo("HU09123456781234567800000000");
     }
 
@@ -199,40 +199,40 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_result_has28Characters()
+    void toIban_String_result_has28Characters()
     {
-        assertThat(IbanConverter.toIban("1234567812345678")).hasSize(28);
-        assertThat(IbanConverter.toIban("123456781234567800000000")).hasSize(28);
+        assertThat(BankAccountNumberConverter.toIbanString("1234567812345678")).hasSize(28);
+        assertThat(BankAccountNumberConverter.toIbanString("123456781234567800000000")).hasSize(28);
     }
 
 
     @Test
-    void toIban_result_startsWithHU()
+    void toIban_String_result_startsWithHU()
     {
-        assertThat(IbanConverter.toIban("1234567812345678")).startsWith("HU");
-        assertThat(IbanConverter.toIban("111111111111111111111111")).startsWith("HU");
+        assertThat(BankAccountNumberConverter.toIbanString("1234567812345678")).startsWith("HU");
+        assertThat(BankAccountNumberConverter.toIbanString("111111111111111111111111")).startsWith("HU");
     }
 
 
     @Test
-    void toIban_16Digits_checkDigitIsValid()
+    void toIban_String_16Digits_checkDigitIsValid()
     {
         // Érvényes IBAN esetén a teljes numerikus érték mod 97 == 1
-        assertIbanChecksumValid(IbanConverter.toIban("1234567812345678"));
+        assertIbanChecksumValid(BankAccountNumberConverter.toIbanString("1234567812345678"));
     }
 
 
     @Test
-    void toIban_24Digits_checkDigitIsValid()
+    void toIban_String_24Digits_checkDigitIsValid()
     {
-        assertIbanChecksumValid(IbanConverter.toIban("111111111111111111111111"));
+        assertIbanChecksumValid(BankAccountNumberConverter.toIbanString("111111111111111111111111"));
     }
 
 
     @Test
-    void toIban_16DigitsAllZeros_checkDigitIsValid()
+    void toIban_String_16DigitsAllZeros_checkDigitIsValid()
     {
-        assertIbanChecksumValid(IbanConverter.toIban("0000000000000000"));
+        assertIbanChecksumValid(BankAccountNumberConverter.toIbanString("0000000000000000"));
     }
 
     // -------------------------------------------------------------------------
@@ -241,10 +241,10 @@ class IbanConverterTest
 
 
     @Test
-    void toIban_16DigitsPaddedEquals24DigitsResult()
+    void toIban_String_16DigitsPaddedEquals24DigitsResult()
     {
-        String from16 = IbanConverter.toIban("1234567812345678");
-        String from24 = IbanConverter.toIban("123456781234567800000000");
+        String from16 = BankAccountNumberConverter.toIbanString("1234567812345678");
+        String from24 = BankAccountNumberConverter.toIbanString("123456781234567800000000");
         assertThat(from16).isEqualTo(from24);
     }
 
@@ -266,89 +266,14 @@ class IbanConverterTest
             "1234-AB-5678",               // kötőjel eltávolítás után betű közben
             "ABCD1234",                   // 4 betű + számjegyek (nem 2+n minta)
     })
-    void toIban_invalidFormat_throwsIllegalArgumentException(String invalid)
+    void toIban_String_invalidFormat_throwsIllegalArgumentException(String invalid)
     {
-        assertThat(IbanConverter.isValidAccountNum(invalid)).isFalse();
-        assertThatThrownBy(() -> IbanConverter.toIban(invalid))
+        assertThat(BankAccountNumberConverter.isValidAccountNum(invalid)).isFalse();
+        assertThatThrownBy(() -> BankAccountNumberConverter.toIbanString(invalid))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(invalid);
     }
 
-
-    // -------------------------------------------------------------------------
-    // isValidIban
-    // -------------------------------------------------------------------------
-
-
-    @Test
-    void isValidIban_null_returnsFalse()
-    {
-        assertThat(IbanConverter.isValidIban(null)).isFalse();
-    }
-
-
-    @Test
-    void isValidIban_blank_returnsFalse()
-    {
-        assertThat(IbanConverter.isValidIban("")).isFalse();
-    }
-
-
-    @Test
-    void isValidIban_validHungarianIban_returnsTrue()
-    {
-        assertThat(IbanConverter.isValidIban(VALID_IBAN)).isTrue();
-    }
-
-
-    @Test
-    void isValidIban_validHungarianIbanLowercase_returnsTrue()
-    {
-        assertThat(IbanConverter.isValidIban(VALID_IBAN.toLowerCase())).isTrue();
-    }
-
-
-    @Test
-    void isValidIban_validHungarianIbanWithSpaces_returnsTrue()
-    {
-        assertThat(IbanConverter.isValidIban("HU21 1000 0001 2000 0002 3000 0003")).isTrue();
-    }
-
-
-    @Test
-    void isValidIban_validGermanIban_returnsTrue()
-    {
-        assertThat(IbanConverter.isValidIban("DE89370400440532013000")).isTrue();
-    }
-
-
-    @Test
-    void isValidIban_wrongCheckDigits_returnsFalse()
-    {
-        // HU50 érvényes, HU51 érvénytelen ellenőrzőjegyű
-        assertThat(IbanConverter.isValidIban("HU51" + VALID_GIRO)).isFalse();
-    }
-
-
-    @Test
-    void isValidIban_startsWithDigit_returnsFalse()
-    {
-        assertThat(IbanConverter.isValidIban("1234567812345678")).isFalse();
-    }
-
-
-    @Test
-    void isValidIban_threeLetterCountryCode_returnsFalse()
-    {
-        assertThat(IbanConverter.isValidIban("HUN50" + VALID_GIRO)).isFalse();
-    }
-
-
-    @Test
-    void isValidIban_onlyCountryCode_returnsFalse()
-    {
-        assertThat(IbanConverter.isValidIban("HU")).isFalse();
-    }
 
     // -------------------------------------------------------------------------
     // isValidAccountNum
@@ -358,21 +283,21 @@ class IbanConverterTest
     @Test
     void isValidAccountNum_null_returnsFalse()
     {
-        assertThat(IbanConverter.isValidAccountNum(null)).isFalse();
+        assertThat(BankAccountNumberConverter.isValidAccountNum(null)).isFalse();
     }
 
 
     @Test
     void isValidAccountNum_blank_returnsFalse()
     {
-        assertThat(IbanConverter.isValidAccountNum("")).isFalse();
+        assertThat(BankAccountNumberConverter.isValidAccountNum("")).isFalse();
     }
 
 
     @Test
     void isValidAccountNum_valid24DigitGiro_returnsTrue()
     {
-        assertThat(IbanConverter.isValidAccountNum(VALID_GIRO)).isTrue();
+        assertThat(BankAccountNumberConverter.isValidAccountNum(VALID_GIRO)).isTrue();
     }
 
 
@@ -380,14 +305,14 @@ class IbanConverterTest
     void isValidAccountNum_valid16DigitWithValidGiroBlocks_returnsTrue()
     {
         // Blokk 1: 10000001, Blokk 2: 20000002, Blokk 3: 00000000 (padding után mindig érvényes)
-        assertThat(IbanConverter.isValidAccountNum("1000000120000002")).isTrue();
+        assertThat(BankAccountNumberConverter.isValidAccountNum("1000000120000002")).isTrue();
     }
 
 
     @Test
     void isValidAccountNum_validHungarianIban_returnsTrue()
     {
-        assertThat(IbanConverter.isValidAccountNum(VALID_IBAN)).isTrue();
+        assertThat(BankAccountNumberConverter.isValidAccountNum(VALID_IBAN)).isTrue();
     }
 
 
@@ -395,7 +320,7 @@ class IbanConverterTest
     void isValidAccountNum_validForeignIban_returnsTrue()
     {
         // Külföldi IBAN esetén csak az IBAN ellenőrzőjegy kell, GIRO checksum nem
-        assertThat(IbanConverter.isValidAccountNum("DE89370400440532013000")).isTrue();
+        assertThat(BankAccountNumberConverter.isValidAccountNum("DE89370400440532013000")).isTrue();
     }
 
 
@@ -403,14 +328,14 @@ class IbanConverterTest
     void isValidAccountNum_invalidGiroChecksum_returnsFalse()
     {
         // A 24-jegyű GIRO checksumja érvénytelen → false
-        assertThat(IbanConverter.isValidAccountNum("123456781234567800000000")).isFalse();
+        assertThat(BankAccountNumberConverter.isValidAccountNum("123456781234567800000000")).isFalse();
     }
 
 
     @Test
     void isValidAccountNum_invalidIbanChecksum_returnsFalse()
     {
-        assertThat(IbanConverter.isValidAccountNum("HU51" + VALID_GIRO)).isFalse();
+        assertThat(BankAccountNumberConverter.isValidAccountNum("HU51" + VALID_GIRO)).isFalse();
     }
 
 
@@ -421,11 +346,11 @@ class IbanConverterTest
             VALID_IBAN,
             "DE89370400440532013000",
     })
-    void isValidAccountNum_whenTrue_toIbanDoesNotThrow(String accountNum)
+    void isValidAccountNum_whenTrue_toIbanStringDoesNotThrow(String accountNum)
     {
         // Ha isValidAccountNum true-t ad vissza, convertToIban nem dobhat kivételt ugyanarra a bemenetre
-        assertThat(IbanConverter.isValidAccountNum(accountNum)).isTrue();
-        assertThatCode(() -> IbanConverter.toIban(accountNum)).doesNotThrowAnyException();
+        assertThat(BankAccountNumberConverter.isValidAccountNum(accountNum)).isTrue();
+        assertThatCode(() -> BankAccountNumberConverter.toIbanString(accountNum)).doesNotThrowAnyException();
     }
 
     // -------------------------------------------------------------------------

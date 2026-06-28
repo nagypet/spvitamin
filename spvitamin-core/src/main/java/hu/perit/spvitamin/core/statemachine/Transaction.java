@@ -24,4 +24,11 @@ public class Transaction<S extends Enum<?>, E extends Enum<?>>
     private S source;
     private S target;
     private E event;
+    private boolean ignored = false;
+    private Guard guard = null;
+
+    public boolean isGuardMet()
+    {
+        return guard == null || guard.test();
+    }
 }

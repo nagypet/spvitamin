@@ -28,7 +28,17 @@ public final class CheckedExceptionConverter
 {
     public static <T> T invoke(Callable<T> callable)
     {
-        return invoke(callable, ServerException::throwFrom);
+        return invoke(callable, CheckedExceptionConverter::checkedExceptionHandler);
+    }
+
+
+    static <T> T checkedExceptionHandler(Throwable ex)
+    {
+        if (ex instanceof RuntimeException rex)
+        {
+            throw rex;
+        }
+        throw new ServerException(ex);
     }
 
 
@@ -47,7 +57,7 @@ public final class CheckedExceptionConverter
 
     public static void invokeVoid(ThrowingRunnable runnable)
     {
-        invokeVoid(runnable, ServerException::throwFrom);
+        invokeVoid(runnable, CheckedExceptionConverter::checkedExceptionHandler);
     }
 
 

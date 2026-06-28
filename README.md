@@ -110,6 +110,10 @@ dependencyManagement {
 - 2026-06-13: SpringBoot 4.1.0
 - 2026-06-14: Security module improvements
 - 2026-06-15: Non-existing REST endpoint returns HTTP 404 Not Found (NoResourceFoundException: No static resource)
+- 2026-06-28: CheckedExceptionConverter only wrapes check exceptions into a ServerException
+- 2026-06-28: StateMachine support now conditions
+- 2026-06-28: GenericRestExceptionResponseBuilder improved
+- 2026-06-28: AbstractStringValue to make String usage type-safe
 
 
 ### 4.0.3-1-RELEASE not yet released

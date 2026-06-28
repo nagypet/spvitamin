@@ -13,6 +13,7 @@ class GiroAccountNumTest
     //   Blokk 2: 20000002  (2*9=18, check=(10-8)%10=2)
     //   Blokk 3: 30000003  (3*9=27, check=(10-7)%10=3)
     private static final String VALID_GIRO = "100000012000000230000003";
+    private static final String VALID_GIRO_FORMATTED = "10000001-20000002-30000003";
 
 
     @Test
@@ -40,6 +41,9 @@ class GiroAccountNumTest
     void isValidGiro_valid24Digits_returnsTrue()
     {
         assertThat(GiroAccountNum.isValid(VALID_GIRO)).isTrue();
+        assertThat(GiroAccountNum.fromString(VALID_GIRO)).hasToString(VALID_GIRO);
+        assertThat(GiroAccountNum.fromString(VALID_GIRO).value()).isEqualTo(VALID_GIRO);
+        assertThat(GiroAccountNum.fromString(VALID_GIRO).format()).isEqualTo(VALID_GIRO_FORMATTED);
     }
 
 

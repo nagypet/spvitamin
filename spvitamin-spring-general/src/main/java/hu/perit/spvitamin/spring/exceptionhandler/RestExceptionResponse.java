@@ -30,14 +30,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * #know-how:custom-rest-error-response
@@ -136,31 +131,10 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
             }
         }
 
-        if (exceptionWrapper.causedBy("jakarta.validation.ConstraintViolationException"))
+        List<String> validationErrors = ValidationErrorExtractor.extractErrors(ex);
+        if (!validationErrors.isEmpty())
         {
-            //Get all errors
-            exceptionWrapper.getFromCauseChain(jakarta.validation.ConstraintViolationException.class).ifPresent(throwable -> {
-                jakarta.validation.ConstraintViolationException cve = (jakarta.validation.ConstraintViolationException) throwable;
-                Set<jakarta.validation.ConstraintViolation<?>> violations = cve.getConstraintViolations();
-                List<String> errors = new ArrayList<>();
-                for (jakarta.validation.ConstraintViolation<?> violation : violations)
-                {
-                    errors.add(String.format("%s %s", violation.getPropertyPath(), violation.getMessage()));
-                }
-                this.error = errors;
-            });
-        }
-        else if (ex instanceof MethodArgumentNotValidException manve)
-        {
-            BindingResult bindingResult = manve.getBindingResult();
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            List<String> errors = new ArrayList<>();
-            for (FieldError fieldError : fieldErrors)
-            {
-                errors.add(String.format("%s %s! Rejected value: '%s'", fieldError.getField(), fieldError.getDefaultMessage(),
-                    getRejectedValueAsText(fieldError.getRejectedValue())));
-            }
-            this.error = errors;
+            this.error = validationErrors;
         }
         else
         {
@@ -176,15 +150,5 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
             this.type = are.getType().name();
         }
     }
-
-
-    private String getRejectedValueAsText(Object rejectedValue)
-    {
-        if (rejectedValue == null)
-        {
-            return "null";
-        }
-
-        return rejectedValue.toString();
-    }
 }
+

@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Optional;
@@ -57,6 +58,7 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
                 || exception.causedBy(MethodArgumentNotValidException.class)
                 || exception.causedBy("hu.perit.ngface.core.widget.exception.NgFaceBadRequestException")
                 || exception.causedBy(HttpMessageNotReadableException.class)
+                || exception.causedBy(HandlerMethodValidationException.class)
         )
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
@@ -88,6 +90,13 @@ public class GenericRestExceptionResponseBuilder<T extends IRestExceptionRespons
         {
             exceptionLogger.log(path, ex, LogLevel.WARN);
             return Optional.of(this.supplier.get(HttpStatus.NOT_FOUND, ex, path, traceId));
+        }
+
+        // ========== CONFLICT (409) ===================================================================================
+        if (exception.causedBy("org.springframework.orm.ObjectOptimisticLockingFailureException"))
+        {
+            exceptionLogger.log(path, ex, LogLevel.WARN);
+            return Optional.of(this.supplier.get(HttpStatus.CONFLICT, ex, path, traceId));
         }
 
         // ========== NOT_IMPLEMENTED (501) ============================================================================

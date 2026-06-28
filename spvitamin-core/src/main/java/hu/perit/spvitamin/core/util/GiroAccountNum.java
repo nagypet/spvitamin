@@ -1,15 +1,26 @@
+/*
+ * Copyright 2020-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package hu.perit.spvitamin.core.util;
 
-import lombok.Data;
+import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
-@Data
-public class GiroAccountNum
+public class GiroAccountNum extends AbstractStringValue<GiroAccountNum>
 {
-    // null or valid 24-digit GIRO number
-    private final String giro24;
-
-
     public static GiroAccountNum fromString(String value)
     {
         return new GiroAccountNum(value);
@@ -18,14 +29,20 @@ public class GiroAccountNum
 
     private GiroAccountNum(String accountNumber)
     {
+        super(validate(accountNumber));
+    }
+
+
+    // returns a valid GIRO string (no spaces/dashes) or null
+    private static String validate(String accountNumber)
+    {
         if (StringUtils.isBlank(accountNumber))
         {
-            this.giro24 = null;
-            return;
+            return null;
         }
 
         // Strip spaces and dashes (formatting characters)
-        String cleaned = accountNumber.replaceAll("[\\s\\-]", "");
+        String cleaned = sanitize(accountNumber);
 
         // GIRO format: 16 or 24 digits
         if (cleaned.matches("\\d{16}"))
@@ -33,34 +50,41 @@ public class GiroAccountNum
             // Pad to 24 digits by appending 8 zeros
             cleaned = cleaned + "00000000";
         }
-        this.giro24 = isValidFormat(cleaned) ? cleaned : null;
+        return isValidFormat(cleaned) ? cleaned : null;
+    }
+
+
+    @Nonnull
+    private static String sanitize(@Nonnull String accountNumber)
+    {
+        return accountNumber.replaceAll("[\\s\\-]", "");
     }
 
 
     public boolean isValid()
     {
-        return isValid(this.giro24);
+        return isValid(this.value);
     }
 
 
     public String getBankCode()
     {
-        if (StringUtils.isBlank(this.giro24))
+        if (StringUtils.isBlank(this.value))
         {
             return null;
         }
-        return this.giro24.substring(0, 8);
+        return this.value.substring(0, 8);
     }
 
 
     // the account number without the bank code
     public String getAccountNumber()
     {
-        if (StringUtils.isBlank(this.giro24))
+        if (StringUtils.isBlank(this.value))
         {
             return null;
         }
-        return this.giro24.substring(8);
+        return this.value.substring(8);
     }
 
 
@@ -71,26 +95,21 @@ public class GiroAccountNum
             return false;
         }
 
-        String cleaned = giro.replaceAll("[\\s\\-]", "");
+        String cleaned = sanitize(giro);
         return cleaned.matches("\\d{16}") || cleaned.matches("\\d{24}");
     }
 
 
     public static boolean isValid(String giro)
     {
-        if (StringUtils.isBlank(giro))
+        if (!isValidFormat(giro))
         {
             return false;
         }
-
-        String cleaned = giro.replaceAll("[\\s\\-]", "");
-        if (!isValidFormat(cleaned))
-        {
-            return false;
-        }
+        String cleaned = sanitize(giro);
 
         // Weights for 7-digit and 15-digit CDV calculations
-        int[] weights7  = {9, 7, 3, 1, 9, 7, 3};
+        int[] weights7 = {9, 7, 3, 1, 9, 7, 3};
         int[] weights15 = {9, 7, 3, 1, 9, 7, 3, 1, 9, 7, 3, 1, 9, 7, 3};
 
         // CDV at position 8, calculated from positions 1-7
@@ -126,9 +145,12 @@ public class GiroAccountNum
     }
 
 
-    @Override
-    public String toString()
+    public String format()
     {
-        return this.giro24;
+        if (this.value == null)
+        {
+            return "";
+        }
+        return this.value.substring(0, 8) + "-" + this.value.substring(8, 16) + "-" + this.value.substring(16);
     }
 }
