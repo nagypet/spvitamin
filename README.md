@@ -114,6 +114,7 @@ dependencyManagement {
 - 2026-06-28: StateMachine support now conditions
 - 2026-06-28: GenericRestExceptionResponseBuilder improved
 - 2026-06-28: AbstractStringValue to make String usage type-safe
+- 2026-07-12: HttpRequestMethodNotSupportedException produces HTTP 400 instead og HTTP 500
 
 
 ### 4.0.3-1-RELEASE not yet released
