@@ -29,8 +29,6 @@ public interface ResilientJobEntityService<T extends AbstractResilientJobEntity>
 {
     T createNew(ResilientJobProperties jobProperties, ResilientJobParameter parameter);
 
-    int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout);
-
     int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout);
 
     List<T> getNextBatchAndSetInProgressState(ProcessorType processorType, Long lastId);

@@ -34,18 +34,6 @@ import java.util.Set;
 
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
-    // By using the whereState this method will work fine even if the DONE records are not deleted.
-    @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and e.processingFirstStartedTimestamp < :timestamp and e.nextRetryTimestamp <= :now")
-    int terminatePermanentlyFailingEntities(
-            Long processorType,
-            OffsetDateTime timestamp,
-            Set<ResilientJobStatus> whereStates,
-            ResilientJobStatus errorState,
-            OffsetDateTime now
-    );
-
-
     // The 'coalesce(e.processingLastStartedTimestamp, e.creationTimestamp)' is only necessary for the database migration
     @Modifying
     @Query("update #{#entityName} e set e.status = :targetState, e.retryCount = e.retryCount + 1 where e.processorType = :processorType and e.status = :whereState and coalesce(e.processingLastStartedTimestamp, e.creationTimestamp) < :timestamp")

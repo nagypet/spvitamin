@@ -204,7 +204,7 @@ public class StateMachine<S extends Enum<?>, E extends Enum<?>>
     public Set<S> getStateForEvent(E event)
     {
         return this.transactions.stream()
-                .filter(t -> t.getEvent() == event)
+                .filter(t -> t.getEvent() == event && !t.isIgnored())
                 .map(t -> t.getSource())
                 .collect(Collectors.toSet());
     }

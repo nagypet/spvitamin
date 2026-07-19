@@ -34,4 +34,5 @@ public class CookieStoreService
     public void clear(String clientId)
     {
         // intentionally empty
-    }}
+    }
+}

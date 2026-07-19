@@ -17,7 +17,6 @@
 package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
 import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -55,8 +54,7 @@ class BJob extends ContextAwareBatchJob
             }
             catch (Exception e)
             {
-                ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(e);
-                log.error(exceptionWrapper.toStringWithCauses());
+                log.error(StackTracer.toString(e));
 
                 boolean isItemRelated = this.processor.isItemRelatedException(e);
                 boolean isRetryable = this.processor.isRetryableException(e);
@@ -154,7 +152,17 @@ class BJob extends ContextAwareBatchJob
         log.info("Processor {} finished entity {}", this.processor.getClass().getSimpleName(), this.entity);
 
         // Deleting the entity after successful processing
-        this.resilientJobEntityService.deleteById(this.entity.getId());
+        try
+        {
+            this.resilientJobEntityService.deleteById(this.entity.getId());
+        }
+        catch (Exception e)
+        {
+            // The job was processed successfully, but deletion failed (likely a transient DB issue).
+            // The entity stays IN_PROGRESS and will eventually be reset by resetStuckInProgressEntities.
+            // When that happens, processJob will run again - the processor must be idempotent (use operationId as idempotency key).
+            log.error("Failed to delete job entity {} after successful processing: {}", entity.getId(), StackTracer.toString(e));
+        }
     }
 
 

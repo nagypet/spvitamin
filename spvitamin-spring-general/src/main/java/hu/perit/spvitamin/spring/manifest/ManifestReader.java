@@ -16,20 +16,26 @@
 
 package hu.perit.spvitamin.spring.manifest;
 
+import hu.perit.spvitamin.core.StackTracer;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Properties;
 
-import hu.perit.spvitamin.core.StackTracer;
-import lombok.extern.slf4j.Slf4j;
-
+@UtilityClass
 @Slf4j
-public class ManifestReader {
+public class ManifestReader
+{
 
-    public static Properties getManifestAttributes()
+    public static Properties getManifestAttributes(String applicationName)
     {
+        Objects.requireNonNull(applicationName, "applicationName");
         Properties prop = new Properties();
         Enumeration<URL> resources;
         try
@@ -41,11 +47,10 @@ public class ManifestReader {
                 try (InputStream manifestStream = url.openStream())
                 {
                     prop.load(manifestStream);
-                    String name = prop.getProperty("Implementation-Vendor");
-                    String type = prop.getProperty("Implementation-Type");
-                    if (type != null && type.equalsIgnoreCase("Application")) {
+                    if (matchesApplication(prop, applicationName))
+                    {
                         ResourceUrlDecoder resourceUrl = new ResourceUrlDecoder(url);
-                        log.info(String.format("Manifest loaded from '%s'", resourceUrl.getLocation().get(0)));
+                        log.info(String.format("Manifest loaded from '%s'", resourceUrl.getLocation().getFirst()));
                         return prop;
                     }
                 }
@@ -57,5 +62,11 @@ public class ManifestReader {
         }
 
         return new Properties();
+    }
+
+
+    private static boolean matchesApplication(Properties prop, String applicationName)
+    {
+        return Strings.CI.equals(prop.getProperty("Implementation-Title"), applicationName);
     }
 }

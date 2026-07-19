@@ -115,6 +115,16 @@ dependencyManagement {
 - 2026-06-28: GenericRestExceptionResponseBuilder improved
 - 2026-06-28: AbstractStringValue to make String usage type-safe
 - 2026-07-12: HttpRequestMethodNotSupportedException produces HTTP 400 instead og HTTP 500
+- 2026-07-19: spvitamin-core:
+  - StateMachine.getStateForEvent fixed
+  - CharsetSanitizer multichar replacement fixed
+- 2026-07-19: spvitamin-spring-data: 
+  - PessimisticJpaRepository findByIdReadOnly uses a read-only session
+- 2026-07-19: spvitamin-spring-general:
+  - HttpMediaTypeNotSupportedException produces HTTP 400 instead og HTTP 500
+  - ManifestReader fixed
+- 2026-07-19: spvitamin-spring-resilientjobrunner
+  - terminatePermanentlyFailingEntities removed
 
 
 ### 4.0.3-1-RELEASE not yet released

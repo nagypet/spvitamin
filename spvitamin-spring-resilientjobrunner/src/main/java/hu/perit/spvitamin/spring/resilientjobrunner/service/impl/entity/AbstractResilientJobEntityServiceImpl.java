@@ -52,9 +52,14 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
 
 
     @Override
+    @Transactional
     public T createNew(ResilientJobProperties jobProperties, ResilientJobParameter parameter)
     {
         // Checking if there is already an ongoing job with the same parameters
+        // NOTE: This check-then-insert is not atomic. A race condition can create duplicate jobs if two threads
+        // call createNew concurrently with the same parameters and no active job exists yet.
+        // The reliable fix requires a DB-level UNIQUE constraint on (processor_type, parameter_hash) combined with
+        // catching DataIntegrityViolationException here and returning the existing entity.
         String parameterJson = parameter.toJson();
         String parameterHash = HashUtils.get32BytesSha256Hash(parameterJson);
         T existingEntity = findExistingOngoingJob(jobProperties.getId(), parameterHash).orElse(null);
@@ -90,20 +95,6 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
 
     @Override
     @Transactional
-    public int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout)
-    {
-        return this.repo.terminatePermanentlyFailingEntities(
-                processorType.getProcessorId(),
-                OffsetDateTime.now().minusSeconds(timeout.getSeconds()),
-                EnumSet.of(ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS),
-                ResilientJobStatus.ERROR,
-                OffsetDateTime.now()
-        );
-    }
-
-
-    @Override
-    @Transactional
     public int resetStuckInProgressEntities(ProcessorType processorType, Duration timeout)
     {
         return this.repo.resetStuckInProgressEntities(
@@ -127,11 +118,14 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
                 OffsetDateTime.now(),
                 pageRequest
         );
-        this.repo.updateStatusAndProcessingStartedTimestamp(
-                entities.stream().map(i -> i.getId()).toList(),
-                ResilientJobStatus.IN_PROGRESS,
-                OffsetDateTime.now()
-        );
+        if (!entities.isEmpty())
+        {
+            this.repo.updateStatusAndProcessingStartedTimestamp(
+                    entities.stream().map(i -> i.getId()).toList(),
+                    ResilientJobStatus.IN_PROGRESS,
+                    OffsetDateTime.now()
+            );
+        }
         return entities;
     }
 
@@ -142,7 +136,7 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     {
         // com.microsoft.sqlserver.jdbc.SQLServerException: The incoming request has too many parameters. The server supports a maximum of 2100 parameters. Reduce the number of parameters and resend the request
         return Lists.partition(ids, MAX_CRITERIA_IN_QUERIES).stream()
-                .mapToInt(idList -> this.repo.updateStatusWhere(ids, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
+                .mapToInt(idList -> this.repo.updateStatusWhere(idList, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
                 .sum();
     }
 

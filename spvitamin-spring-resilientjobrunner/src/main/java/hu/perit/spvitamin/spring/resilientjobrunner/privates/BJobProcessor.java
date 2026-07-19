@@ -130,13 +130,6 @@ class BJobProcessor
         try (var ctx = ThreadContextDecorator.with(processorType.getName(), null))
         {
             ResilientJobProperties properties = getProperties(processorType);
-            int countTerminatedEntities = this.resilientJobEntityService.terminatePermanentlyFailingEntities(processorType, properties.getRetryTimeout());
-            if (countTerminatedEntities > 0)
-            {
-                // This is logged with error level, because in this case the onError method is not called,
-                // and therefore the connected processor may not be aware of the failure.
-                log.error("{} jobs have been terminated due to permanent errors", countTerminatedEntities);
-            }
 
             int countResetedEntities = this.resilientJobEntityService.resetStuckInProgressEntities(processorType, properties.getProcessingTimeout());
             if (countResetedEntities > 0)

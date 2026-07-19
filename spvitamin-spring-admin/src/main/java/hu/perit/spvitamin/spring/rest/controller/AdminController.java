@@ -27,6 +27,7 @@ import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -47,6 +48,7 @@ public class AdminController implements AdminApi
     private final ShutdownManager sm;
     private final ServerParameterProvider serverParameterProvider;
     private final AdminProperties adminProperties;
+    private final Environment environment;
 
 
     @Override
@@ -64,7 +66,8 @@ public class AdminController implements AdminApi
     @LoggedRestMethod(eventId = 2, module = MODULE_NAME)
     public Properties retrieveVersionInfoUsingGET()
     {
-        Properties manifest = ManifestReader.getManifestAttributes();
+        String applicationName = environment.getProperty("spring.application.name");
+        Properties manifest = ManifestReader.getManifestAttributes(applicationName);
         String name = manifest.getProperty("Implementation-Title", "Application Title");
         String version = manifest.getProperty("Implementation-Version", "");
         //String svnVersion = manifest.getProperty("SVN-REVISION", "");

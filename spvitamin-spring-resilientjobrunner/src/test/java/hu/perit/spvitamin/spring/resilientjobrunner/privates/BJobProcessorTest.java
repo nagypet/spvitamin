@@ -107,7 +107,6 @@ class BJobProcessorTest
         when(collectionProperties.getResilientJobs()).thenReturn(map);
         when(collectionProperties.get(name)).thenReturn(props);
 
-        when(resilientJobEntityService.terminatePermanentlyFailingEntities(any(), any())).thenReturn(0);
         when(resilientJobEntityService.resetStuckInProgressEntities(any(), any())).thenReturn(0);
         when(resilientJobEntityService.getNextBatchAndSetInProgressState(any(), anyLong())).thenReturn(java.util.Collections.emptyList());
 
@@ -118,7 +117,6 @@ class BJobProcessorTest
         processor.process(processorType);
 
         // verify initial calls
-        verify(resilientJobEntityService, times(1)).terminatePermanentlyFailingEntities(eq(processorType), eq(props.getRetryTimeout()));
         verify(resilientJobEntityService, times(1)).resetStuckInProgressEntities(eq(processorType), eq(Duration.ofMinutes(5)));
 
         ArgumentCaptor<Long> lastIdCaptor = ArgumentCaptor.forClass(Long.class);

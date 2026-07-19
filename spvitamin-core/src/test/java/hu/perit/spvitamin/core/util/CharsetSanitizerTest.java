@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.nio.charset.StandardCharsets;
+
 import static hu.perit.spvitamin.core.util.CharsetSanitizer.CP852;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,7 +77,7 @@ class CharsetSanitizerTest
     @Test
     void sanitize_germanEszett_replacedWithSs()
     {
-        assertThat(CharsetSanitizer.of(CP852).sanitize("Straße")).isEqualTo("Strasse");
+        assertThat(CharsetSanitizer.of(StandardCharsets.US_ASCII).sanitize("Straße")).isEqualTo("Strasse");
     }
 
 

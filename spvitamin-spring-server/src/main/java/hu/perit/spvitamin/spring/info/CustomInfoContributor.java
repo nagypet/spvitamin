@@ -17,28 +17,38 @@
 package hu.perit.spvitamin.spring.info;
 
 import hu.perit.spvitamin.spring.manifest.ManifestReader;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
 @Component
-public class CustomInfoContributor implements InfoContributor {
+@RequiredArgsConstructor
+public class CustomInfoContributor implements InfoContributor
+{
+    private final Environment environment;
+
 
     @Override
-    public void contribute(Info.Builder builder) {
-        Properties manifest = ManifestReader.getManifestAttributes();
-            String name = manifest.getProperty("Implementation-Title", "Application Title");
+    public void contribute(Info.Builder builder)
+    {
+        String applicationName = environment.getProperty("spring.application.name");
+        Properties manifest = ManifestReader.getManifestAttributes(applicationName);
+        String name = manifest.getProperty("Implementation-Title", "Application Title");
         String version = manifest.getProperty("Implementation-Version", "");
         //String svnVersion = manifest.getProperty("SVN-REVISION", "");
         String buildTime = manifest.getProperty("Build-Time", "");
         String build;
-        if (StringUtils.isNoneBlank(buildTime)) {
+        if (StringUtils.isNoneBlank(buildTime))
+        {
             build = String.format("%s", buildTime);
         }
-        else {
+        else
+        {
             build = "Started from IDE, no build info is available!";
         }
 

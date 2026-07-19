@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.Normalizer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -12,6 +14,18 @@ import static lombok.AccessLevel.PRIVATE;
 public final class CharsetSanitizer
 {
     public static final Charset CP852 = Charset.forName("IBM852");
+
+    private static final Map<Character, String> REPLACEMENT_MAP;
+
+    static
+    {
+        REPLACEMENT_MAP = new HashMap<>();
+        REPLACEMENT_MAP.put('ß', "ss");
+        REPLACEMENT_MAP.put('Æ', "AE");
+        REPLACEMENT_MAP.put('æ', "ae");
+        REPLACEMENT_MAP.put('Ø', "O");
+        REPLACEMENT_MAP.put('ø', "o");
+    }
 
     private final Charset charset;
 
@@ -45,36 +59,41 @@ public final class CharsetSanitizer
 
     public String sanitize(String input)
     {
-        // Speciális többkarakteres cserék – ezek a karakterek this.charset-ben nem szerepelnek
-        String preprocessed = input
-                .replace("ß", "ss")
-                .replace("Æ", "AE")
-                .replace("æ", "ae")
-                .replace("Ø", "O")
-                .replace("ø", "o");
+        if (input == null)
+        {
+            return null;
+        }
 
         CharsetEncoder encoder = this.charset.newEncoder();
         StringBuilder result = new StringBuilder();
 
-        for (char c : preprocessed.toCharArray())
+        for (char c : input.toCharArray())
         {
             if (encoder.canEncode(c))
             {
-                // A karakter this.charset-ben kódolható – megtartjuk (pl. magyar ékezetes betűk)
+                // The character can be encoded in the target charset - keep it
                 result.append(c);
             }
             else
             {
-                // Megpróbáljuk NFD normalizálással az alapkaraktert kinyerni
-                String decomposed = Normalizer.normalize(String.valueOf(c), Normalizer.Form.NFD);
-                String baseChars = decomposed.replaceAll("\\p{M}", "");
-                if (!baseChars.isEmpty() && encoder.canEncode(baseChars.charAt(0)))
+                // Multi-character replacements
+                if (REPLACEMENT_MAP.containsKey(c))
                 {
-                    result.append(baseChars.charAt(0));
+                    result.append(REPLACEMENT_MAP.get(c));
                 }
                 else
                 {
-                    result.append('?');
+                    // Trying to get the base character by NFD normalization
+                    String decomposed = Normalizer.normalize(String.valueOf(c), Normalizer.Form.NFD);
+                    String baseChars = decomposed.replaceAll("\\p{M}", "");
+                    if (!baseChars.isEmpty() && encoder.canEncode(baseChars.charAt(0)))
+                    {
+                        result.append(baseChars.charAt(0));
+                    }
+                    else
+                    {
+                        result.append('?');
+                    }
                 }
             }
         }

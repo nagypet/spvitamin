@@ -29,6 +29,8 @@ public abstract class AbstractProcessor
     private final ResilientJobProperties properties;
 
 
+    // In some rare circumstances this method might be called multiple times for the same job, even if the job has been
+    // processed successfully. The processor should be idempotent (use operationId as idempotency key).
     public abstract void processJob(AbstractResilientJobEntity entity) throws Exception;
 
     public abstract void onError(AbstractResilientJobEntity entity, Exception e);
