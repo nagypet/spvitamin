@@ -125,6 +125,13 @@ dependencyManagement {
   - ManifestReader fixed
 - 2026-07-19: spvitamin-spring-resilientjobrunner
   - terminatePermanentlyFailingEntities removed
+- 2026-08-02:
+  - SftpStorage newOutputStream handles apped and overwrite modes
+  - In production-mode there is no stack trace in the rest response
+  - PessimisticJpaRepository condition for read-only session fixed
+  - In production-mode all cookies are secured
+  - Protection against brute-force attacks
+  - XssFilter to remove scripts from JSON inputs
 
 
 ### 4.0.3-1-RELEASE not yet released

@@ -105,6 +105,6 @@ public class AdminController implements AdminApi
     @LoggedRestMethod(eventId = 4, module = MODULE_NAME)
     public void cspViolationsUsingPOST(String request)
     {
-        // do nothing
+        log.warn("cspViolationsUsingPOST: {}", request);
     }
 }

@@ -41,6 +41,7 @@ public class ServerErrorAutoConfiguration
         log.info("Configuring {} with: {}", ServerExceptionProperties.class.getName(), errorProperties);
 
         ServerExceptionProperties.setStackTraceEnabled(getStackTraceType());
+        ServerExceptionProperties.setCauseEnabled(!securityProperties.isProductionMode());
         RestExceptionResponse.setExceptionEnabled(errorProperties.isIncludeException());
         RestExceptionResponse.setMessageEnabled(errorProperties.getIncludeMessage() == ServerProperties.ErrorProperties.IncludeAttribute.ALWAYS);
     }

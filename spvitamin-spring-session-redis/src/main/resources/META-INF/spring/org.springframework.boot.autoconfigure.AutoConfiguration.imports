@@ -14,6 +14,4 @@
 # limitations under the License.
 #
 
-hu.perit.spvitamin.spring.security.autoconfiguration.SpvitaminSpringSecurityAutoconfiguration
-hu.perit.spvitamin.spring.security.autoconfiguration.SessionRegistryConfigLocal
-hu.perit.spvitamin.spring.security.bruteforce.BruteForceAutoConfiguration
+hu.perit.spvitamin.spring.session.redis.RedisBruteForceAutoConfiguration

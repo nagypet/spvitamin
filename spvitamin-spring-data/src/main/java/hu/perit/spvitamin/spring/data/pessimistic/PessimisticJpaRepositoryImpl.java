@@ -18,12 +18,12 @@ package hu.perit.spvitamin.spring.data.pessimistic;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,22 +38,52 @@ import java.util.Optional;
  * (e.g. authorization checks, quota checks), even when these loads happen inside a writable
  * outer transaction or within an Open EntityManager In View session.
  * <p>
- * If a read-write transaction is already active when {@link #findByIdReadOnly} or
- * {@link #findAllByIdReadOnly} is called, the entity is NOT marked as read-only. This avoids
- * silently disabling dirty-checking on an entity that was previously fetched with a write lock
- * in the same transaction (e.g. via {@link #findByIdWithWriteLock}).
+ * The entity is NOT marked as read-only if it already holds a write lock in the current session
+ * (e.g. previously fetched via {@link #findByIdWithWriteLock}). This is determined by checking
+ * the JPA lock mode rather than the transaction's read-only flag, so read-only marking works
+ * correctly even when called from within a read-write outer transaction.
  * <p>
  * Register as base class in {@code @EnableJpaRepositories(repositoryBaseClass = PessimisticJpaRepositoryImpl.class)}.
  */
+@Slf4j
 public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements PessimisticJpaRepository<T, ID>
 {
     private final EntityManager entityManager;
+    private final JpaEntityInformation<T, ?> entityInformation;
 
 
     public PessimisticJpaRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager)
     {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
+        this.entityInformation = entityInformation;
+    }
+
+
+    @Override
+    @Transactional
+    public <S extends T> S save(S entity)
+    {
+        if (!this.entityInformation.isNew(entity) && this.entityManager.contains(entity))
+        {
+            Session session = this.entityManager.unwrap(Session.class);
+            if (session.isReadOnly(entity))
+            {
+                log.error("*** save() called on a Hibernate read-only entity — changes will be silently ignored!" +
+                        " Entity: {} id={}", entity.getClass().getSimpleName(), this.entityInformation.getId(entity));
+            }
+            else
+            {
+                LockModeType lockMode = this.entityManager.getLockMode(entity);
+                if (lockMode == LockModeType.NONE || lockMode == LockModeType.OPTIMISTIC || lockMode == LockModeType.READ)
+                {
+                    log.warn("save() called on entity without a pessimistic write lock — consider using" +
+                            " findByIdWithWriteLock() to prevent optimistic locking failures in concurrent scenarios." +
+                            " Entity: {} id={} lockMode={}", entity.getClass().getSimpleName(), this.entityInformation.getId(entity), lockMode);
+                }
+            }
+        }
+        return super.save(entity);
     }
 
 
@@ -62,11 +92,17 @@ public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, 
     public Optional<T> findByIdReadOnly(ID id)
     {
         Optional<T> result = super.findById(id);
-        if (!TransactionSynchronizationManager.isCurrentTransactionReadOnly())
-        {
-            return result;
-        }
-        result.ifPresent(entity -> this.entityManager.unwrap(Session.class).setReadOnly(entity, true));
+        result.ifPresent(entity -> {
+            // Mark as read-only unless the entity already holds a write lock in this session
+            // (e.g. previously fetched via findByIdWithWriteLock). Checking the JPA lock mode
+            // avoids silently disabling dirty-checking on intentionally write-locked entities,
+            // while still protecting genuinely read-only loads in read-write outer transactions.
+            LockModeType lockMode = this.entityManager.getLockMode(entity);
+            if (lockMode == LockModeType.NONE || lockMode == LockModeType.OPTIMISTIC || lockMode == LockModeType.READ)
+            {
+                this.entityManager.unwrap(Session.class).setReadOnly(entity, true);
+            }
+        });
         return result;
     }
 
@@ -76,12 +112,14 @@ public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, 
     public List<T> findAllByIdReadOnly(Iterable<ID> ids)
     {
         List<T> result = super.findAllById(ids);
-        if (!TransactionSynchronizationManager.isCurrentTransactionReadOnly())
-        {
-            return result;
-        }
         Session session = this.entityManager.unwrap(Session.class);
-        result.forEach(entity -> session.setReadOnly(entity, true));
+        result.forEach(entity -> {
+            LockModeType lockMode = this.entityManager.getLockMode(entity);
+            if (lockMode == LockModeType.NONE || lockMode == LockModeType.OPTIMISTIC || lockMode == LockModeType.READ)
+            {
+                session.setReadOnly(entity, true);
+            }
+        });
         return result;
     }
 

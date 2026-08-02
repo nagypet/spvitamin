@@ -53,6 +53,9 @@ dependencies {
     implementation libs.commons.collections4
     implementation libs.commons.io
 
+    // jsoup (HTML sanitization)
+    implementation libs.jsoup
+
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
 

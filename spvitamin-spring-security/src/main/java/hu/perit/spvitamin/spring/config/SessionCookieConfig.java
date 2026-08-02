@@ -29,6 +29,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 public class SessionCookieConfig
 {
     private final SessionProperties sessionProperties;
+    private final SecurityProperties securityProperties;
 
 
     @Bean
@@ -38,7 +39,7 @@ public class SessionCookieConfig
         serializer.setCookieName(this.sessionProperties.getCookieName());
         serializer.setSameSite("Lax");
         serializer.setUseHttpOnlyCookie(true);
-        serializer.setUseSecureCookie(false);
+        serializer.setUseSecureCookie(securityProperties.isProductionMode());
         serializer.setCookieMaxAge((int) this.sessionProperties.getSessionMaxAge().getSeconds());
         log.info("Session cookie serializer created.");
         return serializer;

@@ -21,14 +21,14 @@ import hu.perit.spvitamin.spring.security.utils.PrincipalUtils;
 import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 @Component
@@ -41,36 +41,37 @@ public class SessionMetricProvider
 
     public Double getCountAllSessions()
     {
-        List<SessionInformation> allSessions = sessionRegistry.getAllPrincipals().stream()
-                .flatMap(u -> sessionRegistry.getAllSessions(u, false).stream())
-                .toList();
+        Map<Object, List<SessionInformation>> sessionMap = new HashMap<>();
 
-        dump("All sessions", allSessions);
-        return (double) allSessions.size();
+        sessionRegistry.getAllPrincipals().forEach(principal -> sessionMap.put(principal, sessionRegistry.getAllSessions(principal, false)));
+
+        dump("All sessions", sessionMap);
+        return (double) sessionMap.values().stream().mapToInt(List::size).sum();
     }
 
 
     public Double getCountNamedUserSessions()
     {
-        List<SessionInformation> allSessions = sessionRegistry.getAllPrincipals().stream()
-                .flatMap(u -> sessionRegistry.getAllSessions(u, false).stream())
-                .toList();
+        Map<Object, List<SessionInformation>> sessionMap = new HashMap<>();
 
-        List<SessionInformation> filteredSessions = allSessions.stream()
-                .filter(i -> !i.isExpired() && !PrincipalUtils.isTechnicalUser(i.getPrincipal()))
-                .toList();
+        sessionRegistry.getAllPrincipals().forEach(principal -> {
+            if (!PrincipalUtils.isTechnicalUser(principal))
+            {
+                sessionMap.put(principal, sessionRegistry.getAllSessions(principal, false));
+            }
+        });
 
-        dump("Named-user sessions", filteredSessions);
-        return (double) filteredSessions.size();
+        dump("Named-user sessions", sessionMap);
+        return (double) sessionMap.values().stream().mapToInt(List::size).sum();
     }
 
 
-    private static void dump(String name, List<SessionInformation> sessions)
+    private static void dump(String name, Map<Object, List<SessionInformation>> sessionMap)
     {
         StringJoiner sj = new StringJoiner("\n");
-        for (SessionInformation si : sessions)
+        for (Map.Entry<Object, List<SessionInformation>> entry : sessionMap.entrySet())
         {
-            sj.add(MessageFormat.format("{0}, {1}, expired: {2}, lastRequest: {3}", si.getSessionId(), getPrincipalName(si.getPrincipal()), si.isExpired(), si.getLastRequest()));
+            sj.add(MessageFormat.format("{0}: {1} session(s)", getPrincipalName(entry.getKey()), entry.getValue().size()));
         }
         log.debug("{}:\n{}", name, sj);
     }
@@ -78,18 +79,12 @@ public class SessionMetricProvider
 
     private static String getPrincipalName(Object principal)
     {
-        if (principal == null)
+        return switch (principal)
         {
-            return "";
-        }
-        if (principal instanceof AuthenticatedUser authenticatedUser)
-        {
-            return authenticatedUser.getUsername();
-        }
-        if (principal instanceof User user)
-        {
-            return user.getUsername();
-        }
-        return principal.toString();
+            case null -> "";
+            case AuthenticatedUser authenticatedUser -> authenticatedUser.getUsername();
+            case User user -> user.getUsername();
+            default -> principal.toString();
+        };
     }
 }

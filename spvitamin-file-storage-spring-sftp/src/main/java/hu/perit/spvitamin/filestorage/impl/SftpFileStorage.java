@@ -21,6 +21,7 @@ import hu.perit.spvitamin.filestorage.FileInfo;
 import hu.perit.spvitamin.filestorage.FileStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.common.SftpException;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -36,6 +37,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.FileVisitOption;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -102,8 +104,9 @@ public class SftpFileStorage implements FileStorage
     public OutputStream newOutputStream(FilePath path, OpenOption... options) throws IOException
     {
         log.debug("Creating new output stream for path: {}", path);
+        boolean append = java.util.Arrays.asList(options).contains(StandardOpenOption.APPEND);
         // This is a custom OutputStream that buffers data and writes it to SFTP when closed
-        return new SftpOutputStream(path, sftpSessionFactory);
+        return new SftpOutputStream(path, sftpSessionFactory, append);
     }
 
 
@@ -418,6 +421,7 @@ public class SftpFileStorage implements FileStorage
         return fileTime.toInstant();
     }
 
+
     /**
      * {@inheritDoc}
      * <p>
@@ -453,6 +457,8 @@ public class SftpFileStorage implements FileStorage
         private final FilePath path;
         private final DefaultSftpSessionFactory factory;
         private final ByteArrayOutputStream buffer;
+        private final boolean append;
+        private boolean closed = false;
 
 
         /**
@@ -461,11 +467,12 @@ public class SftpFileStorage implements FileStorage
          * @param path    the path to the file to write to
          * @param factory the SFTP session factory to use for creating sessions
          */
-        public SftpOutputStream(FilePath path, DefaultSftpSessionFactory factory)
+        public SftpOutputStream(FilePath path, DefaultSftpSessionFactory factory, Boolean append)
         {
             this.path = path;
             this.factory = factory;
             this.buffer = new ByteArrayOutputStream();
+            this.append = BooleanUtils.isTrue(append);
         }
 
 
@@ -511,12 +518,20 @@ public class SftpFileStorage implements FileStorage
         /**
          * Closes this output stream and writes the buffered data to the SFTP server.
          * This method ensures that the parent directories exist before writing the file.
+         * If append mode is active, existing file content is prepended to the new data.
+         * In overwrite mode (default), any existing file is deleted first.
+         * This method is idempotent: subsequent calls after the first have no effect.
          *
          * @throws IOException if an I/O error occurs
          */
         @Override
         public void close() throws IOException
         {
+            if (closed)
+            {
+                return;
+            }
+            closed = true;
             try (SftpSession session = factory.getSession())
             {
                 // Ensure parent directories exist
@@ -524,7 +539,28 @@ public class SftpFileStorage implements FileStorage
                 createDirectoriesRecursively(session, parentDir);
 
                 // Write the buffered data to the file
-                session.write(new ByteArrayInputStream(buffer.toByteArray()), path.toString());
+                byte[] dataToWrite;
+                if (append && session.exists(path.toString()))
+                {
+                    // Read existing content and prepend it
+                    ByteArrayOutputStream existingContent = new ByteArrayOutputStream();
+                    session.read(path.toString(), existingContent);
+                    ByteArrayOutputStream combined = new ByteArrayOutputStream();
+                    combined.write(existingContent.toByteArray());
+                    combined.write(buffer.toByteArray());
+                    dataToWrite = combined.toByteArray();
+                }
+                else
+                {
+                    // Overwrite mode: delete existing file first to avoid duplicates
+                    if (session.exists(path.toString()))
+                    {
+                        session.remove(path.toString());
+                    }
+                    dataToWrite = buffer.toByteArray();
+                }
+
+                session.write(new ByteArrayInputStream(dataToWrite), path.toString());
             }
             finally
             {

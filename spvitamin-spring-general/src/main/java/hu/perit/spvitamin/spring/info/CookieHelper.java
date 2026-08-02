@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.info;
 
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SysConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,12 +50,13 @@ public final class CookieHelper
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+        boolean productionMode = SysConfig.getSecurityProperties().isProductionMode();
 
         jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie(cookieName, "");
         cookie.setPath(path);
         cookie.setMaxAge(0);
         cookie.setHttpOnly(true);
-        cookie.setSecure(request.isSecure());
+        cookie.setSecure(productionMode);
         response.addCookie(cookie);
     }
 
@@ -87,10 +89,11 @@ public final class CookieHelper
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+        boolean productionMode = SysConfig.getSecurityProperties().isProductionMode();
 
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(request.isSecure())
+                .secure(productionMode)
                 .path(path)
                 .sameSite("Strict")
                 .maxAge(ttl.plusMinutes(1))
@@ -102,10 +105,11 @@ public final class CookieHelper
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+        boolean productionMode = SysConfig.getSecurityProperties().isProductionMode();
 
         return ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .secure(request.isSecure())
+                .secure(productionMode)
                 .path(path)
                 .sameSite("Strict")
                 .maxAge(0) // törlés

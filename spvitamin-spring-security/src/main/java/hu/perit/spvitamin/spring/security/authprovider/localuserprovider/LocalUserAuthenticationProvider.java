@@ -21,15 +21,13 @@ import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.CredentialType;
-import hu.perit.spvitamin.spring.security.authprovider.SpvitaminBasicAuthenticationProvider;
+import hu.perit.spvitamin.spring.security.authprovider.AbstractSpvitaminBasicAuthenticationProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,7 +39,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnBean(annotation = EnableLocalUserAuthProvider.class)
-public class LocalUserAuthenticationProvider implements SpvitaminBasicAuthenticationProvider
+public class LocalUserAuthenticationProvider extends AbstractSpvitaminBasicAuthenticationProvider
 {
     private final LocalUserProperties localUserProperties;
 
@@ -50,28 +48,6 @@ public class LocalUserAuthenticationProvider implements SpvitaminBasicAuthentica
     private void init()
     {
         log.info("Initializing {}", this.getClass().getName());
-    }
-
-
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException
-    {
-        try
-        {
-            AuthenticatedUser authenticatedUser = loadUserByUsernameAndPassword(authentication.getName(), (String) authentication.getCredentials());
-            return new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
-        }
-        catch (UsernameNotFoundException e)
-        {
-            return null;
-        }
-    }
-
-
-    @Override
-    public boolean supports(Class<?> authentication)
-    {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
 

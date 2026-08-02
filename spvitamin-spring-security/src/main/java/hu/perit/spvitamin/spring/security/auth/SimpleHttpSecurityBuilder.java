@@ -56,6 +56,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -140,11 +141,15 @@ public class SimpleHttpSecurityBuilder
 
         if (securityProperties.getAdditionalSecurityHeaders() != null)
         {
-            for (String header : securityProperties.getAdditionalSecurityHeaders().values())
+            for (Map.Entry<String, String> header : securityProperties.getAdditionalSecurityHeaders().entrySet())
             {
-                // pl: X-Content-Security-Policy=default-src 'self'
-                String[] headerParts = header.split("=");
-                http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1])));
+                /**
+                 * security:
+                 *   additional-security-headers:
+                 *     Content-Security-Policy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; report-uri /api/spvitamin/admin/csp_violations;"
+                 *     Permissions-Policy: "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
+                 */
+                http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(header.getKey(), header.getValue())));
             }
         }
 

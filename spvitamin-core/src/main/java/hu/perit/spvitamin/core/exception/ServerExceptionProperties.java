@@ -51,6 +51,7 @@ public class ServerExceptionProperties
 
 
     private static StackTraceEnabled myStackTraceEnabled = StackTraceEnabled.ALWAYS;
+    private static boolean myCauseEnabled = true;
 
     private String message;
     private String exceptionClass;
@@ -65,6 +66,12 @@ public class ServerExceptionProperties
     }
 
 
+    public static void setCauseEnabled(boolean causeEnabled)
+    {
+        myCauseEnabled = causeEnabled;
+    }
+
+
     public ServerExceptionProperties(Throwable exception)
     {
         ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(exception);
@@ -72,7 +79,7 @@ public class ServerExceptionProperties
         this.superClasses = exceptionWrapper.getSuperClassNames();
         this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
         this.stackTrace = limitedStackTrace(exception.getStackTrace());
-        if (exception.getCause() != null)
+        if (exception.getCause() != null && myCauseEnabled)
         {
             this.cause = convertCauses(exception.getCause());
         }
@@ -151,13 +158,13 @@ public class ServerExceptionProperties
         this.exceptionClass = exceptionWrapper.getClassName();
         this.superClasses = exceptionWrapper.getSuperClassNames();
         this.message = StringUtils.isBlank(exception.getMessage()) ? this.exceptionClass : exception.getMessage();
-        this.cause = cause;
+        this.cause = myCauseEnabled ? cause : null;
     }
 
 
     private static ServerExceptionProperties convertCauses(Throwable cause)
     {
-        if (cause == null)
+        if (cause == null || !myCauseEnabled)
         {
             return null;
         }
