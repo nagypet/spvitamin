@@ -55,22 +55,29 @@ public class RedisLoginAttemptService implements LoginAttemptService
     @Override
     public void registerFailure(String username)
     {
-        String countKey = countKey(username);
-        String lockKey = lockKey(username);
-
-        Long count = redisTemplate.opsForValue().increment(countKey);
-        // Set a cleanup TTL on the counter so it does not accumulate in Redis indefinitely
-        redisTemplate.expire(countKey, properties.getLockDuration().plusHours(1));
-
-        if (count != null && count >= properties.getMaxAttempts())
+        try
         {
-            redisTemplate.opsForValue().set(lockKey, "1", properties.getLockDuration());
-            log.warn("Account locked due to too many failed login attempts: username={}, attempts={}, lockDuration={}",
-                    username, count, properties.getLockDuration());
+            String countKey = countKey(username);
+            String lockKey = lockKey(username);
+
+            Long count = redisTemplate.opsForValue().increment(countKey);
+            // Set a cleanup TTL on the counter so it does not accumulate in Redis indefinitely
+            redisTemplate.expire(countKey, properties.getLockDuration().plusHours(1));
+
+            if (count != null && count >= properties.getMaxAttempts())
+            {
+                redisTemplate.opsForValue().set(lockKey, "1", properties.getLockDuration());
+                log.warn("Account locked due to too many failed login attempts: username={}, attempts={}, lockDuration={}",
+                        username, count, properties.getLockDuration());
+            }
+            else
+            {
+                log.warn("Failed login attempt: username={}, failedAttempts={}/{}", username, count, properties.getMaxAttempts());
+            }
         }
-        else
+        catch (Exception e)
         {
-            log.warn("Failed login attempt: username={}, failedAttempts={}/{}", username, count, properties.getMaxAttempts());
+            log.error("Redis unavailable while registering failed login attempt for user '{}': {}", username, e.getMessage());
         }
     }
 
@@ -78,14 +85,29 @@ public class RedisLoginAttemptService implements LoginAttemptService
     @Override
     public void registerSuccess(String username)
     {
-        redisTemplate.delete(List.of(countKey(username), lockKey(username)));
+        try
+        {
+            redisTemplate.delete(List.of(countKey(username), lockKey(username)));
+        }
+        catch (Exception e)
+        {
+            log.error("Redis unavailable while clearing brute-force counters for user '{}': {}", username, e.getMessage());
+        }
     }
 
 
     @Override
     public boolean isBlocked(String username)
     {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(lockKey(username)));
+        try
+        {
+            return Boolean.TRUE.equals(redisTemplate.hasKey(lockKey(username)));
+        }
+        catch (Exception e)
+        {
+            log.error("Redis unavailable while checking brute-force lock for user '{}', failing open: {}", username, e.getMessage());
+            return false;
+        }
     }
 
 

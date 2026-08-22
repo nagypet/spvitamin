@@ -132,6 +132,10 @@ dependencyManagement {
   - In production-mode all cookies are secured
   - Protection against brute-force attacks
   - XssFilter to remove scripts from JSON inputs
+- 2026-08-22:
+  - AbstractTokenCache can handle unencrypted credentials as well
+  - PessimisticJpaRepository throws exception on save if the session is read-only
+  - RedisLoginAttemptService fix in case the Redis is temporarily unavailable
 
 
 ### 4.0.3-1-RELEASE not yet released

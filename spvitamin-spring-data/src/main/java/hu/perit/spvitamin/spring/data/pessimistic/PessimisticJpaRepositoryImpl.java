@@ -69,8 +69,10 @@ public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, 
             Session session = this.entityManager.unwrap(Session.class);
             if (session.isReadOnly(entity))
             {
-                log.error("*** save() called on a Hibernate read-only entity — changes will be silently ignored!" +
-                        " Entity: {} id={}", entity.getClass().getSimpleName(), this.entityInformation.getId(entity));
+                throw new IllegalStateException(
+                        "save() called on a Hibernate read-only entity!" +
+                                " Entity: " + entity.getClass().getSimpleName() +
+                                " id=" + this.entityInformation.getId(entity));
             }
             else
             {
@@ -130,6 +132,10 @@ public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, 
     {
         Map<String, Object> hints = Map.of("jakarta.persistence.lock.timeout", 3000);
         T entity = this.entityManager.find(getDomainClass(), id, LockModeType.PESSIMISTIC_WRITE, hints);
+        if (entity != null)
+        {
+            this.entityManager.unwrap(Session.class).setReadOnly(entity, false);
+        }
         return Optional.ofNullable(entity);
     }
 
@@ -145,6 +151,7 @@ public class PessimisticJpaRepositoryImpl<T, ID> extends SimpleJpaRepository<T, 
             T entity = this.entityManager.find(getDomainClass(), id, LockModeType.PESSIMISTIC_WRITE, hints);
             if (entity != null)
             {
+                this.entityManager.unwrap(Session.class).setReadOnly(entity, false);
                 result.add(entity);
             }
         }

@@ -11,9 +11,11 @@ import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.http.ResponseEntityUtils;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 public abstract class AbstractTokenCache<T extends Enum<T>> implements TokenCache<T>
@@ -31,7 +33,11 @@ public abstract class AbstractTokenCache<T extends Enum<T>> implements TokenCach
         for (Map.Entry<T, String> propertiesEntry : microserviceProperties.entrySet())
         {
             MicroserviceProperties properties = this.microserviceCollectionProperties.get(propertiesEntry.getValue());
-            String decrypted = cryptoUtil.decrypt(this.cryptoProperties.getSecret(), properties.getAuth().getEncryptedPassword());
+            String encrypted = properties.getAuth().getEncryptedPassword();
+            String decrypted = StringUtils.isNotBlank(encrypted)
+                    ? cryptoUtil.decrypt(this.cryptoProperties.getSecret(), encrypted)
+                    : properties.getAuth().getPassword();
+            Objects.requireNonNull(decrypted, "Password cannot be null!");
             this.authApis.put(propertiesEntry.getKey(), SimpleFeignClientBuilder.newInstance()
                     .browserModeWithClientId(propertiesEntry.getKey().name())
                     .requestInterceptor(new BasicAuthRequestInterceptor(properties.getAuth().getUsername(), decrypted))

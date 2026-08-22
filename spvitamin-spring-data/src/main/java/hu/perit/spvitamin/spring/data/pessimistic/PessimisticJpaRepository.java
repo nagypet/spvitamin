@@ -32,4 +32,7 @@ public interface PessimisticJpaRepository<T, ID> extends JpaRepository<T, ID>
     Optional<T> findByIdWithWriteLock(ID id);
 
     List<T> findAllByIdWithWriteLock(Iterable<ID> ids);
+
+    @Override
+    <S extends T> S save(S entity);
 }
