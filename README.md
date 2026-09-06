@@ -143,6 +143,7 @@ dependencyManagement {
   - UnprocessableContentException produces HTTP 422 Unprocessable Content
   - StateMachine new method: getDefinedEvents
   - Case class extended by toUpper()
+  - VersionedResilientJobParameter
 
 
 ### 4.0.3-1-RELEASE not yet released
