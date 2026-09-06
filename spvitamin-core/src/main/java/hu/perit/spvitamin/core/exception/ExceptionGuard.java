@@ -32,7 +32,7 @@ public class ExceptionGuard
         }
         catch (Exception e)
         {
-            log.error(StackTracer.toStringCompact(e));
+            log.error(StackTracer.toString(e));
         }
     }
 
@@ -45,7 +45,7 @@ public class ExceptionGuard
         }
         catch (Exception e)
         {
-            log.error(StackTracer.toStringCompact(e));
+            log.error(StackTracer.toString(e));
         }
         return null;
     }

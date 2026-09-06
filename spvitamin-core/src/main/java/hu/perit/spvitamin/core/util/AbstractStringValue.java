@@ -47,6 +47,18 @@ public abstract class AbstractStringValue<T extends AbstractStringValue<T>> impl
     public int compareTo(T other)
     {
         Objects.requireNonNull(other, "other must not be null");
+        if (this.value == null && other.value() == null)
+        {
+            return 0;
+        }
+        if (this.value == null)
+        {
+            return -1;
+        }
+        if (other.value() == null)
+        {
+            return 1;
+        }
         return this.value.compareTo(other.value());
     }
 
@@ -70,7 +82,7 @@ public abstract class AbstractStringValue<T extends AbstractStringValue<T>> impl
             return false; // type-safe equals
         }
         AbstractStringValue<?> that = (AbstractStringValue<?>) o;
-        return value.equals(that.value);
+        return Objects.equals(value, that.value);
     }
 
 

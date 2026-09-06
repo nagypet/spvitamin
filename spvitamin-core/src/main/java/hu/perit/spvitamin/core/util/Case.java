@@ -26,4 +26,10 @@ public final class Case
     {
         return input == null ? null : input.toLowerCase().strip();
     }
+
+
+    public static String toUpper(String input)
+    {
+        return input == null ? null : input.toUpperCase().strip();
+    }
 }

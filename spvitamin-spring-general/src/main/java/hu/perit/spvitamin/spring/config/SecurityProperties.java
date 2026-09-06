@@ -16,14 +16,21 @@
 
 package hu.perit.spvitamin.spring.config;
 
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.resource.Resources;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +50,7 @@ public class SecurityProperties
     {
         RESOURCE_SERVER,
         AUTHORIZATION_SERVER,
-        NONE;
+        NONE
     }
 
 
@@ -75,6 +82,25 @@ public class SecurityProperties
     void init()
     {
         log.debug(this.toString());
+        if (this.mode == SecurityProperties.Mode.AUTHORIZATION_SERVER)
+        {
+            if (this.auth == null && (this.oauth2 == null || this.oauth2.getProviders().isEmpty()))
+            {
+                throw new IllegalStateException("auth or oauth2 must be set!");
+            }
+            // In case of oauth2 either clientSecret or clientSecretFile must be set
+            if (this.oauth2 != null)
+            {
+                for (Map.Entry<String, SecurityProperties.OAuth2Provider> stringOAuth2ProviderEntry : this.oauth2.getProviders().entrySet())
+                {
+                    SecurityProperties.OAuth2Provider provider = stringOAuth2ProviderEntry.getValue();
+                    if (StringUtils.isBlank(provider.getClientSecret()) && StringUtils.isBlank(provider.getClientSecretFile()))
+                    {
+                        throw new IllegalStateException("Either clientSecret or clientSecretFile must be set!");
+                    }
+                }
+            }
+        }
     }
 
 
@@ -95,10 +121,33 @@ public class SecurityProperties
         private String redirectUri = "{baseUrl}/login/oauth2/code/{registrationId}";
         @NotNull
         private String clientId;
-        @NotNull
         private String clientSecret;
+        private String clientSecretFile;
         private List<String> scopes = List.of("openid", "profile", "email");
         private List<String> grantTypes = List.of("authorization_code");
+
+
+        public synchronized String getClientSecret()
+        {
+            if (StringUtils.isNotBlank(this.clientSecret))
+            {
+                return this.clientSecret;
+            }
+            else if (StringUtils.isNotBlank(this.clientSecretFile))
+            {
+                // Load the client secret from the file
+                try (InputStream is = Resources.getResourceAsInputStream(this.clientSecretFile))
+                {
+                    this.clientSecret = StreamUtils.copyToString(is, StandardCharsets.UTF_8).trim();
+                    return this.clientSecret;
+                }
+                catch (ResourceNotFoundException | IOException e)
+                {
+                    throw new RuntimeException("Failed to load client secret", e);
+                }
+            }
+            throw new IllegalStateException("Neither clientSecret nor clientSecretFile is set!");
+        }
     }
 
 

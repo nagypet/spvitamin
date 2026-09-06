@@ -18,10 +18,13 @@ package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.spring.info.SessionUserService;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import org.springframework.security.core.Authentication;
 
 public interface AuthorizationService extends SessionUserService
 {
     void registerAuthenticatedUserFactory(AuthenticatedUserFactory authenticatedUserFactory);
+
+    boolean isOAuth2Authentication(Authentication authentication);
 
     void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
 

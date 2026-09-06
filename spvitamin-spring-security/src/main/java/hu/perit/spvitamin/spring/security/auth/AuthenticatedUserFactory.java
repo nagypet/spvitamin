@@ -17,10 +17,11 @@
 package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import org.springframework.security.core.Authentication;
 
 public interface AuthenticatedUserFactory
 {
-    boolean canHandle(Object principal);
+    boolean canHandle(Authentication authentication);
 
-    AuthenticatedUser createAuthenticatedUser(Object principal);
+    AuthenticatedUser createAuthenticatedUser(Authentication authentication);
 }

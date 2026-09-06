@@ -26,7 +26,7 @@ import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import hu.perit.spvitamin.spring.security.BasicOnlySessionSecurityContextRepository;
+import hu.perit.spvitamin.spring.security.SelectiveSessionSecurityContextRepositor;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
@@ -157,7 +157,8 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication()
+    // Creating a session only in case of Basic Authentication or OAuth2
+    public SimpleHttpSecurityBuilder createSessionSelectively()
     {
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
@@ -165,7 +166,7 @@ public class SimpleHttpSecurityBuilder
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .sessionAuthenticationStrategy(authenticationStrategy)
                 )
-                .securityContext(ctx -> ctx.securityContextRepository(new BasicOnlySessionSecurityContextRepository()));
+                .securityContext(ctx -> ctx.securityContextRepository(new SelectiveSessionSecurityContextRepositor()));
 
         return this;
     }
@@ -360,11 +361,11 @@ public class SimpleHttpSecurityBuilder
     {
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
-                .ignorePersistedSecurity()
+                //.ignorePersistedSecurity() is commented out with reason: in case of OAuth2 authentication, the token is saved in the session
                 .authorizeRequests(r -> r.anyRequest().authenticated())
                 .basicAuth()
                 .jwtAuth()
-                .createSessionOnlyForBasicAuthentication();
+                .createSessionSelectively();
 
         return this;
     }
@@ -375,7 +376,7 @@ public class SimpleHttpSecurityBuilder
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .authorizeRequests(r -> r.anyRequest().permitAll())
-                .createSessionOnlyForBasicAuthentication();
+                .createSessionSelectively();
 
         return this;
     }

@@ -50,6 +50,24 @@ public class AuthorizationServiceImpl implements AuthorizationService
 
 
     @Override
+    public boolean isOAuth2Authentication(Authentication authentication)
+    {
+        if (authentication == null)
+        {
+            return false;
+        }
+        for (AuthenticatedUserFactory authenticatedUserFactory : this.authenticatedUserFactories)
+        {
+            if (authenticatedUserFactory.canHandle(authentication))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
     public void setAuthenticatedUser(AuthenticatedUser authenticatedUser)
     {
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -139,9 +157,9 @@ public class AuthorizationServiceImpl implements AuthorizationService
         // Trying specific factories
         for (AuthenticatedUserFactory authenticatedUserFactory : this.authenticatedUserFactories)
         {
-            if (authenticatedUserFactory.canHandle(principal))
+            if (authenticatedUserFactory.canHandle(authentication))
             {
-                return authenticatedUserFactory.createAuthenticatedUser(principal);
+                return authenticatedUserFactory.createAuthenticatedUser(authentication);
             }
         }
 

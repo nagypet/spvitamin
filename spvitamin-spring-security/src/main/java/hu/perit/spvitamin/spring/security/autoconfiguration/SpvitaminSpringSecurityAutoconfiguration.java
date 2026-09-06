@@ -55,14 +55,6 @@ public class SpvitaminSpringSecurityAutoconfiguration
         {
             throw new IllegalStateException("Production mode is enabled, but either adminGuiAccess, adminEndpointsAccess, swaggerAccess or managementEndpointsAccess is set to '*'!");
         }
-
-        if (this.securityProperties.getMode() == SecurityProperties.Mode.AUTHORIZATION_SERVER)
-        {
-            if (this.securityProperties.getAuth() == null && (this.securityProperties.getOauth2() == null || this.securityProperties.getOauth2().getProviders().isEmpty()))
-            {
-                throw new IllegalStateException("auth or oauth2 must be set!");
-            }
-        }
     }
 
 

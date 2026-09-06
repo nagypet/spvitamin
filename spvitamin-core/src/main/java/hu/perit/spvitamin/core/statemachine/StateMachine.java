@@ -171,6 +171,25 @@ public class StateMachine<S extends Enum<?>, E extends Enum<?>>
     }
 
 
+    /**
+     * Retrieves the set of events that are defined for transitions starting from the current state.
+     * The defined events are extracted from the transitions that:
+     * - originate from the current state,
+     * - are not explicitly marked as ignored.
+     *
+     * @return a list containing the events that are allowed for transitions from the current state
+     */
+    public synchronized List<E> getDefinedEvents()
+    {
+        return this.transactions.stream()
+                .filter(t -> t.getSource().equals(this.currentState))
+                .filter(Transaction::isGuardMet)
+                .filter(t -> !t.isIgnored())
+                .map(t -> t.getEvent())
+                .toList();
+    }
+
+
     private synchronized Optional<Transaction<S, E>> getTransactionForEvent(E event)
     {
         List<Transaction<S, E>> trx = this.transactions.stream()

@@ -17,7 +17,6 @@
 package hu.perit.spvitamin.spring.data.converter;
 
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

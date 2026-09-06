@@ -137,6 +137,12 @@ dependencyManagement {
   - PessimisticJpaRepository throws exception on save if the session is read-only
   - RedisLoginAttemptService fix in case the Redis is temporarily unavailable
 - 2026-08-23: AuthenticationManager created only if the security mode is either AUTHORIZATION_SERVER or RESOURCE_SERVER
+- 2026-09-06: 
+  - Currency introduced
+  - OAuth2 authentication fixed
+  - UnprocessableContentException produces HTTP 422 Unprocessable Content
+  - StateMachine new method: getDefinedEvents
+  - Case class extended by toUpper()
 
 
 ### 4.0.3-1-RELEASE not yet released

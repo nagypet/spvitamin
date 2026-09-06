@@ -18,6 +18,7 @@ package hu.perit.spvitamin.core.thing;
 
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
+import hu.perit.spvitamin.core.util.AbstractStringValue;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -96,6 +97,12 @@ public abstract class Thing
         if (object instanceof byte[])
         {
             return objectToValue(name, object);
+        }
+
+        // AbstractStringValue subclasses (e.g. Currency) behave like strings
+        if (object instanceof AbstractStringValue<?> stringValue)
+        {
+            return objectToValue(name, stringValue.value());
         }
 
         if (object instanceof Collection<?> list)
