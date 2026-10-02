@@ -78,6 +78,7 @@ public class LocalUserAuthenticationProvider extends AbstractSpvitaminBasicAuthe
         }
 
         return AuthenticatedUser.builder()
+                .userId(user.getId())
                 .username(username)
                 .displayName(username)
                 .authorities(List.of(new SimpleGrantedAuthority("ROLE_EMPTY")))

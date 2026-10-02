@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.core.statemachine;
+package hu.perit.spvitamin.spring.data.converter;
 
-import lombok.Data;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import org.apache.commons.lang3.StringUtils;
 
-@Data
-public class Transaction<S extends Enum<?>, E extends Enum<?>>
+@Converter
+public class EmptyStringToNullConverter implements AttributeConverter<String, String>
 {
-    private S source;
-    private S target;
-    private E event;
-    private boolean ignored = false;
-    private Guard guard = null;
-
-    public boolean isGuardMet()
+    @Override
+    public String convertToDatabaseColumn(String attribute)
     {
-        return guard == null || Boolean.TRUE.equals(guard.test());
+        return StringUtils.isBlank(attribute) ? null : attribute;
+    }
+
+
+    @Override
+    public String convertToEntityAttribute(String dbData)
+    {
+        return dbData;
     }
 }

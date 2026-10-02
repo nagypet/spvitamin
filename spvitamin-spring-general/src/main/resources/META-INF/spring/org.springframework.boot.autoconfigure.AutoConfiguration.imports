@@ -15,3 +15,4 @@
 #
 
 hu.perit.spvitamin.spring.autoconfiguration.SpvitaminSpringGeneralAutoconfiguration
+hu.perit.spvitamin.spring.rest.StandardApiResponsesConfiguration

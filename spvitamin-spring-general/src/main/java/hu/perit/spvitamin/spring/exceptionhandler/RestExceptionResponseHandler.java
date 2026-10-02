@@ -17,7 +17,9 @@
 package hu.perit.spvitamin.spring.exceptionhandler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 
@@ -43,7 +45,9 @@ public abstract class RestExceptionResponseHandler<T extends IRestExceptionRespo
     protected ResponseEntity<T> exceptionHandler(Exception ex, WebRequest request, String traceId)
     {
         T exceptionResponse = getExceptionResponse(ex, request, traceId);
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(exceptionResponse, headers, HttpStatus.valueOf(exceptionResponse.getStatus()));
     }
 
 

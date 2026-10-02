@@ -110,7 +110,7 @@ public class DynamicDataSource implements DataSource, Closeable
         try
         {
             Connection connection = this.dataSource.getConnection();
-            log.debug("DynamicDataSource created a new Connection.");
+            log.trace("DynamicDataSource created a new Connection.");
             this.connected = true;
             return connection;
         }
@@ -130,7 +130,7 @@ public class DynamicDataSource implements DataSource, Closeable
         try
         {
             Connection connection = this.dataSource.getConnection(username, password);
-            log.debug("DynamicDataSource created a new Connection.");
+            log.trace("DynamicDataSource created a new Connection.");
             this.connected = true;
             return connection;
         }

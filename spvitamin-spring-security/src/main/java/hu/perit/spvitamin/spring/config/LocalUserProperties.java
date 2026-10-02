@@ -48,5 +48,6 @@ public class LocalUserProperties {
 	public static class User {
 		private String password;
 		private String encryptedPassword;
+		private String id;
 	}
 }

@@ -155,4 +155,14 @@ public class Iban extends AbstractStringValue<Iban>
         }
         return sb.toString();
     }
+
+
+    public String countryCode()
+    {
+        if (value == null || !isValidFormat(value))
+        {
+            return null;
+        }
+        return value.substring(0, 2);
+    }
 }

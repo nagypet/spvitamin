@@ -58,6 +58,7 @@ dependencies {
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
     implementation libs.jakarta.annotation.api
 
@@ -75,6 +76,9 @@ dependencies {
 
     // Reflections
     implementation libs.reflections
+
+    // springdoc-openapi (optional — only for @StandardApiResponses processing)
+    compileOnly libs.openapi.api
 
 
     // -----------------------------------------------------------------------------------------------------------------

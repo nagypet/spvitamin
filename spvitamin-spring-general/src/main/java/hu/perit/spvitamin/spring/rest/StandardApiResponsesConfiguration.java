@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.core.statemachine;
+package hu.perit.spvitamin.spring.rest;
 
-import lombok.Data;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Data
-public class Transaction<S extends Enum<?>, E extends Enum<?>>
+/**
+ * Registers {@link StandardApiResponsesCustomizer} only when springdoc-openapi is on the classpath.
+ */
+@Configuration
+@ConditionalOnClass(name = "org.springdoc.core.customizers.OperationCustomizer")
+public class StandardApiResponsesConfiguration
 {
-    private S source;
-    private S target;
-    private E event;
-    private boolean ignored = false;
-    private Guard guard = null;
-
-    public boolean isGuardMet()
+    @Bean
+    public StandardApiResponsesCustomizer standardApiResponsesCustomizer()
     {
-        return guard == null || Boolean.TRUE.equals(guard.test());
+        return new StandardApiResponsesCustomizer();
     }
 }

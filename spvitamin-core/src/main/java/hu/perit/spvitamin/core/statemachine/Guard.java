@@ -34,20 +34,26 @@ package hu.perit.spvitamin.core.statemachine;
 @FunctionalInterface
 public interface Guard
 {
-    boolean test();
+    /**
+     * Evaluates this guard condition.
+     *
+     * @return {@code true} if the guard is satisfied, {@code false} if not satisfied, or {@code null}
+     *         if the condition cannot be determined (treated as {@code false} by the state machine).
+     */
+    Boolean test();
 
     default Guard and(Guard other)
     {
-        return () -> this.test() && other.test();
+        return () -> Boolean.TRUE.equals(this.test()) && Boolean.TRUE.equals(other.test());
     }
 
     default Guard or(Guard other)
     {
-        return () -> this.test() || other.test();
+        return () -> Boolean.TRUE.equals(this.test()) || Boolean.TRUE.equals(other.test());
     }
 
     default Guard negate()
     {
-        return () -> !this.test();
+        return () -> !Boolean.TRUE.equals(this.test());
     }
 }

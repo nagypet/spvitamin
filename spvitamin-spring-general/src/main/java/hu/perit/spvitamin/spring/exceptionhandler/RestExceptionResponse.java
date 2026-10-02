@@ -125,10 +125,11 @@ public class RestExceptionResponse implements JsonSerializable, IRestExceptionRe
             {
                 this.exception = new ServerExceptionProperties(ex);
             }
-            else if (myMessageEnabled)
-            {
-                this.message = ex.getMessage();
-            }
+        }
+
+        else if (myMessageEnabled)
+        {
+            this.message = ex.getMessage();
         }
 
         List<String> validationErrors = ValidationErrorExtractor.extractErrors(ex);

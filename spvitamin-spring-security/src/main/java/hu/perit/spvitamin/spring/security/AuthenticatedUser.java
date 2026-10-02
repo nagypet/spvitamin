@@ -89,6 +89,28 @@ public class AuthenticatedUser implements UserDetails
     }
 
 
+    public <T> T getUserIdAsThrow(Class<T> clazz)
+    {
+        if (String.class.isAssignableFrom(clazz))
+        {
+            return (T) this.userId; // NOSONAR
+        }
+        else
+        {
+            // Couldn't be cast, let's try to convert with Json
+            try
+            {
+                String json = JSonSerializer.toJson(this.userId);
+                return JSonSerializer.fromJson(json, clazz);
+            }
+            catch (JacksonException ex)
+            {
+                throw new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''userId''", this.username), ex);
+            }
+        }
+    }
+
+
     public <T> T getAdditionalClaimThrow(String name, Class<T> clazz)
     {
         return getAdditionalClaim(name, clazz)

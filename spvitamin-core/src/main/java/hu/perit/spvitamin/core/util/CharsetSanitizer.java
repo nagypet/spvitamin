@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 public final class CharsetSanitizer
 {
     public static final Charset CP852 = Charset.forName("IBM852");
+    public static final Charset ISO_8859_2 = Charset.forName("ISO-8859-2");
 
     private static final Map<Character, String> REPLACEMENT_MAP;
 

@@ -122,7 +122,7 @@ public class StackTracer
 
     public static String currentThreadToString()
     {
-        return "\n" + getPartialStackTrace(null, Thread.currentThread().getStackTrace(), false);
+        return "\n" + getPartialStackTrace(null, Thread.currentThread().getStackTrace(), true);
     }
 
 

@@ -21,10 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
-public class Currency extends AbstractStringValue<Currency>
+public class Currency extends AbstractPooledStringValue<Currency>
 {
-    public static final Currency HUF = Currency.fromString("HUF");
-    public static final Currency USD = Currency.fromString("USD");
+    public static final Currency HUF = of("HUF");
+    public static final Currency EUR = of("EUR");
+    public static final Currency USD = of("USD");
 
 
     protected Currency(String value)
@@ -33,9 +34,15 @@ public class Currency extends AbstractStringValue<Currency>
     }
 
 
+    public static Currency of(String value)
+    {
+        return intern(Currency.class, validate(value), Currency::new);
+    }
+
+
     public static Currency fromString(String value)
     {
-        return new Currency(value);
+        return of(value);
     }
 
 

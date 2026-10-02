@@ -144,6 +144,14 @@ dependencyManagement {
   - StateMachine new method: getDefinedEvents
   - Case class extended by toUpper()
   - VersionedResilientJobParameter
+- 2026-10-02:
+  - AbstractPooledStringValue to support == operation
+  - Currency inherited from AbstractPooledStringValue
+  - RestExceptionResponse message propagated to frontend
+  - LocalUserProperties supports id field
+  - EmptyStringToNullConverter
+  - @StandardApiResponses annotation
+  - @SuppressRestEndpoints annotation
 
 
 ### 4.0.3-1-RELEASE not yet released

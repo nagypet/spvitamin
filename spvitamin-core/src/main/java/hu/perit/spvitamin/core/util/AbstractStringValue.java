@@ -21,6 +21,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Type-safe wrapper for String values. Equality is based on the wrapped string value and the concrete
+ * subclass type ({@link #equals} and {@link #hashCode} are final and value-based).
+ *
+ * <p><b>Note on reference equality ({@code ==}):</b> Unlike interned {@link String} literals, two instances
+ * wrapping the same value are <em>not</em> the same object reference. Use {@link #equals} for comparison.
+ * If reference equality is required and the set of distinct values is small and bounded, extend
+ * {@link AbstractPooledStringValue} instead — it maintains a per-type intern pool so that
+ * {@code ==} works like it does for interned strings.
+ */
 public abstract class AbstractStringValue<T extends AbstractStringValue<T>> implements Comparable<T>, Serializable
 {
     protected final String value;
