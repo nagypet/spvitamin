@@ -21,15 +21,14 @@ import {Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {TemplatePortal} from '@angular/cdk/portal';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule } from '@angular/material/sort';
-import { NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
     exportAs: 'ngFaceSortFilterHeader',
     selector: '[ngface-sort-filter-header]',
     templateUrl: './sort-filter-header.component.html',
     styleUrls: ['./sort-filter-header.component.scss'],
-    standalone: true,
-    imports: [NgIf, MatSortModule, NgClass, MatIconModule, ExcelFilterComponent]
+    imports: [MatSortModule, NgClass, MatIconModule, ExcelFilterComponent]
 })
 export class SortFilterHeaderComponent
 {

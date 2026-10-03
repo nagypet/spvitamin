@@ -27,20 +27,19 @@ import {ResponsiveClassDirective} from '../../directives/responsive-class-direct
 import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
-  selector: 'ngface-titlebar',
-  templateUrl: './ngface-titlebar.component.html',
-  styleUrls: ['./ngface-titlebar.component.scss'],
-  imports: [
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatBadgeModule,
-    ResponsiveClassDirective,
-    NgClass,
-    MatTooltip
-  ],
-  standalone: true
+    selector: 'ngface-titlebar',
+    templateUrl: './ngface-titlebar.component.html',
+    styleUrls: ['./ngface-titlebar.component.scss'],
+    imports: [
+        MatToolbarModule,
+        MatIconModule,
+        MatButtonModule,
+        MatMenuModule,
+        MatBadgeModule,
+        ResponsiveClassDirective,
+        NgClass,
+        MatTooltip
+    ]
 })
 export class NgfaceTitlebarComponent implements OnChanges
 {

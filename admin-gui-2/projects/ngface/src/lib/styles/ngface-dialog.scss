@@ -99,12 +99,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 @media (max-width: 899px) {
   .mat-mdc-dialog-container {
-    --mdc-dialog-container-shape: 0;
+    --mat-dialog-container-shape: 0;
   }
 }
 @media (min-width: 900px) {
   .mat-mdc-dialog-container {
-    --mdc-dialog-container-shape: 10px;
+    --mat-dialog-container-shape: 10px;
   }
 }
 

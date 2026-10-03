@@ -22,7 +22,7 @@ import {ErrorService} from '../../services/error.service';
 import {A11yModule} from '@angular/cdk/a11y';
 import {MatButtonModule} from '@angular/material/button';
 import {NgScrollbarModule} from 'ngx-scrollbar';
-import {formatDate, NgIf} from '@angular/common';
+import { formatDate } from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
 import {DeviceTypeService} from '../../services/device-type.service';
@@ -68,20 +68,18 @@ export interface StackTraceElement
 }
 
 @Component({
-  selector: 'lib-ngface-error-dialog',
-  templateUrl: './ngface-error-dialog.component.html',
-  styleUrls: ['./ngface-error-dialog.component.scss'],
-  standalone: true,
-  imports: [
+    selector: 'lib-ngface-error-dialog',
+    templateUrl: './ngface-error-dialog.component.html',
+    styleUrls: ['./ngface-error-dialog.component.scss'],
+    imports: [
     MatDialogModule,
     MatIconModule,
-    NgIf,
     NgScrollbarModule,
     MatButtonModule,
     A11yModule,
     ResponsiveClassDirective,
     NgfaceButtonComponent
-  ]
+]
 })
 export class NgfaceErrorDialogComponent implements OnInit
 {
@@ -151,7 +149,7 @@ export class NgfaceErrorDialogComponent implements OnInit
 
   private static getButton(buttonId: string, label: string, style: Ngface.Button.Style): Ngface.Button
   {
-    return {id: buttonId, type: 'Button', label, style, badge: '', hint: '', data: {type: 'VoidWidgetData'}, enabled: true};
+    return {id: buttonId, type: 'Button', label, style, badge: '', hint: '', data: {type: 'VoidWidgetData'}, enabled: true, options: null};
   }
 
   ngOnInit(): void

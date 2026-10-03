@@ -27,6 +27,12 @@
          [debounceTime]="500"
          (click)="onClick($event)"
   >
+  @if (clearable && formControl.value) {
+    <button mat-icon-button matSuffix type="button" (click)="onClearClicked($event)" tabindex="-1">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
     @if (!multiselect) {
       @for (valueSetItem of valueSetProvider.filteredOptions$ | async; track valueSetItem.text) {

@@ -20,15 +20,14 @@ import {MatIcon} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 
 @Component({
-  selector: 'app-confirmation-dialog',
-  standalone: true,
-  imports: [
-    MatDialogModule,
-    MatIcon,
-    MatButtonModule
-  ],
-  templateUrl: './confirmation-dialog.component.html',
-  styleUrl: './confirmation-dialog.component.css'
+    selector: 'app-confirmation-dialog',
+    imports: [
+        MatDialogModule,
+        MatIcon,
+        MatButtonModule
+    ],
+    templateUrl: './confirmation-dialog.component.html',
+    styleUrl: './confirmation-dialog.component.css'
 })
 export class ConfirmationDialogComponent {
 

@@ -17,7 +17,8 @@
 @use '@angular/material' as mat;
 @use "sass:map";
 
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 $microdms-palette: (
   50: var(--palette-50),

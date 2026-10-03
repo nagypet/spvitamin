@@ -30,17 +30,16 @@ import {environment} from '../../../environments/environment';
 import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
-  imports: [
-    NgfaceFormComponent,
-    NgfaceTextInputComponent,
-    NgfaceButtonComponent,
-    ResponsiveClassDirective,
-    MatButton,
-  ],
-  standalone: true
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    imports: [
+        NgfaceFormComponent,
+        NgfaceTextInputComponent,
+        NgfaceButtonComponent,
+        ResponsiveClassDirective,
+        MatButton,
+    ]
 })
 export class LoginComponent extends FormBaseComponent implements OnInit
 {

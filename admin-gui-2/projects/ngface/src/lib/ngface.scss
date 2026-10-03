@@ -15,12 +15,12 @@
  */
 
 //@import url("https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp");
-@import './styles/material-design-icons';
-@import './styles/material-design-symbols';
-@import './styles/fonts';
+@use './styles/material-design-icons';
+@use './styles/material-design-symbols';
+@use './styles/fonts';
+@use './styles/ngface-button';
+@use './styles/ngface-dialog';
 @import '@angular/cdk/overlay-prebuilt.css';
-@import './styles/ngface-button';
-@import './styles/ngface-dialog';
 
 
 
@@ -63,9 +63,10 @@
   margin-bottom: 20px;
 
   // When ngface-input-field placed in a ngface-row, there should be a right margin
-  .ngface-input-field {
-    margin-right: 20px;
-  }
+  gap: 20px;
+  //.ngface-input-field {
+  //  margin-right: 20px;
+  //}
 }
 
 .ngface-row.phone.portrait {
@@ -166,9 +167,9 @@
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, .16);
   border-radius: 10px;
   padding: 5px 15px !important;
-  --mdc-plain-tooltip-container-color: var(--app-primary-palette-default, #0d6efd);
-  --mdc-plain-tooltip-supporting-text-color: var(--app-primary-contrast-500, #0d6efd) !important;
-  --mdc-plain-tooltip-supporting-text-size: 14px;
+  --mat-tooltip-container-color: var(--app-primary-palette-default, #0d6efd);
+  --mat-tooltip-supporting-text-color: var(--app-primary-contrast-500, #0d6efd) !important;
+  --mat-tooltip-supporting-text-size: 14px;
 }
 
 
@@ -185,10 +186,10 @@
   white-space: nowrap;
 }
 
-.mat-mdc-paginator-range-label.tablet,
-.mat-mdc-paginator-range-label.desktop {
+.mat-mdc-paginator-range-label {
   white-space: nowrap;
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // data-table

@@ -32,11 +32,10 @@ export interface SelectionChangeEvent
 
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngface-select',
-  templateUrl: './ngface-select.component.html',
-  standalone: true,
-  imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, ResponsiveClassDirective]
+    // tslint:disable-next-line:component-selector
+    selector: 'ngface-select',
+    templateUrl: './ngface-select.component.html',
+    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, ResponsiveClassDirective]
 })
 export class NgfaceSelectComponent extends InputBaseComponent implements OnChanges
 {

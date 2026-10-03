@@ -19,7 +19,6 @@ import {Ngface} from '../../ngface-models';
 import {InputBaseComponent} from '../input-base.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {IntlNumericInputComponent} from './intl-numeric-input/intl-numeric-input.component';
-import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
 
 
 export interface NumericValueChangeEvent
@@ -33,8 +32,7 @@ export interface NumericValueChangeEvent
     // tslint:disable-next-line:component-selector
     selector: 'ngface-numeric-input',
     templateUrl: './ngface-numeric-input.component.html',
-    standalone: true,
-    imports: [IntlNumericInputComponent, ReactiveFormsModule, ResponsiveClassDirective]
+    imports: [IntlNumericInputComponent, ReactiveFormsModule]
 })
 export class NgfaceNumericInputComponent extends InputBaseComponent
 {

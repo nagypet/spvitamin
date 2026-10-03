@@ -15,11 +15,13 @@
  */
 
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Injectable, Optional} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {ErrorService} from '../services/error.service';
 import {OAuthService} from '../services/oauth2/oauth.service';
+import {ErrorInterceptorCustomizer} from './error-interceptor-customizer';
+import {DefaultErrorInterceptorCustomizer} from './default-error-interceptor-customizer';
 
 
 @Injectable()
@@ -28,7 +30,9 @@ export class ErrorInterceptor implements HttpInterceptor
 
   constructor(
     private errorService: ErrorService,
-    private oAuthService: OAuthService
+    private oAuthService: OAuthService,
+    private defaultCustomizer: DefaultErrorInterceptorCustomizer,
+    @Optional() private customizer: ErrorInterceptorCustomizer
   )
   {
   }
@@ -42,15 +46,16 @@ export class ErrorInterceptor implements HttpInterceptor
         {
           console.error(error);
 
-          if (error.status !== 401 && error.status !== 404)
-          {
-            const tokenEndpoint: boolean = this.oAuthService.isConfigured ? request.url.includes(this.oAuthService.config.tokenEndpoint) : false;
+          const tokenEndpoint: boolean = this.oAuthService.isConfigured ? request.url.includes(this.oAuthService.config.tokenEndpoint) : false;
 
-            if (request.url.includes('/logout') || tokenEndpoint)
-            {
-              console.error('error', error);
-            }
-            else
+          if (request.url.includes('/logout') || tokenEndpoint)
+          {
+            console.error('error', error);
+          }
+          else
+          {
+            const activeCustomizer = this.customizer ?? this.defaultCustomizer;
+            if (activeCustomizer.shouldHandleError(request, error))
             {
               this.errorService.handleError(error);
             }

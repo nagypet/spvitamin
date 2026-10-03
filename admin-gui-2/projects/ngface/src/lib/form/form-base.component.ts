@@ -20,8 +20,9 @@ import {Ngface} from '../ngface-models';
 import {NgfaceFormComponent} from './ngface-form/ngface-form.component';
 
 @Component({
-  selector: 'ngface-form-base',
-  template: ''
+    selector: 'ngface-form-base',
+    template: '',
+    standalone: false
 })
 export abstract class FormBaseComponent
 {

@@ -32,3 +32,5 @@ export * from './lib/form/ngface-form/ngface-form.component'
 export * from './lib/form/form-base.component'
 export * from './lib/ngface.module';
 export * from './lib/directives/safe-html.pipe';
+export * from './lib/interceptors/error-interceptor-customizer';
+export * from './lib/interceptors/default-error-interceptor-customizer';

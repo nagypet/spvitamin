@@ -22,23 +22,21 @@ import {MatIcon} from '@angular/material/icon';
 import {BehaviorSubject, Observable, ReplaySubject, Subscription} from 'rxjs';
 import {IUploadEvent, IUploadProgress} from '../ngface-file-upload.type';
 import {BytesPipe} from '../../../directives/bytes.pipe';
-import {AsyncPipe, NgIf} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {HttpClient, HttpEventType} from '@angular/common/http';
 
 @Component({
-  selector: 'upload-item',
-  standalone: true,
-  imports: [
+    selector: 'upload-item',
+    imports: [
     MatCard,
     MatProgressBar,
     MatIconButton,
     MatIcon,
     BytesPipe,
-    AsyncPipe,
-    NgIf
-  ],
-  templateUrl: './upload-item.component.html',
-  styleUrl: './upload-item.component.css'
+    AsyncPipe
+],
+    templateUrl: './upload-item.component.html',
+    styleUrl: './upload-item.component.scss'
 })
 export class UploadItemComponent implements OnInit, OnDestroy
 {

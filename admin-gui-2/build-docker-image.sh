@@ -18,7 +18,7 @@
 SOURCE_DIR="./dist/admin-gui/browser/"
 DEST_DIR="../spvitamin-spring-admin/src/main/resources/public/admin-gui/"
 
-docker run -it --rm -v $(pwd):/opt/app np/node-angular-18-2 /opt/app/build.sh
+docker run -it --rm -v $(pwd):/opt/app np/node-angular-21 /opt/app/build.sh
 rm -R "$DEST_DIR"
 mkdir -p "$DEST_DIR"
 cp -r "$SOURCE_DIR"* "$DEST_DIR"

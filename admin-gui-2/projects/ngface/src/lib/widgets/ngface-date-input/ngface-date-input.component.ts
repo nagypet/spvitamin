@@ -31,16 +31,15 @@ export interface DateValueChangeEvent
 }
 
 @Component({
-  selector: 'ngface-date-input',
-  templateUrl: './ngface-date-input.component.html',
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    ReactiveFormsModule,
-    ResponsiveClassDirective
-  ]
+    selector: 'ngface-date-input',
+    templateUrl: './ngface-date-input.component.html',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        ReactiveFormsModule,
+        ResponsiveClassDirective
+    ]
 })
 export class NgfaceDateInputComponent extends InputBaseComponent implements OnInit
 {

@@ -20,13 +20,12 @@ import {DeviceTypeService} from './core/services/device-type.service';
 import {environment} from '../environments/environment';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  imports: [
-    LayoutComponent
-  ],
-  standalone: true
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    imports: [
+        LayoutComponent
+    ]
 })
 export class AppComponent
 {
@@ -47,7 +46,7 @@ export class AppComponent
   }
 
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onWindowResize(): void
   {
     this.deviceTypeService.calculateDeviceType();

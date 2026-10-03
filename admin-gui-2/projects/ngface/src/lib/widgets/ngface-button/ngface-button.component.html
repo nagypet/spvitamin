@@ -22,7 +22,19 @@
         [matBadge]="getBadge()"
         matBadgeColor="warn"
 >
-    <span (click)="!isEnabled() ? $event.stopPropagation() : undefined">
+    <span class="ngface-button-label" (click)="!isEnabled() ? $event.stopPropagation() : undefined">
         {{getData().label}}
     </span>
+    @if (hasOptions()) {
+        <span class="ngface-button-separator"></span>
+        <span class="ngface-button-arrow" [matMenuTriggerFor]="optionsMenu"
+              (click)="$event.stopPropagation()">
+            <mat-icon>expand_more</mat-icon>
+        </span>
+        <mat-menu #optionsMenu="matMenu">
+            @for (option of getOptions(); track option.id) {
+                <button mat-menu-item (click)="onOptionClick(option)">{{option.value}}</button>
+            }
+        </mat-menu>
+    }
 </button>

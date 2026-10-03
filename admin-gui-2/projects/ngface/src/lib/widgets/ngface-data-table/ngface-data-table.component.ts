@@ -84,26 +84,25 @@ export interface TableMasterToggleEvent
 
 
 @Component({
-  selector: 'ngface-data-table',
-  templateUrl: './ngface-data-table.component.html',
-  styleUrls: ['./ngface-data-table.component.scss'],
-  standalone: true,
-  imports: [
-    NgClass,
-    NgScrollbarModule,
-    MatTableModule,
-    MatSortModule,
-    MatCheckboxModule,
-    SortFilterHeaderComponent,
-    MatTooltipModule,
-    MatButtonModule,
-    MatIconModule,
-    MatPaginatorModule,
-    SafeHtmlPipe,
-    ResponsiveClassDirective,
-    HideTooltipOnClickDirective,
-    MatMenuModule
-  ]
+    selector: 'ngface-data-table',
+    templateUrl: './ngface-data-table.component.html',
+    styleUrls: ['./ngface-data-table.component.scss'],
+    imports: [
+        NgClass,
+        NgScrollbarModule,
+        MatTableModule,
+        MatSortModule,
+        MatCheckboxModule,
+        SortFilterHeaderComponent,
+        MatTooltipModule,
+        MatButtonModule,
+        MatIconModule,
+        MatPaginatorModule,
+        SafeHtmlPipe,
+        ResponsiveClassDirective,
+        HideTooltipOnClickDirective,
+        MatMenuModule
+    ]
 })
 export class NgfaceDataTableComponent implements OnDestroy, OnChanges, AfterViewInit
 {

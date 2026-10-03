@@ -15,11 +15,9 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {NgForOf} from '@angular/common';
-import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
 import {AdminService} from '../../core/services/admin.service';
-import {MatAnchor} from '@angular/material/button';
 
 export interface TabDef
 {
@@ -28,16 +26,12 @@ export interface TabDef
 }
 
 @Component({
-  selector: 'app-tab-set',
-  templateUrl: './tab-set.component.html',
-  styleUrls: ['./tab-set.component.scss'],
+    selector: 'app-tab-set',
+    templateUrl: './tab-set.component.html',
+    styleUrls: ['./tab-set.component.scss'],
   imports: [
-    NgForOf,
-    RouterOutlet,
-    MatTabsModule,
-    MatAnchor
-  ],
-  standalone: true
+    MatTabsModule
+  ]
 })
 export class TabSetComponent implements OnInit
 {

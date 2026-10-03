@@ -57,22 +57,21 @@ export interface GenericAutocompleteValueSetChangeEvent
 
 
 @Component({
-  selector: 'ngface-generic-autocomplete',
-  templateUrl: './ngface-generic-autocomplete.component.html',
-  imports: [
-    MatFormFieldModule,
-    MatOptionModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatInputModule,
-    AsyncPipe,
-    DebounceInputDirective,
-    A11yModule,
-    ResponsiveClassDirective,
-    MatCheckboxModule,
-  ],
-  standalone: true
+    selector: 'ngface-generic-autocomplete',
+    templateUrl: './ngface-generic-autocomplete.component.html',
+    imports: [
+        MatFormFieldModule,
+        MatOptionModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        MatAutocompleteModule,
+        MatInputModule,
+        AsyncPipe,
+        DebounceInputDirective,
+        A11yModule,
+        ResponsiveClassDirective,
+        MatCheckboxModule,
+    ]
 })
 export class NgfaceGenericAutocompleteComponent extends InputBaseComponent implements OnChanges, OnDestroy
 {

@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  APP_INITIALIZER,
-  ApplicationConfig,
-  importProvidersFrom,
-  LOCALE_ID,
-  provideZoneChangeDetection
-} from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, LOCALE_ID, provideZoneChangeDetection, inject, provideAppInitializer } from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 
 import {routes} from './app.routes';
@@ -84,6 +78,9 @@ export const appConfig: ApplicationConfig = {
     },
 
     provideHttpClient(withInterceptorsFromDi()),
-    {provide: APP_INITIALIZER, useFactory: initSecurity, deps: [AuthenticationRepositoryService, AuthService, OAuthService], multi: true}
+    provideAppInitializer(() => {
+        const initializerFn = (initSecurity)(inject(AuthenticationRepositoryService), inject(AuthService), inject(OAuthService));
+        return initializerFn();
+      })
   ]
 };

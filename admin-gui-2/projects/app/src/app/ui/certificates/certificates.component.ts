@@ -25,17 +25,16 @@ import {CertificateFile, KeystoreEntry} from '../../core/model/keystore';
 import {AdminService} from '../../core/services/admin.service';
 
 @Component({
-  selector: 'app-certificates',
-  templateUrl: './certificates.component.html',
-  styleUrls: ['./certificates.component.scss'],
-  imports: [
-    KeystoreComponent,
-    MatButtonModule,
-    MatFormField,
-    MatInput,
-    MatLabel
-  ],
-  standalone: true
+    selector: 'app-certificates',
+    templateUrl: './certificates.component.html',
+    styleUrls: ['./certificates.component.scss'],
+    imports: [
+        KeystoreComponent,
+        MatButtonModule,
+        MatFormField,
+        MatInput,
+        MatLabel
+    ]
 })
 export class CertificatesComponent implements OnInit
 {

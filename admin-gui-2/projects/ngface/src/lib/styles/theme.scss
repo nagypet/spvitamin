@@ -15,11 +15,14 @@
  */
 
 @use '@angular/material' as mat;
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
 
 @mixin set-palette($palette, $type) {
   :root {
     @each $key in (50, 100, 200, 300, 400, 500, 600, 700, 800, 900, default, darker, lighter) {
-      @if map-has-key($palette, $key) {
+      @if map.has-key($palette, $key) {
         $cssColor: --app-#{$type}-palette-#{$key};
         $cssContrastColor: --app-#{$type}-contrast-#{$key};
         $value: #{mat.m2-get-color-from-palette($palette, $key)};
@@ -40,7 +43,7 @@
       or $value == ""
       or $value == 0
       or $value == ()
-      or length($value) == 0 {
+      or (meta.type-of($value) == 'list' and list.length($value) == 0) {
     @return true;
   }
   @return false;

@@ -31,9 +31,10 @@ export class MyErrorStateMatcher implements ErrorStateMatcher
 
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngface-custom-widet-base',
-  template: ''
+    // tslint:disable-next-line:component-selector
+    selector: 'ngface-custom-widet-base',
+    template: '',
+    standalone: false
 })
 export abstract class CustomWidgetBaseComponent
 {

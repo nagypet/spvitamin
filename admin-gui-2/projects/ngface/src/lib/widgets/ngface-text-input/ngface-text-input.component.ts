@@ -17,7 +17,6 @@
 import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {Ngface} from '../../ngface-models';
 import {InputBaseComponent} from '../input-base.component';
-import {NgIf} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -25,11 +24,10 @@ import {ResponsiveClassDirective} from '../../directives/responsive-class-direct
 import {NgfaceWidgetFactory} from '../ngface-widget-factory';
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngface-text-input',
-  templateUrl: './ngface-text-input.component.html',
-  standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, NgIf, ResponsiveClassDirective]
+    // tslint:disable-next-line:component-selector
+    selector: 'ngface-text-input',
+    templateUrl: './ngface-text-input.component.html',
+    imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, ResponsiveClassDirective]
 })
 export class NgfaceTextInputComponent extends InputBaseComponent implements AfterViewInit
 {

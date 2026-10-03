@@ -152,6 +152,7 @@ dependencyManagement {
   - EmptyStringToNullConverter
   - @StandardApiResponses annotation
   - @SuppressRestEndpoints annotation
+  - admin-gui updated to Angular 21
 
 
 ### 4.0.3-1-RELEASE not yet released

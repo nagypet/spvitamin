@@ -28,15 +28,14 @@ import {Subscription} from 'rxjs';
 import {AuthenticationRepositoryService} from '../../../../../ngface/src/lib/services/auth/authentication-repository.service';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  imports: [
-    RouterLink,
-    MatToolbar,
-    NgfaceButtonComponent
-  ],
-  standalone: true
+    selector: 'app-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss'],
+    imports: [
+        RouterLink,
+        MatToolbar,
+        NgfaceButtonComponent
+    ]
 })
 export class HeaderComponent extends FormBaseComponent implements OnInit, OnDestroy
 {

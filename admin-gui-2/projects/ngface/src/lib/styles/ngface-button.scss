@@ -27,6 +27,34 @@
   opacity: 1;
   transition: opacity ease 0.2s;
   cursor: pointer;
+
+  .ngface-button-label {
+    vertical-align: middle;
+  }
+
+  .ngface-button-separator {
+    display: inline-block;
+    width: 1px;
+    height: 1.2em;
+    background: currentColor;
+    opacity: 0.4;
+    vertical-align: middle;
+    margin: 0 4px;
+  }
+
+  .ngface-button-arrow {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    cursor: pointer;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+    }
+  }
 }
 
 .ngface-button.phone {

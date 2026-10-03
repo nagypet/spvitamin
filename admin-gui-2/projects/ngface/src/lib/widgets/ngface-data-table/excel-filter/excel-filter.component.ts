@@ -40,12 +40,11 @@ export interface FilterChangeEvent
 }
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngface-excel-filter',
-  templateUrl: './excel-filter.component.html',
-  styleUrls: ['./excel-filter.component.scss'],
-  standalone: true,
-  imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, MatCheckboxModule, FormsModule, MatButtonModule]
+    // tslint:disable-next-line:component-selector
+    selector: 'ngface-excel-filter',
+    templateUrl: './excel-filter.component.html',
+    styleUrls: ['./excel-filter.component.scss'],
+    imports: [ReactiveFormsModule, A11yModule, DebounceInputDirective, MatIconModule, MatCheckboxModule, FormsModule, MatButtonModule]
 })
 export class ExcelFilterComponent implements OnInit
 {
@@ -144,7 +143,8 @@ export class ExcelFilterComponent implements OnInit
           remote: this.filterer.valueSet.remote
         },
         type: this.filterer.type,
-        order: this.filterer.order
+        order: this.filterer.order,
+        defaultLabel: this.filterer.defaultLabel
       };
     }
 

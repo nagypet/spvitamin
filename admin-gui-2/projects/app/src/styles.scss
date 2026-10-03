@@ -21,7 +21,12 @@
 // Change here the currently used theme for development
 @use '../public/themes/theme' as theme;
 
-@include mat.core();
+@use '../../ngface/src/lib/styles/ngface-button';
+@use '../../ngface/src/lib/styles/ngface-dialog';
+@use '../../ngface/src/lib/ngface.scss' as ngface-styles;
+
+@include mat.elevation-classes();
+@include mat.app-background();
 
 // Material theming
 @include mat.all-component-themes(theme.$my-theme);
@@ -31,10 +36,6 @@
 @include ngface.set-palette(theme.$my-warn, warn);
 
 @import 'bootstrap/dist/css/bootstrap.min.css';
-@import '../../ngface/src/lib/ngface.scss';
-
-@import '../../ngface/src/lib/styles/ngface-button';
-@import '../../ngface/src/lib/styles/ngface-dialog';
 
 html, body {
   //  height: 100%;

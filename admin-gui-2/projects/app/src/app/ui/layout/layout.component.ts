@@ -22,16 +22,15 @@ import {TabSetComponent} from '../tab-set/tab-set.component';
 import {AdminService} from '../../core/services/admin.service';
 
 @Component({
-  selector: 'app-layout',
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
-  imports: [
-    HeaderComponent,
-    RouterOutlet,
-    FooterComponent,
-    TabSetComponent
-  ],
-  standalone: true
+    selector: 'app-layout',
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss'],
+    imports: [
+        HeaderComponent,
+        RouterOutlet,
+        FooterComponent,
+        TabSetComponent
+    ]
 })
 export class LayoutComponent implements OnInit
 {

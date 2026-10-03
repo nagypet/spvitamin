@@ -31,6 +31,8 @@ import {ResponsiveClassDirective} from '../../directives/responsive-class-direct
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {ValueSetItem} from '../types';
 import {Subscription} from 'rxjs';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
 
 export interface AutocompleteRequest
 {
@@ -56,27 +58,31 @@ export interface AutocompleteValueSetChangeEvent
 
 
 @Component({
-  selector: 'ngface-autocomplete',
-  templateUrl: './ngface-autocomplete.component.html',
-  imports: [
-    MatFormFieldModule,
-    MatOptionModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatInputModule,
-    AsyncPipe,
-    DebounceInputDirective,
-    A11yModule,
-    ResponsiveClassDirective,
-    MatCheckboxModule,
-  ],
-  standalone: true
+    selector: 'ngface-autocomplete',
+    templateUrl: './ngface-autocomplete.component.html',
+    imports: [
+        MatFormFieldModule,
+        MatOptionModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        MatAutocompleteModule,
+        MatInputModule,
+        AsyncPipe,
+        DebounceInputDirective,
+        A11yModule,
+        ResponsiveClassDirective,
+        MatCheckboxModule,
+        MatIconModule,
+        MatButtonModule,
+    ]
 })
 export class NgfaceAutocompleteComponent extends InputBaseComponent implements OnChanges, OnDestroy
 {
   @Input()
   multiselect = false;
+
+  @Input()
+  clearable = false;
 
   @Output()
   onAutocompleteRequest: EventEmitter<AutocompleteRequest> = new EventEmitter();
@@ -201,6 +207,18 @@ export class NgfaceAutocompleteComponent extends InputBaseComponent implements O
         searchText: this.formControl.value,
         valueSetProvider: this.valueSetProvider
       });
+    }
+  }
+
+
+  onClearClicked($event: MouseEvent): void
+  {
+    $event.stopPropagation();
+    this.formControl.setValue('');
+    this.valueSetProvider.searchText = '';
+    if (!this.multiselect)
+    {
+      this.onValueChange.emit({widgetId: this.widgetid, value: ''});
     }
   }
 

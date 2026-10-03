@@ -28,7 +28,7 @@ export class DebounceInputDirective
   debounceTime: number = 0;
 
   @HostListener('input', ['$event'])
-  onInput(event: UIEvent): void
+  onInput(event: Event): void
   {
     this.value$.next((event.target as HTMLInputElement).value);
   }

@@ -52,24 +52,24 @@ export class MyErrorStateMatcher implements ErrorStateMatcher
 
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngface-intl-numeric-input',
-  templateUrl: './intl-numeric-input.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      multi: true,
-      useExisting: IntlNumericInputComponent
-    }
-  ],
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    NumericInputFilterDirective,
-    FormsModule,
-    ResponsiveClassDirective]
+    // tslint:disable-next-line:component-selector
+    selector: 'ngface-intl-numeric-input',
+    templateUrl: './intl-numeric-input.component.html',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            multi: true,
+            useExisting: IntlNumericInputComponent
+        }
+    ],
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        NumericInputFilterDirective,
+        FormsModule,
+        ResponsiveClassDirective
+    ]
 })
 export class IntlNumericInputComponent implements ControlValueAccessor, OnInit, OnDestroy
 {

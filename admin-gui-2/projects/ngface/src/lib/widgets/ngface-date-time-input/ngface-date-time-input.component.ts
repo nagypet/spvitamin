@@ -44,26 +44,25 @@ export function timeFormatValidator(): ValidatorFn
 
 
 @Component({
-  selector: 'ngface-date-time-input',
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatDatepicker,
-    MatDatepickerInput,
-    MatDatepickerToggle,
-    MatError,
-    MatFormField,
-    MatHint,
-    MatInput,
-    MatLabel,
-    MatSuffix,
-    ResponsiveClassDirective,
-    ReactiveFormsModule
-  ],
-  templateUrl: './ngface-date-time-input.component.html',
-  styleUrl: './ngface-date-time-input.component.scss'
+    selector: 'ngface-date-time-input',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatDatepicker,
+        MatDatepickerInput,
+        MatDatepickerToggle,
+        MatError,
+        MatFormField,
+        MatHint,
+        MatInput,
+        MatLabel,
+        MatSuffix,
+        ResponsiveClassDirective,
+        ReactiveFormsModule
+    ],
+    templateUrl: './ngface-date-time-input.component.html',
+    styleUrl: './ngface-date-time-input.component.scss'
 })
 export class NgfaceDateTimeInputComponent extends InputBaseComponent implements OnChanges
 {

@@ -21,10 +21,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule }   from '@angular/material/icon';
 
 @Component({
-  standalone: true,
-  selector: 'dialog-close-btn',
-  imports: [MatButtonModule, MatIconModule],
-  template: `
+    selector: 'dialog-close-btn',
+    imports: [MatButtonModule, MatIconModule],
+    template: `
     <button mat-icon-button
             class="close-btn"
             aria-label="Close"
@@ -32,7 +31,7 @@ import { MatIconModule }   from '@angular/material/icon';
       <mat-icon class="material-symbols-outlined">close</mat-icon>
     </button>
   `,
-  styles: [`
+    styles: [`
     :host { /* a cím elemhez képest */
       position: absolute;
       top: 50%;

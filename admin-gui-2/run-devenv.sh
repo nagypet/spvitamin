@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-docker run -it --rm -p 4200:4200 -v $(pwd):/opt/app --add-host=nexus.idx.com:192.168.1.34 np/node-angular-18-2
+docker run -it --rm -p 4200:4200 -v $(pwd):/opt/app np/node-angular-21

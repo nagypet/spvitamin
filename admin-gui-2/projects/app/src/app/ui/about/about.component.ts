@@ -19,13 +19,12 @@ import {Location} from '@angular/common';
 import {MatButton} from '@angular/material/button';
 
 @Component({
-  selector: 'app-about',
-  templateUrl: './about.component.html',
-  styleUrls: ['./about.component.scss'],
-  imports: [
-    MatButton
-  ],
-  standalone: true
+    selector: 'app-about',
+    templateUrl: './about.component.html',
+    styleUrls: ['./about.component.scss'],
+    imports: [
+        MatButton
+    ]
 })
 export class AboutComponent implements OnInit {
 

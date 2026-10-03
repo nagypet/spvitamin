@@ -134,7 +134,8 @@ export class NgfaceWidgetFactory
       type: 'Button',
       label: params.label,
       style: params.style,
-      enabled: params.enabled
+      enabled: params.enabled,
+      options: null
     } as Ngface.Button;
   }
 

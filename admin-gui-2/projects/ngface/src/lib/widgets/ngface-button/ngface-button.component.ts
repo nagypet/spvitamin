@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Ngface} from '../../ngface-models';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {NgClass} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatIconModule} from '@angular/material/icon';
 import {ResponsiveClassDirective} from '../../directives/responsive-class-directive';
+
+export interface OptionClickEvent
+{
+  widgetId: string;
+  optionId: string;
+  optionValue: string;
+}
 
 @Component({
     selector: 'ngface-button',
     templateUrl: './ngface-button.component.html',
-    standalone: true,
-    imports: [MatButtonModule, NgClass, MatTooltipModule, MatBadgeModule, ResponsiveClassDirective]
+    imports: [MatButtonModule, NgClass, MatTooltipModule, MatBadgeModule, MatMenuModule, MatIconModule, ResponsiveClassDirective]
 })
 export class NgfaceButtonComponent implements OnInit
 {
@@ -42,6 +50,9 @@ export class NgfaceButtonComponent implements OnInit
 
   @Input()
   badge?: string;
+
+  @Output()
+  optionClick = new EventEmitter<OptionClickEvent>();
 
   constructor()
   {
@@ -64,7 +75,8 @@ export class NgfaceButtonComponent implements OnInit
         label: 'undefined button',
         enabled: false,
         id: '',
-        hint: ''
+        hint: '',
+        options: null
       };
     }
     return this.formdata?.widgets[this.widgetid] as Ngface.Button;
@@ -93,5 +105,26 @@ export class NgfaceButtonComponent implements OnInit
   isEnabled(): boolean
   {
     return this.enabled && this.getData().enabled;
+  }
+
+  hasOptions(): boolean
+  {
+    const options = this.getData().options;
+    return options !== null && Object.keys(options).length > 0;
+  }
+
+  getOptions(): { id: string; value: string }[]
+  {
+    const options = this.getData().options;
+    if (!options)
+    {
+      return [];
+    }
+    return Object.entries(options).map(([id, value]) => ({id, value}));
+  }
+
+  onOptionClick(option: { id: string; value: string }): void
+  {
+    this.optionClick.emit({widgetId: this.widgetid, optionId: option.id, optionValue: option.value});
   }
 }

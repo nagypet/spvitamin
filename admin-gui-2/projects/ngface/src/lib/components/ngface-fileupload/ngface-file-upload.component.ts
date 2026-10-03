@@ -17,7 +17,7 @@
 import {Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton, MatFabButton} from '@angular/material/button';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {UploadItemComponent} from './upload-item/upload-item.component';
 import {IUploadEvent} from './ngface-file-upload.type';
 import {MatBadge} from '@angular/material/badge';
@@ -31,19 +31,16 @@ export interface FileStatus
 // Adapted this project to my needs: https://github.com/nishantmc/angular-material-fileupload.git
 
 @Component({
-  selector: 'ngface-file-upload',
-  standalone: true,
-  imports: [
+    selector: 'ngface-file-upload',
+    imports: [
     MatIcon,
     MatFabButton,
     MatButton,
-    NgIf,
-    NgForOf,
     UploadItemComponent,
     MatBadge
-  ],
-  templateUrl: './ngface-file-upload.component.html',
-  styleUrl: './ngface-file-upload.component.css'
+],
+    templateUrl: './ngface-file-upload.component.html',
+    styleUrl: './ngface-file-upload.component.scss'
 })
 export class NgfaceFileUploadComponent implements OnChanges
 {
@@ -84,6 +81,8 @@ export class NgfaceFileUploadComponent implements OnChanges
 
   @Output() onQueued: EventEmitter<File | undefined> = new EventEmitter<File | undefined>();
 
+  @Output() onAllUploaded: EventEmitter<void> = new EventEmitter<void>();
+
 
   public files: Array<FileStatus> = [];
 
@@ -121,13 +120,14 @@ export class NgfaceFileUploadComponent implements OnChanges
       console.log(fileUpload);
       fileUpload.upload();
     });
+    this.onAllUploaded.emit();
   }
 
 
   removeAll(): void
   {
     this.onQueued.emit(undefined);
-    for (let i = 0; i < this.files.length; i++)
+    for (let i = this.files.length - 1; i >= 0; i--)
     {
       if (!this.files[i].uploaded)
       {

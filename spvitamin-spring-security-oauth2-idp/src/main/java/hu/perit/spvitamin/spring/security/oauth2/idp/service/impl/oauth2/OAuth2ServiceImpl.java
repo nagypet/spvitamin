@@ -269,7 +269,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
                 Collection<GrantedAuthority> roles = this.roleMapperService.mapUsernameAndGroupToRoles(authenticatedUser.getUsername(), groups);
                 authenticatedUser = authenticatedUser.clone().authorities(roles).build();
 
-                log.debug(String.format("Granted roles: '%s'", authenticatedUser.getAuthorities().toString()));
+                log.debug(String.format("Granted roles: '%s'", authenticatedUser.getAuthorities()));
                 authorizationService.setAuthenticatedUser(authenticatedUser);
             }
 

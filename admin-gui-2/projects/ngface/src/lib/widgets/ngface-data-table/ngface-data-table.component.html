@@ -72,8 +72,8 @@
                       <!-- Action with submenu (one-level). Parent opens menu; submenu items show labels only. -------->
                       @if (action.style === 'ICON') {
                         <button mat-icon-button class="action-button"
-                                [disabled]="!action.enabled || row.disabled"
-                                [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                                [disabled]="!(action.forceEnabled || (action.enabled && !row.disabled))"
+                                [matTooltip]="action.forceEnabled || (action.enabled && !row.disabled) ? action.label : ''"
                                 matTooltipPosition="above"
                                 [matMenuTriggerFor]="menu"
                                 (click)="$event.stopPropagation()"
@@ -84,7 +84,7 @@
                         </button>
                       } @else {
                         <button class="action-button-button ngface-button"
-                                [disabled]="!action.enabled || row.disabled"
+                                [disabled]="!(action.forceEnabled || (action.enabled && !row.disabled))"
                                 [matMenuTriggerFor]="menu"
                                 (click)="$event.stopPropagation()"
                         >
@@ -94,7 +94,7 @@
                       <mat-menu #menu="matMenu">
                         @for (sub of action.actions; track sub) {
                           <button mat-menu-item
-                                  [disabled]="!sub.enabled || row.disabled"
+                                  [disabled]="!(sub.forceEnabled || (sub.enabled && !row.disabled))"
                                   (click)="$event.stopPropagation(); actionClick(row, sub)">
                             {{ sub.text }}
                           </button>
@@ -108,8 +108,8 @@
                           <span [innerHTML]="action.text | safeHtml"></span>
                         }
                         <button mat-icon-button class="action-button"
-                                [disabled]="!action.enabled || row.disabled"
-                                [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                                [disabled]="!(action.forceEnabled || (action.enabled && !row.disabled))"
+                                [matTooltip]="action.forceEnabled || (action.enabled && !row.disabled) ? action.label : ''"
                                 matTooltipPosition="above"
                                 hideTooltipOnClick
                                 (click)="$event.stopPropagation(); actionClick(row, action)"
@@ -128,22 +128,22 @@
                       <div class="icon-cell" [ngClass]="getCellStyle(row, column)">
                         @if (getIcon(row, column)?.placement === 'BEFORE') {
                           <mat-icon class="material-symbols-outlined"
-                                    [matTooltip]="action.enabled && !row.disabled ? getIcon(row, column)?.label : ''"
+                                    [matTooltip]="action.forceEnabled || (action.enabled && !row.disabled) ? getIcon(row, column)?.label : ''"
                                     [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
                           </mat-icon>
                         }
                         <a href
                            class="action-link"
-                           [attr.aria-disabled]="!action.enabled || row.disabled ? true : null"
-                           (click)="$event.stopPropagation(); $event.preventDefault(); (action.enabled && !row.disabled) ? actionClick(row, action) : null;"
-                           [matTooltip]="action.enabled && !row.disabled ? action.label : ''"
+                           [attr.aria-disabled]="!(action.forceEnabled || (action.enabled && !row.disabled)) ? true : null"
+                           (click)="$event.stopPropagation(); $event.preventDefault(); (action.forceEnabled || (action.enabled && !row.disabled)) ? actionClick(row, action) : null;"
+                           [matTooltip]="action.forceEnabled || (action.enabled && !row.disabled) ? action.label : ''"
                            [innerHTML]="action.text | safeHtml"
                         >
                           {{ action.label }}
                         </a>
                         @if (getIcon(row, column)?.placement === 'AFTER') {
                           <mat-icon class="material-symbols-outlined"
-                                    [matTooltip]="action.enabled && !row.disabled ? getIcon(row, column)?.label : ''"
+                                    [matTooltip]="action.forceEnabled || (action.enabled && !row.disabled) ? getIcon(row, column)?.label : ''"
                                     [style.color]="getIcon(row, column)?.color">{{ getIcon(row, column)?.code }}
                           </mat-icon>
                         }
@@ -152,7 +152,7 @@
                     } @else  if (action.style === 'BUTTON') {
                       <!-- Button ------------------------------------------------------------------------------------->
                       <button class="action-button-button ngface-button"
-                              [disabled]="!action.enabled || row.disabled"
+                              [disabled]="!(action.forceEnabled || (action.enabled && !row.disabled))"
                               (click)="$event.stopPropagation(); actionClick(row, action)"
                       >
                         {{ action.text }}
