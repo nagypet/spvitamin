@@ -16,48 +16,53 @@
 
 package hu.perit.spvitamin.spring.mvc;
 
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import hu.perit.spvitamin.spring.config.AdminProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
+import java.util.List;
 
 @Configuration
-public class AdminGuiRedirectConfig implements WebMvcConfigurer {
+public class AdminGuiRedirectConfig implements WebMvcConfigurer
+{
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
+    public void addViewControllers(ViewControllerRegistry registry)
+    {
         // adminProperties.getAdminGuiUrl() must be e.g.: /admin-gui
         AdminProperties adminProperties = SysConfig.getAdminProperties();
 
-        if (!adminProperties.getDefaultSiteUrl().isBlank()) {
-            String target = String.format("redirect:%s/%s", adminProperties.getDefaultSiteUrl(), adminProperties.getDefaultSiteRootFileName());
-
-            registry.addViewController("/").setViewName(target);
-
-            registry.addViewController(adminProperties.getDefaultSiteUrl()).setViewName(target);
-            registry.addViewController(adminProperties.getDefaultSiteUrl() + "/").setViewName(target);
-        }
-
-        if (!adminProperties.getAdminGuiUrl().isBlank()) {
-            String target = String.format("redirect:%s/%s", adminProperties.getAdminGuiUrl(), adminProperties.getAdminGuiRootFileName());
-
-            registry.addViewController(adminProperties.getAdminGuiUrl()).setViewName(target);
-            registry.addViewController(adminProperties.getAdminGuiUrl() + "/").setViewName(target);
+        List<AdminProperties.SiteConfig> sites = adminProperties.getSites();
+        for (int i = 0; i < sites.size(); i++)
+        {
+            AdminProperties.SiteConfig site = sites.get(i);
+            String target = String.format("redirect:%s/%s", site.getUrl(), site.getFilename());
+            if (i == 0)
+            {
+                // The first site is the default site
+                registry.addViewController("/").setViewName(target);
+            }
+            registry.addViewController(site.getUrl()).setViewName(target);
+            registry.addViewController(site.getUrl() + "/").setViewName(target);
         }
     }
 
+
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(ResourceHandlerRegistry registry)
+    {
         AdminProperties adminProperties = SysConfig.getAdminProperties();
-        if (adminProperties.getDefaultSiteStaticContentsPath() != null) {
+        AdminProperties.SiteConfig defaultSiteConfig = adminProperties.getSites().getFirst();
+        if (StringUtils.isNotBlank(defaultSiteConfig.getStaticContentsPath()))
+        {
             registry
-                    .addResourceHandler(adminProperties.getDefaultSiteUrl() + "/**")
-                    .addResourceLocations(
-                            !adminProperties.getDefaultSiteStaticContentsPath().endsWith("/") ?
-                            adminProperties.getDefaultSiteStaticContentsPath() + "/" :
-                            adminProperties.getDefaultSiteStaticContentsPath()
+                    .addResourceHandler(defaultSiteConfig.getUrl() + "/**")
+                    .addResourceLocations(!defaultSiteConfig.getStaticContentsPath().endsWith("/")
+                            ? defaultSiteConfig.getStaticContentsPath() + "/"
+                            : defaultSiteConfig.getStaticContentsPath()
                     );
         }
     }

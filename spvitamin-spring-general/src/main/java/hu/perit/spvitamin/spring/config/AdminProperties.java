@@ -17,14 +17,21 @@
 package hu.perit.spvitamin.spring.config;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -35,39 +42,93 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "admin")
 @Slf4j
+@Validated
 public class AdminProperties
 {
     @Autowired
     @Getter(AccessLevel.NONE)
     private ServerProperties serverProperties;
 
-    private String defaultSiteUrl = "/admin-gui";
-    private String defaultSiteRootFileName = "";
+    // Legacy site configuration
+    @Getter(AccessLevel.NONE)
+    private String defaultSiteUrl;
+    @Getter(AccessLevel.NONE)
+    private String defaultSiteRootFileName;
+    @Getter(AccessLevel.NONE)
     private String defaultSiteStaticContentsPath;
 
     // e.g. admin.admin-gui-url=/alma
-    private String adminGuiUrl = "/admin-gui";
-    private String adminGuiRootFileName = "index.html";
+    @Getter(AccessLevel.NONE)
+    private String adminGuiUrl;
+    @Getter(AccessLevel.NONE)
+    private String adminGuiRootFileName;
 
-    // This string will be displayen in the footer of the AdminGUI
+    // New site configuration
+    @Setter(AccessLevel.NONE)
+    private List<SiteConfig> sites = new ArrayList<>();
+
+
+    public SiteConfig getDefaultSiteConfig()
+    {
+        return this.sites.getFirst();
+    }
+
+
+    // This string will be displayed in the footer of the AdminGUI
     private String copyright = "Peter Nagy - nagy.peter.home@gmail.com; peter.nagy@perit.hu";
 
-    // If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in case of
-    // a Kubernetes or Openshift deployment, where certificates are not managed by the app.
+    // If set to false, the Keystore and Truststore menus are disabled in the AdminGUI. This is useful in the case of
+    // a Kubernetes or Openshift deployment, where the app does not manage certificates.
     private Boolean keystoreAdminEnabled = true;
 
 
     @PostConstruct
     private void postConstruct()
     {
-        log.info(String.format("Default site: %s%s/%s", serverProperties.getServiceUrl(), this.defaultSiteUrl,
-            this.defaultSiteRootFileName));
-        log.info(String.format("AdminGUI: %s%s/%s", serverProperties.getServiceUrl(), this.adminGuiUrl, this.adminGuiRootFileName));
+        List<SiteConfig> newSites = new ArrayList<>();
+        if (StringUtils.isNotBlank(this.defaultSiteUrl))
+        {
+            newSites.add(SiteConfig.of(this.defaultSiteUrl, this.defaultSiteRootFileName, this.defaultSiteStaticContentsPath));
+        }
+        if (StringUtils.isNotBlank(this.adminGuiUrl))
+        {
+            newSites.add(SiteConfig.of(this.adminGuiUrl, this.adminGuiRootFileName));
+        }
+        newSites.addAll(this.sites);
+        if (newSites.stream().noneMatch(site -> site.getUrl().equals("/admin-gui")))
+        {
+            newSites.add(SiteConfig.of("/admin-gui", "index.html"));
+        }
+        this.sites = newSites;
+        this.sites.forEach(site -> log.info(String.format("Site: %s%s/%s", serverProperties.getServiceUrl(), site.getUrl(), site.getFilename())));
     }
 
 
     public String getKeystoreAdminEnabled()
     {
-        return BooleanUtils.isTrue(this.keystoreAdminEnabled) ? "true" : "false";
+        return Boolean.toString(BooleanUtils.isTrue(this.keystoreAdminEnabled));
+    }
+
+
+    @Data
+    public static class SiteConfig
+    {
+        @NotBlank
+        private final String url;
+        @NotBlank
+        private final String filename;
+        private final String staticContentsPath;
+
+
+        public static SiteConfig of(String url, String filename)
+        {
+            return new SiteConfig(url, filename, null);
+        }
+
+
+        public static SiteConfig of(String url, String filename, String staticContentsPath)
+        {
+            return new SiteConfig(url, filename, staticContentsPath);
+        }
     }
 }

@@ -16,7 +16,6 @@
 
 package hu.perit.spvitamin.spring.security.auth;
 
-import hu.perit.spvitamin.spring.config.AdminProperties;
 import hu.perit.spvitamin.spring.config.EnableSpvitaminOAuth2Idp;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
@@ -344,15 +343,7 @@ public class SpvitaminWebSecurityConfig
 
     private String[] adminGuiEndpoints()
     {
-        AdminProperties adminProperties = SysConfig.getAdminProperties();
-        if (adminProperties.getAdminGuiUrl().isBlank())
-        {
-            return new String[]{"/", "/*.*", "/css/**", "/assets/**"};
-        }
-        else
-        {
-            return new String[]{"/", String.format("%s/**", adminProperties.getAdminGuiUrl())};
-        }
+        return new String[]{"/", "/admin-gui/**"};
     }
 
 

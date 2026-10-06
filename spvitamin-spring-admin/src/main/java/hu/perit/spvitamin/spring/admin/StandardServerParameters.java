@@ -47,6 +47,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,6 +75,7 @@ class StandardServerParameters
     private final SwaggerProperties swaggerProperties;
     private final SystemProperties systemProperties;
 
+
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
     {
@@ -82,6 +84,20 @@ class StandardServerParameters
         params.add(LINKS, new ServerParameter("(1) Swagger UI", this.getSwaggerUrl(), true));
         params.add(LINKS, new ServerParameter("(2) Swagger API Docs", this.getApiDocsUrl(), true));
         params.add(LINKS, new ServerParameter("(3) Actuator", this.getActuatorUrl(), true));
+
+        List<AdminProperties.SiteConfig> sites = adminProperties.getSites();
+        for (int i = 0; i < sites.size(); i++)
+        {
+            AdminProperties.SiteConfig site = sites.get(i);
+            params.add(LINKS, new ServerParameter(
+                    i == 0
+                            ? String.format("(%d) Default site", i + 4)
+                            : String.format("(%d) Other site #%d", i + 4, i),
+                    String.format("%s%s/%s", serverProperties.getServiceUrl(), site.getUrl(), site.getFilename()),
+                    true
+            ));
+        }
+
 
 //        H2ConsoleProperties h2ConsoleProperties = getH2Properties();
 //        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
