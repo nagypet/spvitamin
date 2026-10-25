@@ -20,6 +20,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import static org.jsoup.parser.Parser.unescapeEntities;
+
 @Slf4j
 class XssRequestWrapper extends HttpServletRequestWrapper
 {
@@ -79,7 +81,7 @@ class XssRequestWrapper extends HttpServletRequestWrapper
                 JsonNode child = objectNode.get(fieldName);
                 if (child.isString())
                 {
-                    objectNode.put(fieldName, Jsoup.clean(child.stringValue(), SAFELIST));
+                    objectNode.put(fieldName, unescapeEntities(Jsoup.clean(child.stringValue(), SAFELIST), false));
                 }
                 else
                 {
@@ -95,7 +97,7 @@ class XssRequestWrapper extends HttpServletRequestWrapper
                 JsonNode child = arrayNode.get(i);
                 if (child.isString())
                 {
-                    arrayNode.set(i, StringNode.valueOf(Jsoup.clean(child.stringValue(), SAFELIST)));
+                    arrayNode.set(i, StringNode.valueOf(unescapeEntities(Jsoup.clean(child.stringValue(), SAFELIST), false)));
                 }
                 else
                 {

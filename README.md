@@ -155,6 +155,9 @@ dependencyManagement {
   - admin-gui updated to Angular 21
 - 2026-10-06:
   - AdminProperties: site configuration improved
+- 2026-10-25:
+  - XssRequestWrapper fixed
+  - Sonar plugin version updated
 
 
 ### 4.0.3-1-RELEASE not yet released

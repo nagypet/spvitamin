@@ -24,9 +24,12 @@ subprojects {
     sonarqube {
         properties {
             property "sonar.projectName", "github/nagypet/spvitamin/${project.name}"
-            property "sonar.host.url", "http://localhost:9000"
+            property "sonar.projectKey", "${project.name}"
+            property "sonar.host.url", "${sonarServer}"
+            property "sonar.token", "${sonarToken}"
             //property "sonar.branch.name", "master"
             property "sonar.exclusions", "**/generated*/**"
+            property "sonar.java.source", "${jvmVersion}"
 
             // For SVN projects, SonarQube would run "svn blame" to know
             // who changed which parts of the code. Without authorization
