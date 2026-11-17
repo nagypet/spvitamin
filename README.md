@@ -158,7 +158,10 @@ dependencyManagement {
 - 2026-10-25:
   - XssRequestWrapper fixed
   - Sonar plugin version updated
-
+- 2026-11-17: 
+  - LoggedRestMethod annotation fixed to be compatible with SneakyThrows
+  - new modul: spvitamin-images for basic image manipulation functions
+  - new modul: spvitamin-spring-email for a robust IMAD downloader
 
 ### 4.0.3-1-RELEASE not yet released
 - 2026-02-28: Java21, SpringBoot 4.0.3

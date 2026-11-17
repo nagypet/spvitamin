@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.restmethodlogger;
 
+import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.httplogging.LoggingHelper;
 import hu.perit.spvitamin.spring.info.SessionInfo;
@@ -102,7 +103,15 @@ public class LoggedRestMethodAspect
         catch (Throwable ex)
         {
             callOut(arguments.getString(annotation.externalTraceId()), subsystem, username, method.getName(), annotation.eventId(), ex, annotation.muted());
-            throw ex;
+            if (ex instanceof RuntimeException)
+            {
+                throw ex;
+            }
+            else
+            {
+                // To allow SneakyThrows to conserve the original exception response code mapping
+                return ServerException.throwFrom(ex);
+            }
         }
     }
 

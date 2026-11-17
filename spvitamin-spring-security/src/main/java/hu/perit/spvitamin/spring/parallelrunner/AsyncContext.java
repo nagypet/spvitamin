@@ -33,4 +33,18 @@ public class AsyncContext
     {
         return new AsyncContext(ThreadContext.getContext(), SecurityContextHolder.getContext());
     }
+
+
+    public static void restore(AsyncContext context)
+    {
+        ThreadContext.putAll(context.getThreadContext());
+        SecurityContextHolder.setContext(context.getSecurityContext());
+    }
+
+
+    public static void clear()
+    {
+        ThreadContext.clearAll();
+        SecurityContextHolder.clearContext();
+    }
 }

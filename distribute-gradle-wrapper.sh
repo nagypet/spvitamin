@@ -28,11 +28,13 @@ copyTo spvitamin-file-storage
 copyTo spvitamin-file-storage-spring-sftp
 copyTo spvitamin-json-time
 copyTo spvitamin-pdf
+copyTo spvitamin-images
 copyTo spvitamin-spring-admin
 copyTo spvitamin-spring-cloud-client
 copyTo spvitamin-spring-cloud-feign
 copyTo spvitamin-spring-data
 copyTo spvitamin-spring-general
+copyTo spvitamin-spring-email
 copyTo spvitamin-spring-logging
 copyTo spvitamin-spring-resilientjobrunner
 copyTo spvitamin-spring-security

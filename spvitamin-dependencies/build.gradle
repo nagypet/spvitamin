@@ -52,6 +52,7 @@ dependencies {
         api project(":spvitamin-spring-cloud-feign")
         api project(":spvitamin-spring-data")
         api project(":spvitamin-spring-general")
+        api project(":spvitamin-spring-email")
         api project(":spvitamin-spring-logging")
         api project(":spvitamin-spring-security")
         api project(":spvitamin-spring-security-authservice")
@@ -62,6 +63,7 @@ dependencies {
         api project(":spvitamin-spring-server")
         api project(":spvitamin-spring-session-redis")
         api project(":spvitamin-spring-resilientjobrunner")
+        api project(":spvitamin-images")
         api project(":spvitamin-test")
     }
 }
